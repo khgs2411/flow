@@ -4,6 +4,8 @@
 **Created**: 2025-10-01
 **Status**: Ready for deployment
 
+> **⚠️ Important**: This framework is designed for use with [Claude Code](https://claude.ai/code). The slash commands require Claude Code's command system. The methodology and PLAN.md patterns can be used manually with any AI, but automation features require Claude Code.
+
 ---
 
 ## 🚀 Quick Start (30 seconds)
