@@ -111,19 +111,38 @@ flow/
 
 ### 🚀 For End Users (Using the Framework)
 
-**Just download `flow.sh` and run it in your project:**
+**Two ways to get `flow.sh`:**
+
+#### Option A: Direct Download (Recommended - No Git Needed)
 
 ```bash
 # Navigate to your project directory
 cd /path/to/your/project
 
-# Copy or download flow.sh to your project
-# Then run it:
+# Download flow.sh directly
+curl -O https://raw.githubusercontent.com/khgs2411/flow/master/flow.sh
+chmod +x flow.sh
+
+# Run it to install the framework
 ./flow.sh
 
 # Or force overwrite existing files:
 ./flow.sh --force
 ```
+
+#### Option B: Clone Once, Copy Anywhere
+
+```bash
+# Clone the repo once (to a shared location)
+git clone https://github.com/khgs2411/flow.git ~/flow-framework
+
+# Copy flow.sh to any project
+cp ~/flow-framework/flow.sh /path/to/your/project/
+cd /path/to/your/project
+./flow.sh
+```
+
+**Important:** You are NOT tied to the cloned repo! The `flow.sh` file is self-contained and can be copied anywhere. Your project has no connection to the Flow repo after installation.
 
 **What gets installed:**
 ```
