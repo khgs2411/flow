@@ -157,6 +157,25 @@ After editing framework sources:
 6. Verify `.flow/` has 2 documentation files
 7. Test a command like `/flow-status` to ensure content is correct
 
+## Contributing
+
+For detailed contribution guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md). Key points:
+
+- **For Users**: Just download and run `flow.sh` - no fork needed
+- **For Contributors**: Fork the repo, edit `framework/` files (NOT `flow.sh` directly), rebuild with `./build-standalone.sh`, then submit PR
+- **Commit Format**: Use `[Type]: Short description` format (Add/Fix/Update/Refactor/Docs)
+- **Philosophy**: Maintain principles of plan-before-code, context preservation, iterative refinement
+- **Big Changes**: Open an issue first to discuss major architectural changes
+
+### Distribution URL
+
+Users can download the framework directly:
+```bash
+wget https://raw.githubusercontent.com/khgs2411/flow/master/flow.sh
+chmod +x flow.sh
+./flow.sh
+```
+
 ## Version History
 
 - **V1.0** (2025-10-01) - Initial release
