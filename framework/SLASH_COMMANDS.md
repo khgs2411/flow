@@ -666,6 +666,81 @@ You are executing the `/flow-rollback` command from the Flow framework.
 
 ---
 
+## /flow-verify-plan
+
+**File**: `flow-verify-plan.md`
+
+```markdown
+You are executing the `/flow-verify-plan` command from the Flow framework.
+
+**Purpose**: Verify that PLAN.md is synchronized with the actual project state.
+
+**Context**:
+- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
+- **Working File**: PLAN.md (current project)
+- **Use case**: Run before starting new AI session or compacting conversation to ensure context is accurate
+
+**Instructions**:
+
+1. **Find PLAN.md**: Look in current directory, traverse up if needed
+
+2. **Find current iteration**: Look for iteration marked 🚧 IN PROGRESS or 🎨 READY FOR IMPLEMENTATION
+
+3. **Read current implementation section**:
+   - Find "Implementation - Iteration [N]" section
+   - Identify all action items
+   - Note which items are marked as ✅ complete
+
+4. **Verify claimed completions against actual project state**:
+   - For each ✅ completed action item, check if it actually exists:
+     - "Create UserAuth.ts" → Verify file exists
+     - "Add login endpoint" → Search for login endpoint in code
+     - "Update database schema" → Check schema files
+   - List any discrepancies found
+
+5. **Check for unreported work**:
+   - Look for modified files that aren't mentioned in PLAN.md
+   - Check git status (if available) for uncommitted changes
+   - Identify files that were changed but not documented
+
+6. **Report findings**:
+   ```
+   📋 Plan Verification Results:
+
+   ✅ Verified Complete:
+   - [List action items that are correctly marked complete]
+
+   ❌ Discrepancies Found:
+   - [List action items marked complete but evidence not found]
+
+   📝 Unreported Work:
+   - [List files changed but not mentioned in PLAN.md]
+
+   Status: [SYNCHRONIZED / NEEDS UPDATE]
+   ```
+
+7. **If discrepancies found**:
+   - Ask user: "PLAN.md is out of sync with project state. Update PLAN.md now? (yes/no)"
+   - If yes: Update PLAN.md to reflect actual state:
+     - Uncheck items that aren't actually done
+     - Add notes about files modified
+     - Update status markers if needed
+   - If no: "Review discrepancies above and update PLAN.md manually."
+
+8. **If synchronized**:
+   - "PLAN.md is synchronized with project state. Ready to continue work."
+
+**Manual alternative**:
+- Review PLAN.md action items manually
+- Check each completed item exists in codebase
+- Use `git status` and `git diff` to verify changes
+- Update PLAN.md to match reality
+
+**Output**: Verification report and optional PLAN.md updates.
+```
+
+---
+
 ## Installation Instructions
 
 To use these commands:

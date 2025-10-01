@@ -379,7 +379,7 @@ Work through the code, checking off action items as you complete them:
 
 ## Slash Commands Reference
 
-Flow provides 15 slash commands organized into 5 categories. **Important**: These are convenience tools - the real power is the methodology. You can use Flow WITHOUT commands by manually following the patterns.
+Flow provides 16 slash commands organized into 5 categories. **Important**: These are convenience tools - the real power is the methodology. You can use Flow WITHOUT commands by manually following the patterns.
 
 ### Planning Commands (1)
 
@@ -442,7 +442,7 @@ Flow provides 15 slash commands organized into 5 categories. **Important**: Thes
 - Auto-updates task/phase if all complete
 - **Manual**: Check off items, add verification, update to ✅
 
-### Navigation Commands (5)
+### Navigation Commands (6)
 
 **`/flow-status`**
 - Shows current phase/task/iteration
@@ -466,6 +466,14 @@ Flow provides 15 slash commands organized into 5 categories. **Important**: Thes
 **`/flow-rollback`**
 - Undoes last PLAN.md change
 - **Manual**: Git revert or manual edit
+
+**`/flow-verify-plan`**
+- Verifies PLAN.md is synced with actual project state
+- Checks completed items exist in codebase
+- Reports discrepancies and unreported work
+- Updates PLAN.md to match reality if needed
+- **Use before**: New AI session or conversation compacting
+- **Manual**: Review action items, check files exist, use git status
 
 ### Using Flow WITHOUT Slash Commands
 
