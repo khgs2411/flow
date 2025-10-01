@@ -385,9 +385,10 @@ Work through the code, checking off action items as you complete them:
 - Allows framework to evolve (commands always read latest version)
 
 ### Why pre-implementation pattern?
-- Discovered during real-world usage (RED plan file)
-- Common need: refactoring/setup before main work
-- Ensures brainstorming fully complete before implementation starts
+- Emerged organically during real development - while brainstorming a complex feature, it became clear that existing code needed refactoring first
+- Common scenario: "We can't implement this cleanly until we fix/refactor X"
+- Prevents starting implementation with unresolved dependencies
+- Ensures brainstorming is truly complete before coding begins
 
 ---
 
@@ -441,8 +442,11 @@ Potential additions to consider:
 ## Credits
 
 **Created by**: Liad Goren
-**Inspired by**: Real-world usage on RED RPG skill generation system
+
+**Inspired by**: Real-world experience building a complex game engine feature. The patterns emerged organically through iterative development with Claude Code, revealing what actually works when AI and humans collaborate on complex software.
+
 **Philosophy**: Domain-Driven Design + Agile + Extreme Programming principles
+
 **AI Partner**: Claude (Anthropic) via Claude Code
 
 ---
