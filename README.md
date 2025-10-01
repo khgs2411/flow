@@ -1,7 +1,9 @@
 # Flow Framework
 ## AI in the loop
 
-*Domain-Driven Design with Agile Iterative Philosophy*
+*You design the architecture and iterations. AI executes within your framework. Context never gets lost.*
+
+*Domain-Driven Design meets Agile Iterative Philosophy*
 
 **Version**: 1.0
 **Created**: 2025-10-01
