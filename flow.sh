@@ -803,6 +803,114 @@ You are executing the `/flow-verify-plan` command from the Flow framework.
 
 ---
 
+## /flow-compact
+
+**File**: `flow-compact.md`
+
+```markdown
+You are executing the `/flow-compact` command from the Flow framework.
+
+**Purpose**: Generate comprehensive conversation report for context transfer to new AI instance.
+
+**Context**:
+- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
+- **Working File**: PLAN.md (current project)
+- **Use case**: Before compacting conversation or starting new AI session - ensures zero context loss
+
+**Instructions**:
+
+1. **Find PLAN.md**: Look in current directory, traverse up if needed
+
+2. **Generate comprehensive report covering**:
+
+   **Current Work Context**:
+   - What feature/task are we working on?
+   - What phase/task/iteration are we in? (with status)
+   - What was the original goal?
+
+   **Conversation History**:
+   - What decisions were made during brainstorming? (with rationale)
+   - What subjects were discussed and resolved?
+   - What pre-implementation tasks were identified and completed?
+   - What action items were generated?
+
+   **Implementation Progress**:
+   - What has been implemented so far?
+   - What files were created/modified?
+   - What verification was done?
+   - What remains incomplete?
+
+   **Challenges & Solutions**:
+   - What blockers were encountered?
+   - How were they resolved?
+   - What design trade-offs were made?
+
+   **Next Steps**:
+   - What is the immediate next action?
+   - What are the pending action items?
+   - What should the next AI instance focus on?
+
+   **Important Context**:
+   - Any quirks or special considerations for this feature
+   - Technical constraints or dependencies
+   - User preferences or decisions that must be preserved
+
+3. **Report format**:
+   ```
+   # Context Transfer Report
+   ## Generated: [Date/Time]
+
+   ## Current Status
+   [Phase/Task/Iteration with status markers]
+
+   ## Feature Overview
+   [What we're building and why]
+
+   ## Conversation Summary
+   [Chronological summary of discussions and decisions]
+
+   ## Implementation Progress
+   [What's done, what's in progress, what's pending]
+
+   ## Key Decisions & Rationale
+   [Critical decisions made with reasoning]
+
+   ## Files Modified
+   [List with brief description of changes]
+
+   ## Challenges Encountered
+   [Problems and how they were solved]
+
+   ## Next Actions
+   [Immediate next steps for new AI instance]
+
+   ## Critical Context
+   [Must-know information for continuation]
+   ```
+
+4. **Important guidelines**:
+   - **Do NOT include generic project info** (tech stack, architecture overview, etc.)
+   - **Focus ENTIRELY on the feature at hand** and this conversation
+   - **Do NOT worry about token output length** - comprehensive is better than brief
+   - **Include WHY, not just WHAT** - decisions need context
+   - **Be specific** - reference exact file names, function names, line numbers
+   - **Preserve user preferences** - if user made specific choices, document them
+
+5. **After generating report**:
+   - "Context transfer report generated. Copy this report to a new AI session to continue work with zero context loss."
+   - "Use `/flow-verify-plan` before starting new session to ensure PLAN.md is synchronized."
+
+**Manual alternative**:
+- Read entire conversation history manually
+- Summarize key points, decisions, and progress
+- Document in separate notes file
+- Reference PLAN.md for structure
+
+**Output**: Comprehensive context transfer report.
+```
+
+---
+
 ## Installation Instructions
 
 To use these commands:
@@ -857,7 +965,7 @@ Repeat for next iteration
 
 ---
 
-**Version**: 1.0
+**Version**: 1.0.1
 **Last Updated**: 2025-10-01
 COMMANDS_DATA_EOF
 }
