@@ -63,16 +63,21 @@ The Flow framework is a spec-driven iterative development methodology that combi
 
 ## What's New (V1.0)
 
-✅ **Single File Distribution** - `flow.sh` is self-contained with all framework content embedded (~63KB)
-✅ **Clean Structure** - Source files organized in `framework/` directory
-✅ **Build System** - `build-standalone.sh` regenerates distribution from sources
-✅ **Portable Framework** - Auto-locates in `.flow/`, `.claude/`, or `~/.claude/flow/`
-✅ **Automated Deployment** - One command (`./flow.sh`) installs everything
-✅ **Example PLAN.md** - Complete mock example showing full workflow
-✅ **No Dependencies** - Universal bash script, works everywhere
-✅ **Bugs Discovered Pattern** - Document bugs found during brainstorming
-✅ **Improvements Tracking** - Track what you improved over originals
-✅ **Dynamic Subject Addition** - Add brainstorming subjects on-the-fly
+### Core Features
+- ✅ **Single File Distribution** - `flow.sh` is self-contained (~63KB, no dependencies)
+- ✅ **Automated Deployment** - One command (`./flow.sh`) installs everything
+- ✅ **Universal Compatibility** - Pure bash, works everywhere
+
+### Framework Structure
+- ✅ **Clean Organization** - Source files in `framework/` directory
+- ✅ **Build System** - `build-standalone.sh` regenerates distribution
+- ✅ **Portable** - Auto-locates in `.flow/`, `.claude/`, or `~/.claude/flow/`
+
+### Development Patterns
+- ✅ **Complete Example** - Mock payment gateway project in EXAMPLE_PLAN.md
+- ✅ **Bugs Discovered Pattern** - Document bugs found during brainstorming
+- ✅ **Improvements Tracking** - Track what you improved over originals
+- ✅ **Dynamic Subject Addition** - Add brainstorming subjects on-the-fly
 
 ---
 
