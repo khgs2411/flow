@@ -1,0 +1,724 @@
+# Flow Framework - Slash Commands
+
+This file contains all slash command definitions for the Flow framework. Copy these to `.claude/commands/` when ready to use.
+
+---
+
+## Command Guidelines
+
+**IMPORTANT**: Every command must:
+
+1. **Read the framework guide** at the start to understand patterns and structure
+2. **Find and parse PLAN.md** to understand current state
+3. **Follow framework patterns exactly** (status markers, section structure, etc.)
+4. **Update PLAN.md** according to framework conventions
+5. **Provide clear next steps** to the user
+
+**Framework Location**: `DEVELOPMENT_FRAMEWORK.md` (searches in: `.claude/`, project root, or `~/.claude/flow/`)
+
+**Status Markers** (use consistently):
+- ✅ Complete
+- ⏳ Pending
+- 🚧 In Progress
+- 🎨 Ready for Implementation
+- ❌ Rejected
+- 🔮 Future/Deferred
+
+---
+
+## /flow-blueprint
+
+**File**: `flow-blueprint.md`
+
+```markdown
+You are executing the `/flow-blueprint` command from the Flow framework.
+
+**Purpose**: Generate initial PLAN.md file with skeleton structure for a new feature/project/bug/issue.
+
+**Instructions**:
+
+1. **Read the framework guide**:
+   - Search for DEVELOPMENT_FRAMEWORK.md in these locations (in order):
+     - `.claude/DEVELOPMENT_FRAMEWORK.md`
+     - `./DEVELOPMENT_FRAMEWORK.md` (project root)
+     - `~/.claude/flow/DEVELOPMENT_FRAMEWORK.md` (global)
+   - Read the first found location
+   - Understand the hierarchy: PHASE → TASK → ITERATION → BRAINSTORM → IMPLEMENTATION
+   - Study the plan file template section
+   - Note the status markers and section structure
+
+2. **Analyze the feature request**: `$ARGUMENTS`
+
+3. **Check for reference implementation**:
+   - If user mentioned a reference path in arguments, use it
+   - Otherwise, ask: "Do you have a reference implementation I should analyze? (Provide path or say 'no')"
+   - If reference provided, read and analyze it to inform the planning
+
+4. **Generate PLAN.md** in current directory following the framework template:
+   - **Overview section**: Purpose, goals, scope
+   - **Architecture section**: High-level design, key components
+   - **Development Plan**:
+     - Estimate 2-4 phases (Foundation, Core Implementation, Testing, Enhancement/Polish)
+     - For each phase: 1-5 tasks
+     - For each task: 2-10 iterations (high-level names only)
+     - Mark everything as ⏳ PENDING
+     - Add placeholder brainstorming sessions (empty subject lists)
+
+5. **Depth**: Medium detail
+   - Phase names and strategies
+   - Task names and purposes
+   - Iteration names only (no brainstorming subjects yet)
+
+6. **Confirm to user**:
+   - "Created PLAN.md with [X] phases, [Y] tasks, [Z] iterations"
+   - "Use `/flow-status` to see current state"
+   - "Use `/flow-brainstorm_start [topic]` to begin first iteration"
+
+**Output**: Create PLAN.md file and confirm creation to user.
+```
+
+---
+
+## /flow-phase
+
+**File**: `flow-phase.md`
+
+```markdown
+You are executing the `/flow-phase` command from the Flow framework.
+
+**Purpose**: Add a new phase to the current PLAN.md file.
+
+**Context**:
+- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
+- **Working File**: PLAN.md (current project)
+
+**Instructions**:
+
+1. **Find PLAN.md**: Look in current directory, traverse up if needed
+
+2. **Verify framework understanding**: Know that phases are top-level milestones (e.g., "Foundation", "Core Implementation", "Testing")
+
+2. **Parse arguments**: `$ARGUMENTS` = phase description
+
+3. **Add new phase section**:
+   ```markdown
+   ### Phase [N]: [$ARGUMENTS] ⏳
+
+   **Strategy**: [Ask user or infer from description]
+
+   **Goal**: [What this phase achieves]
+
+   ---
+   ```
+
+4. **Update PLAN.md**: Append new phase to Development Plan section
+
+5. **Confirm to user**: "Added Phase [N]: [$ARGUMENTS] to PLAN.md"
+
+**Output**: Update PLAN.md with new phase.
+```
+
+---
+
+## /flow-task
+
+**File**: `flow-task.md`
+
+```markdown
+You are executing the `/flow-task` command from the Flow framework.
+
+**Purpose**: Add a new task to the current phase in PLAN.md.
+
+**Context**:
+- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
+- **Working File**: PLAN.md (current project)
+
+**Instructions**:
+
+1. **Find PLAN.md**: Look in current directory, traverse up if needed
+
+2. **Parse arguments**: `$ARGUMENTS` = task description
+
+3. **Find current phase**: Look for last phase marked ⏳ or 🚧
+
+4. **Add new task section**:
+   ```markdown
+   #### Task [N]: [$ARGUMENTS] ⏳
+
+   **Status**: PENDING
+   **Purpose**: [What this task accomplishes]
+
+   ---
+   ```
+
+5. **Update PLAN.md**: Append task under current phase
+
+6. **Confirm to user**: "Added Task [N]: [$ARGUMENTS] to current phase"
+
+**Output**: Update PLAN.md with new task.
+```
+
+---
+
+## /flow-iteration
+
+**File**: `flow-iteration.md`
+
+```markdown
+You are executing the `/flow-iteration` command from the Flow framework.
+
+**Purpose**: Add a new iteration to the current task in PLAN.md.
+
+**Instructions**:
+
+1. **Find PLAN.md**: Look in current directory, traverse up if needed
+
+2. **Parse arguments**: `$ARGUMENTS` = iteration description
+
+3. **Find current task**: Look for last task marked ⏳ or 🚧
+
+4. **Add new iteration section**:
+   ```markdown
+   ##### Iteration [N]: [$ARGUMENTS] ⏳
+
+   **Status**: PENDING
+   **Goal**: [What this iteration builds]
+
+   ---
+   ```
+
+5. **Update PLAN.md**: Append iteration under current task
+
+6. **Confirm to user**: "Added Iteration [N]: [$ARGUMENTS] to current task. Use `/flow-brainstorm_start [topic]` to begin."
+
+**Output**: Update PLAN.md with new iteration.
+```
+
+---
+
+## /flow-brainstorm_start
+
+**File**: `flow-brainstorm_start.md`
+
+```markdown
+You are executing the `/flow-brainstorm_start` command from the Flow framework.
+
+**Purpose**: Begin a brainstorming session for the current iteration.
+
+**Context**:
+- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
+- **Working File**: PLAN.md (current project)
+- **Framework Pattern**: See "Brainstorming Session Pattern" section in framework guide
+
+**Instructions**:
+
+1. **Find PLAN.md**: Look in current directory, traverse up if needed
+
+2. **Parse arguments**: `$ARGUMENTS` = brainstorming topic
+
+3. **Find current iteration**: Look for last iteration marked ⏳ or 🚧
+
+4. **Update iteration status**: Change to 🚧 IN PROGRESS
+
+5. **Add brainstorming section**:
+   ```markdown
+   ### **Brainstorming Session - [$ARGUMENTS]**
+
+   **Subjects to Discuss** (tackle one at a time):
+
+   1. ⏳ [Suggest first subject based on iteration goal]
+
+   **Resolved Subjects**:
+
+   ---
+   ```
+
+6. **Suggest first subject**: Based on iteration name/goal, suggest an initial subject to discuss
+
+7. **Confirm to user**: "Started brainstorming session: [$ARGUMENTS]. First subject: [subject name]. Use `/flow-brainstorm_subject [name]` to add more subjects."
+
+**Output**: Update PLAN.md with brainstorming section and status change.
+```
+
+---
+
+## /flow-brainstorm_subject
+
+**File**: `flow-brainstorm_subject.md`
+
+```markdown
+You are executing the `/flow-brainstorm_subject` command from the Flow framework.
+
+**Purpose**: Add a new subject to the current brainstorming session.
+
+**Instructions**:
+
+1. **Find PLAN.md**: Look in current directory, traverse up if needed
+
+2. **Parse arguments**: `$ARGUMENTS` = subject name and optional brief description
+
+3. **Find current brainstorming session**: Look for "Subjects to Discuss" section
+
+4. **Add subject to list**:
+   - Count existing subjects
+   - Append: `[N]. ⏳ **[$ARGUMENTS]** - [Brief description if provided]`
+
+5. **Update PLAN.md**: Add subject to "Subjects to Discuss" list
+
+6. **Confirm to user**: "Added Subject [N]: [$ARGUMENTS] to brainstorming session."
+
+**Output**: Update PLAN.md with new subject.
+```
+
+---
+
+## /flow-brainstorm_resolve
+
+**File**: `flow-brainstorm_resolve.md`
+
+```markdown
+You are executing the `/flow-brainstorm_resolve` command from the Flow framework.
+
+**Purpose**: Mark a brainstorming subject as resolved with a decision.
+
+**Instructions**:
+
+1. **Find PLAN.md**: Look in current directory, traverse up if needed
+
+2. **Parse arguments**: `$ARGUMENTS` = subject name/number
+
+3. **Find subject**:
+   - If number provided, find subject [N]
+   - If name provided, find matching subject
+   - Default: Find first ⏳ subject (not yet resolved)
+
+4. **Update subject status**: Change ⏳ to ✅ in "Subjects to Discuss" list
+
+5. **Prompt user for details**:
+   - "What decision did you make for this subject?"
+   - "What's the rationale? (comma-separated reasons)"
+   - "What action items resulted? (comma-separated, or 'none')"
+
+6. **Add resolution section** under "Resolved Subjects":
+   ```markdown
+   ### ✅ **Subject [N]: [Name]**
+
+   **Decision**: [User's decision]
+
+   **Rationale**:
+   - [Reason 1]
+   - [Reason 2]
+
+   **Action Items**:
+   - [ ] [Action item 1]
+   - [ ] [Action item 2]
+
+   ---
+   ```
+
+7. **Update PLAN.md**: Update subject status and add resolution section
+
+8. **Confirm to user**: "Resolved Subject [N]: [Name]. Use `/flow-brainstorm_subject` to add more, or `/flow-brainstorm_complete` when done."
+
+**Output**: Update PLAN.md with resolved subject.
+```
+
+---
+
+## /flow-brainstorm_complete
+
+**File**: `flow-brainstorm_complete.md`
+
+```markdown
+You are executing the `/flow-brainstorm_complete` command from the Flow framework.
+
+**Purpose**: Close the current brainstorming session (only after pre-implementation tasks are done).
+
+**IMPORTANT**: Pre-implementation tasks should be documented IN PLAN.md during brainstorming, then completed BEFORE running this command.
+
+**Instructions**:
+
+1. **Find PLAN.md**: Look in current directory, traverse up if needed
+
+2. **Verify all subjects resolved**: Check "Subjects to Discuss" - all should be ✅
+
+3. **Check for pre-implementation tasks**:
+   - Look for "### **Pre-Implementation Tasks:**" section in PLAN.md
+   - If found:
+     - Check if all pre-tasks are marked ✅ COMPLETE
+     - If any are ⏳ PENDING or 🚧 IN PROGRESS:
+       "Pre-implementation tasks exist but are not complete. Complete them first, then run this command again."
+     - If all are ✅ COMPLETE: Proceed to step 4
+   - If not found:
+     - Ask user: "Are there any pre-implementation tasks that need to be completed before starting the main implementation? (Refactoring, system-wide changes, bug fixes discovered during brainstorming, etc.)"
+     - If yes: "Please document pre-implementation tasks in PLAN.md first (see framework guide), complete them, then run this command again."
+     - If no: Proceed to step 4
+
+4. **Update iteration status**: Change from 🚧 to 🎨 READY FOR IMPLEMENTATION
+
+5. **Add note**: "**Status**: All brainstorming complete, pre-implementation tasks done, ready for implementation"
+
+6. **Confirm to user**: "Brainstorming session complete. Iteration is now 🎨 READY FOR IMPLEMENTATION. Use `/flow-implement_start` to begin."
+
+**Output**: Update PLAN.md with brainstorming completion status.
+```
+
+---
+
+## /flow-implement_start
+
+**File**: `flow-implement_start.md`
+
+```markdown
+You are executing the `/flow-implement_start` command from the Flow framework.
+
+**Purpose**: Begin implementation phase for the current iteration.
+
+**Context**:
+- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
+- **Working File**: PLAN.md (current project)
+- **Framework Pattern**: See "Implementation Pattern" section in framework guide
+- **Prerequisite**: Brainstorming must be ✅ COMPLETE and all pre-implementation tasks done
+
+**Instructions**:
+
+1. **Find PLAN.md**: Look in current directory, traverse up if needed
+
+2. **Find current iteration**: Look for iteration marked 🎨 READY FOR IMPLEMENTATION
+
+3. **Verify readiness**:
+   - Brainstorming should be marked ✅ COMPLETE
+   - All pre-implementation tasks should be ✅ COMPLETE
+   - If not ready: Warn user and ask to complete brainstorming first
+
+4. **Update iteration status**: Change from 🎨 to 🚧 IN PROGRESS
+
+5. **Create implementation section**:
+   ```markdown
+   ### **Implementation - Iteration [N]: [Name]**
+
+   **Status**: 🚧 IN PROGRESS
+
+   **Action Items** (from brainstorming):
+
+   [Copy all unchecked action items from resolved subjects]
+
+   **Implementation Notes**:
+
+   [Leave blank for user to fill during implementation]
+
+   **Files Modified**:
+
+   [Leave blank - will be filled as work progresses]
+
+   **Verification**: [Leave blank - how work will be verified]
+
+   ---
+   ```
+
+6. **Confirm to user**: "Implementation started for Iteration [N]. Work through action items and check them off as you complete them. Use `/flow-implement_complete` when done."
+
+**Output**: Update PLAN.md with implementation section and status change.
+```
+
+---
+
+## /flow-implement_complete
+
+**File**: `flow-implement_complete.md`
+
+```markdown
+You are executing the `/flow-implement_complete` command from the Flow framework.
+
+**Purpose**: Mark the current iteration as complete.
+
+**Instructions**:
+
+1. **Find PLAN.md**: Look in current directory, traverse up if needed
+
+2. **Find current iteration**: Look for iteration marked 🚧 IN PROGRESS
+
+3. **Verify completion**:
+   - Check all action items are ✅ checked
+   - If unchecked items remain: Ask user "There are unchecked action items. Are you sure you want to mark complete? (yes/no)"
+
+4. **Prompt for verification notes**:
+   - "How did you verify this iteration works? (tests, manual checks, etc.)"
+
+5. **Update iteration status**: Change from 🚧 to ✅ COMPLETE
+
+6. **Update implementation section**:
+   - Add verification notes
+   - Add timestamp
+
+7. **Add completion summary**:
+   ```markdown
+   **Implementation Results**:
+   - [Summarize what was built]
+   - [List key accomplishments]
+
+   **Verification**: [User's verification method]
+
+   **Completed**: [Date]
+   ```
+
+8. **Check if task/phase complete**:
+   - If all iterations in task complete → Mark task ✅
+   - If all tasks in phase complete → Mark phase ✅
+
+9. **Confirm to user**: "Iteration [N] marked complete! Use `/flow-iteration [description]` to start next iteration, or `/flow-status` to see current state."
+
+**Output**: Update PLAN.md with completion status and summary.
+```
+
+---
+
+## /flow-status
+
+**File**: `flow-status.md`
+
+```markdown
+You are executing the `/flow-status` command from the Flow framework.
+
+**Purpose**: Show current position in the plan.
+
+**Instructions**:
+
+1. **Find PLAN.md**: Look in current directory, traverse up if needed
+
+2. **Parse PLAN.md** to extract:
+   - Current phase (last phase with ⏳ or 🚧 or 🎨)
+   - Current task (last task with ⏳ or 🚧 or 🎨)
+   - Current iteration (last iteration with ⏳ or 🚧 or 🎨)
+   - Current status emoji and state
+
+3. **Display hierarchy**:
+   ```
+   📋 Current Status:
+
+   Phase [N]: [Name] [Status]
+     └─ Task [N]: [Name] [Status]
+         └─ Iteration [N]: [Name] [Status]
+
+   Next Action: [Suggest next command based on status]
+   ```
+
+4. **Suggest next action**:
+   - If ⏳ PENDING → "Use `/flow-brainstorm_start [topic]` to begin"
+   - If 🚧 IN PROGRESS (brainstorming) → "Continue resolving subjects with `/flow-brainstorm_resolve`"
+   - If 🎨 READY → "Use `/flow-implement_start` to begin implementation"
+   - If 🚧 IN PROGRESS (implementing) → "Work through action items, use `/flow-implement_complete` when done"
+   - If ✅ COMPLETE → "Use `/flow-iteration [description]` to start next iteration"
+
+5. **Show progress summary**:
+   - Count completed vs total iterations
+   - Count completed vs total tasks
+   - Show percentage complete
+
+**Output**: Display current status and suggest next action.
+```
+
+---
+
+## /flow-next-subject
+
+**File**: `flow-next-subject.md`
+
+```markdown
+You are executing the `/flow-next-subject` command from the Flow framework.
+
+**Purpose**: Move to the next unresolved subject in the current brainstorming session.
+
+**Instructions**:
+
+1. **Find PLAN.md**: Look in current directory, traverse up if needed
+
+2. **Find current brainstorming session**: Look for "Subjects to Discuss" section
+
+3. **Find first unresolved subject**: Look for first ⏳ subject in the list
+
+4. **If found**:
+   - Display subject name and description
+   - Ask: "Ready to resolve this subject? Use `/flow-brainstorm_resolve [subject-name]`"
+
+5. **If all resolved**:
+   - Notify: "All subjects resolved! Use `/flow-brainstorm_complete` to finish brainstorming."
+
+6. **Show progress**: "[N] of [Total] subjects resolved"
+
+**Output**: Show next subject to work on.
+```
+
+---
+
+## /flow-next-iteration
+
+**File**: `flow-next-iteration.md`
+
+```markdown
+You are executing the `/flow-next-iteration` command from the Flow framework.
+
+**Purpose**: Move to the next iteration in the plan.
+
+**Instructions**:
+
+1. **Find PLAN.md**: Look in current directory, traverse up if needed
+
+2. **Find current iteration**: Look for last iteration with any active status (⏳ 🚧 🎨 ✅)
+
+3. **Check if current iteration is complete**:
+   - If not ✅ COMPLETE: "Current iteration not complete. Finish it first or use `/flow-iteration` to create a new one."
+   - If ✅ COMPLETE: Proceed
+
+4. **Look for next iteration in plan**:
+   - Check if there's a next iteration already defined (⏳ PENDING)
+   - If found: Display iteration name and ask "Ready to start Iteration [N]: [Name]? Use `/flow-brainstorm_start [topic]`"
+   - If not found: "No next iteration defined. Use `/flow-iteration [description]` to create one."
+
+5. **Show progress**: "Iteration [N] of [Total] complete"
+
+**Output**: Show next iteration or prompt to create one.
+```
+
+---
+
+## /flow-next
+
+**File**: `flow-next.md`
+
+```markdown
+You are executing the `/flow-next` command from the Flow framework.
+
+**Purpose**: Auto-detect current context and suggest the next logical step.
+
+**Instructions**:
+
+1. **Find PLAN.md**: Look in current directory, traverse up if needed
+
+2. **Determine current context**:
+   - Check current iteration status (⏳ 🚧 🎨 ✅)
+   - Check if in brainstorming session (look for "Subjects to Discuss")
+   - Check if in implementation (look for "Action Items")
+
+3. **Suggest next command based on context**:
+
+   **If in brainstorming (🚧)**:
+   - "Use `/flow-next-subject` to see next subject to resolve"
+   - OR "Use `/flow-brainstorm_complete` if all subjects done"
+
+   **If ready for implementation (🎨)**:
+   - "Use `/flow-implement_start` to begin implementation"
+
+   **If implementing (🚧)**:
+   - Show unchecked action items count
+   - "Complete action items and use `/flow-implement_complete` when done"
+
+   **If iteration complete (✅)**:
+   - "Use `/flow-next-iteration` to move to next iteration"
+
+   **If pending (⏳)**:
+   - "Use `/flow-brainstorm_start [topic]` to begin this iteration"
+
+4. **Show current status summary**: Brief summary of where you are
+
+**Output**: Suggest appropriate next command based on context.
+```
+
+---
+
+## /flow-rollback
+
+**File**: `flow-rollback.md`
+
+```markdown
+You are executing the `/flow-rollback` command from the Flow framework.
+
+**Purpose**: Undo the last change made to PLAN.md.
+
+**Instructions**:
+
+1. **Find PLAN.md**: Look in current directory, traverse up if needed
+
+2. **Check if rollback is possible**:
+   - Look for "Changelog" section at bottom of PLAN.md
+   - If no recent changes logged: "No recent changes to rollback."
+
+3. **Identify last change**:
+   - Parse last entry in Changelog
+   - Determine what was changed (phase added, task marked complete, etc.)
+
+4. **Ask for confirmation**:
+   - "Last change: [Description of change]. Rollback? (yes/no)"
+
+5. **If confirmed, revert change**:
+   - Remove last added section, OR
+   - Change status marker back to previous state, OR
+   - Uncheck last checked checkbox
+
+6. **Update Changelog**: Add rollback entry
+
+7. **Confirm to user**: "Rolled back: [Description of change]"
+
+**Limitation**: Can only rollback one step at a time. For major reverts, manually edit PLAN.md.
+
+**Output**: Revert last change in PLAN.md.
+```
+
+---
+
+## Installation Instructions
+
+To use these commands:
+
+1. **Copy individual command files** to `.claude/commands/`:
+   ```bash
+   mkdir -p .claude/commands
+   # Copy each command section above into separate .md files
+   # Example: flow-blueprint.md, flow-phase.md, etc.
+   ```
+
+2. **Or use the copy-paste method**:
+   - Copy the content between the code blocks for each command
+   - Create corresponding `.md` files in `.claude/commands/`
+   - File names should match command names (e.g., `flow-blueprint.md`)
+
+3. **Test with `/help`**: Run `/help` in Claude Code to see your new commands listed
+
+---
+
+## Command Execution Flow
+
+```
+/flow-blueprint
+    ↓
+Creates PLAN.md with skeleton
+    ↓
+/flow-brainstorm_start
+    ↓
+/flow-brainstorm_subject (repeat as needed)
+    ↓
+/flow-brainstorm_resolve (for each subject)
+    ↓
+Complete pre-implementation tasks (if any)
+    ↓
+/flow-brainstorm_complete
+    ↓
+/flow-implement_start
+    ↓
+Work through action items (check them off)
+    ↓
+/flow-implement_complete
+    ↓
+Repeat for next iteration
+```
+
+**Helper commands** available at any time:
+- `/flow-status` - Check current position
+- `/flow-next` - Auto-advance to next step
+- `/flow-rollback` - Undo last change
+- `/flow-phase`, `/flow-task`, `/flow-iteration` - Add structure as needed
+
+---
+
+**Version**: 1.0
+**Last Updated**: 2025-10-01
