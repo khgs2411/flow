@@ -258,43 +258,112 @@ vim framework/SLASH_COMMANDS.md
 
 ## Example Workflow
 
+**Real-world scenario**: Building a real-time collaborative text editor
+
+### 1. Create the Blueprint
+
 ```bash
-# 1. Start new feature
-/flow-blueprint RPG skill generation engine
-
-# 2. Begin first iteration (created by blueprint)
-/flow-brainstorm_start Template Parsing Design
-
-# 3. Add subjects to discuss
-/flow-brainstorm_subject Placeholder Syntax
-/flow-brainstorm_subject Mutation vs Immutable
-/flow-brainstorm_subject Parser Architecture
-
-# 4. Resolve subjects one by one
-/flow-brainstorm_resolve Placeholder Syntax
-# (Answer prompts for decision, rationale, action items)
-
-/flow-next-subject  # Move to next subject
-/flow-brainstorm_resolve Mutation vs Immutable
-# ...continue for all subjects
-
-# 5. Complete any pre-implementation tasks
-# (Refactoring, system-wide changes, etc.)
-
-# 6. Close brainstorming
-/flow-brainstorm_complete
-
-# 7. Begin implementation
-/flow-implement_start
-# (Work through action items, check them off)
-
-# 8. Complete iteration
-/flow-implement_complete
-
-# 9. Move to next iteration
-/flow-next-iteration
-# ...repeat!
+/flow-blueprint Real-time collaborative text editor with conflict resolution
 ```
+
+**What happens**: Creates `PLAN.md` with phases, tasks, and iteration placeholders.
+
+### 2. Start First Iteration
+
+```bash
+/flow-brainstorm_start Conflict Resolution Architecture
+```
+
+**What happens**: Marks iteration as "In Progress", creates brainstorming section.
+
+### 3. Add Subjects During Discussion
+
+```bash
+/flow-brainstorm_subject Data Structure (CRDT vs OT)
+/flow-brainstorm_subject WebSocket vs WebRTC
+/flow-brainstorm_subject Offline Support Strategy
+```
+
+**What happens**: Subjects added to "Subjects to Discuss" list with ⏳ status.
+
+### 4. Resolve Each Subject
+
+```bash
+/flow-brainstorm_resolve Data Structure (CRDT vs OT)
+```
+
+**Prompts you for**:
+- Decision: "Use CRDT (Conflict-free Replicated Data Types)"
+- Rationale: "Better eventual consistency, no central server needed, proven with Yjs library"
+- Action items: "Research Yjs library, prototype basic CRDT implementation, benchmark performance"
+
+**What happens**: Subject marked ✅, decision documented with rationale and action items.
+
+```bash
+/flow-next-subject  # Shows next unresolved subject
+/flow-brainstorm_resolve WebSocket vs WebRTC
+# ...continue for remaining subjects
+```
+
+### 5. Handle Pre-Implementation Tasks
+
+During brainstorming, you realize the current network layer needs refactoring:
+
+```bash
+# Document it (don't implement yet!)
+# Add to PLAN.md:
+### Pre-Implementation Tasks:
+#### ⏳ Task 1: Refactor Network Layer
+**Objective**: Extract network logic into separate module before adding WebSocket support
+**Action Items**:
+- [ ] Create NetworkManager interface
+- [ ] Extract existing HTTP code
+- [ ] Add tests for network layer
+```
+
+**Then complete the tasks** before moving forward.
+
+### 6. Complete Brainstorming
+
+```bash
+/flow-brainstorm_complete
+```
+
+**What happens**: Checks all subjects resolved and pre-tasks done, marks iteration 🎨 Ready.
+
+### 7. Implement
+
+```bash
+/flow-implement_start
+```
+
+**What happens**: Creates implementation section with all action items from brainstorming.
+
+Work through the code, checking off action items as you complete them:
+- [x] Research Yjs library
+- [x] Prototype basic CRDT implementation
+- [x] Benchmark performance
+- ...
+
+### 8. Complete Iteration
+
+```bash
+/flow-implement_complete
+```
+
+**What happens**: Marks iteration ✅ Complete, asks for verification notes, updates task/phase if all iterations done.
+
+### 9. Move to Next Iteration
+
+```bash
+/flow-next-iteration
+```
+
+**What happens**: Shows next pending iteration or prompts to create one.
+
+---
+
+**The Power**: Your PLAN.md now contains complete context - all decisions, rationale, pre-tasks, implementations, and verifications. Anyone (including a different AI) can pick up from where you left off.
 
 ---
 
