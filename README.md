@@ -22,6 +22,13 @@
   - [For End Users](#-for-end-users-using-the-framework)
   - [For Developers](#-for-developers-improving-the-framework)
 - [Example Workflow](#example-workflow)
+- [Slash Commands Reference](#slash-commands-reference)
+  - [Planning Commands](#planning-commands-1)
+  - [Structure Commands](#structure-commands-3)
+  - [Brainstorming Commands](#brainstorming-commands-4)
+  - [Implementation Commands](#implementation-commands-2)
+  - [Navigation Commands](#navigation-commands-5)
+  - [Using Flow Without Commands](#using-flow-without-slash-commands)
 - [Design Decisions](#design-decisions)
 - [Key Insights](#key-insights-from-development)
 - [Comparison to Other Frameworks](#comparison-to-other-frameworks)
@@ -367,6 +374,119 @@ Work through the code, checking off action items as you complete them:
 ---
 
 **The Power**: Your PLAN.md now contains complete context - all decisions, rationale, pre-tasks, implementations, and verifications. Anyone (including a different AI) can pick up from where you left off.
+
+---
+
+## Slash Commands Reference
+
+Flow provides 15 slash commands organized into 5 categories. **Important**: These are convenience tools - the real power is the methodology. You can use Flow WITHOUT commands by manually following the patterns.
+
+### Planning Commands (1)
+
+**`/flow-blueprint <feature-name>`**
+- Creates initial PLAN.md with skeleton structure
+- Generates phases, tasks, and iteration placeholders
+- Asks about reference implementations to analyze
+- **Manual alternative**: Copy EXAMPLE_PLAN.md template, adapt to your feature
+
+### Structure Commands (3)
+
+**`/flow-phase <phase-name>`**
+- Adds new phase to PLAN.md (e.g., "Testing", "Polish")
+- **Manual**: Add `### Phase N: Name ⏳` section
+
+**`/flow-task <task-name>`**
+- Adds new task under current phase
+- **Manual**: Add `#### Task N: Name ⏳` under phase
+
+**`/flow-iteration <iteration-name>`**
+- Adds new iteration under current task
+- **Manual**: Add `##### Iteration N: Name ⏳` under task
+
+### Brainstorming Commands (4)
+
+**`/flow-brainstorm_start <topic>`**
+- Begins brainstorming session for current iteration
+- Marks iteration as 🚧 In Progress
+- Creates "Subjects to Discuss" section
+- **Manual**: Add brainstorming section with subject list
+
+**`/flow-brainstorm_subject <subject-name>`**
+- Adds subject to discussion list
+- Supports dynamic subject addition during brainstorming
+- **Manual**: Add `N. ⏳ Subject Name` to subject list
+
+**`/flow-brainstorm_resolve <subject>`**
+- Prompts for decision, rationale, action items
+- Marks subject ✅ Complete
+- Documents resolution in "Resolved Subjects"
+- **Manual**: Move subject to resolved, add decision/rationale/actions
+
+**`/flow-brainstorm_complete`**
+- Checks all subjects resolved
+- Verifies pre-implementation tasks done
+- Marks iteration 🎨 Ready for Implementation
+- **Manual**: Check subjects complete, update status to 🎨
+
+### Implementation Commands (2)
+
+**`/flow-implement_start`**
+- Begins implementation phase
+- Copies action items from brainstorming
+- Marks iteration 🚧 In Progress
+- **Manual**: Create implementation section, copy action items
+
+**`/flow-implement_complete`**
+- Marks iteration ✅ Complete
+- Prompts for verification notes
+- Auto-updates task/phase if all complete
+- **Manual**: Check off items, add verification, update to ✅
+
+### Navigation Commands (5)
+
+**`/flow-status`**
+- Shows current phase/task/iteration
+- Displays progress percentage
+- Suggests next command
+- **Manual**: Scan PLAN.md for current 🚧 items
+
+**`/flow-next`**
+- Auto-detects context, suggests next step
+- Smart helper for "what do I do now?"
+- **Manual**: Look at status markers, decide next action
+
+**`/flow-next-subject`**
+- Shows next unresolved brainstorming subject
+- **Manual**: Find first ⏳ subject in list
+
+**`/flow-next-iteration`**
+- Shows next pending iteration
+- **Manual**: Find next ⏳ iteration
+
+**`/flow-rollback`**
+- Undoes last PLAN.md change
+- **Manual**: Git revert or manual edit
+
+### Using Flow WITHOUT Slash Commands
+
+**The methodology is the core**, not the commands. You can:
+
+1. **Copy EXAMPLE_PLAN.md** as template
+2. **Follow the patterns**:
+   - Phase → Task → Iteration → Brainstorm → Implement
+   - Use status markers (⏳ 🚧 🎨 ✅)
+   - Document decisions with rationale
+   - Handle pre-implementation tasks
+3. **Reference DEVELOPMENT_FRAMEWORK.md** when stuck
+4. **Update PLAN.md manually** as you work
+
+**Commands are automation** - they enforce patterns and update PLAN.md consistently. But the real magic is:
+- Planning before coding
+- Documenting WHY, not just WHAT
+- Context preservation in PLAN.md
+- Explicit pre-implementation tasks
+
+You can achieve all of this by manually following the framework patterns. Commands just make it faster and more consistent.
 
 ---
 
