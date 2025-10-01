@@ -6,6 +6,34 @@
 
 ---
 
+## 🚀 Quick Start (30 seconds)
+
+**Just cloned this repo? Here's how to use it:**
+
+```bash
+# Make flow.sh executable (one-time setup)
+chmod +x flow.sh
+
+# Run it in YOUR project directory
+cd /path/to/your/project
+~/path/to/flow-repo/flow.sh
+
+# That's it! Framework is now installed in your project.
+```
+
+**What just happened?**
+- ✅ Created `.claude/commands/` with 15 slash commands
+- ✅ Created `.flow/` with framework documentation
+- ✅ Your project is ready to use Flow!
+
+**Need to reinstall or update?**
+```bash
+# Use --force to overwrite existing files
+./flow.sh --force
+```
+
+---
+
 ## Overview
 
 The Flow framework is a spec-driven iterative development methodology that combines Domain-Driven Design principles with Agile philosophy. It helps developers build complex features with minimal refactoring by:
@@ -125,10 +153,11 @@ chmod +x flow.sh
 
 # Run it to install the framework
 ./flow.sh
-
-# Or force overwrite existing files:
-./flow.sh --force
 ```
+
+**Options:**
+- `./flow.sh` - Install framework (skips existing files)
+- `./flow.sh --force` - Reinstall/update (overwrites existing files)
 
 #### Option B: Clone Once, Copy Anywhere
 
