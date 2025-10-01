@@ -8,6 +8,26 @@
 
 ---
 
+## Table of Contents
+
+- [🚀 Quick Start](#-quick-start-30-seconds)
+- [Overview](#overview)
+- [What's New](#whats-new-v10)
+- [Project Structure](#project-structure)
+- [How It Works](#how-it-works)
+- [Installation](#installation)
+  - [For End Users](#-for-end-users-using-the-framework)
+  - [For Developers](#-for-developers-improving-the-framework)
+- [Example Workflow](#example-workflow)
+- [Design Decisions](#design-decisions)
+- [Key Insights](#key-insights-from-development)
+- [Comparison to Other Frameworks](#comparison-to-other-frameworks)
+- [Future Enhancements](#future-enhancements-v2)
+- [Credits](#credits)
+- [License](#license)
+
+---
+
 ## 🚀 Quick Start (30 seconds)
 
 **Just cloned this repo? Two ways to use it:**
