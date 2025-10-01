@@ -995,9 +995,27 @@ Move to next iteration, applying lessons learned.
 
 **How to Add**:
 
-1. Add new numbered item to "Subjects to Discuss" list with ⏳ status
+1. **IMMEDIATELY update PLAN.md**: Add new numbered item to "Subjects to Discuss" list with ⏳ status
 2. Mark it as "NEW" or add brief context about why it was added
 3. Continue with current subject - don't jump to new one immediately
+
+**IMPORTANT**: Always update the "Subjects to Discuss" list in PLAN.md BEFORE continuing the discussion. This ensures you don't lose track of topics.
+
+**Example**:
+```markdown
+User: "I now dislike the names... let's think about naming convention"
+
+AI: "Great point! Let me add this as a subject to our brainstorming session first."
+
+[AI updates PLAN.md:]
+
+**Subjects to Discuss**:
+1. 🚧 **Placeholder Detection Strategy** - CURRENT
+2. ⏳ **Naming Convention** - NEW (emerged during Subject 1 discussion)
+3. ⏳ **Handler Registration** (Q2 from Subject 1) - DEFERRED
+
+AI: "Added Subject 2: Naming Convention to the list. Now, back to Subject 1..."
+```
 
 ### Pre-Implementation Tasks During Brainstorming
 
