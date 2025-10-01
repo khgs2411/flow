@@ -8,17 +8,33 @@
 
 ## 🚀 Quick Start (30 seconds)
 
-**Just cloned this repo? Here's how to use it:**
+**Just cloned this repo? Two ways to use it:**
+
+### Option A: Run from Flow Repo (Recommended)
 
 ```bash
-# Make flow.sh executable (one-time setup)
+# 1. Make flow.sh executable (one-time setup)
 chmod +x flow.sh
 
-# Run it in YOUR project directory
+# 2. Run it from YOUR project directory
 cd /path/to/your/project
 ~/path/to/flow-repo/flow.sh
 
-# That's it! Framework is now installed in your project.
+# That's it! Framework is now installed.
+```
+
+### Option B: Copy to Your Project
+
+```bash
+# 1. Copy flow.sh to your project
+cp flow.sh /path/to/your/project/
+
+# 2. Run it there
+cd /path/to/your/project
+chmod +x flow.sh
+./flow.sh
+
+# You can delete flow.sh after installation if you want
 ```
 
 **What just happened?**
