@@ -1,4 +1,7 @@
-# Flow Framework - Domain-Driven Design with Agile Iterative Philosophy
+# Flow Framework
+## AI in the loop
+
+*Domain-Driven Design with Agile Iterative Philosophy*
 
 **Version**: 1.0
 **Created**: 2025-10-01
