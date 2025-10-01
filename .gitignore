@@ -1,0 +1,15 @@
+# Testing artifacts
+.claude/
+.flow/
+
+# Temporary files
+*.tmp
+*.swp
+*~
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
