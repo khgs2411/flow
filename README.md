@@ -70,7 +70,7 @@ chmod +x flow.sh
 ```
 
 **What just happened?**
-- ✅ Created `.claude/commands/` with 17 slash commands
+- ✅ Created `.claude/commands/` with 18 slash commands
 - ✅ Created `.flow/` with framework documentation
 - ✅ Your project is ready to use Flow!
 
@@ -82,9 +82,10 @@ chmod +x flow.sh
 
 **💡 Pro Tip - Starting a New Session:**
 When continuing work or starting a fresh AI session:
-1. Run `/flow-status` - Verify your current position
-2. Run `/flow-verify-plan` - Ensure PLAN.md matches actual code
-3. Explicitly tell the AI where you are (e.g., "We're on Iteration 5")
+1. Run `/flow-summarize` - Get the big picture (all phases/tasks/iterations)
+2. Run `/flow-status` - Verify your current position (micro view)
+3. Run `/flow-verify-plan` - Ensure PLAN.md matches actual code
+4. Explicitly tell the AI where you are (e.g., "We're on Iteration 5")
 
 This prevents confusion in large projects (2000+ line PLAN.md files).
 
@@ -387,7 +388,7 @@ Work through the code, checking off action items as you complete them:
 
 ## Slash Commands Reference
 
-Flow provides 17 slash commands organized into 5 categories. **Important**: These are convenience tools - the real power is the methodology. You can use Flow WITHOUT commands by manually following the patterns.
+Flow provides 18 slash commands organized into 5 categories. **Important**: These are convenience tools - the real power is the methodology. You can use Flow WITHOUT commands by manually following the patterns.
 
 ### Planning Commands (1)
 
@@ -450,13 +451,23 @@ Flow provides 17 slash commands organized into 5 categories. **Important**: Thes
 - Auto-updates task/phase if all complete
 - **Manual**: Check off items, add verification, update to ✅
 
-### Navigation Commands (7)
+### Navigation Commands (8)
 
 **`/flow-status`**
-- Shows current phase/task/iteration
+- Shows current phase/task/iteration (micro view - "where am I now?")
 - Displays progress percentage
 - Suggests next command
+- Detects conflicting status sections
 - **Manual**: Scan PLAN.md for current 🚧 items
+
+**`/flow-summarize`**
+- Shows entire project structure (macro view - "what's the whole picture?")
+- Hierarchical Phase → Task → Iteration breakdown
+- Completion percentages at each level
+- Compact, scannable format with grouped items
+- Handles V1/V2/V3 version splits
+- **Use for**: Bird's eye view, progress reports, project health check
+- **Manual**: Read entire PLAN.md, create outline with percentages
 
 **`/flow-next`**
 - Auto-detects context, suggests next step
