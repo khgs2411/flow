@@ -486,13 +486,30 @@ You are executing the `/flow-status` command from the Flow framework.
 
 1. **Find PLAN.md**: Look in current directory, traverse up if needed
 
-2. **Parse PLAN.md** to extract:
+2. **Check for conflicting status sections**:
+   - Search for patterns like "Progress Tracking", "Current Status", "Status Summary"
+   - Look for multiple "**Status**:" lines in the file
+   - Check if status at top of file conflicts with status sections elsewhere
+   - If multiple status sections found:
+     ```
+     ⚠️  WARNING: Multiple status sections detected!
+
+     Found status indicators at:
+     - Line [N]: **Status**: [value]
+     - Line [N]: ## Progress Tracking
+
+     This violates Flow's "Single Source of Truth" principle.
+     The authoritative status is at the TOP of PLAN.md.
+     Consider archiving or removing stale status sections.
+     ```
+
+3. **Parse PLAN.md** to extract:
    - Current phase (last phase with ⏳ or 🚧 or 🎨)
    - Current task (last task with ⏳ or 🚧 or 🎨)
    - Current iteration (last iteration with ⏳ or 🚧 or 🎨)
    - Current status emoji and state
 
-3. **Display hierarchy**:
+4. **Display hierarchy**:
    ```
    📋 Current Status:
 
@@ -503,14 +520,14 @@ You are executing the `/flow-status` command from the Flow framework.
    Next Action: [Suggest next command based on status]
    ```
 
-4. **Suggest next action**:
+5. **Suggest next action**:
    - If ⏳ PENDING → "Use `/flow-brainstorm_start [topic]` to begin"
    - If 🚧 IN PROGRESS (brainstorming) → "Continue resolving subjects with `/flow-brainstorm_resolve`"
    - If 🎨 READY → "Use `/flow-implement_start` to begin implementation"
    - If 🚧 IN PROGRESS (implementing) → "Work through action items, use `/flow-implement_complete` when done"
    - If ✅ COMPLETE → "Use `/flow-iteration [description]` to start next iteration"
 
-5. **Show progress summary**:
+6. **Show progress summary**:
    - Count completed vs total iterations
    - Count completed vs total tasks
    - Show percentage complete
@@ -759,7 +776,12 @@ You are executing the `/flow-compact` command from the Flow framework.
 
 1. **Find PLAN.md**: Look in current directory, traverse up if needed
 
-2. **Generate comprehensive report covering**:
+2. **Run status verification first**:
+   - Execute `/flow-status` command logic to verify current position
+   - Check for conflicting status sections (warn if found)
+   - Use this verified status as authoritative source for the report
+
+3. **Generate comprehensive report covering**:
 
    **Current Work Context**:
    - What feature/task are we working on?
@@ -793,7 +815,7 @@ You are executing the `/flow-compact` command from the Flow framework.
    - Technical constraints or dependencies
    - User preferences or decisions that must be preserved
 
-3. **Report format**:
+4. **Report format**:
    ```
    # Context Transfer Report
    ## Generated: [Date/Time]
@@ -826,7 +848,7 @@ You are executing the `/flow-compact` command from the Flow framework.
    [Must-know information for continuation]
    ```
 
-4. **Important guidelines**:
+5. **Important guidelines**:
    - **Do NOT include generic project info** (tech stack, architecture overview, etc.)
    - **Focus ENTIRELY on the feature at hand** and this conversation
    - **Do NOT worry about token output length** - comprehensive is better than brief
@@ -834,7 +856,7 @@ You are executing the `/flow-compact` command from the Flow framework.
    - **Be specific** - reference exact file names, function names, line numbers
    - **Preserve user preferences** - if user made specific choices, document them
 
-5. **After generating report**:
+6. **After generating report**:
    - "Context transfer report generated. Copy this report to a new AI session to continue work with zero context loss."
    - "Use `/flow-verify-plan` before starting new session to ensure PLAN.md is synchronized."
 
@@ -903,5 +925,5 @@ Repeat for next iteration
 
 ---
 
-**Version**: 1.0.1
-**Last Updated**: 2025-10-01
+**Version**: 1.0.2
+**Last Updated**: 2025-10-02

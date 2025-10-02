@@ -548,13 +548,30 @@ You are executing the `/flow-status` command from the Flow framework.
 
 1. **Find PLAN.md**: Look in current directory, traverse up if needed
 
-2. **Parse PLAN.md** to extract:
+2. **Check for conflicting status sections**:
+   - Search for patterns like "Progress Tracking", "Current Status", "Status Summary"
+   - Look for multiple "**Status**:" lines in the file
+   - Check if status at top of file conflicts with status sections elsewhere
+   - If multiple status sections found:
+     ```
+     ⚠️  WARNING: Multiple status sections detected!
+
+     Found status indicators at:
+     - Line [N]: **Status**: [value]
+     - Line [N]: ## Progress Tracking
+
+     This violates Flow's "Single Source of Truth" principle.
+     The authoritative status is at the TOP of PLAN.md.
+     Consider archiving or removing stale status sections.
+     ```
+
+3. **Parse PLAN.md** to extract:
    - Current phase (last phase with ⏳ or 🚧 or 🎨)
    - Current task (last task with ⏳ or 🚧 or 🎨)
    - Current iteration (last iteration with ⏳ or 🚧 or 🎨)
    - Current status emoji and state
 
-3. **Display hierarchy**:
+4. **Display hierarchy**:
    ```
    📋 Current Status:
 
@@ -565,14 +582,14 @@ You are executing the `/flow-status` command from the Flow framework.
    Next Action: [Suggest next command based on status]
    ```
 
-4. **Suggest next action**:
+5. **Suggest next action**:
    - If ⏳ PENDING → "Use `/flow-brainstorm_start [topic]` to begin"
    - If 🚧 IN PROGRESS (brainstorming) → "Continue resolving subjects with `/flow-brainstorm_resolve`"
    - If 🎨 READY → "Use `/flow-implement_start` to begin implementation"
    - If 🚧 IN PROGRESS (implementing) → "Work through action items, use `/flow-implement_complete` when done"
    - If ✅ COMPLETE → "Use `/flow-iteration [description]` to start next iteration"
 
-5. **Show progress summary**:
+6. **Show progress summary**:
    - Count completed vs total iterations
    - Count completed vs total tasks
    - Show percentage complete
@@ -821,7 +838,12 @@ You are executing the `/flow-compact` command from the Flow framework.
 
 1. **Find PLAN.md**: Look in current directory, traverse up if needed
 
-2. **Generate comprehensive report covering**:
+2. **Run status verification first**:
+   - Execute `/flow-status` command logic to verify current position
+   - Check for conflicting status sections (warn if found)
+   - Use this verified status as authoritative source for the report
+
+3. **Generate comprehensive report covering**:
 
    **Current Work Context**:
    - What feature/task are we working on?
@@ -855,7 +877,7 @@ You are executing the `/flow-compact` command from the Flow framework.
    - Technical constraints or dependencies
    - User preferences or decisions that must be preserved
 
-3. **Report format**:
+4. **Report format**:
    ```
    # Context Transfer Report
    ## Generated: [Date/Time]
@@ -888,7 +910,7 @@ You are executing the `/flow-compact` command from the Flow framework.
    [Must-know information for continuation]
    ```
 
-4. **Important guidelines**:
+5. **Important guidelines**:
    - **Do NOT include generic project info** (tech stack, architecture overview, etc.)
    - **Focus ENTIRELY on the feature at hand** and this conversation
    - **Do NOT worry about token output length** - comprehensive is better than brief
@@ -896,7 +918,7 @@ You are executing the `/flow-compact` command from the Flow framework.
    - **Be specific** - reference exact file names, function names, line numbers
    - **Preserve user preferences** - if user made specific choices, document them
 
-5. **After generating report**:
+6. **After generating report**:
    - "Context transfer report generated. Copy this report to a new AI session to continue work with zero context loss."
    - "Use `/flow-verify-plan` before starting new session to ensure PLAN.md is synchronized."
 
@@ -965,8 +987,8 @@ Repeat for next iteration
 
 ---
 
-**Version**: 1.0.1
-**Last Updated**: 2025-10-01
+**Version**: 1.0.2
+**Last Updated**: 2025-10-02
 COMMANDS_DATA_EOF
 }
 
@@ -1358,6 +1380,100 @@ Use these consistently throughout the plan file:
 | 🎨     | Ready       | Brainstorming complete, ready to implement |
 | ❌     | Rejected    | Options/approaches not chosen              |
 | 🔮     | Future      | Deferred to V2/V3/later phase              |
+
+---
+
+## Status Management Best Practices
+
+### Single Source of Truth for Status
+
+**CRITICAL**: Your PLAN.md should have **EXACTLY ONE** authoritative status indicator.
+
+**Where to put status:**
+- At the top of the file, in the metadata section
+- Format: `**Status**: [Current phase/iteration]`
+- Example: `**Status**: Phase 2, Task 5, Iteration 7 - In Progress`
+
+**What NOT to do:**
+- ❌ Creating multiple "Progress Tracking" or "Current Status" sections
+- ❌ Adding status summaries at the bottom of the file
+- ❌ Leaving old status sections when updating to new status
+
+### Maintaining Status in Long-Running Projects
+
+As your project grows (1000+ lines), status management becomes critical:
+
+1. **Update status in-place** - Don't create new status sections, update the existing one at the top
+2. **Use status markers** - Let ✅ ⏳ 🚧 markers indicate completion, don't duplicate this info
+3. **Archive old summaries** - If you create progress summaries, move them to a "Status History" appendix
+4. **Use slash commands** - `/flow-status` dynamically reads your PLAN.md and reports TRUE current state
+
+### Status Section Template
+
+```markdown
+**Created**: 2025-10-01
+**Status**: Phase 2, Task 5, Iteration 7 - In Progress
+**Version**: V1
+**Last Updated**: 2025-10-02
+```
+
+Update `**Status**` and `**Last Updated**` as you progress. **NEVER** add a second status section.
+
+### Verification
+
+Before starting a new AI session or after a long break:
+
+1. Run `/flow-status` - See computed current state from PLAN.md
+2. Run `/flow-verify-plan` - Verify PLAN.md matches actual project files
+3. Update the `**Status**` line at top if needed
+
+---
+
+## Common Pitfalls
+
+### Pitfall 1: Multiple Status Sections
+
+**Problem**: In long projects (weeks/months), developers often add "Progress Tracking" sections at the bottom of PLAN.md. Over time, these become stale while the top status is updated, creating conflicting information.
+
+**Example**:
+```markdown
+# Top of file (line 10):
+**Status**: Phase 2, Task 5, Iteration 7 - In Progress
+
+# Bottom of file (line 3600):
+## Progress Tracking
+Current Phase: Phase 1 - Foundation Setup (COMPLETE ✅)
+Next Task: Task 5 - Implement Blue (Validator)
+```
+
+**Result**: New AI sessions read the stale bottom section and think you're at Iteration 1 when you're actually at Iteration 7.
+
+**Solution**:
+- Maintain single status line at top
+- Use `/flow-status` to verify current state
+- Archive old progress notes to "Status History (Archive)" section if needed
+
+### Pitfall 2: Confusing Tasks vs Iterations
+
+**Problem**: High-level "Tasks" (e.g., Task 7: Implement Green) don't map 1:1 to "Iterations" (Iteration 7: Red Orchestration). This naming overlap confuses status tracking.
+
+**Example**:
+- Task 7 is "Implement Green Service"
+- Iteration 7 is "Red Orchestration" (different component!)
+
+**Solution**:
+- Use `/flow-status` to see the hierarchy clearly
+- Status line should show both: `**Status**: Task 7 (Green Service), Iteration 5 (Template Parsing) - Complete`
+- Don't rely on numbers alone; include names for clarity
+
+### Pitfall 3: Not Verifying Status at Session Start
+
+**Problem**: When starting a new AI session or compacting conversation, AI may scan PLAN.md and misinterpret current state (especially in 2000+ line files).
+
+**Solution**:
+- **ALWAYS** run `/flow-status` at the start of new AI sessions
+- Run `/flow-verify-plan` to ensure PLAN.md matches actual code
+- Explicitly state to AI: "We're on Iteration X, here's the context"
 
 ---
 

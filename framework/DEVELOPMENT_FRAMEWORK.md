@@ -387,6 +387,100 @@ Use these consistently throughout the plan file:
 
 ---
 
+## Status Management Best Practices
+
+### Single Source of Truth for Status
+
+**CRITICAL**: Your PLAN.md should have **EXACTLY ONE** authoritative status indicator.
+
+**Where to put status:**
+- At the top of the file, in the metadata section
+- Format: `**Status**: [Current phase/iteration]`
+- Example: `**Status**: Phase 2, Task 5, Iteration 7 - In Progress`
+
+**What NOT to do:**
+- ❌ Creating multiple "Progress Tracking" or "Current Status" sections
+- ❌ Adding status summaries at the bottom of the file
+- ❌ Leaving old status sections when updating to new status
+
+### Maintaining Status in Long-Running Projects
+
+As your project grows (1000+ lines), status management becomes critical:
+
+1. **Update status in-place** - Don't create new status sections, update the existing one at the top
+2. **Use status markers** - Let ✅ ⏳ 🚧 markers indicate completion, don't duplicate this info
+3. **Archive old summaries** - If you create progress summaries, move them to a "Status History" appendix
+4. **Use slash commands** - `/flow-status` dynamically reads your PLAN.md and reports TRUE current state
+
+### Status Section Template
+
+```markdown
+**Created**: 2025-10-01
+**Status**: Phase 2, Task 5, Iteration 7 - In Progress
+**Version**: V1
+**Last Updated**: 2025-10-02
+```
+
+Update `**Status**` and `**Last Updated**` as you progress. **NEVER** add a second status section.
+
+### Verification
+
+Before starting a new AI session or after a long break:
+
+1. Run `/flow-status` - See computed current state from PLAN.md
+2. Run `/flow-verify-plan` - Verify PLAN.md matches actual project files
+3. Update the `**Status**` line at top if needed
+
+---
+
+## Common Pitfalls
+
+### Pitfall 1: Multiple Status Sections
+
+**Problem**: In long projects (weeks/months), developers often add "Progress Tracking" sections at the bottom of PLAN.md. Over time, these become stale while the top status is updated, creating conflicting information.
+
+**Example**:
+```markdown
+# Top of file (line 10):
+**Status**: Phase 2, Task 5, Iteration 7 - In Progress
+
+# Bottom of file (line 3600):
+## Progress Tracking
+Current Phase: Phase 1 - Foundation Setup (COMPLETE ✅)
+Next Task: Task 5 - Implement Blue (Validator)
+```
+
+**Result**: New AI sessions read the stale bottom section and think you're at Iteration 1 when you're actually at Iteration 7.
+
+**Solution**:
+- Maintain single status line at top
+- Use `/flow-status` to verify current state
+- Archive old progress notes to "Status History (Archive)" section if needed
+
+### Pitfall 2: Confusing Tasks vs Iterations
+
+**Problem**: High-level "Tasks" (e.g., Task 7: Implement Green) don't map 1:1 to "Iterations" (Iteration 7: Red Orchestration). This naming overlap confuses status tracking.
+
+**Example**:
+- Task 7 is "Implement Green Service"
+- Iteration 7 is "Red Orchestration" (different component!)
+
+**Solution**:
+- Use `/flow-status` to see the hierarchy clearly
+- Status line should show both: `**Status**: Task 7 (Green Service), Iteration 5 (Template Parsing) - Complete`
+- Don't rely on numbers alone; include names for clarity
+
+### Pitfall 3: Not Verifying Status at Session Start
+
+**Problem**: When starting a new AI session or compacting conversation, AI may scan PLAN.md and misinterpret current state (especially in 2000+ line files).
+
+**Solution**:
+- **ALWAYS** run `/flow-status` at the start of new AI sessions
+- Run `/flow-verify-plan` to ensure PLAN.md matches actual code
+- Explicitly state to AI: "We're on Iteration X, here's the context"
+
+---
+
 ## Plan File Template
 
 **Complete Example**: See `.flow/EXAMPLE_PLAN.md` for a full working example of a payment gateway integration project showing multiple completed iterations, brainstorming sessions, bug discoveries, and improvements.

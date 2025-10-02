@@ -70,7 +70,7 @@ chmod +x flow.sh
 ```
 
 **What just happened?**
-- ✅ Created `.claude/commands/` with 15 slash commands
+- ✅ Created `.claude/commands/` with 17 slash commands
 - ✅ Created `.flow/` with framework documentation
 - ✅ Your project is ready to use Flow!
 
@@ -79,6 +79,14 @@ chmod +x flow.sh
 # Use --force to overwrite existing files
 ./flow.sh --force
 ```
+
+**💡 Pro Tip - Starting a New Session:**
+When continuing work or starting a fresh AI session:
+1. Run `/flow-status` - Verify your current position
+2. Run `/flow-verify-plan` - Ensure PLAN.md matches actual code
+3. Explicitly tell the AI where you are (e.g., "We're on Iteration 5")
+
+This prevents confusion in large projects (2000+ line PLAN.md files).
 
 ---
 
