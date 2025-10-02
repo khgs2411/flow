@@ -3432,6 +3432,12 @@ deploy_commands() {
 
   for cmd in "${COMMANDS[@]}"; do
     local cmd_file="$target_dir/${cmd}.md"
+
+    # If force mode, delete existing file first to ensure clean write
+    if [ "$force" = true ] && [ -f "$cmd_file" ]; then
+      rm -f "$cmd_file"
+    fi
+
     [ -f "$cmd_file" ] && [ "$force" = false ] && { echo -e "${YELLOW}⏭️  Skip ${cmd}.md${NC}"; continue; }
 
     local content=$(extract_command "$cmd")
@@ -3448,6 +3454,12 @@ deploy_framework() {
   local force="$2"
   local framework_file="$target_dir/DEVELOPMENT_FRAMEWORK.md"
   local example_file="$target_dir/EXAMPLE_PLAN.md"
+
+  # If force mode, delete existing files first to ensure clean write
+  if [ "$force" = true ]; then
+    [ -f "$framework_file" ] && rm -f "$framework_file"
+    [ -f "$example_file" ] && rm -f "$example_file"
+  fi
 
   # Deploy framework guide
   if [ -f "$framework_file" ] && [ "$force" = false ]; then
