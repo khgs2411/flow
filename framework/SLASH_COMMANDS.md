@@ -167,7 +167,7 @@ Testing:
    - "✨ Created .flow/PLAN.md with [X] phases, [Y] tasks, [Z] iterations"
    - "📂 Flow is now managing this project from .flow/ directory"
    - "Use `/flow-status` to see current state"
-   - "Use `/flow-brainstorm_start [topic]` to begin first iteration"
+   - "Use `/flow-brainstorm-start [topic]` to begin first iteration"
 
 **Output**: Create `.flow/PLAN.md` file and confirm creation to user.
 ```
@@ -318,16 +318,16 @@ You are executing the `/flow-migrate` command from the Flow framework.
 
 ---
 
-## /flow-update-plan-version
+## /flow-plan-update
 
-**File**: `flow-update-plan-version.md`
+**File**: `flow-plan-update.md`
 
 ```markdown
 ---
 description: Update existing plan to match latest Flow framework structure
 ---
 
-You are executing the `/flow-update-plan-version` command from the Flow framework.
+You are executing the `/flow-plan-update` command from the Flow framework.
 
 **Purpose**: Update an existing `.flow/PLAN.md` to match the latest Flow framework structure and patterns.
 
@@ -426,16 +426,16 @@ You are executing the `/flow-update-plan-version` command from the Flow framewor
 
 ---
 
-## /flow-phase
+## /flow-phase-add
 
-**File**: `flow-phase.md`
+**File**: `flow-phase-add.md`
 
 ```markdown
 ---
 description: Add a new phase to the development plan
 ---
 
-You are executing the `/flow-phase` command from the Flow framework.
+You are executing the `/flow-phase-add` command from the Flow framework.
 
 **Purpose**: Add a new phase to the current PLAN.md file.
 
@@ -478,16 +478,107 @@ If you discover NEW issues while working on this phase that are NOT part of the 
 
 ---
 
-## /flow-task
+## /flow-phase-start
 
-**File**: `flow-task.md`
+**File**: `flow-phase-start.md`
+
+```markdown
+---
+description: Mark current phase as in progress
+---
+
+You are executing the `/flow-phase-start` command from the Flow framework.
+
+**Purpose**: Mark the current phase as 🚧 IN PROGRESS (when first task starts).
+
+**Context**:
+- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
+- **Working File**: .flow/PLAN.md (current project)
+
+**🚨 SCOPE BOUNDARY RULE**:
+If you discover NEW issues while working on this phase that are NOT part of the current work:
+1. **STOP** immediately
+2. **NOTIFY** user of the new issue
+3. **DISCUSS** what to do (add to brainstorm, create pre-task, defer, or handle now)
+4. **ONLY** proceed with user's explicit approval
+
+**Instructions**:
+
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+
+2. **Find current phase**: Look for last phase marked ⏳ PENDING
+
+3. **Update phase status**: Change marker from ⏳ to 🚧 IN PROGRESS
+
+4. **Update Progress Dashboard**:
+   - Find "## 📋 Progress Dashboard" section
+   - Update current phase information
+   - Update last updated timestamp
+   - Add action description: "Phase [N] started"
+
+5. **Confirm to user**: "Started Phase [N]: [Name]. Use `/flow-task-add [description]` to create tasks."
+
+**Output**: Update .flow/PLAN.md with phase status change and Progress Dashboard update.
+```
+
+---
+
+## /flow-phase-complete
+
+**File**: `flow-phase-complete.md`
+
+```markdown
+---
+description: Mark current phase as complete
+---
+
+You are executing the `/flow-phase-complete` command from the Flow framework.
+
+**Purpose**: Mark the current phase as ✅ COMPLETE (when all tasks done).
+
+**Context**:
+- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
+- **Working File**: .flow/PLAN.md (current project)
+
+**Instructions**:
+
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+
+2. **Find current phase**: Look for phase marked 🚧 IN PROGRESS
+
+3. **Verify all tasks complete**: Check that all tasks in this phase are marked ✅ COMPLETE
+   - If incomplete tasks found: "Phase has incomplete tasks. Complete them first or mark as ❌ CANCELLED / 🔮 DEFERRED."
+
+4. **Update phase status**: Change marker from 🚧 to ✅ COMPLETE
+
+5. **Update Progress Dashboard**:
+   - Find "## 📋 Progress Dashboard" section
+   - Update current phase to next phase (or mark project complete if no next phase)
+   - Update completion percentages
+   - Update last updated timestamp
+   - Add action description: "Phase [N] complete"
+
+6. **Check for next phase**:
+   - If next phase exists: Auto-advance to next phase (show name)
+   - If no next phase: "All phases complete! Project finished."
+
+7. **Confirm to user**: "Phase [N] marked complete! Next: Phase [N+1]: [Name]. Use `/flow-phase-start` when ready."
+
+**Output**: Update .flow/PLAN.md with phase completion and Progress Dashboard update.
+```
+
+---
+
+## /flow-task-add
+
+**File**: `flow-task-add.md`
 
 ```markdown
 ---
 description: Add a new task under the current phase
 ---
 
-You are executing the `/flow-task` command from the Flow framework.
+You are executing the `/flow-task-add` command from the Flow framework.
 
 **Purpose**: Add a new task to the current phase in PLAN.md.
 
@@ -529,16 +620,107 @@ If you discover NEW issues while working on this task that are NOT part of the c
 
 ---
 
-## /flow-iteration
+## /flow-task-start
 
-**File**: `flow-iteration.md`
+**File**: `flow-task-start.md`
+
+```markdown
+---
+description: Mark current task as in progress
+---
+
+You are executing the `/flow-task-start` command from the Flow framework.
+
+**Purpose**: Mark the current task as 🚧 IN PROGRESS (when first iteration starts).
+
+**Context**:
+- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
+- **Working File**: .flow/PLAN.md (current project)
+
+**🚨 SCOPE BOUNDARY RULE**:
+If you discover NEW issues while working on this task that are NOT part of the current work:
+1. **STOP** immediately
+2. **NOTIFY** user of the new issue
+3. **DISCUSS** what to do (add to brainstorm, create pre-task, defer, or handle now)
+4. **ONLY** proceed with user's explicit approval
+
+**Instructions**:
+
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+
+2. **Find current task**: Look for last task marked ⏳ PENDING in current phase
+
+3. **Update task status**: Change marker from ⏳ to 🚧 IN PROGRESS
+
+4. **Update Progress Dashboard**:
+   - Find "## 📋 Progress Dashboard" section
+   - Update current task information
+   - Update last updated timestamp
+   - Add action description: "Task [N] started"
+
+5. **Confirm to user**: "Started Task [N]: [Name]. Use `/flow-iteration-add [description]` to create iterations."
+
+**Output**: Update .flow/PLAN.md with task status change and Progress Dashboard update.
+```
+
+---
+
+## /flow-task-complete
+
+**File**: `flow-task-complete.md`
+
+```markdown
+---
+description: Mark current task as complete
+---
+
+You are executing the `/flow-task-complete` command from the Flow framework.
+
+**Purpose**: Mark the current task as ✅ COMPLETE (when all iterations done).
+
+**Context**:
+- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
+- **Working File**: .flow/PLAN.md (current project)
+
+**Instructions**:
+
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+
+2. **Find current task**: Look for task marked 🚧 IN PROGRESS
+
+3. **Verify all iterations complete**: Check that all iterations in this task are marked ✅ COMPLETE
+   - If incomplete iterations found: "Task has incomplete iterations. Complete them first or mark as ❌ CANCELLED / 🔮 DEFERRED."
+
+4. **Update task status**: Change marker from 🚧 to ✅ COMPLETE
+
+5. **Update Progress Dashboard**:
+   - Find "## 📋 Progress Dashboard" section
+   - Update current task to next task (or next phase if all tasks done)
+   - Update completion percentages
+   - Update last updated timestamp
+   - Add action description: "Task [N] complete"
+
+6. **Check if phase complete**:
+   - If all tasks in phase are ✅ COMPLETE: Suggest `/flow-phase-complete`
+   - If more tasks: Auto-advance to next task (show name)
+
+7. **Confirm to user**: "Task [N] marked complete! Next: Task [N+1]: [Name]. Use `/flow-task-start` when ready."
+
+**Output**: Update .flow/PLAN.md with task completion and Progress Dashboard update.
+```
+
+---
+
+## /flow-iteration-add
+
+**File**: `flow-iteration-add.md`
 
 ```markdown
 ---
 description: Add a new iteration under the current task
 ---
 
-You are executing the `/flow-iteration` command from the Flow framework.
+You are executing the `/flow-iteration-add` command from the Flow framework.
 
 **Purpose**: Add a new iteration to the current task in PLAN.md.
 
@@ -569,23 +751,23 @@ If you discover NEW issues while working on this iteration that are NOT part of 
 
 5. **Update .flow/PLAN.md**: Append iteration under current task
 
-6. **Confirm to user**: "Added Iteration [N]: [$ARGUMENTS] to current task. Use `/flow-brainstorm_start [topic]` to begin."
+6. **Confirm to user**: "Added Iteration [N]: [$ARGUMENTS] to current task. Use `/flow-brainstorm-start [topic]` to begin."
 
 **Output**: Update .flow/PLAN.md with new iteration.
 ```
 
 ---
 
-## /flow-brainstorm_start
+## /flow-brainstorm-start
 
-**File**: `flow-brainstorm_start.md`
+**File**: `flow-brainstorm-start.md`
 
 ```markdown
 ---
 description: Start brainstorming session for current iteration
 ---
 
-You are executing the `/flow-brainstorm_start` command from the Flow framework.
+You are executing the `/flow-brainstorm-start` command from the Flow framework.
 
 **Purpose**: Begin a brainstorming session for the current iteration.
 
@@ -626,23 +808,23 @@ If you discover NEW issues during brainstorming that are NOT part of the current
 
 6. **Suggest first subject**: Based on iteration name/goal, suggest an initial subject to discuss
 
-7. **Confirm to user**: "Started brainstorming session: [$ARGUMENTS]. First subject: [subject name]. Use `/flow-brainstorm_subject [name]` to add more subjects."
+7. **Confirm to user**: "Started brainstorming session: [$ARGUMENTS]. First subject: [subject name]. Use `/flow-brainstorm-subject [name]` to add more subjects."
 
 **Output**: Update .flow/PLAN.md with brainstorming section and status change.
 ```
 
 ---
 
-## /flow-brainstorm_subject
+## /flow-brainstorm-subject
 
-**File**: `flow-brainstorm_subject.md`
+**File**: `flow-brainstorm-subject.md`
 
 ```markdown
 ---
 description: Add a subject to discuss in brainstorming
 ---
 
-You are executing the `/flow-brainstorm_subject` command from the Flow framework.
+You are executing the `/flow-brainstorm-subject` command from the Flow framework.
 
 **Purpose**: Add a new subject to the current brainstorming session.
 
@@ -667,16 +849,16 @@ You are executing the `/flow-brainstorm_subject` command from the Flow framework
 
 ---
 
-## /flow-brainstorm_resolve
+## /flow-brainstorm-resolve
 
-**File**: `flow-brainstorm_resolve.md`
+**File**: `flow-brainstorm-resolve.md`
 
 ```markdown
 ---
 description: Resolve current subject with decision
 ---
 
-You are executing the `/flow-brainstorm_resolve` command from the Flow framework.
+You are executing the `/flow-brainstorm-resolve` command from the Flow framework.
 
 **Purpose**: Mark a brainstorming subject as resolved with a decision.
 
@@ -742,27 +924,27 @@ You are executing the `/flow-brainstorm_resolve` command from the Flow framework
 8. **Update .flow/PLAN.md**: Update subject status, add resolution section, create pre-implementation task if Type A
 
 9. **Suggest next action**:
-   - Type A: "Created Pre-Implementation Task [N]. Continue with next subject or use `/flow-brainstorm_complete` when all subjects resolved."
-   - Type B: "Documented decision. Continue with next subject or use `/flow-brainstorm_complete` when all subjects resolved."
-   - Type C: "Auto-resolved. Continue with next subject or use `/flow-brainstorm_complete` when all subjects resolved."
+   - Type A: "Created Pre-Implementation Task [N]. Continue with next subject or use `/flow-brainstorm-complete` when all subjects resolved."
+   - Type B: "Documented decision. Continue with next subject or use `/flow-brainstorm-complete` when all subjects resolved."
+   - Type C: "Auto-resolved. Continue with next subject or use `/flow-brainstorm-complete` when all subjects resolved."
 
-10. **Confirm to user**: "Resolved Subject [N]: [Name] ([Resolution Type]). Use `/flow-brainstorm_subject` to add more, or `/flow-brainstorm_complete` when done."
+10. **Confirm to user**: "Resolved Subject [N]: [Name] ([Resolution Type]). Use `/flow-brainstorm-subject` to add more, or `/flow-brainstorm-complete` when done."
 
 **Output**: Update .flow/PLAN.md with resolved subject.
 ```
 
 ---
 
-## /flow-brainstorm_complete
+## /flow-brainstorm-complete
 
-**File**: `flow-brainstorm_complete.md`
+**File**: `flow-brainstorm-complete.md`
 
 ```markdown
 ---
 description: Complete brainstorming and generate action items
 ---
 
-You are executing the `/flow-brainstorm_complete` command from the Flow framework.
+You are executing the `/flow-brainstorm-complete` command from the Flow framework.
 
 **Purpose**: Close the current brainstorming session (only after pre-implementation tasks are done).
 
@@ -790,23 +972,23 @@ You are executing the `/flow-brainstorm_complete` command from the Flow framewor
 
 5. **Add note**: "**Status**: All brainstorming complete, pre-implementation tasks done, ready for implementation"
 
-6. **Confirm to user**: "Brainstorming session complete. Iteration is now 🎨 READY FOR IMPLEMENTATION. Use `/flow-implement_start` to begin."
+6. **Confirm to user**: "Brainstorming session complete. Iteration is now 🎨 READY FOR IMPLEMENTATION. Use `/flow-implement-start` to begin."
 
 **Output**: Update .flow/PLAN.md with brainstorming completion status.
 ```
 
 ---
 
-## /flow-implement_start
+## /flow-implement-start
 
-**File**: `flow-implement_start.md`
+**File**: `flow-implement-start.md`
 
 ```markdown
 ---
 description: Begin implementation of current iteration
 ---
 
-You are executing the `/flow-implement_start` command from the Flow framework.
+You are executing the `/flow-implement-start` command from the Flow framework.
 
 **Purpose**: Begin implementation phase for the current iteration.
 
@@ -866,23 +1048,23 @@ If you discover NEW issues during implementation that are NOT part of the curren
    ---
    ```
 
-6. **Confirm to user**: "Implementation started for Iteration [N]. Work through action items and check them off as you complete them. Use `/flow-implement_complete` when done."
+6. **Confirm to user**: "Implementation started for Iteration [N]. Work through action items and check them off as you complete them. Use `/flow-implement-complete` when done."
 
 **Output**: Update .flow/PLAN.md with implementation section and status change.
 ```
 
 ---
 
-## /flow-implement_complete
+## /flow-implement-complete
 
-**File**: `flow-implement_complete.md`
+**File**: `flow-implement-complete.md`
 
 ```markdown
 ---
 description: Mark current iteration as complete
 ---
 
-You are executing the `/flow-implement_complete` command from the Flow framework.
+You are executing the `/flow-implement-complete` command from the Flow framework.
 
 **Purpose**: Mark the current iteration as complete.
 
@@ -920,7 +1102,7 @@ You are executing the `/flow-implement_complete` command from the Flow framework
    - If all iterations in task complete → Mark task ✅
    - If all tasks in phase complete → Mark phase ✅
 
-9. **Confirm to user**: "Iteration [N] marked complete! Use `/flow-iteration [description]` to start next iteration, or `/flow-status` to see current state."
+9. **Confirm to user**: "Iteration [N] marked complete! Use `/flow-iteration-add [description]` to start next iteration, or `/flow-status` to see current state."
 
 **Output**: Update .flow/PLAN.md with completion status and summary.
 ```
@@ -1000,10 +1182,10 @@ You are executing the `/flow-status` command from the Flow framework.
    ```
 
 7. **Suggest next action**:
-   - If ⏳ PENDING → "Use `/flow-brainstorm_start [topic]` to begin"
-   - If 🚧 IN PROGRESS (brainstorming) → "Continue resolving subjects with `/flow-brainstorm_resolve`"
-   - If 🎨 READY → "Use `/flow-implement_start` to begin implementation"
-   - If 🚧 IN PROGRESS (implementing) → "Work through action items, use `/flow-implement_complete` when done"
+   - If ⏳ PENDING → "Use `/flow-brainstorm-start [topic]` to begin"
+   - If 🚧 IN PROGRESS (brainstorming) → "Continue resolving subjects with `/flow-brainstorm-resolve`"
+   - If 🎨 READY → "Use `/flow-implement-start` to begin implementation"
+   - If 🚧 IN PROGRESS (implementing) → "Work through action items, use `/flow-implement-complete` when done"
    - If ✅ COMPLETE → "Use `/flow-iteration [description]` to start next iteration"
 
 8. **Show progress summary**:
@@ -1226,10 +1408,10 @@ You are executing the `/flow-next-subject` command from the Flow framework.
 
 4. **If found**:
    - Display subject name and description
-   - Ask: "Ready to resolve this subject? Use `/flow-brainstorm_resolve [subject-name]`"
+   - Ask: "Ready to resolve this subject? Use `/flow-brainstorm-resolve [subject-name]`"
 
 5. **If all resolved**:
-   - Notify: "All subjects resolved! Use `/flow-brainstorm_complete` to finish brainstorming."
+   - Notify: "All subjects resolved! Use `/flow-brainstorm-complete` to finish brainstorming."
 
 6. **Show progress**: "[N] of [Total] subjects resolved"
 
@@ -1244,31 +1426,46 @@ You are executing the `/flow-next-subject` command from the Flow framework.
 
 ```markdown
 ---
-description: Skip to next iteration (mark current complete)
+description: Show next iteration details
 ---
 
 You are executing the `/flow-next-iteration` command from the Flow framework.
 
-**Purpose**: Move to the next iteration in the plan.
+**Purpose**: Display details about the next pending iteration in the current task.
+
+**Pattern**: Works like `/flow-next-subject` but for iterations - shows what's coming next.
 
 **Instructions**:
 
 1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
-2. **Find current iteration**: Look for last iteration with any active status (⏳ 🚧 🎨 ✅)
+2. **Find current task**: Look for task marked 🚧 IN PROGRESS
 
-3. **Check if current iteration is complete**:
-   - If not ✅ COMPLETE: "Current iteration not complete. Finish it first or use `/flow-iteration` to create a new one."
-   - If ✅ COMPLETE: Proceed
+3. **Find next pending iteration**: Look for first iteration in current task marked ⏳ PENDING
 
-4. **Look for next iteration in plan**:
-   - Check if there's a next iteration already defined (⏳ PENDING)
-   - If found: Display iteration name and ask "Ready to start Iteration [N]: [Name]? Use `/flow-brainstorm_start [topic]`"
-   - If not found: "No next iteration defined. Use `/flow-iteration [description]` to create one."
+4. **If found, display iteration details**:
+   ```
+   📋 Next Iteration:
 
-5. **Show progress**: "Iteration [N] of [Total] complete"
+   **Iteration [N]**: [Name]
 
-**Output**: Show next iteration or prompt to create one.
+   **Goal**: [What this iteration builds]
+
+   **Status**: ⏳ PENDING
+
+   **Approach**: [Brief description from iteration section if available]
+
+   ---
+   Ready to start? Use `/flow-brainstorm-start [topic]` to begin.
+   ```
+
+5. **If NOT found (no pending iterations)**:
+   - Check if current iteration is in progress: "Still working on Iteration [N]: [Name]. Use `/flow-implement-complete` when done."
+   - Otherwise: "No more iterations in current task. Use `/flow-iteration-add [description]` to create next iteration, or `/flow-task-complete` if task is done."
+
+6. **Show progress**: "Iteration [current] of [total] in current task"
+
+**Output**: Display next iteration details and suggest appropriate next action.
 ```
 
 ---
@@ -1279,7 +1476,7 @@ You are executing the `/flow-next-iteration` command from the Flow framework.
 
 ```markdown
 ---
-description: Auto-advance to next pending iteration
+description: Smart helper - suggests next action based on current context
 ---
 
 You are executing the `/flow-next` command from the Flow framework.
@@ -1299,20 +1496,20 @@ You are executing the `/flow-next` command from the Flow framework.
 
    **If in brainstorming (🚧)**:
    - "Use `/flow-next-subject` to see next subject to resolve"
-   - OR "Use `/flow-brainstorm_complete` if all subjects done"
+   - OR "Use `/flow-brainstorm-complete` if all subjects done"
 
    **If ready for implementation (🎨)**:
-   - "Use `/flow-implement_start` to begin implementation"
+   - "Use `/flow-implement-start` to begin implementation"
 
    **If implementing (🚧)**:
    - Show unchecked action items count
-   - "Complete action items and use `/flow-implement_complete` when done"
+   - "Complete action items and use `/flow-implement-complete` when done"
 
    **If iteration complete (✅)**:
    - "Use `/flow-next-iteration` to move to next iteration"
 
    **If pending (⏳)**:
-   - "Use `/flow-brainstorm_start [topic]` to begin this iteration"
+   - "Use `/flow-brainstorm-start [topic]` to begin this iteration"
 
 4. **Show current status summary**: Brief summary of where you are
 
@@ -1586,7 +1783,7 @@ Creates PLAN.md with skeleton
     ↓
 /flow-brainstorm_start
     ↓
-/flow-brainstorm_subject (repeat as needed)
+/flow-brainstorm-subject (repeat as needed)
     ↓
 /flow-brainstorm_resolve (for each subject)
     ↓
@@ -1594,11 +1791,11 @@ Complete pre-implementation tasks (if any)
     ↓
 /flow-brainstorm_complete
     ↓
-/flow-implement_start
+/flow-implement-start
     ↓
 Work through action items (check them off)
     ↓
-/flow-implement_complete
+/flow-implement-complete
     ↓
 Repeat for next iteration
 ```
@@ -1607,7 +1804,7 @@ Repeat for next iteration
 - `/flow-status` - Check current position
 - `/flow-next` - Auto-advance to next step
 - `/flow-rollback` - Undo last change
-- `/flow-phase`, `/flow-task`, `/flow-iteration` - Add structure as needed
+- `/flow-phase-add`, `/flow-task-add`, `/flow-iteration-add` - Add structure as needed
 
 ---
 

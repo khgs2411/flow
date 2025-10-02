@@ -33,7 +33,7 @@ This is the **Flow Framework** - a spec-driven iterative development methodology
 2. **`framework/` directory** (source files)
    - `DEVELOPMENT_FRAMEWORK.md` - Complete methodology documentation
    - `EXAMPLE_PLAN.md` - Reference example (payment gateway project)
-   - `SLASH_COMMANDS.md` - All 15 slash command definitions
+   - `SLASH_COMMANDS.md` - All 20 slash command definitions
 
 3. **Build system**
    - `build-standalone.sh` - Generates `flow.sh` from sources
@@ -44,7 +44,7 @@ This is the **Flow Framework** - a spec-driven iterative development methodology
 **Key principle**: `flow.sh` is the ONLY file needed for distribution. All framework content is embedded within it.
 
 When users run `flow.sh` in their project:
-- Extracts 15 slash commands to `.claude/commands/`
+- Extracts 20 slash commands to `.claude/commands/`
 - Extracts framework docs to `.flow/` directory
 - Everything is self-contained - no network requests or external files needed
 
@@ -180,7 +180,7 @@ chmod +x flow.sh
 
 - **V1.0** (2025-10-01) - Initial release
   - Single-file distribution
-  - 15 slash commands
+  - 20 slash commands
   - Pre-implementation tasks pattern
   - Bugs discovered pattern
   - Dynamic subject addition

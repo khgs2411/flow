@@ -1484,37 +1484,176 @@ This framework is designed to work with slash commands that automate plan file u
 
 **Prefix**: All commands use `flow-` prefix to prevent conflicts with other frameworks.
 
-### Initial Planning
+**Total Commands**: 24 commands organized into 6 categories
 
-- `/flow-blueprint [feature-description]` - **START HERE**: Generate initial PLAN.md with skeleton structure (phases/tasks/iterations). AI will ask for reference implementation if not provided.
+**Design Principles**:
+- ✅ **Consistent Naming**: All separators use hyphens (no underscores)
+- ✅ **Symmetric Lifecycle**: Every hierarchy level has add → start → complete
+- ✅ **Clear Intent**: Suffix indicates action (`-add`, `-start`, `-complete`)
+- ✅ **Auto-Update**: All state-changing commands update Progress Dashboard atomically
 
-### Structure Commands
+---
 
-- `/flow-phase [description]` - Start new phase
-- `/flow-task [description]` - Start new task within current phase
-- `/flow-iteration [description]` - Start new iteration within current task
+### 1. Plan Initialization (3 commands)
 
-### Brainstorming Workflow
+**Use Case**: Start a new project or migrate existing documentation
 
-- `/flow-brainstorm_start [topic]` - Begin brainstorming session for current iteration
-- `/flow-brainstorm_subject [name]` - Add new subject to discuss
-- `/flow-brainstorm_resolve [subject-name]` - Mark subject as resolved with decision
-- `/flow-brainstorm_complete` - Close brainstorming (only after pre-tasks done)
+- `/flow-blueprint [feature-description]` - **START HERE**: Generate initial PLAN.md with skeleton structure (phases/tasks/iterations). AI will ask for reference implementation, testing methodology, and project constraints.
+- `/flow-migrate [file-path]` - Migrate existing PRD/PLAN/TODO to Flow format (creates backup, preserves all content)
+- `/flow-plan-update` - Update existing PLAN.md to latest Flow framework structure (moves Progress Dashboard, standardizes markers)
 
-### Implementation Workflow
+---
 
-- `/flow-implement_start` - Begin implementation phase
-- `/flow-implement_complete` - Mark current iteration complete
+### 2. Phase Lifecycle (3 commands)
 
-### Navigation & State
+**Use Case**: Manage top-level project milestones (e.g., "Foundation", "Core Implementation", "Testing")
 
-- `/flow-status` - Show current position in plan (phase → task → iteration → status)
-- `/flow-next` - Auto-detect context and suggest next command (smart helper)
-- `/flow-next-subject` - Move to next unresolved brainstorming subject
-- `/flow-next-iteration` - Move to next iteration in plan
-- `/flow-rollback` - Undo last change to plan file
+**Symmetric Triplet** (create → start → complete):
+- `/flow-phase-add [description]` - Create new phase structure in PLAN.md
+- `/flow-phase-start` - Mark current phase as 🚧 IN PROGRESS (when first task starts)
+- `/flow-phase-complete` - Mark current phase as ✅ COMPLETE (when all tasks done, auto-advances to next phase)
 
-See `.claude/commands/` for slash command implementations.
+**Why Symmetric?** Users need explicit control over phase boundaries. "Adding" a phase doesn't mean you're ready to start it.
+
+---
+
+### 3. Task Lifecycle (3 commands)
+
+**Use Case**: Manage work units within a phase (e.g., "Database Schema", "API Endpoints", "Error Handling")
+
+**Symmetric Triplet** (create → start → complete):
+- `/flow-task-add [description]` - Create new task structure under current phase
+- `/flow-task-start` - Mark current task as 🚧 IN PROGRESS (when first iteration starts)
+- `/flow-task-complete` - Mark current task as ✅ COMPLETE (when all iterations done, auto-advances to next task)
+
+**Why Symmetric?** Tasks are work units that need clear start/end boundaries, not just structure.
+
+---
+
+### 4. Iteration Lifecycle (6 commands)
+
+**Use Case**: Build a single feature increment through brainstorming → implementation
+
+**Symmetric Lifecycle** (create → design → build → complete):
+- `/flow-iteration-add [description]` - Create new iteration structure under current task
+
+**Brainstorming Phase** (design before code):
+- `/flow-brainstorm-start [topic]` - Begin brainstorming session, mark iteration as 🚧 IN PROGRESS (brainstorming)
+- `/flow-brainstorm-subject [name]` - Add new subject to discuss during brainstorming
+- `/flow-brainstorm-resolve [subject-name]` - Mark subject as resolved with decision (Type A: pre-task, Type B: documentation, Type C: auto-resolved)
+- `/flow-brainstorm-complete` - Close brainstorming, mark iteration as 🎨 READY FOR IMPLEMENTATION (only after pre-tasks done)
+
+**Implementation Phase** (build the code):
+- `/flow-implement-start` - Begin implementation, mark iteration as 🚧 IN PROGRESS (implementing)
+- `/flow-implement-complete` - Mark iteration as ✅ COMPLETE, auto-advance to next iteration
+
+**Why Two Phases?** Flow's core value is "design before code" - brainstorming must be distinct from implementation.
+
+---
+
+### 5. Navigation Commands (3 commands)
+
+**Use Case**: Find your way through the plan, understand what's next
+
+**Consistent Pattern** - `/flow-next-X` shows details about next X in sequence:
+
+- `/flow-next` - **Smart universal navigator**: Analyzes PLAN.md state and suggests appropriate next command
+  - "What should I do next?" → Context-aware suggestion
+  - If iteration is ⏳ → suggests `/flow-brainstorm-start`
+  - If iteration is 🎨 → suggests `/flow-implement-start`
+  - If iteration is ✅ → suggests next iteration or `/flow-iteration-add`
+
+- `/flow-next-subject` - **Brainstorming navigator**: Shows next unresolved subject (⏳) in current brainstorming session
+  - "What subject should I discuss next?" → Displays subject name + description
+  - Specific to brainstorming phase
+
+- `/flow-next-iteration` - **Task navigator**: Shows next pending iteration (⏳) in current task
+  - "What iteration should I work on next?" → Displays iteration goal + approach
+  - Helps user understand upcoming work
+
+**Relationship**: Work together - run `/flow-next` for suggestion → run `/flow-next-iteration` for details
+
+---
+
+### 6. Status & Validation (5 commands)
+
+**Use Case**: Understand project state, verify accuracy, manage context
+
+- `/flow-status` - Show current position (phase → task → iteration → status) + verify Progress Dashboard consistency
+  - Smart verification: skips ✅ COMPLETE items (verified & frozen), only checks active work
+  - Suggests next action based on current status
+
+- `/flow-summarize` - Generate high-level overview of entire project structure (all phases/tasks/iterations)
+  - Bird's eye view with completion percentages
+  - Compact format showing completed vs pending work
+  - Useful for status reports and V1/V2 planning
+
+- `/flow-verify-plan` - Verify PLAN.md is synchronized with actual codebase state
+  - Checks if completed action items actually exist in code
+  - Identifies unreported work (modified files not in PLAN)
+  - Run before compacting or starting new session
+
+- `/flow-compact` - Generate comprehensive context transfer report for new AI session
+  - Zero context loss handoff
+  - Includes decisions, progress, challenges, next steps
+  - Critical for conversation continuity
+
+- `/flow-rollback` - Undo last change to PLAN.md (limited to one step)
+  - Emergency undo for accidental changes
+  - Uses changelog to identify last change
+
+---
+
+## Command Usage Flow
+
+**Typical workflow for a new iteration**:
+
+```
+1. /flow-iteration-add "Feature name"
+2. /flow-brainstorm-start "Feature design"
+3. /flow-brainstorm-subject "Architecture decision"
+4. /flow-brainstorm-resolve "Architecture decision"
+   (repeat subjects as needed)
+5. Complete pre-implementation tasks (if any from Type A resolutions)
+6. /flow-brainstorm-complete
+7. /flow-implement-start
+8. Work through action items, check off as complete
+9. /flow-implement-complete
+10. /flow-status (verify and move to next iteration)
+```
+
+**Helper commands at any time**:
+- `/flow-status` - Where am I?
+- `/flow-next` - What should I do?
+- `/flow-next-iteration` - What's coming next?
+
+---
+
+## Command Design Rationale
+
+**Why 24 commands instead of fewer?**
+- Explicit is better than implicit - users want clear control
+- Symmetric naming is predictable and discoverable
+- Each command has single responsibility (no overloading)
+
+**Why hyphens instead of underscores?**
+- Standard in CLI tools (kubectl, docker, gh, npm)
+- Consistent with existing Flow commands
+- Easier to type and read
+
+**Why `-add` suffix for structure commands?**
+- Makes intent crystal clear ("I'm creating new structure, not starting work")
+- Distinguishes from `-start` (begin work) and `-complete` (finish work)
+- Eliminates confusion about command purpose
+
+**Why auto-update Progress Dashboard?**
+- Dashboard is "mission control" - must NEVER be stale
+- Manual updates lead to inconsistency
+- Real-time state is core Flow promise
+
+---
+
+See `.claude/commands/` for complete slash command implementations.
 
 ---
 
