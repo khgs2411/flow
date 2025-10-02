@@ -1506,10 +1506,10 @@ You are executing the `/flow-next-subject` command from the Flow framework.
    - Update PLAN.md with resolution
    - Show progress: "[N] of [Total] subjects resolved"
    - Auto-show next unresolved subject (if any)
-   - If all resolved: "All subjects resolved! Use `/flow-brainstorm-complete` to finish."
+   - If all resolved: "All subjects resolved! Use `/flow-brainstorm-review` to review decisions and plan follow-up work."
 
 5. **If all resolved**:
-   - Notify: "All subjects resolved! Use `/flow-brainstorm-complete` to finish brainstorming."
+   - Notify: "All subjects resolved! Use `/flow-brainstorm-review` to review decisions, identify pre-tasks, and plan follow-up work."
    - Show summary of what was decided
 
 **Key Principle**: Moving to next subject implies current is resolved. No separate "resolve" command needed.

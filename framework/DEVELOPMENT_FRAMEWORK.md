@@ -1408,6 +1408,46 @@ When rewriting/refactoring existing code, document what you improved:
   - **Check for staleness** - if implementation diverges from plan, update the plan
 - The plan file is the source of truth and must stay synchronized with actual progress
 
+### 9. Brainstorming Completion Workflow (CRITICAL)
+
+**When AI resolves subjects naturally** (without using slash commands):
+
+After resolving the LAST subject in brainstorming session:
+- ✅ DO: Suggest `/flow-brainstorm-review` to review all decisions
+- ❌ DON'T: Suggest `/flow-brainstorm-complete` directly
+
+**The correct sequence**:
+1. All subjects resolved → Suggest `/flow-brainstorm-review`
+2. Review creates pre-tasks → Work on pre-tasks immediately
+3. All pre-tasks complete → Suggest `/flow-brainstorm-complete`
+4. Brainstorming complete → Suggest `/flow-implement-start`
+
+**When pre-implementation tasks exist**:
+- If pre-tasks are ⏳ PENDING → Suggest working on them, NOT `/flow-brainstorm-complete`
+- If pre-tasks are ✅ COMPLETE → Suggest `/flow-brainstorm-complete`
+- NEVER suggest `/flow-brainstorm-complete` if uncompleted pre-tasks exist
+
+**Example natural conversation**:
+```
+AI resolves last subject → marks it ✅
+AI: "All subjects resolved! Next: Use `/flow-brainstorm-review` to review
+     all decisions and identify any pre-implementation work needed."
+
+User runs /flow-brainstorm-review
+AI: "I recommend creating 3 pre-implementation tasks..."
+User: "Yes, create them"
+AI creates pre-tasks in PLAN.md
+
+AI: "Pre-tasks created. Let's start with Task 1: [description]. Ready to begin?"
+User works on pre-tasks...
+
+All pre-tasks complete → AI: "All pre-tasks complete! Use
+    `/flow-brainstorm-complete` to mark brainstorming done and move to
+    implementation."
+```
+
+**Why this matters**: `/flow-brainstorm-complete` will BLOCK if pre-tasks are incomplete. The AI should guide users through the correct workflow to avoid confusion.
+
 ---
 
 ## Example: Iteration Lifecycle

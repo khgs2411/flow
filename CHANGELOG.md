@@ -17,9 +17,9 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.0.12** - Brainstorming Workflow Redesign & Performance Optimization
+**v1.0.13** - Brainstorming Workflow Bug Fixes
 
-See the [v1.0.12 release](https://github.com/khgs2411/flow/releases/tag/v1.0.12) for full details.
+See the [v1.0.13 release](https://github.com/khgs2411/flow/releases/tag/v1.0.13) for full details.
 
 ## Version Numbering
 
