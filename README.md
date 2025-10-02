@@ -69,7 +69,7 @@ chmod +x flow.sh
 ```
 
 **What just happened?**
-- ✅ Created `.claude/commands/` with 20 slash commands
+- ✅ Created `.claude/commands/` with 24 slash commands
 - ✅ Created `.flow/` with framework documentation
 - ✅ Your project is ready to use Flow!
 
@@ -142,7 +142,7 @@ The Flow framework is a spec-driven iterative development methodology that combi
 
 ## 📦 What's New
 
-**Latest version**: [v1.0.10](https://github.com/khgs2411/flow/releases/tag/v1.0.10) - Documentation & Version Improvements
+**Latest version**: [v1.0.11](https://github.com/khgs2411/flow/releases/tag/v1.0.11) - README Command Reference Update
 
 See [**GitHub Releases**](https://github.com/khgs2411/flow/releases) for detailed changelog and version history.
 
@@ -196,8 +196,8 @@ flow/
 - **Shows**: Full workflow from brainstorming → implementation → completion
 
 #### 3c. **SLASH_COMMANDS.md** (The Command Definitions)
-- **Purpose**: All 20 slash command definitions
-- **Commands**: Planning (3), Structure (3), Brainstorming (4), Implementation (2), Navigation (8)
+- **Purpose**: All 24 slash command definitions
+- **Commands**: Planning (3), Phase Lifecycle (3), Task Lifecycle (3), Iteration Lifecycle (6), Navigation (3), Status & Validation (5)
 
 ---
 
@@ -211,7 +211,7 @@ flow/
 
 **When you run `flow.sh` in your project:**
 - Creates `.claude/commands/` and `.flow/` directories
-- Extracts 20 slash commands from embedded data
+- Extracts 24 slash commands from embedded data
 - Writes DEVELOPMENT_FRAMEWORK.md and EXAMPLE_PLAN.md to `.flow/`
 - All content is embedded in flow.sh - no external files needed!
 
@@ -264,10 +264,10 @@ cd /path/to/your/project
 **What gets installed:**
 ```
 your-project/
-├── .claude/commands/          # 20 slash commands
+├── .claude/commands/          # 24 slash commands
 │   ├── flow-blueprint.md
-│   ├── flow-phase.md
-│   └── ... (13 more)
+│   ├── flow-phase-add.md
+│   └── ... (22 more)
 └── .flow/                     # Framework documentation
     ├── DEVELOPMENT_FRAMEWORK.md
     └── EXAMPLE_PLAN.md
@@ -316,7 +316,7 @@ vim framework/SLASH_COMMANDS.md
 ### 2. Start First Iteration
 
 ```bash
-/flow-brainstorm_start Conflict Resolution Architecture
+/flow-brainstorm-start Conflict Resolution Architecture
 ```
 
 **What happens**: Marks iteration as "In Progress", creates brainstorming section.
@@ -324,9 +324,9 @@ vim framework/SLASH_COMMANDS.md
 ### 3. Add Subjects During Discussion
 
 ```bash
-/flow-brainstorm_subject Data Structure (CRDT vs OT)
-/flow-brainstorm_subject WebSocket vs WebRTC
-/flow-brainstorm_subject Offline Support Strategy
+/flow-brainstorm-subject Data Structure (CRDT vs OT)
+/flow-brainstorm-subject WebSocket vs WebRTC
+/flow-brainstorm-subject Offline Support Strategy
 ```
 
 **What happens**: Subjects added to "Subjects to Discuss" list with ⏳ status.
@@ -334,7 +334,7 @@ vim framework/SLASH_COMMANDS.md
 ### 4. Resolve Each Subject
 
 ```bash
-/flow-brainstorm_resolve Data Structure (CRDT vs OT)
+/flow-brainstorm-resolve Data Structure (CRDT vs OT)
 ```
 
 **Prompts you for**:
@@ -346,7 +346,7 @@ vim framework/SLASH_COMMANDS.md
 
 ```bash
 /flow-next-subject  # Shows next unresolved subject
-/flow-brainstorm_resolve WebSocket vs WebRTC
+/flow-brainstorm-resolve WebSocket vs WebRTC
 # ...continue for remaining subjects
 ```
 
@@ -371,7 +371,7 @@ During brainstorming, you realize the current network layer needs refactoring:
 ### 6. Complete Brainstorming
 
 ```bash
-/flow-brainstorm_complete
+/flow-brainstorm-complete
 ```
 
 **What happens**: Checks all subjects resolved and pre-tasks done, marks iteration 🎨 Ready.
@@ -379,7 +379,7 @@ During brainstorming, you realize the current network layer needs refactoring:
 ### 7. Implement
 
 ```bash
-/flow-implement_start
+/flow-implement-start
 ```
 
 **What happens**: Creates implementation section with all action items from brainstorming.
@@ -393,7 +393,7 @@ Work through the code, checking off action items as you complete them:
 ### 8. Complete Iteration
 
 ```bash
-/flow-implement_complete
+/flow-implement-complete
 ```
 
 **What happens**: Marks iteration ✅ Complete, asks for verification notes, updates task/phase if all iterations done.
@@ -472,7 +472,7 @@ Flow provides **24 slash commands** organized into **6 categories**. **Important
 - Updates Progress Dashboard, advances to next task
 - **Manual**: Change task marker to ✅, update dashboard
 
-### 4. Iteration Lifecycle (6 commands)
+### 4. Iteration Lifecycle (7 commands)
 
 **`/flow-iteration-add <iteration-name>`** (was `/flow-iteration`)
 - Adds new iteration under current task
@@ -642,11 +642,11 @@ AI: [reads section, follows steps 1-8 manually]
 
 4. **Continue with other commands**:
    ```
-   "Read framework/SLASH_COMMANDS.md section '/flow-brainstorm_start' and execute for 'API design'"
+   "Read framework/SLASH_COMMANDS.md section '/flow-brainstorm-start' and execute for 'API design'"
 
-   "Read framework/SLASH_COMMANDS.md section '/flow-brainstorm_resolve' and resolve Subject 1"
+   "Read framework/SLASH_COMMANDS.md section '/flow-brainstorm-resolve' and resolve Subject 1"
 
-   "Read framework/SLASH_COMMANDS.md section '/flow-implement_start' and begin implementation"
+   "Read framework/SLASH_COMMANDS.md section '/flow-implement-start' and begin implementation"
    ```
 
 ### Example Usage with ChatGPT
@@ -717,21 +717,23 @@ When you get to step 4 (testing methodology), here are my answers:
 - ✅ Progress tracking with status markers
 - ✅ Testing Strategy enforcement
 - ✅ Scope Boundary Rule
-- ✅ All 20 commands via manual prompts
+- ✅ All 24 commands via manual prompts
 
 ### Available Commands
 
-All 20 commands in SLASH_COMMANDS.md work this way:
+All 24 commands in SLASH_COMMANDS.md work this way:
 
-**Planning**: `/flow-blueprint`, `/flow-migrate`, `/flow-update-plan-version`
+**Planning**: `/flow-blueprint`, `/flow-migrate`, `/flow-plan-update`
 
-**Structure**: `/flow-phase`, `/flow-task`, `/flow-iteration`
+**Phase Lifecycle**: `/flow-phase-add`, `/flow-phase-start`, `/flow-phase-complete`
 
-**Brainstorming**: `/flow-brainstorm_start`, `/flow-brainstorm_subject`, `/flow-brainstorm_resolve`, `/flow-brainstorm_complete`
+**Task Lifecycle**: `/flow-task-add`, `/flow-task-start`, `/flow-task-complete`
 
-**Implementation**: `/flow-implement_start`, `/flow-implement_complete`
+**Iteration Lifecycle**: `/flow-iteration-add`, `/flow-brainstorm-start`, `/flow-brainstorm-subject`, `/flow-brainstorm-resolve`, `/flow-brainstorm-complete`, `/flow-implement-start`, `/flow-implement-complete`
 
-**Navigation**: `/flow-status`, `/flow-next`, `/flow-next-subject`, `/flow-next-iteration`, `/flow-rollback`, `/flow-verify-plan`, `/flow-summarize`, `/flow-compact`
+**Navigation**: `/flow-next`, `/flow-next-subject`, `/flow-next-iteration`
+
+**Status & Validation**: `/flow-status`, `/flow-summarize`, `/flow-verify-plan`, `/flow-compact`, `/flow-rollback`
 
 Just reference the section name in your prompt!
 

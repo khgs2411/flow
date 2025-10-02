@@ -1913,7 +1913,7 @@ COMMANDS_DATA_EOF
 
 get_framework_content() {
   cat <<'FRAMEWORK_DATA_EOF'
-**Version**: 1.0.9
+**Version**: 1.0.11
 
 # Domain-Driven Design with Agile Iterative Philosophy
 
@@ -3588,7 +3588,7 @@ By following this framework, you build complex features incrementally with minim
 
 ---
 
-**Version**: 1.0.9
+**Version**: 1.0.11
 **Last Updated**: 2025-10-02
 FRAMEWORK_DATA_EOF
 }

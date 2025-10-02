@@ -17,9 +17,9 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.0.10** - Documentation & Version Improvements
+**v1.0.11** - README Command Reference Update
 
-See the [v1.0.10 release](https://github.com/khgs2411/flow/releases/tag/v1.0.10) for full details.
+See the [v1.0.11 release](https://github.com/khgs2411/flow/releases/tag/v1.0.11) for full details.
 
 ## Version Numbering
 
