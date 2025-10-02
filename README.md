@@ -15,7 +15,6 @@
 
 - [🚀 Quick Start](#-quick-start-30-seconds)
 - [Overview](#overview)
-- [What's New](#whats-new-v10)
 - [Project Structure](#project-structure)
 - [How It Works](#how-it-works)
 - [Installation](#installation)
@@ -115,97 +114,11 @@ The Flow framework is a spec-driven iterative development methodology that combi
 
 ---
 
-## What's New in V1.0.8 🎉
+## 📦 What's New
 
-### Critical Feature: Scope Boundary Rule
-- ✅ **🚨 AI Scope Control** - Prevents AI from fixing out-of-scope issues without permission
-- ✅ **Explicit User Consent Required** - AI must STOP and ask before handling discovered issues
-- ✅ **Framework-wide Rule** - Added to all workflow commands (phase/task/iteration/brainstorm/implement)
-- ✅ **Documented Pattern** - Complete example in EXAMPLE_PLAN.md showing proper scope violation handling
-- ✅ **Prevents Scope Creep** - Maintains Flow's intentional progression
+**Latest version**: [v1.0.8](https://github.com/khgs2411/flow/releases/tag/v1.0.8) - Scope Boundary Rule
 
-### What This Fixes
-**Problem**: While working on Pre-Implementation Task 2, AI discovers unrelated bug in Test 3 and "helpfully" fixes it without asking, causing:
-- Untracked changes outside current scope
-- Confusion in code review ("why are these changes here?")
-- Loss of user's ability to prioritize work
-- Violation of Flow's principle of intentional, focused iterations
-
-**Solution**: AI now STOPS immediately, notifies user, discusses options (add to brainstorm, create pre-task, defer, or fix now), and ONLY proceeds with explicit approval.
-
-### Version History
-
----
-
-## What's New in V1.0.7
-
-### Subject Resolution Types
-- ✅ **Type A: Pre-Implementation Task** - Code changes needed before iteration
-- ✅ **Type B: Immediate Documentation** - Architectural decisions, no code yet
-- ✅ **Type C: Auto-Resolved** - Answered by cascade effect from other subjects
-- ✅ **Enhanced /flow-brainstorm_resolve** - Guides AI to choose correct resolution type
-
-### Migration Cleanup Enhancements
-- ✅ **Duplicate Section Removal** - Auto-removes old "Implementation Tasks", "Current Phase" duplicates
-- ✅ **Status Pointer Updates** - Converts "Search for 'Current Phase'" to jump links
-- ✅ **Redundant Framework Docs** - Identifies and removes custom brainstorming docs (now in Flow)
-- ✅ **Applied to Both Commands** - /flow-migrate and /flow-update-plan-version
-
----
-
-## What's New in V1.0.6
-
-### Critical Bugfixes
-- ✅ **flow-compact Command** - Added missing command to build script (was defined but never installed)
-- ✅ **README Command Counts** - Fixed Table of Contents (Planning: 1→3, Navigation: 5→8, Total: 18→20)
-- ✅ **Migration Documentation** - Added docs for /flow-migrate and /flow-update-plan-version
-- ✅ **Force Flag Fix** - `flow.sh --force` now truly overwrites (explicit file deletion)
-
----
-
-## What's New in V1.0.5
-
-### Major Features
-- ✅ **`.flow/` Directory Standard** - Flow now manages plans from `.flow/PLAN.md` (single source of truth)
-- ✅ **`/flow-migrate` Command** - Convert existing PRD.md, PLAN.md, TODO.md to Flow format mid-development
-- ✅ **`/flow-blueprint` Enhanced** - Always creates fresh `.flow/PLAN.md`, ignoring existing plans
-- ✅ **Smart Migration Paths** - Auto-detects structured/flat/unstructured docs and migrates intelligently
-- ✅ **Backup System** - Migration creates timestamped backups of original files
-- ✅ **Universal Compatibility** - Works with TaskMaster AI, Spec-Kit, and custom documentation
-
-### Migration Features
-- 🔍 **Auto-discovery** - Searches for PRD.md, PLAN.md, TODO.md, DEVELOPMENT.md, etc.
-- 🧠 **Structure Detection** - Recognizes phases/tasks/iterations or flat lists
-- 💾 **Content Preservation** - NEVER discards original content, only enhances with Flow formatting
-- 🎯 **Three Migration Paths**:
-  - **Structured** (has phases/tasks) → Enhance with Flow features
-  - **Flat List** (todos) → Convert to Flow hierarchy
-  - **Unstructured** (notes) → Extract concepts into brainstorming subjects
-
-### Breaking Changes
-- ⚠️ **PLAN.md location changed** from project root to `.flow/PLAN.md`
-- ⚠️ All slash commands now read/write `.flow/PLAN.md`
-- ⚠️ Use `/flow-migrate` to move existing plans to new location
-
----
-
-## What's New in V1.0 (Previous Release)
-
-### Core Features
-- ✅ **Single File Distribution** - `flow.sh` is self-contained (~63KB, no dependencies)
-- ✅ **Automated Deployment** - One command (`./flow.sh`) installs everything
-- ✅ **Universal Compatibility** - Pure bash, works everywhere
-
-### Framework Structure
-- ✅ **Clean Organization** - Source files in `framework/` directory
-- ✅ **Build System** - `build-standalone.sh` regenerates distribution
-- ✅ **Portable** - Auto-locates in `.flow/`, `.claude/`, or `~/.claude/flow/`
-
-### Development Patterns
-- ✅ **Complete Example** - Mock payment gateway project in EXAMPLE_PLAN.md
-- ✅ **Bugs Discovered Pattern** - Document bugs found during brainstorming
-- ✅ **Improvements Tracking** - Track what you improved over originals
-- ✅ **Dynamic Subject Addition** - Add brainstorming subjects on-the-fly
+See [**GitHub Releases**](https://github.com/khgs2411/flow/releases) for detailed changelog and version history.
 
 ---
 
