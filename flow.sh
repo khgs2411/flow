@@ -115,6 +115,35 @@ You are executing the `/flow-blueprint` command from the Flow framework.
 
 **IMPORTANT**: This command ALWAYS creates a fresh `.flow/PLAN.md`, overwriting any existing plan file. Use `/flow-migrate` if you want to convert existing documentation.
 
+**💡 TIP FOR USERS**: Provide rich context in $ARGUMENTS! You are the domain expert - the more details you provide upfront, the better the plan.
+
+**Good example**:
+```
+/flow-blueprint "Payment Gateway Integration
+
+Requirements:
+- Integrate with Stripe API for credit card processing
+- Support webhooks for async payment notifications
+- Handle failed payments with retry logic (3 attempts, exponential backoff)
+
+Constraints:
+- Must work with existing Express.js backend
+- Maximum 2-second response time
+
+Reference:
+- See src/legacy/billing.ts for old PayPal integration
+- Similar webhook pattern in src/webhooks/shipment.ts
+
+Testing:
+- Simulation-based per service (scripts/{service}.scripts.ts)
+"
+```
+
+**Minimal example** (AI will ask follow-up questions):
+```
+/flow-blueprint "payment gateway"
+```
+
 **Instructions**:
 
 1. **Read the framework guide**:
@@ -129,14 +158,18 @@ You are executing the `/flow-blueprint` command from the Flow framework.
    - Note the status markers and section structure
 
 2. **Analyze the feature request**: `$ARGUMENTS`
+   - Extract all provided information: requirements, constraints, reference paths, testing preferences
+   - If user provided rich context (requirements, constraints, references), use it directly
+   - If minimal context provided (just a name), prepare to ask follow-up questions
 
-3. **Check for reference implementation**:
-   - If user mentioned a reference path in arguments, use it
-   - Otherwise, ask: "Do you have a reference implementation I should analyze? (Provide path or say 'no')"
+3. **Check for reference implementation** (if not already in $ARGUMENTS):
+   - If user mentioned reference paths in arguments (e.g., "See src/legacy/billing.ts"), read and analyze them
+   - If no reference mentioned, ask: "Do you have a reference implementation I should analyze? (Provide path or say 'no')"
    - If reference provided, read and analyze it to inform the planning
 
-4. **Gather testing methodology** (CRITICAL - if not in $ARGUMENTS):
-   - Ask: "How do you prefer to verify implementations? Choose or describe:
+4. **Gather testing methodology** (CRITICAL - if not already in $ARGUMENTS):
+   - If user provided testing details in arguments (e.g., "Testing: Simulation-based per service"), use them directly and skip to step 5
+   - Otherwise, ask: "How do you prefer to verify implementations? Choose or describe:
      - **Simulation-based (per-service)**: Each service has its own test file (e.g., `{service}.scripts.ts`)
      - **Simulation-based (single file)**: All tests in one orchestration file (e.g., `run.scripts.ts`)
      - **Unit tests**: Test individual functions/classes after implementation (Jest/Vitest/etc.)

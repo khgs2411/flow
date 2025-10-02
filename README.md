@@ -77,6 +77,32 @@ chmod +x flow.sh
 - **New project**: Run `/flow-blueprint [description]` to create your plan
 - **Existing project**: Run `/flow-migrate` to convert existing docs (PRD.md, PLAN.md, TODO.md, etc.)
 
+**💡 TIP**: Provide rich context to `/flow-blueprint` for better plans!
+```bash
+# Instead of this (minimal):
+/flow-blueprint "payment gateway"
+
+# Do this (rich context):
+/flow-blueprint "Payment Gateway Integration
+
+Requirements:
+- Integrate with Stripe API for credit card processing
+- Support webhooks for async payment notifications
+- Retry logic: 3 attempts with exponential backoff
+
+Constraints:
+- Must work with existing Express.js backend
+- Max 2-second response time
+
+Reference:
+- See src/legacy/billing.ts for old PayPal integration
+
+Testing:
+- Simulation-based per service (scripts/{service}.scripts.ts)
+"
+```
+**Result**: AI has everything upfront, creates better plan with fewer questions!
+
 **Need to reinstall or update?**
 ```bash
 # Use --force to overwrite existing files
