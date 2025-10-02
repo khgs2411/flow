@@ -142,7 +142,7 @@ The Flow framework is a spec-driven iterative development methodology that combi
 
 ## 📦 What's New
 
-**Latest version**: [v1.0.12](https://github.com/khgs2411/flow/releases/tag/v1.0.12) - Brainstorming Workflow Redesign & Performance Optimization
+**Latest version**: [v1.0.13](https://github.com/khgs2411/flow/releases/tag/v1.0.13) - Command Fixes: Pre-Implementation Task Detection
 
 See [**GitHub Releases**](https://github.com/khgs2411/flow/releases) for detailed changelog and version history.
 

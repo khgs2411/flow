@@ -1176,7 +1176,7 @@ You are executing the `/flow-status` command from the Flow framework.
    **Grep 1 - Verify Current Phase**:
    ```bash
    # If Dashboard says "Phase 2", verify Phase 2 marker
-   pattern: "^#### Phase 2:"
+   pattern: "^### Phase 2:"
    Use -A 2 to read status line
    Extract: Status emoji (⏳ 🚧 🎨 ✅ ❌ 🔮)
    ```
@@ -1184,7 +1184,7 @@ You are executing the `/flow-status` command from the Flow framework.
    **Grep 2 - Verify Current Task**:
    ```bash
    # If Dashboard says "Task 4", verify Task 4 marker
-   pattern: "^##### Task 4:"
+   pattern: "^#### Task 4:"
    Use -A 2 to read status line
    Extract: Status emoji
    ```
@@ -1192,9 +1192,36 @@ You are executing the `/flow-status` command from the Flow framework.
    **Grep 3 - Verify Current Iteration**:
    ```bash
    # If Dashboard says "Iteration 6", verify Iteration 6 marker
-   pattern: "^###### Iteration 6:"
+   pattern: "^##### Iteration 6:"
    Use -A 2 to read status line
    Extract: Status emoji
+   ```
+
+   **Grep 4 - Check for Pre-Implementation Tasks**:
+   ```bash
+   # Check if current iteration has pre-implementation tasks
+   pattern: "^### \*\*Pre-Implementation Tasks:\*\*$"
+   Search within current iteration scope
+
+   If found:
+     Count pending: grep -c "^#### ⏳ Task [0-9]"
+     Count complete: grep -c "^#### ✅ Task [0-9]"
+     Extract task names and numbers for reporting
+
+   Use awk to scope search to current iteration:
+   awk '/^##### Iteration X\.Y:.*🚧/,/^#####[^#]|^####[^#]/ {print}' PLAN.md
+   ```
+
+   **Grep 5 - Check Unresolved Brainstorming Subjects**:
+   ```bash
+   # Check if iteration has unresolved subjects
+   Extract "Subjects to Discuss" section:
+   awk '/\*\*Subjects to Discuss\*\*:/,/\*\*Resolved Subjects\*\*:/ {print}'
+
+   Count unresolved: grep -c "^[0-9]\+\. ⏳"
+
+   If any unresolved:
+     Extract subject names for reporting
    ```
 
 4. **Micro integrity check** (active work only):
@@ -1230,15 +1257,61 @@ You are executing the `/flow-status` command from the Flow framework.
      └─ Task [N]: [Name] [Status]
          └─ Iteration [N]: [Name] [Status]
 
+   🔍 Current Phase: [Detailed phase description]
+
+   [If in brainstorming with unresolved subjects:]
+   - Brainstorming subjects: ⏳ In progress (X/Y resolved)
+     - ⏳ Subject Name 1
+     - ⏳ Subject Name 2
+
+   [If in brainstorming with pre-tasks:]
+   - Brainstorming subjects: ✅ All resolved
+   - Pre-implementation tasks: ⏳ In progress (X/Y complete)
+     - ✅ Task 1: Name
+     - ⏳ Task 2: Name (NEXT)
+     - ⏳ Task 3: Name
+
    Last Updated: [Timestamp from Dashboard]
    ```
 
-7. **Suggest next action** (based on current iteration status):
-   - If ⏳ PENDING → "Use `/flow-brainstorm-start [topics]` to begin brainstorming"
-   - If 🚧 IMPLEMENTING (in brainstorm phase) → "Continue with `/flow-next-subject` to resolve subjects"
-   - If 🎨 READY → "Use `/flow-implement-start` to begin implementation"
-   - If 🚧 IMPLEMENTING (in implementation phase) → "Work through action items, use `/flow-implement-complete` when done"
-   - If ✅ COMPLETE → "Use `/flow-iteration-add [description]` to start next iteration"
+7. **Suggest next action** (comprehensive decision tree):
+
+   **Step 1: Check iteration status marker**
+
+   **If ⏳ PENDING**:
+   → "Use `/flow-brainstorm-start [topics]` to begin brainstorming"
+
+   **If 🚧 IN PROGRESS**:
+   **Step 2: Determine which phase** (check in this order):
+
+   A. **Check for unresolved subjects** (from Grep 5):
+      If unresolved subjects exist:
+        → "Continue with `/flow-next-subject` to resolve next subject"
+        Display: Show count and list unresolved subject names
+
+   B. **Check for pre-implementation tasks** (from Grep 4):
+      If pre-tasks section exists:
+        Count pending pre-tasks
+
+        If any pending (⏳):
+          → "Continue with Task X: [Name]" (show next pending pre-task)
+          Display: "Pre-implementation tasks: [X/Y] complete"
+
+        If all complete (✅):
+          → "Pre-implementation tasks complete. Use `/flow-brainstorm-complete` to mark brainstorming done"
+
+   C. **Check for Implementation section**:
+      If "### **Implementation**" section exists:
+        → "Continue main implementation. Use `/flow-implement-complete` when done"
+
+   D. **Default** (subjects resolved, no pre-tasks, no implementation yet):
+      → "Use `/flow-brainstorm-complete` to finish brainstorming"
+
+   **If 🎨 READY**:
+   → "Use `/flow-implement-start` to begin implementation"
+
+   **If ✅ COMPLETE**:
+   → "Use `/flow-iteration-add [description]` to start next iteration"
 
 8. **Show completion summary** (from Dashboard percentages):
    - Display Phase completion percentage
@@ -1588,27 +1661,54 @@ You are executing the `/flow-next` command from the Flow framework.
 
 2. **Determine current context**:
    - Check current iteration status (⏳ 🚧 🎨 ✅)
-   - Check if in brainstorming session (look for "Subjects to Discuss")
-   - Check if in implementation (look for "Action Items")
+   - Check if in brainstorming session:
+     - Look for "Subjects to Discuss" section
+     - Count unresolved subjects: grep -c "^[0-9]\+\. ⏳"
+   - Check for pre-implementation tasks:
+     - Look for "### **Pre-Implementation Tasks:**" section
+     - Count pending: grep -c "^#### ⏳ Task [0-9]"
+     - Count complete: grep -c "^#### ✅ Task [0-9]"
+   - Check if in main implementation (look for "### **Implementation**" section)
 
 3. **Suggest next command based on context**:
 
-   **If in brainstorming (🚧)**:
-   - "Use `/flow-next-subject` to see next subject to resolve"
-   - OR "Use `/flow-brainstorm-complete` if all subjects done"
+   **Determine exact state**:
 
-   **If ready for implementation (🎨)**:
-   - "Use `/flow-implement-start` to begin implementation"
+   **If status = ⏳ PENDING**:
+   → "Use `/flow-brainstorm-start [topic]` to begin this iteration"
 
-   **If implementing (🚧)**:
-   - Show unchecked action items count
-   - "Complete action items and use `/flow-implement-complete` when done"
+   **If status = 🚧 IN PROGRESS**:
+   **Check phase progression** (in this order):
 
-   **If iteration complete (✅)**:
-   - "Use `/flow-next-iteration` to move to next iteration"
+   1. **Check unresolved subjects**:
+      If any "⏳" subjects in "Subjects to Discuss":
+        → "Use `/flow-next-subject` to resolve next subject"
+        Show: "X subjects remaining: [list]"
 
-   **If pending (⏳)**:
-   - "Use `/flow-brainstorm-start [topic]` to begin this iteration"
+   2. **Check pre-implementation tasks**:
+      If "### **Pre-Implementation Tasks:**" section exists:
+        Count pending tasks (^#### ⏳)
+
+        If pending > 0:
+          → "Continue with Task X: [Name]"
+          Show: "[X/Y] pre-implementation tasks complete"
+
+        If pending = 0:
+          → "Pre-implementation complete. Use `/flow-brainstorm-complete`"
+
+   3. **Check main implementation**:
+      If "### **Implementation**" section exists:
+        → "Continue main implementation"
+        Show: "Use `/flow-implement-complete` when done"
+
+   4. **Default** (subjects resolved, no pre-tasks):
+      → "Use `/flow-brainstorm-complete` to finish brainstorming"
+
+   **If status = 🎨 READY**:
+   → "Use `/flow-implement-start` to begin implementation"
+
+   **If status = ✅ COMPLETE**:
+   → "Use `/flow-next-iteration` to move to next iteration"
 
 4. **Show current status summary**: Brief summary of where you are
 

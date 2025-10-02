@@ -17,7 +17,14 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.0.13** - Brainstorming Workflow Bug Fixes
+**v1.0.13** - Command Fixes: Pre-Implementation Task Detection (2025-10-02)
+
+**Critical Bug Fixes**:
+- Fixed heading level patterns in `/flow-status` (was preventing ALL marker detection)
+- Added pre-implementation task detection to `/flow-status` and `/flow-next`
+- Implemented comprehensive decision trees for both commands
+- Enhanced status reporting with progress indicators
+- Framework rule now enforced: Commands check both subjects AND pre-tasks before suggesting completion
 
 See the [v1.0.13 release](https://github.com/khgs2411/flow/releases/tag/v1.0.13) for full details.
 
