@@ -80,14 +80,21 @@ chmod +x flow.sh
 ./flow.sh --force
 ```
 
-**💡 Pro Tip - Starting a New Session:**
-When continuing work or starting a fresh AI session:
+**💡 Pro Tips:**
+
+**Starting a New Session:**
 1. Run `/flow-summarize` - Get the big picture (all phases/tasks/iterations)
 2. Run `/flow-status` - Verify your current position (micro view)
 3. Run `/flow-verify-plan` - Ensure PLAN.md matches actual code
 4. Explicitly tell the AI where you are (e.g., "We're on Iteration 5")
 
-This prevents confusion in large projects (2000+ line PLAN.md files).
+**For Complex Projects (10+ iterations, V1/V2 splits, 2000+ lines):**
+- Add a Progress Dashboard section after Architecture in your PLAN.md
+- Provides always-visible mission control with jump links
+- Commands verify dashboard matches status markers (smart verification skips completed items)
+- See [DEVELOPMENT_FRAMEWORK.md](framework/DEVELOPMENT_FRAMEWORK.md#progress-dashboard-required-for-complex-projects) for template
+
+This prevents confusion in large projects and enables token-efficient verification.
 
 ---
 
@@ -98,6 +105,7 @@ The Flow framework is a spec-driven iterative development methodology that combi
 - **Planning before coding** through structured brainstorming sessions
 - **Iterating in small, testable increments** (skeleton → veins → flesh → fibers)
 - **Preserving context** in a PLAN.md file that survives across sessions
+- **Mandatory status markers** at every level (Phase/Task/Iteration/Subject) for rigorous progress tracking
 - **Enforcing patterns** through slash commands that update the plan automatically
 
 ---

@@ -486,30 +486,51 @@ You are executing the `/flow-status` command from the Flow framework.
 
 1. **Find PLAN.md**: Look in current directory, traverse up if needed
 
-2. **Check for conflicting status sections**:
-   - Search for patterns like "Progress Tracking", "Current Status", "Status Summary"
-   - Look for multiple "**Status**:" lines in the file
-   - Check if status at top of file conflicts with status sections elsewhere
-   - If multiple status sections found:
+2. **Parse Progress Dashboard** (if exists):
+   - Look for "## 📋 Progress Dashboard" section
+   - Extract claimed current phase/task/iteration
+   - Extract completion percentages
+   - Note: Dashboard is manual, may need verification
+
+3. **Parse status markers** (ground truth):
+   - Find current phase (last phase with ⏳ 🚧 🎨 ❌ 🔮)
+   - Find current task (last task with ⏳ 🚧 🎨 ❌ 🔮)
+   - Find current iteration (last iteration with ⏳ 🚧 🎨 ❌ 🔮)
+   - Count ✅ COMPLETE items (these are frozen, skip verification)
+
+4. **Smart verification** (active work only):
+   - **Skip ✅ COMPLETE items** - Already verified, now frozen
+   - **Verify active work** (🚧 ⏳ 🎨):
+     - Check if Progress Dashboard claims match markers
+     - Check if ❌ CANCELLED items have reasons
+     - Check if 🔮 DEFERRED items have reasons + destinations
+   - **Report**:
      ```
-     ⚠️  WARNING: Multiple status sections detected!
+     🔍 Consistency Check (Active Work Only):
 
-     Found status indicators at:
-     - Line [N]: **Status**: [value]
-     - Line [N]: ## Progress Tracking
+     ✅ Phase 2 marker: 🚧 IN PROGRESS ✓
+     ✅ Task 5 marker: 🚧 IN PROGRESS ✓
+     ✅ Iteration 6 marker: 🚧 IN PROGRESS ✓
 
-     This violates Flow's "Single Source of Truth" principle.
-     The authoritative status is at the TOP of PLAN.md.
-     Consider archiving or removing stale status sections.
+     ⏭️  Skipped: 15 completed items (verified & frozen)
+
+     Status: All active markers aligned with Progress Dashboard ✓
      ```
 
-3. **Parse PLAN.md** to extract:
-   - Current phase (last phase with ⏳ or 🚧 or 🎨)
-   - Current task (last task with ⏳ or 🚧 or 🎨)
-   - Current iteration (last iteration with ⏳ or 🚧 or 🎨)
-   - Current status emoji and state
+5. **If inconsistency detected**:
+   ```
+   ⚠️  INCONSISTENCY (Active Work):
 
-4. **Display hierarchy**:
+   Progress Dashboard: Iteration 6 🚧 IN PROGRESS
+   Actual marker: Iteration 6 ⏳ PENDING
+
+   Action: Update Progress Dashboard to match markers
+   (Markers are ground truth)
+
+   ⏭️  Skipped: 15 completed items
+   ```
+
+6. **Display hierarchy**:
    ```
    📋 Current Status:
 
@@ -520,19 +541,21 @@ You are executing the `/flow-status` command from the Flow framework.
    Next Action: [Suggest next command based on status]
    ```
 
-5. **Suggest next action**:
+7. **Suggest next action**:
    - If ⏳ PENDING → "Use `/flow-brainstorm_start [topic]` to begin"
    - If 🚧 IN PROGRESS (brainstorming) → "Continue resolving subjects with `/flow-brainstorm_resolve`"
    - If 🎨 READY → "Use `/flow-implement_start` to begin implementation"
    - If 🚧 IN PROGRESS (implementing) → "Work through action items, use `/flow-implement_complete` when done"
    - If ✅ COMPLETE → "Use `/flow-iteration [description]` to start next iteration"
 
-6. **Show progress summary**:
+8. **Show progress summary**:
    - Count completed vs total iterations
    - Count completed vs total tasks
    - Show percentage complete
+   - Show deferred count (🔮)
+   - Show cancelled count (❌)
 
-**Output**: Display current status and suggest next action.
+**Output**: Display current status, smart verification results, and suggest next action.
 ```
 
 ---
@@ -673,13 +696,37 @@ You are executing the `/flow-summarize` command from the Flow framework.
    V2 = Dynamic formulas, character stats integration, full feature set
    ```
 
-6. **Handle multiple versions**:
+6. **Add deferred/cancelled sections**:
+   ```
+   🔮 Deferred Items:
+   - Iteration 10: Name Generation (V2 - complexity, needs 124 components)
+   - Task 12: Advanced Features (V2 - out of V1 scope)
+   - Feature X: Multi-provider support (V3 - abstraction layer)
+
+   ❌ Cancelled Items:
+   - Task 8: Custom HTTP Client (rejected - SDK is better)
+   - Subject 3: GraphQL API (rejected - REST is sufficient)
+   ```
+
+7. **Smart verification** (active work only):
+   - Skip ✅ COMPLETE items (verified & frozen)
+   - Verify 🚧 ⏳ 🎨 items match Progress Dashboard
+   - Check ❌ items have reasons
+   - Check 🔮 items have reasons + destinations
+   - Report:
+     ```
+     🔍 Verification (Active Work Only):
+     ✅ All active markers (🚧 ⏳) match Progress Dashboard
+     ⏭️  Skipped 18 completed items (verified & frozen)
+     ```
+
+8. **Handle multiple versions**:
    - If PLAN.md has V2/V3 sections, use `=== V1 Summary ===` separator
    - V1 gets full Phase/Task/Iteration breakdown
    - V2+ get high-level "Enhancements" list (not full iteration tree)
    - Separate TL;DR line for each version
 
-7. **After generating summary**:
+9. **After generating summary**:
    - "Use `/flow-status` to see detailed current position"
    - "Use `/flow-verify-plan` to verify accuracy against actual code"
 
@@ -1082,5 +1129,5 @@ Repeat for next iteration
 
 ---
 
-**Version**: 1.0.3
+**Version**: 1.0.4
 **Last Updated**: 2025-10-02

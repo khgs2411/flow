@@ -4,7 +4,6 @@
 > **🎯 Purpose**: This is a reference example showing the Flow framework in action - demonstrating brainstorming sessions, iterations, pre-implementation tasks, bug discoveries, and state tracking
 
 **Created**: 2025-10-01
-**Status**: Phase 1, Task 1, Iteration 2 - In Progress
 **Version**: V1
 
 ---
@@ -48,9 +47,47 @@
 
 ---
 
+## 📋 Progress Dashboard
+
+**Last Updated**: 2025-10-01
+
+**Current Work**:
+- **Phase**: Phase 1 - Foundation → [Jump](#phase-1-foundation-)
+- **Task**: Task 1 - Setup & API Integration → [Jump](#task-1-setup--api-integration-)
+- **Iteration**: Iteration 2 - Basic Payment Flow → [Jump](#iteration-2-basic-payment-flow-)
+
+**Completion Status**:
+- Phase 1: 🚧 50% | Phase 2: ⏳ 0% | Phase 3: ⏳ 0%
+
+**Progress Overview**:
+- ✅ **Iteration 1**: Project Setup & SDK Integration (verified & frozen)
+- 🚧 **Iteration 2**: Basic Payment Flow ← **YOU ARE HERE**
+- ⏳ **Iteration 3-5**: Webhook system, error handling, testing
+
+**V1 Remaining Work**:
+1. Complete Iteration 2 (basic payment flow)
+2. Implement Iteration 3 (webhook system)
+3. Implement Iteration 4 (error handling)
+4. Phase 2: Advanced features
+5. Phase 3: Testing & polish
+
+**V2 Deferred Items**:
+1. Task 6: Multiple Payment Providers (complexity - abstraction layer needed)
+2. Task 7: Saved Payment Methods (out of V1 scope - security considerations)
+3. Task 8: Subscription Billing (V3 - recurring payments infrastructure)
+
+**Cancelled Items**:
+None
+
+---
+
 ## Development Plan
 
-### Phase 1: Foundation ✅
+### Phase 1: Foundation 🚧
+
+**Status**: IN PROGRESS
+**Started**: 2025-10-01
+**Completed**: (in progress)
 
 **Strategy**: Set up core infrastructure and basic payment flow
 
@@ -61,6 +98,7 @@
 #### Task 1: Setup & API Integration ✅
 
 **Status**: COMPLETE
+**Completed**: 2025-10-01
 **Purpose**: Establish connection to MockPay and implement basic payment creation
 
 ---
@@ -68,17 +106,21 @@
 ##### Iteration 1: Project Setup & SDK Integration ✅
 
 **Status**: COMPLETE
+**Completed**: 2025-10-01
 **Goal**: Install dependencies and configure MockPay credentials
 
 ---
 
-### **Brainstorming Session - API Setup**
+### **Brainstorming Session - API Setup** ✅
+
+**Status**: COMPLETE
 
 **Subjects to Discuss**:
 
-1. ✅ **Credential Management** - How to securely store API keys
-2. ✅ **SDK vs Raw HTTP** - Whether to use official SDK or custom implementation
-3. ✅ **Environment Configuration** - Strategy for dev/staging/prod environments
+1. ✅ **Credential Management** - RESOLVED
+2. ✅ **SDK vs Raw HTTP** - RESOLVED
+3. ✅ **Environment Configuration** - RESOLVED
+4. ❌ **Custom HTTP Client** - REJECTED (SDK is sufficient)
 
 **Resolved Subjects**:
 
@@ -147,9 +189,22 @@
 
 ---
 
-### **Implementation - Iteration 1**
+### ❌ **Subject 4: Custom HTTP Client**
 
-**Status**: ✅ COMPLETE
+**Status**: REJECTED
+
+**Reason**: Building custom HTTP client would duplicate functionality already provided by MockPay SDK. SDK handles authentication, retry logic with exponential backoff, rate limiting, and request signing automatically. Reimplementing these features would be time-consuming and error-prone.
+
+**Decision**: Use MockPay SDK (Subject 2) instead. If custom HTTP implementation is needed later (e.g., for performance optimization or multi-provider abstraction), it can be added in V2 behind the existing adapter interface.
+
+**Rejected on**: 2025-10-01
+
+---
+
+### **Implementation - Iteration 1** ✅
+
+**Status**: COMPLETE
+**Completed**: 2025-10-01
 
 **Action Items**:
 - [x] Add MOCKPAY_API_KEY and MOCKPAY_SECRET to .env.example

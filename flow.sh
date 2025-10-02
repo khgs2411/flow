@@ -548,30 +548,51 @@ You are executing the `/flow-status` command from the Flow framework.
 
 1. **Find PLAN.md**: Look in current directory, traverse up if needed
 
-2. **Check for conflicting status sections**:
-   - Search for patterns like "Progress Tracking", "Current Status", "Status Summary"
-   - Look for multiple "**Status**:" lines in the file
-   - Check if status at top of file conflicts with status sections elsewhere
-   - If multiple status sections found:
+2. **Parse Progress Dashboard** (if exists):
+   - Look for "## 📋 Progress Dashboard" section
+   - Extract claimed current phase/task/iteration
+   - Extract completion percentages
+   - Note: Dashboard is manual, may need verification
+
+3. **Parse status markers** (ground truth):
+   - Find current phase (last phase with ⏳ 🚧 🎨 ❌ 🔮)
+   - Find current task (last task with ⏳ 🚧 🎨 ❌ 🔮)
+   - Find current iteration (last iteration with ⏳ 🚧 🎨 ❌ 🔮)
+   - Count ✅ COMPLETE items (these are frozen, skip verification)
+
+4. **Smart verification** (active work only):
+   - **Skip ✅ COMPLETE items** - Already verified, now frozen
+   - **Verify active work** (🚧 ⏳ 🎨):
+     - Check if Progress Dashboard claims match markers
+     - Check if ❌ CANCELLED items have reasons
+     - Check if 🔮 DEFERRED items have reasons + destinations
+   - **Report**:
      ```
-     ⚠️  WARNING: Multiple status sections detected!
+     🔍 Consistency Check (Active Work Only):
 
-     Found status indicators at:
-     - Line [N]: **Status**: [value]
-     - Line [N]: ## Progress Tracking
+     ✅ Phase 2 marker: 🚧 IN PROGRESS ✓
+     ✅ Task 5 marker: 🚧 IN PROGRESS ✓
+     ✅ Iteration 6 marker: 🚧 IN PROGRESS ✓
 
-     This violates Flow's "Single Source of Truth" principle.
-     The authoritative status is at the TOP of PLAN.md.
-     Consider archiving or removing stale status sections.
+     ⏭️  Skipped: 15 completed items (verified & frozen)
+
+     Status: All active markers aligned with Progress Dashboard ✓
      ```
 
-3. **Parse PLAN.md** to extract:
-   - Current phase (last phase with ⏳ or 🚧 or 🎨)
-   - Current task (last task with ⏳ or 🚧 or 🎨)
-   - Current iteration (last iteration with ⏳ or 🚧 or 🎨)
-   - Current status emoji and state
+5. **If inconsistency detected**:
+   ```
+   ⚠️  INCONSISTENCY (Active Work):
 
-4. **Display hierarchy**:
+   Progress Dashboard: Iteration 6 🚧 IN PROGRESS
+   Actual marker: Iteration 6 ⏳ PENDING
+
+   Action: Update Progress Dashboard to match markers
+   (Markers are ground truth)
+
+   ⏭️  Skipped: 15 completed items
+   ```
+
+6. **Display hierarchy**:
    ```
    📋 Current Status:
 
@@ -582,19 +603,21 @@ You are executing the `/flow-status` command from the Flow framework.
    Next Action: [Suggest next command based on status]
    ```
 
-5. **Suggest next action**:
+7. **Suggest next action**:
    - If ⏳ PENDING → "Use `/flow-brainstorm_start [topic]` to begin"
    - If 🚧 IN PROGRESS (brainstorming) → "Continue resolving subjects with `/flow-brainstorm_resolve`"
    - If 🎨 READY → "Use `/flow-implement_start` to begin implementation"
    - If 🚧 IN PROGRESS (implementing) → "Work through action items, use `/flow-implement_complete` when done"
    - If ✅ COMPLETE → "Use `/flow-iteration [description]` to start next iteration"
 
-6. **Show progress summary**:
+8. **Show progress summary**:
    - Count completed vs total iterations
    - Count completed vs total tasks
    - Show percentage complete
+   - Show deferred count (🔮)
+   - Show cancelled count (❌)
 
-**Output**: Display current status and suggest next action.
+**Output**: Display current status, smart verification results, and suggest next action.
 ```
 
 ---
@@ -735,13 +758,37 @@ You are executing the `/flow-summarize` command from the Flow framework.
    V2 = Dynamic formulas, character stats integration, full feature set
    ```
 
-6. **Handle multiple versions**:
+6. **Add deferred/cancelled sections**:
+   ```
+   🔮 Deferred Items:
+   - Iteration 10: Name Generation (V2 - complexity, needs 124 components)
+   - Task 12: Advanced Features (V2 - out of V1 scope)
+   - Feature X: Multi-provider support (V3 - abstraction layer)
+
+   ❌ Cancelled Items:
+   - Task 8: Custom HTTP Client (rejected - SDK is better)
+   - Subject 3: GraphQL API (rejected - REST is sufficient)
+   ```
+
+7. **Smart verification** (active work only):
+   - Skip ✅ COMPLETE items (verified & frozen)
+   - Verify 🚧 ⏳ 🎨 items match Progress Dashboard
+   - Check ❌ items have reasons
+   - Check 🔮 items have reasons + destinations
+   - Report:
+     ```
+     🔍 Verification (Active Work Only):
+     ✅ All active markers (🚧 ⏳) match Progress Dashboard
+     ⏭️  Skipped 18 completed items (verified & frozen)
+     ```
+
+8. **Handle multiple versions**:
    - If PLAN.md has V2/V3 sections, use `=== V1 Summary ===` separator
    - V1 gets full Phase/Task/Iteration breakdown
    - V2+ get high-level "Enhancements" list (not full iteration tree)
    - Separate TL;DR line for each version
 
-7. **After generating summary**:
+9. **After generating summary**:
    - "Use `/flow-status` to see detailed current position"
    - "Use `/flow-verify-plan` to verify accuracy against actual code"
 
@@ -1144,7 +1191,7 @@ Repeat for next iteration
 
 ---
 
-**Version**: 1.0.3
+**Version**: 1.0.4
 **Last Updated**: 2025-10-02
 COMMANDS_DATA_EOF
 }
@@ -1527,16 +1574,98 @@ Features can be split into versions:
 
 ## Status Markers
 
-Use these consistently throughout the plan file:
+**CRITICAL**: Status markers are **MANDATORY** at every level (Phase, Task, Iteration, Brainstorm, Subject). They are the ground truth for your project state.
 
-| Marker | Meaning     | Usage                                      |
-| ------ | ----------- | ------------------------------------------ |
-| ✅     | Complete    | Finished tasks, iterations, subjects       |
-| ⏳     | Pending     | Not started yet                            |
-| 🚧     | In Progress | Currently working on this                  |
-| 🎨     | Ready       | Brainstorming complete, ready to implement |
-| ❌     | Rejected    | Options/approaches not chosen              |
-| 🔮     | Future      | Deferred to V2/V3/later phase              |
+### Marker Reference
+
+| Marker | Meaning          | Usage                                           | Documentation Required       | Verification         |
+| ------ | ---------------- | ----------------------------------------------- | ---------------------------- | -------------------- |
+| ✅     | Complete         | Finished and verified (frozen, no re-verify)    | Completion date              | Skipped (frozen)     |
+| ⏳     | Pending          | Not started yet                                 | None                         | Verified             |
+| 🚧     | In Progress      | Currently working on this                       | None                         | Verified             |
+| 🎨     | Ready            | Brainstorming done, ready to implement          | None                         | Verified             |
+| ❌     | Cancelled        | Decided against (task/iteration/subject)        | **WHY** (mandatory!)         | Verified             |
+| 🔮     | Deferred         | Moved to V2/V3/later phase                      | **WHY + WHERE** (mandatory!) | Verified             |
+
+### Required Documentation
+
+**For ❌ CANCELLED items:**
+
+Must include reason for cancellation:
+
+```markdown
+##### Iteration 8: Custom Retry Logic ❌
+
+**Status**: CANCELLED
+**Reason**: SDK already handles retry logic with exponential backoff. Reimplementing would be redundant and error-prone.
+**Cancelled on**: 2025-09-30
+```
+
+**For 🔮 DEFERRED items:**
+
+Must include reason AND destination:
+
+```markdown
+##### Iteration 10: Name Generation 🔮
+
+**Status**: DEFERRED to Phase 4 (V2)
+**Reason**: Requires 124 name components with weighted selection system. Core generation must be proven first.
+**Deferred to**: Phase 4, Task 11
+**Deferred on**: 2025-10-01
+```
+
+### Mandatory Markers
+
+**Every level MUST have a status marker:**
+
+```markdown
+### Phase 1: Foundation ✅
+
+**Status**: COMPLETE
+**Completed**: 2025-09-30
+
+#### Task 1: Setup & Integration ✅
+
+**Status**: COMPLETE
+**Completed**: 2025-09-28
+
+##### Iteration 1: Project Setup ✅
+
+**Status**: COMPLETE
+**Completed**: 2025-09-28
+
+### **Brainstorming Session - API Setup** ✅
+
+**Status**: COMPLETE
+
+**Subjects to Discuss**:
+1. ✅ **Credential Management** - RESOLVED
+2. ❌ **Custom HTTP Client** - REJECTED (SDK is better)
+3. 🔮 **Advanced Retry** - DEFERRED to V2
+```
+
+### Smart Verification
+
+**Token-efficient validation:**
+
+Commands verify only **active work** (🚧 ⏳ 🎨 ❌ 🔮) and skip completed items (✅):
+
+- ✅ **COMPLETE** items = Verified when completed, now frozen (skipped)
+- 🚧 **IN PROGRESS** items = Verify markers match Progress Dashboard
+- ⏳ **PENDING** items = Verify markers exist
+- ❌ **CANCELLED** items = Verify reason is documented
+- 🔮 **DEFERRED** items = Verify reason and destination documented
+
+**Example:**
+
+```
+🔍 Verification:
+✅ Phase 2 marker: 🚧 IN PROGRESS ✓
+✅ Task 5 marker: 🚧 IN PROGRESS ✓
+✅ Iteration 6 marker: 🚧 IN PROGRESS ✓
+
+⏭️  Skipped: 15 completed items (verified & frozen)
+```
 
 ---
 
@@ -1583,6 +1712,210 @@ Before starting a new AI session or after a long break:
 1. Run `/flow-status` - See computed current state from PLAN.md
 2. Run `/flow-verify-plan` - Verify PLAN.md matches actual project files
 3. Update the `**Status**` line at top if needed
+
+---
+
+## Progress Dashboard (Required for Complex Projects)
+
+### When to Use
+
+**Required for:**
+- ✅ Projects with 10+ iterations across multiple phases
+- ✅ V1/V2/V3 version planning with deferred features
+- ✅ Long-running development (weeks/months)
+- ✅ Large PLAN.md files (2000+ lines)
+
+**Optional for:** Simple 2-3 iteration features (single status line may suffice)
+
+### Purpose
+
+The Progress Dashboard is **your mission control** - a single section at the top of PLAN.md that shows the big picture and points to current work. It works with status markers to create a rigorous progress tracking system:
+
+- **Progress Dashboard** = Always visible pointer + overview (manual)
+- **Status Markers** = Ground truth at every level (mandatory)
+- **`/flow-status`** = Current position verification (computed, active work only)
+- **`/flow-summarize`** = Full structure overview (computed, includes deferred/cancelled)
+
+### Template
+
+Insert this section **after Architecture, before Development Plan**:
+
+```markdown
+## 📋 Progress Dashboard
+
+**Last Updated**: [Date]
+
+**Current Work**:
+- **Phase**: Phase 2 - Core Implementation → [Jump](#phase-2-core-implementation)
+- **Task**: Task 5 - Error Handling → [Jump](#task-5-error-handling)
+- **Iteration**: Iteration 6 - Circuit Breaker → [Jump](#iteration-6-circuit-breaker)
+
+**Completion Status**:
+- Phase 1: ✅ 100% | Phase 2: 🚧 75% | Phase 3: ⏳ 0%
+
+**Progress Overview**:
+- ✅ **Iteration 1-5**: [Grouped completed items] (verified & frozen)
+- 🚧 **Iteration 6**: Circuit Breaker ← **YOU ARE HERE**
+- ⏳ **Iteration 7**: Blue Validation
+- ⏳ **Iteration 8-9**: [Pending work]
+- 🔮 **Iteration 10**: Name Generation (DEFERRED to V2 - complexity)
+
+**V1 Remaining Work**:
+1. Complete Iteration 6
+2. Implement Iteration 7
+3. Implement Iteration 9
+
+**V2 Deferred Items**:
+1. Iteration 10: Name Generation (moved - complexity)
+2. Task 12: Advanced Features (out of V1 scope)
+
+**Cancelled Items**:
+1. Task 8: Custom HTTP Client (REJECTED - SDK is better)
+
+---
+```
+
+### Key Elements
+
+1. **Jump links** - Navigate to current work in large files (`[Jump](#phase-2-core-implementation)`)
+2. **YOU ARE HERE** - Crystal clear current position
+3. **Completion %** - Quick progress view per phase
+4. **Grouped completed items** - Token-efficient (marked "verified & frozen")
+5. **Deferred/Cancelled tracking** - Explicit scope decisions with reasons
+
+### Positioning in PLAN.md
+
+```markdown
+# [Feature] - Development Plan
+
+**Created**: [Date]
+**Version**: V1
+
+---
+
+## Overview
+[Purpose, Goals, Scope]
+
+---
+
+## Architecture
+[High-level design, components]
+
+---
+
+## 📋 Progress Dashboard    ← INSERT HERE
+
+[Dashboard content]
+
+---
+
+## Development Plan         ← STATUS MARKERS AT EVERY LEVEL
+
+### Phase 1: Foundation ✅
+
+**Status**: COMPLETE
+**Completed**: 2025-09-30
+
+#### Task 1: Setup ✅
+
+**Status**: COMPLETE
+...
+```
+
+### Maintaining the Dashboard
+
+**Update triggers:**
+- ✅ Completing an iteration
+- ✅ Starting new iteration
+- ✅ Deferring items to V2 (🔮)
+- ✅ Cancelling items (❌)
+
+**Maintenance steps:**
+1. **Last Updated** - Change date when modifying
+2. **← YOU ARE HERE** - Move to current iteration
+3. **Completion %** - Recalculate per phase
+4. **Jump links** - Update to current work
+5. **Deferred/Cancelled sections** - Add items with reasons
+
+### Verification (Smart & Token-Efficient)
+
+**Hierarchy of truth:**
+1. **Status markers** (✅ ⏳ 🚧 🎨 ❌ 🔮) = Ground truth
+2. **Progress Dashboard** = Derived from markers (pointer)
+3. **Commands** = Verify dashboard matches markers
+
+**Smart verification (skips completed items):**
+
+Commands verify only **active work**:
+- 🚧 IN PROGRESS - Verify markers match dashboard
+- ⏳ PENDING - Verify markers exist
+- ❌ CANCELLED - Verify reason documented
+- 🔮 DEFERRED - Verify reason + destination documented
+- ✅ **COMPLETE - SKIPPED** (verified when completed, now frozen)
+
+**When conflict:**
+- Trust status markers (ground truth)
+- Update dashboard to match
+- Commands warn about mismatch
+
+### Benefits
+
+1. **Always visible** - No command execution, immediately scannable
+2. **Token-efficient** - Completed items marked "verified & frozen" (skip re-verification)
+3. **Single location** - Lives in PLAN.md (single source of truth)
+4. **Navigate large files** - Jump links to current work (critical for 2000+ line files)
+5. **Scope clarity** - Deferred/Cancelled sections show evolution
+6. **Session continuity** - New AI sessions see full context
+7. **Stakeholder friendly** - Copy/paste for reports
+
+### Real-World Example
+
+From a 3747-line game engine PLAN.md:
+
+```markdown
+## 📋 Progress Dashboard
+
+**Last Updated**: 2025-10-02
+
+**Current Work**:
+- **Phase**: Phase 2 - Core Implementation → [Jump](#phase-2-core-implementation)
+- **Task**: Task 5 - Green Service → [Jump](#task-5-green-service)
+- **Iteration**: Iteration 7 - Blue Validation → [Jump](#iteration-7-blue-validation)
+
+**Completion Status**:
+- Phase 1: ✅ 100% | Phase 2: 🚧 95% | Phase 3: ⏳ 0%
+
+**Progress Overview**:
+- ✅ **Iteration 1-6**: Tier gen, slots, filtering, selection, parsing, integration (verified & frozen)
+- 🚧 **Iteration 7**: Blue Validation (input guards) ← **YOU ARE HERE**
+- ⏳ **Iteration 9**: Red API Layer (wraps Blue → Green)
+
+**V1 Remaining Work**:
+1. Complete Iteration 7 (Blue validation)
+2. Implement Iteration 9 (Red wrapper)
+3. Phase 3: Testing & iteration
+
+**V2 Deferred Items** (Phase 4):
+1. Iteration 8: Name Generation (124 components - complexity)
+2. Task 12: 12 new placeholders (conditionals, resources)
+3. Task 13: Potency system (stats-based formulas)
+4. Task 14: Points & Luck (budget modifiers)
+5. Task 15: Database persistence
+6. Task 16: Damage variance (±10%)
+7. Task 17: Game integration
+
+**Cancelled Items**:
+None
+
+---
+```
+
+**Why this works:**
+- Immediately see 95% done, 1 iteration active
+- Jump link goes straight to Iteration 7 (in 3747-line file!)
+- Completed items marked "verified & frozen" (commands skip them)
+- 7 V2 items explicitly deferred with reasons
+- Clear "YOU ARE HERE" + next steps
 
 ---
 
@@ -2183,7 +2516,6 @@ get_example_content() {
 > **🎯 Purpose**: This is a reference example showing the Flow framework in action - demonstrating brainstorming sessions, iterations, pre-implementation tasks, bug discoveries, and state tracking
 
 **Created**: 2025-10-01
-**Status**: Phase 1, Task 1, Iteration 2 - In Progress
 **Version**: V1
 
 ---
@@ -2227,9 +2559,47 @@ get_example_content() {
 
 ---
 
+## 📋 Progress Dashboard
+
+**Last Updated**: 2025-10-01
+
+**Current Work**:
+- **Phase**: Phase 1 - Foundation → [Jump](#phase-1-foundation-)
+- **Task**: Task 1 - Setup & API Integration → [Jump](#task-1-setup--api-integration-)
+- **Iteration**: Iteration 2 - Basic Payment Flow → [Jump](#iteration-2-basic-payment-flow-)
+
+**Completion Status**:
+- Phase 1: 🚧 50% | Phase 2: ⏳ 0% | Phase 3: ⏳ 0%
+
+**Progress Overview**:
+- ✅ **Iteration 1**: Project Setup & SDK Integration (verified & frozen)
+- 🚧 **Iteration 2**: Basic Payment Flow ← **YOU ARE HERE**
+- ⏳ **Iteration 3-5**: Webhook system, error handling, testing
+
+**V1 Remaining Work**:
+1. Complete Iteration 2 (basic payment flow)
+2. Implement Iteration 3 (webhook system)
+3. Implement Iteration 4 (error handling)
+4. Phase 2: Advanced features
+5. Phase 3: Testing & polish
+
+**V2 Deferred Items**:
+1. Task 6: Multiple Payment Providers (complexity - abstraction layer needed)
+2. Task 7: Saved Payment Methods (out of V1 scope - security considerations)
+3. Task 8: Subscription Billing (V3 - recurring payments infrastructure)
+
+**Cancelled Items**:
+None
+
+---
+
 ## Development Plan
 
-### Phase 1: Foundation ✅
+### Phase 1: Foundation 🚧
+
+**Status**: IN PROGRESS
+**Started**: 2025-10-01
+**Completed**: (in progress)
 
 **Strategy**: Set up core infrastructure and basic payment flow
 
@@ -2240,6 +2610,7 @@ get_example_content() {
 #### Task 1: Setup & API Integration ✅
 
 **Status**: COMPLETE
+**Completed**: 2025-10-01
 **Purpose**: Establish connection to MockPay and implement basic payment creation
 
 ---
@@ -2247,17 +2618,21 @@ get_example_content() {
 ##### Iteration 1: Project Setup & SDK Integration ✅
 
 **Status**: COMPLETE
+**Completed**: 2025-10-01
 **Goal**: Install dependencies and configure MockPay credentials
 
 ---
 
-### **Brainstorming Session - API Setup**
+### **Brainstorming Session - API Setup** ✅
+
+**Status**: COMPLETE
 
 **Subjects to Discuss**:
 
-1. ✅ **Credential Management** - How to securely store API keys
-2. ✅ **SDK vs Raw HTTP** - Whether to use official SDK or custom implementation
-3. ✅ **Environment Configuration** - Strategy for dev/staging/prod environments
+1. ✅ **Credential Management** - RESOLVED
+2. ✅ **SDK vs Raw HTTP** - RESOLVED
+3. ✅ **Environment Configuration** - RESOLVED
+4. ❌ **Custom HTTP Client** - REJECTED (SDK is sufficient)
 
 **Resolved Subjects**:
 
@@ -2326,9 +2701,22 @@ get_example_content() {
 
 ---
 
-### **Implementation - Iteration 1**
+### ❌ **Subject 4: Custom HTTP Client**
 
-**Status**: ✅ COMPLETE
+**Status**: REJECTED
+
+**Reason**: Building custom HTTP client would duplicate functionality already provided by MockPay SDK. SDK handles authentication, retry logic with exponential backoff, rate limiting, and request signing automatically. Reimplementing these features would be time-consuming and error-prone.
+
+**Decision**: Use MockPay SDK (Subject 2) instead. If custom HTTP implementation is needed later (e.g., for performance optimization or multi-provider abstraction), it can be added in V2 behind the existing adapter interface.
+
+**Rejected on**: 2025-10-01
+
+---
+
+### **Implementation - Iteration 1** ✅
+
+**Status**: COMPLETE
+**Completed**: 2025-10-01
 
 **Action Items**:
 - [x] Add MOCKPAY_API_KEY and MOCKPAY_SECRET to .env.example

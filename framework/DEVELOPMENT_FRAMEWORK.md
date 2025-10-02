@@ -374,16 +374,98 @@ Features can be split into versions:
 
 ## Status Markers
 
-Use these consistently throughout the plan file:
+**CRITICAL**: Status markers are **MANDATORY** at every level (Phase, Task, Iteration, Brainstorm, Subject). They are the ground truth for your project state.
 
-| Marker | Meaning     | Usage                                      |
-| ------ | ----------- | ------------------------------------------ |
-| ✅     | Complete    | Finished tasks, iterations, subjects       |
-| ⏳     | Pending     | Not started yet                            |
-| 🚧     | In Progress | Currently working on this                  |
-| 🎨     | Ready       | Brainstorming complete, ready to implement |
-| ❌     | Rejected    | Options/approaches not chosen              |
-| 🔮     | Future      | Deferred to V2/V3/later phase              |
+### Marker Reference
+
+| Marker | Meaning          | Usage                                           | Documentation Required       | Verification         |
+| ------ | ---------------- | ----------------------------------------------- | ---------------------------- | -------------------- |
+| ✅     | Complete         | Finished and verified (frozen, no re-verify)    | Completion date              | Skipped (frozen)     |
+| ⏳     | Pending          | Not started yet                                 | None                         | Verified             |
+| 🚧     | In Progress      | Currently working on this                       | None                         | Verified             |
+| 🎨     | Ready            | Brainstorming done, ready to implement          | None                         | Verified             |
+| ❌     | Cancelled        | Decided against (task/iteration/subject)        | **WHY** (mandatory!)         | Verified             |
+| 🔮     | Deferred         | Moved to V2/V3/later phase                      | **WHY + WHERE** (mandatory!) | Verified             |
+
+### Required Documentation
+
+**For ❌ CANCELLED items:**
+
+Must include reason for cancellation:
+
+```markdown
+##### Iteration 8: Custom Retry Logic ❌
+
+**Status**: CANCELLED
+**Reason**: SDK already handles retry logic with exponential backoff. Reimplementing would be redundant and error-prone.
+**Cancelled on**: 2025-09-30
+```
+
+**For 🔮 DEFERRED items:**
+
+Must include reason AND destination:
+
+```markdown
+##### Iteration 10: Name Generation 🔮
+
+**Status**: DEFERRED to Phase 4 (V2)
+**Reason**: Requires 124 name components with weighted selection system. Core generation must be proven first.
+**Deferred to**: Phase 4, Task 11
+**Deferred on**: 2025-10-01
+```
+
+### Mandatory Markers
+
+**Every level MUST have a status marker:**
+
+```markdown
+### Phase 1: Foundation ✅
+
+**Status**: COMPLETE
+**Completed**: 2025-09-30
+
+#### Task 1: Setup & Integration ✅
+
+**Status**: COMPLETE
+**Completed**: 2025-09-28
+
+##### Iteration 1: Project Setup ✅
+
+**Status**: COMPLETE
+**Completed**: 2025-09-28
+
+### **Brainstorming Session - API Setup** ✅
+
+**Status**: COMPLETE
+
+**Subjects to Discuss**:
+1. ✅ **Credential Management** - RESOLVED
+2. ❌ **Custom HTTP Client** - REJECTED (SDK is better)
+3. 🔮 **Advanced Retry** - DEFERRED to V2
+```
+
+### Smart Verification
+
+**Token-efficient validation:**
+
+Commands verify only **active work** (🚧 ⏳ 🎨 ❌ 🔮) and skip completed items (✅):
+
+- ✅ **COMPLETE** items = Verified when completed, now frozen (skipped)
+- 🚧 **IN PROGRESS** items = Verify markers match Progress Dashboard
+- ⏳ **PENDING** items = Verify markers exist
+- ❌ **CANCELLED** items = Verify reason is documented
+- 🔮 **DEFERRED** items = Verify reason and destination documented
+
+**Example:**
+
+```
+🔍 Verification:
+✅ Phase 2 marker: 🚧 IN PROGRESS ✓
+✅ Task 5 marker: 🚧 IN PROGRESS ✓
+✅ Iteration 6 marker: 🚧 IN PROGRESS ✓
+
+⏭️  Skipped: 15 completed items (verified & frozen)
+```
 
 ---
 
@@ -430,6 +512,210 @@ Before starting a new AI session or after a long break:
 1. Run `/flow-status` - See computed current state from PLAN.md
 2. Run `/flow-verify-plan` - Verify PLAN.md matches actual project files
 3. Update the `**Status**` line at top if needed
+
+---
+
+## Progress Dashboard (Required for Complex Projects)
+
+### When to Use
+
+**Required for:**
+- ✅ Projects with 10+ iterations across multiple phases
+- ✅ V1/V2/V3 version planning with deferred features
+- ✅ Long-running development (weeks/months)
+- ✅ Large PLAN.md files (2000+ lines)
+
+**Optional for:** Simple 2-3 iteration features (single status line may suffice)
+
+### Purpose
+
+The Progress Dashboard is **your mission control** - a single section at the top of PLAN.md that shows the big picture and points to current work. It works with status markers to create a rigorous progress tracking system:
+
+- **Progress Dashboard** = Always visible pointer + overview (manual)
+- **Status Markers** = Ground truth at every level (mandatory)
+- **`/flow-status`** = Current position verification (computed, active work only)
+- **`/flow-summarize`** = Full structure overview (computed, includes deferred/cancelled)
+
+### Template
+
+Insert this section **after Architecture, before Development Plan**:
+
+```markdown
+## 📋 Progress Dashboard
+
+**Last Updated**: [Date]
+
+**Current Work**:
+- **Phase**: Phase 2 - Core Implementation → [Jump](#phase-2-core-implementation)
+- **Task**: Task 5 - Error Handling → [Jump](#task-5-error-handling)
+- **Iteration**: Iteration 6 - Circuit Breaker → [Jump](#iteration-6-circuit-breaker)
+
+**Completion Status**:
+- Phase 1: ✅ 100% | Phase 2: 🚧 75% | Phase 3: ⏳ 0%
+
+**Progress Overview**:
+- ✅ **Iteration 1-5**: [Grouped completed items] (verified & frozen)
+- 🚧 **Iteration 6**: Circuit Breaker ← **YOU ARE HERE**
+- ⏳ **Iteration 7**: Blue Validation
+- ⏳ **Iteration 8-9**: [Pending work]
+- 🔮 **Iteration 10**: Name Generation (DEFERRED to V2 - complexity)
+
+**V1 Remaining Work**:
+1. Complete Iteration 6
+2. Implement Iteration 7
+3. Implement Iteration 9
+
+**V2 Deferred Items**:
+1. Iteration 10: Name Generation (moved - complexity)
+2. Task 12: Advanced Features (out of V1 scope)
+
+**Cancelled Items**:
+1. Task 8: Custom HTTP Client (REJECTED - SDK is better)
+
+---
+```
+
+### Key Elements
+
+1. **Jump links** - Navigate to current work in large files (`[Jump](#phase-2-core-implementation)`)
+2. **YOU ARE HERE** - Crystal clear current position
+3. **Completion %** - Quick progress view per phase
+4. **Grouped completed items** - Token-efficient (marked "verified & frozen")
+5. **Deferred/Cancelled tracking** - Explicit scope decisions with reasons
+
+### Positioning in PLAN.md
+
+```markdown
+# [Feature] - Development Plan
+
+**Created**: [Date]
+**Version**: V1
+
+---
+
+## Overview
+[Purpose, Goals, Scope]
+
+---
+
+## Architecture
+[High-level design, components]
+
+---
+
+## 📋 Progress Dashboard    ← INSERT HERE
+
+[Dashboard content]
+
+---
+
+## Development Plan         ← STATUS MARKERS AT EVERY LEVEL
+
+### Phase 1: Foundation ✅
+
+**Status**: COMPLETE
+**Completed**: 2025-09-30
+
+#### Task 1: Setup ✅
+
+**Status**: COMPLETE
+...
+```
+
+### Maintaining the Dashboard
+
+**Update triggers:**
+- ✅ Completing an iteration
+- ✅ Starting new iteration
+- ✅ Deferring items to V2 (🔮)
+- ✅ Cancelling items (❌)
+
+**Maintenance steps:**
+1. **Last Updated** - Change date when modifying
+2. **← YOU ARE HERE** - Move to current iteration
+3. **Completion %** - Recalculate per phase
+4. **Jump links** - Update to current work
+5. **Deferred/Cancelled sections** - Add items with reasons
+
+### Verification (Smart & Token-Efficient)
+
+**Hierarchy of truth:**
+1. **Status markers** (✅ ⏳ 🚧 🎨 ❌ 🔮) = Ground truth
+2. **Progress Dashboard** = Derived from markers (pointer)
+3. **Commands** = Verify dashboard matches markers
+
+**Smart verification (skips completed items):**
+
+Commands verify only **active work**:
+- 🚧 IN PROGRESS - Verify markers match dashboard
+- ⏳ PENDING - Verify markers exist
+- ❌ CANCELLED - Verify reason documented
+- 🔮 DEFERRED - Verify reason + destination documented
+- ✅ **COMPLETE - SKIPPED** (verified when completed, now frozen)
+
+**When conflict:**
+- Trust status markers (ground truth)
+- Update dashboard to match
+- Commands warn about mismatch
+
+### Benefits
+
+1. **Always visible** - No command execution, immediately scannable
+2. **Token-efficient** - Completed items marked "verified & frozen" (skip re-verification)
+3. **Single location** - Lives in PLAN.md (single source of truth)
+4. **Navigate large files** - Jump links to current work (critical for 2000+ line files)
+5. **Scope clarity** - Deferred/Cancelled sections show evolution
+6. **Session continuity** - New AI sessions see full context
+7. **Stakeholder friendly** - Copy/paste for reports
+
+### Real-World Example
+
+From a 3747-line game engine PLAN.md:
+
+```markdown
+## 📋 Progress Dashboard
+
+**Last Updated**: 2025-10-02
+
+**Current Work**:
+- **Phase**: Phase 2 - Core Implementation → [Jump](#phase-2-core-implementation)
+- **Task**: Task 5 - Green Service → [Jump](#task-5-green-service)
+- **Iteration**: Iteration 7 - Blue Validation → [Jump](#iteration-7-blue-validation)
+
+**Completion Status**:
+- Phase 1: ✅ 100% | Phase 2: 🚧 95% | Phase 3: ⏳ 0%
+
+**Progress Overview**:
+- ✅ **Iteration 1-6**: Tier gen, slots, filtering, selection, parsing, integration (verified & frozen)
+- 🚧 **Iteration 7**: Blue Validation (input guards) ← **YOU ARE HERE**
+- ⏳ **Iteration 9**: Red API Layer (wraps Blue → Green)
+
+**V1 Remaining Work**:
+1. Complete Iteration 7 (Blue validation)
+2. Implement Iteration 9 (Red wrapper)
+3. Phase 3: Testing & iteration
+
+**V2 Deferred Items** (Phase 4):
+1. Iteration 8: Name Generation (124 components - complexity)
+2. Task 12: 12 new placeholders (conditionals, resources)
+3. Task 13: Potency system (stats-based formulas)
+4. Task 14: Points & Luck (budget modifiers)
+5. Task 15: Database persistence
+6. Task 16: Damage variance (±10%)
+7. Task 17: Game integration
+
+**Cancelled Items**:
+None
+
+---
+```
+
+**Why this works:**
+- Immediately see 95% done, 1 iteration active
+- Jump link goes straight to Iteration 7 (in 3747-line file!)
+- Completed items marked "verified & frozen" (commands skip them)
+- 7 V2 items explicitly deferred with reasons
+- Clear "YOU ARE HERE" + next steps
 
 ---
 
