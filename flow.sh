@@ -2013,7 +2013,7 @@ COMMANDS_DATA_EOF
 
 get_framework_content() {
   cat <<'FRAMEWORK_DATA_EOF'
-**Version**: 1.0.11
+**Version**: 1.0.12
 
 # Domain-Driven Design with Agile Iterative Philosophy
 
@@ -3499,7 +3499,7 @@ This framework is designed to work with slash commands that automate plan file u
 
 **Prefix**: All commands use `flow-` prefix to prevent conflicts with other frameworks.
 
-**Total Commands**: 24 commands organized into 6 categories
+**Total Commands**: 23 commands organized into 6 categories
 
 **Design Principles**:
 - ✅ **Consistent Naming**: All separators use hyphens (no underscores)
@@ -3651,10 +3651,11 @@ This framework is designed to work with slash commands that automate plan file u
 
 ## Command Design Rationale
 
-**Why 24 commands instead of fewer?**
+**Why 23 commands instead of fewer?**
 - Explicit is better than implicit - users want clear control
 - Symmetric naming is predictable and discoverable
 - Each command has single responsibility (no overloading)
+- Removed redundant commands (v1.0.12: `/flow-brainstorm-resolve` → integrated into `/flow-next-subject`)
 
 **Why hyphens instead of underscores?**
 - Standard in CLI tools (kubectl, docker, gh, npm)
@@ -3693,7 +3694,7 @@ By following this framework, you build complex features incrementally with minim
 
 ---
 
-**Version**: 1.0.11
+**Version**: 1.0.12
 **Last Updated**: 2025-10-02
 FRAMEWORK_DATA_EOF
 }

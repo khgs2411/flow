@@ -69,7 +69,7 @@ chmod +x flow.sh
 ```
 
 **What just happened?**
-- ✅ Created `.claude/commands/` with 24 slash commands
+- ✅ Created `.claude/commands/` with 23 slash commands
 - ✅ Created `.flow/` with framework documentation
 - ✅ Your project is ready to use Flow!
 
@@ -142,7 +142,7 @@ The Flow framework is a spec-driven iterative development methodology that combi
 
 ## 📦 What's New
 
-**Latest version**: [v1.0.11](https://github.com/khgs2411/flow/releases/tag/v1.0.11) - README Command Reference Update
+**Latest version**: [v1.0.12](https://github.com/khgs2411/flow/releases/tag/v1.0.12) - Brainstorming Workflow Redesign & Performance Optimization
 
 See [**GitHub Releases**](https://github.com/khgs2411/flow/releases) for detailed changelog and version history.
 
@@ -158,7 +158,7 @@ flow/
 └── framework/                   # Source files (for development)
     ├── DEVELOPMENT_FRAMEWORK.md # Complete methodology guide
     ├── EXAMPLE_PLAN.md          # Reference example (payment gateway)
-    └── SLASH_COMMANDS.md        # All 20 slash command definitions
+    └── SLASH_COMMANDS.md        # All 23 slash command definitions
 ```
 
 **For Distribution**: Share `flow.sh` - it's self-contained with everything embedded!
@@ -172,7 +172,7 @@ flow/
 ### 1. **flow.sh** (The Distribution File) ⭐
 - **Purpose**: Single-file deployment script with all framework content embedded
 - **Usage**: `./flow.sh [--force]`
-- **Size**: ~63KB, 2200+ lines (includes all framework content)
+- **Size**: ~146KB, 4,487 lines (includes all framework content)
 - **What it does**: Installs slash commands to `.claude/commands/` and framework docs to `.flow/`
 - **Requirements**: None - pure bash, no dependencies
 - **Distribution**: Share this single file - no source files needed!
@@ -196,7 +196,7 @@ flow/
 - **Shows**: Full workflow from brainstorming → implementation → completion
 
 #### 3c. **SLASH_COMMANDS.md** (The Command Definitions)
-- **Purpose**: All 24 slash command definitions
+- **Purpose**: All 23 slash command definitions
 - **Commands**: Planning (3), Phase Lifecycle (3), Task Lifecycle (3), Iteration Lifecycle (6), Navigation (3), Status & Validation (5)
 
 ---
@@ -211,7 +211,7 @@ flow/
 
 **When you run `flow.sh` in your project:**
 - Creates `.claude/commands/` and `.flow/` directories
-- Extracts 24 slash commands from embedded data
+- Extracts 23 slash commands from embedded data
 - Writes DEVELOPMENT_FRAMEWORK.md and EXAMPLE_PLAN.md to `.flow/`
 - All content is embedded in flow.sh - no external files needed!
 
@@ -264,10 +264,10 @@ cd /path/to/your/project
 **What gets installed:**
 ```
 your-project/
-├── .claude/commands/          # 24 slash commands
+├── .claude/commands/          # 23 slash commands
 │   ├── flow-blueprint.md
 │   ├── flow-phase-add.md
-│   └── ... (22 more)
+│   └── ... (21 more)
 └── .flow/                     # Framework documentation
     ├── DEVELOPMENT_FRAMEWORK.md
     └── EXAMPLE_PLAN.md
@@ -413,7 +413,7 @@ Work through the code, checking off action items as you complete them:
 
 ## Slash Commands Reference
 
-Flow provides **24 slash commands** organized into **6 categories**. **Important**: These are convenience tools - the real power is the methodology. You can use Flow WITHOUT commands by manually following the patterns.
+Flow provides **23 slash commands** organized into **6 categories**. **Important**: These are convenience tools - the real power is the methodology. You can use Flow WITHOUT commands by manually following the patterns.
 
 ### 1. Plan Initialization (3 commands)
 
@@ -471,13 +471,13 @@ Flow provides **24 slash commands** organized into **6 categories**. **Important
 - Updates Progress Dashboard, advances to next task
 - **Manual**: Change task marker to ✅, update dashboard
 
-### 4. Iteration Lifecycle (7 commands)
+### 4. Iteration Lifecycle (6 commands)
 
 **`/flow-iteration-add <iteration-name>`** (was `/flow-iteration`)
 - Adds new iteration under current task
 - **Manual**: Add `##### Iteration N: Name ⏳` under task
 
-**`/flow-brainstorm-start [optional: topics]`** (was `/flow-brainstorm_start`)
+**`/flow-brainstorm-start [optional: topics]`** (was `/flow-brainstorm_start`) ✨ REDESIGNED
 - Begins brainstorming session with user-provided subjects
 - **Two modes**: With argument (AI parses free-form text) or without (interactive prompt)
 - User controls WHAT to brainstorm, AI structures HOW
@@ -490,6 +490,13 @@ Flow provides **24 slash commands** organized into **6 categories**. **Important
 - Supports dynamic subject addition during brainstorming
 - **Manual**: Add `N. ⏳ Subject Name` to subject list
 
+**`/flow-next-subject`** ✨ ENHANCED
+- Shows next unresolved subject, facilitates discussion, captures decision, marks ✅, auto-advances
+- **Integrated workflow**: One command per subject (vs two previously)
+- **5-step process**: Display → Discuss → Capture → Document → Advance
+- Replaces the deprecated `/flow-brainstorm-resolve` command
+- **Manual**: Find next ⏳ subject, discuss, document decision, mark ✅
+
 **`/flow-brainstorm-review`** ⭐ NEW
 - Review all resolved subjects and verify completeness
 - Summarize decisions made during brainstorming
@@ -499,7 +506,7 @@ Flow provides **24 slash commands** organized into **6 categories**. **Important
 - **Manual**: Review PLAN.md, create follow-up work as needed
 
 **`/flow-brainstorm-complete`** (was `/flow-brainstorm_complete`)
-- Checks all subjects resolved
+- Checks all subjects resolved (via review step recommended first)
 - Verifies pre-implementation tasks done
 - Marks iteration 🎨 Ready for Implementation
 - **Manual**: Check subjects complete, update status to 🎨
@@ -523,10 +530,9 @@ Flow provides **24 slash commands** organized into **6 categories**. **Important
 - Smart universal navigator: "what should I do now?"
 - **Manual**: Look at status markers, decide next action
 
-**`/flow-next-subject`**
-- Shows next unresolved brainstorming subject with details
-- Works within brainstorming phase
-- **Manual**: Find first ⏳ subject in list
+**`/flow-next-subject`** ✨ ENHANCED (see Iteration Lifecycle above)
+- Integrated workflow: Show → Discuss → Capture → Document → Advance
+- Replaces deprecated `/flow-brainstorm-resolve` command
 
 **`/flow-next-iteration`**
 - Shows next pending iteration with goal and approach
@@ -536,11 +542,12 @@ Flow provides **24 slash commands** organized into **6 categories**. **Important
 
 ### 6. Status & Validation (5 commands)
 
-**`/flow-status`**
+**`/flow-status`** ⚡ OPTIMIZED
 - Shows current phase/task/iteration (micro view - "where am I now?")
-- Verifies Progress Dashboard consistency
-- Displays progress percentage
-- Suggests next command
+- **Dashboard-first approach**: Reads only Progress Dashboard section (~50 lines)
+- **Performance**: 95% token reduction for large PLAN.md files (32,810 → ~1,530 tokens)
+- **Micro integrity verification**: Verifies current work only (3 targeted Greps)
+- Displays progress percentage and suggests next command
 - **Manual**: Scan PLAN.md for current 🚧 items
 
 **`/flow-summarize`**
@@ -726,17 +733,19 @@ When you get to step 4 (testing methodology), here are my answers:
 
 All 23 commands in SLASH_COMMANDS.md work this way:
 
-**Planning**: `/flow-blueprint`, `/flow-migrate`, `/flow-plan-update`
+**Planning** (3): `/flow-blueprint`, `/flow-migrate`, `/flow-plan-update`
 
-**Phase Lifecycle**: `/flow-phase-add`, `/flow-phase-start`, `/flow-phase-complete`
+**Phase Lifecycle** (3): `/flow-phase-add`, `/flow-phase-start`, `/flow-phase-complete`
 
-**Task Lifecycle**: `/flow-task-add`, `/flow-task-start`, `/flow-task-complete`
+**Task Lifecycle** (3): `/flow-task-add`, `/flow-task-start`, `/flow-task-complete`
 
-**Iteration Lifecycle**: `/flow-iteration-add`, `/flow-brainstorm-start`, `/flow-brainstorm-subject`, `/flow-brainstorm-review`, `/flow-brainstorm-complete`, `/flow-implement-start`, `/flow-implement-complete`
+**Iteration Lifecycle** (6): `/flow-iteration-add`, `/flow-brainstorm-start`, `/flow-brainstorm-subject`, `/flow-brainstorm-review`, `/flow-brainstorm-complete`, `/flow-implement-start`, `/flow-implement-complete`
 
-**Navigation**: `/flow-next`, `/flow-next-subject`, `/flow-next-iteration`
+**Navigation** (3): `/flow-next`, `/flow-next-subject`, `/flow-next-iteration`
 
-**Status & Validation**: `/flow-status`, `/flow-summarize`, `/flow-verify-plan`, `/flow-compact`, `/flow-rollback`
+**Status & Validation** (5): `/flow-status`, `/flow-summarize`, `/flow-verify-plan`, `/flow-compact`, `/flow-rollback`
+
+**Note**: `/flow-brainstorm-resolve` was removed in v1.0.12 - functionality integrated into `/flow-next-subject`.
 
 Just reference the section name in your prompt!
 
