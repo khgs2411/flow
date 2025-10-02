@@ -60,6 +60,14 @@ COMMANDS=(
   "flow-status" "flow-summarize" "flow-verify-plan" "flow-compact" "flow-rollback"
 )
 
+# Deprecated commands (renamed in v1.0.11+) - cleaned up during --force
+DEPRECATED_COMMANDS=(
+  "flow-phase" "flow-task" "flow-iteration"
+  "flow-brainstorm_start" "flow-brainstorm_subject" "flow-brainstorm_resolve" "flow-brainstorm_complete"
+  "flow-implement_start" "flow-implement_complete"
+  "flow-update-plan-version"
+)
+
 FORCE=false
 
 print_help() {
@@ -144,6 +152,19 @@ deploy_commands() {
   local target_dir="$1"
   local force="$2"
   local success_count=0
+
+  # If force mode, clean up deprecated commands first
+  if [ "$force" = true ]; then
+    echo -e "${CYAN}🧹 Cleaning deprecated commands...${NC}"
+    for deprecated_cmd in "${DEPRECATED_COMMANDS[@]}"; do
+      local deprecated_file="$target_dir/${deprecated_cmd}.md"
+      if [ -f "$deprecated_file" ]; then
+        rm -f "$deprecated_file"
+        echo -e "${YELLOW}🗑️  Removed deprecated: ${deprecated_cmd}.md${NC}"
+      fi
+    done
+    echo ""
+  fi
 
   for cmd in "${COMMANDS[@]}"; do
     local cmd_file="$target_dir/${cmd}.md"
