@@ -541,6 +541,151 @@ You can achieve all of this by manually following the framework patterns. Comman
 
 ---
 
+## Using Flow Without Slash Commands
+
+**Flow works with ANY AI model** - not just Claude Code!
+
+The slash commands are just **instructions for AI agents**. Any AI (ChatGPT, Gemini, Llama, etc.) can read SLASH_COMMANDS.md and follow the instructions manually.
+
+### How It Works
+
+**With Claude Code** (automated):
+```
+User: /flow-blueprint "payment gateway"
+Claude Code: [automatically executes flow-blueprint.md instructions]
+```
+
+**With Other AIs** (manual):
+```
+User: "Read framework/SLASH_COMMANDS.md section '/flow-blueprint' and execute those instructions for 'payment gateway'"
+AI: [reads section, follows steps 1-8 manually]
+```
+
+### Step-by-Step Guide for Other AI Models
+
+1. **Install Flow framework** (one-time setup):
+   ```bash
+   # Clone or copy the Flow repo
+   git clone https://github.com/khgs2411/flow.git
+   cd flow
+
+   # Run installation
+   chmod +x flow.sh
+   ./flow.sh
+
+   # This creates:
+   # - .flow/DEVELOPMENT_FRAMEWORK.md (methodology)
+   # - .flow/EXAMPLE_PLAN.md (template)
+   # - framework/SLASH_COMMANDS.md (command instructions)
+   ```
+
+2. **Reference SLASH_COMMANDS.md in your prompts**:
+   ```
+   "Read framework/SLASH_COMMANDS.md section '/flow-blueprint' and follow those instructions to create a plan for [your feature]"
+   ```
+
+3. **AI reads the section and executes**:
+   - The AI will read steps 1-8 from the `/flow-blueprint` section
+   - Follow each instruction (read framework, gather testing methodology, generate PLAN.md, etc.)
+   - Create your `.flow/PLAN.md` following Flow patterns
+
+4. **Continue with other commands**:
+   ```
+   "Read framework/SLASH_COMMANDS.md section '/flow-brainstorm_start' and execute for 'API design'"
+
+   "Read framework/SLASH_COMMANDS.md section '/flow-brainstorm_resolve' and resolve Subject 1"
+
+   "Read framework/SLASH_COMMANDS.md section '/flow-implement_start' and begin implementation"
+   ```
+
+### Example Usage with ChatGPT
+
+**User**:
+```
+I'm using the Flow framework. Please read framework/SLASH_COMMANDS.md
+section '/flow-blueprint' and execute those instructions to create a
+plan for "User Authentication System".
+
+When you get to step 4 (testing methodology), here are my answers:
+- Methodology: Unit tests after implementation
+- Naming: {feature}.test.ts
+- Location: __tests__/
+- Create new: For new features
+- Add to existing: For enhancements
+```
+
+**ChatGPT**:
+```
+[Reads /flow-blueprint section from SLASH_COMMANDS.md]
+[Follows steps 1-8]
+[Creates .flow/PLAN.md with Testing Strategy, phases, tasks, iterations]
+
+✨ Created .flow/PLAN.md with 3 phases, 8 tasks, 15 iterations
+📂 Flow is now managing this project from .flow/ directory
+```
+
+### Tips for Non-Claude AI Models
+
+1. **Always reference the section explicitly**:
+   - ✅ "Read framework/SLASH_COMMANDS.md section '/flow-blueprint'"
+   - ❌ "Create a Flow plan" (AI won't know the exact steps)
+
+2. **Provide answers upfront** (skip AI questions):
+   ```
+   "Execute /flow-blueprint for 'payment gateway'
+
+   Testing methodology: Simulation-based per-service
+   Naming: {service}.scripts.ts
+   Location: scripts/
+   Create new: For new services
+   Add to existing: For enhancements"
+   ```
+
+3. **Check output against framework**:
+   - Compare generated PLAN.md with `.flow/EXAMPLE_PLAN.md`
+   - Verify Testing Strategy section exists
+   - Ensure status markers are used (✅ ⏳ 🚧 🎨 ❌ 🔮)
+
+4. **Manual verification commands**:
+   ```
+   "Read framework/SLASH_COMMANDS.md section '/flow-status' and execute"
+   "Read framework/SLASH_COMMANDS.md section '/flow-verify-plan' and execute"
+   ```
+
+### What You Lose Without Claude Code
+
+**Claude Code provides**:
+- Automatic command execution (type `/flow-blueprint` instead of full prompt)
+- Command autocomplete with descriptions
+- Faster workflow (less typing)
+
+**But you still get**:
+- ✅ Full Flow methodology
+- ✅ All framework patterns (brainstorming, iterations, pre-tasks)
+- ✅ PLAN.md as single source of truth
+- ✅ Progress tracking with status markers
+- ✅ Testing Strategy enforcement
+- ✅ Scope Boundary Rule
+- ✅ All 20 commands via manual prompts
+
+### Available Commands
+
+All 20 commands in SLASH_COMMANDS.md work this way:
+
+**Planning**: `/flow-blueprint`, `/flow-migrate`, `/flow-update-plan-version`
+
+**Structure**: `/flow-phase`, `/flow-task`, `/flow-iteration`
+
+**Brainstorming**: `/flow-brainstorm_start`, `/flow-brainstorm_subject`, `/flow-brainstorm_resolve`, `/flow-brainstorm_complete`
+
+**Implementation**: `/flow-implement_start`, `/flow-implement_complete`
+
+**Navigation**: `/flow-status`, `/flow-next`, `/flow-next-subject`, `/flow-next-iteration`, `/flow-rollback`, `/flow-verify-plan`, `/flow-summarize`, `/flow-compact`
+
+Just reference the section name in your prompt!
+
+---
+
 ## Design Decisions
 
 ### Why `/flow-blueprint` instead of `/flow-init`?
