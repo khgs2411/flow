@@ -68,10 +68,8 @@ You are executing the `/flow-blueprint` command from the Flow framework.
    - Otherwise, ask: "Do you have a reference implementation I should analyze? (Provide path or say 'no')"
    - If reference provided, read and analyze it to inform the planning
 
-4. **Create .flow/ directory** if it doesn't exist:
-   - Run: `mkdir -p .flow`
-
-5. **Generate .flow/PLAN.md** following the framework template (ALWAYS overwrites if exists):
+4. **Generate .flow/PLAN.md** following the framework template (ALWAYS overwrites if exists):
+   - Note: .flow/ directory already exists (created by flow.sh installation)
    - **Framework reference**: Link to DEVELOPMENT_FRAMEWORK.md at top
    - **Overview section**: Purpose, goals, scope
    - **Architecture section**: High-level design, key components
@@ -154,10 +152,8 @@ You are executing the `/flow-migrate` command from the Flow framework.
    - Copy source file: `[original].pre-flow-backup-$(date +%Y-%m-%d-%H%M%S)`
    - Confirm: "✅ Backed up [original] to [backup]"
 
-5. **Create .flow/ directory**:
-   - Run: `mkdir -p .flow`
-
-6. **Generate .flow/PLAN.md** based on detected structure (ALWAYS overwrites if exists):
+5. **Generate .flow/PLAN.md** based on detected structure (ALWAYS overwrites if exists):
+   - Note: .flow/ directory already exists (created by flow.sh installation)
 
    **Path A - STRUCTURED** (already has phases/tasks):
    - Keep existing hierarchy
