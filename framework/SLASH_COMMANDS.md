@@ -42,6 +42,10 @@ This file contains all slash command definitions for the Flow framework. Copy th
 **File**: `flow-blueprint.md`
 
 ```markdown
+---
+description: Create new .flow/PLAN.md for a feature/project from scratch
+---
+
 You are executing the `/flow-blueprint` command from the Flow framework.
 
 **Purpose**: Create a brand new PLAN.md file from scratch for a new feature/project/bug/issue.
@@ -102,6 +106,10 @@ You are executing the `/flow-blueprint` command from the Flow framework.
 **File**: `flow-migrate.md`
 
 ```markdown
+---
+description: Migrate existing PRD/PLAN/TODO to Flow's .flow/PLAN.md format
+---
+
 You are executing the `/flow-migrate` command from the Flow framework.
 
 **Purpose**: Migrate existing project documentation (PLAN.md, TODO.md, etc.) to Flow-compliant `.flow/PLAN.md` format.
@@ -239,6 +247,10 @@ You are executing the `/flow-migrate` command from the Flow framework.
 **File**: `flow-update-plan-version.md`
 
 ```markdown
+---
+description: Update existing plan to match latest Flow framework structure
+---
+
 You are executing the `/flow-update-plan-version` command from the Flow framework.
 
 **Purpose**: Update an existing `.flow/PLAN.md` to match the latest Flow framework structure and patterns.
@@ -337,6 +349,10 @@ You are executing the `/flow-update-plan-version` command from the Flow framewor
 **File**: `flow-phase.md`
 
 ```markdown
+---
+description: Add a new phase to the development plan
+---
+
 You are executing the `/flow-phase` command from the Flow framework.
 
 **Purpose**: Add a new phase to the current PLAN.md file.
@@ -378,6 +394,10 @@ You are executing the `/flow-phase` command from the Flow framework.
 **File**: `flow-task.md`
 
 ```markdown
+---
+description: Add a new task under the current phase
+---
+
 You are executing the `/flow-task` command from the Flow framework.
 
 **Purpose**: Add a new task to the current phase in PLAN.md.
@@ -418,6 +438,10 @@ You are executing the `/flow-task` command from the Flow framework.
 **File**: `flow-iteration.md`
 
 ```markdown
+---
+description: Add a new iteration under the current task
+---
+
 You are executing the `/flow-iteration` command from the Flow framework.
 
 **Purpose**: Add a new iteration to the current task in PLAN.md.
@@ -454,6 +478,10 @@ You are executing the `/flow-iteration` command from the Flow framework.
 **File**: `flow-brainstorm_start.md`
 
 ```markdown
+---
+description: Start brainstorming session for current iteration
+---
+
 You are executing the `/flow-brainstorm_start` command from the Flow framework.
 
 **Purpose**: Begin a brainstorming session for the current iteration.
@@ -500,6 +528,10 @@ You are executing the `/flow-brainstorm_start` command from the Flow framework.
 **File**: `flow-brainstorm_subject.md`
 
 ```markdown
+---
+description: Add a subject to discuss in brainstorming
+---
+
 You are executing the `/flow-brainstorm_subject` command from the Flow framework.
 
 **Purpose**: Add a new subject to the current brainstorming session.
@@ -530,6 +562,10 @@ You are executing the `/flow-brainstorm_subject` command from the Flow framework
 **File**: `flow-brainstorm_resolve.md`
 
 ```markdown
+---
+description: Resolve current subject with decision
+---
+
 You are executing the `/flow-brainstorm_resolve` command from the Flow framework.
 
 **Purpose**: Mark a brainstorming subject as resolved with a decision.
@@ -583,6 +619,10 @@ You are executing the `/flow-brainstorm_resolve` command from the Flow framework
 **File**: `flow-brainstorm_complete.md`
 
 ```markdown
+---
+description: Complete brainstorming and generate action items
+---
+
 You are executing the `/flow-brainstorm_complete` command from the Flow framework.
 
 **Purpose**: Close the current brainstorming session (only after pre-implementation tasks are done).
@@ -623,6 +663,10 @@ You are executing the `/flow-brainstorm_complete` command from the Flow framewor
 **File**: `flow-implement_start.md`
 
 ```markdown
+---
+description: Begin implementation of current iteration
+---
+
 You are executing the `/flow-implement_start` command from the Flow framework.
 
 **Purpose**: Begin implementation phase for the current iteration.
@@ -681,6 +725,10 @@ You are executing the `/flow-implement_start` command from the Flow framework.
 **File**: `flow-implement_complete.md`
 
 ```markdown
+---
+description: Mark current iteration as complete
+---
+
 You are executing the `/flow-implement_complete` command from the Flow framework.
 
 **Purpose**: Mark the current iteration as complete.
@@ -731,6 +779,10 @@ You are executing the `/flow-implement_complete` command from the Flow framework
 **File**: `flow-status.md`
 
 ```markdown
+---
+description: Show current position and verify plan consistency
+---
+
 You are executing the `/flow-status` command from the Flow framework.
 
 **Purpose**: Show current position in the plan.
@@ -818,6 +870,10 @@ You are executing the `/flow-status` command from the Flow framework.
 **File**: `flow-summarize.md`
 
 ```markdown
+---
+description: Generate summary of all phases/tasks/iterations
+---
+
 You are executing the `/flow-summarize` command from the Flow framework.
 
 **Purpose**: Generate high-level overview of entire project structure and completion state.
@@ -999,6 +1055,10 @@ You are executing the `/flow-summarize` command from the Flow framework.
 **File**: `flow-next-subject.md`
 
 ```markdown
+---
+description: Move to next brainstorming subject
+---
+
 You are executing the `/flow-next-subject` command from the Flow framework.
 
 **Purpose**: Move to the next unresolved subject in the current brainstorming session.
@@ -1030,6 +1090,10 @@ You are executing the `/flow-next-subject` command from the Flow framework.
 **File**: `flow-next-iteration.md`
 
 ```markdown
+---
+description: Skip to next iteration (mark current complete)
+---
+
 You are executing the `/flow-next-iteration` command from the Flow framework.
 
 **Purpose**: Move to the next iteration in the plan.
@@ -1061,6 +1125,10 @@ You are executing the `/flow-next-iteration` command from the Flow framework.
 **File**: `flow-next.md`
 
 ```markdown
+---
+description: Auto-advance to next pending iteration
+---
+
 You are executing the `/flow-next` command from the Flow framework.
 
 **Purpose**: Auto-detect current context and suggest the next logical step.
@@ -1105,6 +1173,10 @@ You are executing the `/flow-next` command from the Flow framework.
 **File**: `flow-rollback.md`
 
 ```markdown
+---
+description: Undo last plan change
+---
+
 You are executing the `/flow-rollback` command from the Flow framework.
 
 **Purpose**: Undo the last change made to PLAN.md.
@@ -1145,6 +1217,10 @@ You are executing the `/flow-rollback` command from the Flow framework.
 **File**: `flow-verify-plan.md`
 
 ```markdown
+---
+description: Verify plan file matches actual codebase state
+---
+
 You are executing the `/flow-verify-plan` command from the Flow framework.
 
 **Purpose**: Verify that PLAN.md is synchronized with the actual project state.
