@@ -189,12 +189,65 @@ Move to next iteration, applying lessons learned.
 [Repeat pattern...]
 ```
 
+### Subject Resolution Types
+
+**Every resolved subject falls into ONE of these types:**
+
+**Type A: Pre-Implementation Task** 🔧
+- **When**: Decision requires code changes BEFORE implementing the iteration
+- **Examples**: Refactoring, bug fixes, system-wide changes, removing deprecated code
+- **Action**: Create new task in "### **Pre-Implementation Tasks:**" section
+- **Template**:
+  ```markdown
+  #### ⏳ Task [N]: [Name] (PENDING)
+
+  **Objective**: [What this accomplishes]
+
+  **Root Cause** (if bug): [Why this is needed]
+
+  **Solution**: [How to fix/implement]
+
+  **Action Items**:
+  - [ ] Specific step 1
+  - [ ] Specific step 2
+
+  **Files to Modify**:
+  - path/to/file.ts (what to change)
+  ```
+
+**Type B: Immediate Documentation** 📝
+- **When**: Architectural decision with NO code changes yet
+- **Examples**: Design patterns, data structure choices, API contracts
+- **Action**: Update Architecture/Design sections in PLAN.md NOW
+- **Result**: Decision documented, implementation happens during iteration
+
+**Type C: Auto-Resolved** 🔄
+- **When**: Subject answered by another subject's decision (cascade effect)
+- **Examples**: "If we use Pattern X, then Question Y is answered"
+- **Action**: Mark as "Auto-resolved by Subject [N]", explain why
+- **Result**: No separate action needed, decision flows from parent subject
+
+**Example from Real Project**:
+```markdown
+Subject 1 (Architecture): Add `foundational: boolean` property
+→ Resolution Type: B (Immediate Documentation)
+→ Action: Updated architecture section
+
+Subject 7 (Bug Fix): Conversion placeholder requires 2+ elements
+→ Resolution Type: A (Pre-Implementation Task)
+→ Action: Created Task 3 with code changes, test cases, files to modify
+
+Subjects 2-5: Element type semantics, validation, etc.
+→ Resolution Type: C (Auto-Resolved by Subject 1)
+→ Action: Marked as "answered by Subject 1's foundational decision"
+```
+
 ### Brainstorming Guidelines
 
 1. **One subject at a time** - Don't overwhelm yourself
 2. **Document all options** - Even rejected ones (future reference)
 3. **Explain rationale** - Why did you choose this approach?
-4. **Create concrete action items** - Turn decisions into work
+4. **Choose resolution type** - Pre-Implementation Task, Immediate Doc, or Auto-Resolved
 5. **Mark resolved** - Use ✅ to track progress
 6. **Add subjects dynamically** - New topics can emerge during discussion
 
@@ -605,6 +658,8 @@ Insert this section **after Overview, before Architecture**:
 ```markdown
 # [Feature] - Development Plan
 
+> **📖 Framework Guide**: See DEVELOPMENT_FRAMEWORK.md
+
 **Created**: [Date]
 **Version**: V1
 
@@ -615,14 +670,14 @@ Insert this section **after Overview, before Architecture**:
 
 ---
 
-## Architecture
-[High-level design, components]
+## 📋 Progress Dashboard    ← INSERT HERE (after Overview, before Architecture)
+
+[Dashboard content]
 
 ---
 
-## 📋 Progress Dashboard    ← INSERT HERE
-
-[Dashboard content]
+## Architecture
+[High-level design, components]
 
 ---
 
@@ -638,6 +693,26 @@ Insert this section **after Overview, before Architecture**:
 **Status**: COMPLETE
 ...
 ```
+
+### ⚠️ Avoiding Duplicate Progress Tracking
+
+**IMPORTANT**: The Progress Dashboard is the **ONLY** progress tracking section in your PLAN.md.
+
+**Do NOT create:**
+- ❌ Separate "Implementation Tasks" section with current phase/iteration
+- ❌ "Current Status" section elsewhere in the file
+- ❌ Multiple progress trackers at different locations
+- ❌ Status pointers like "Search for 'Current Phase' below" (use jump links instead)
+
+**If migrating an existing plan:**
+- `/flow-migrate` and `/flow-update-plan-version` will clean up duplicate sections
+- Old progress trackers will be removed
+- Status pointers will be converted to jump links: `[Progress Dashboard](#-progress-dashboard)`
+
+**Single Source of Truth:**
+- **Progress Dashboard** = Always-visible overview with jump links
+- **Status Markers** = Ground truth at every level (✅ ⏳ 🚧 🎨 ❌ 🔮)
+- **Commands** = Computed verification (`/flow-status`, `/flow-summarize`)
 
 ### Maintaining the Dashboard
 

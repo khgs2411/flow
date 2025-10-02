@@ -166,12 +166,15 @@ You are executing the `/flow-migrate` command from the Flow framework.
    **Path A - STRUCTURED** (already has phases/tasks):
    - Keep existing hierarchy
    - Add framework reference at top
-   - Add/enhance Progress Dashboard section
+   - Add/enhance Progress Dashboard section (after Overview, before Architecture)
+   - **Remove duplicate progress sections** (search for patterns like "Current Phase:", "Implementation Tasks", old progress trackers)
+   - **Update status pointers** (change "Search for 'Current Phase' below" to jump link to Progress Dashboard)
+   - **Identify redundant framework docs** (ask user if sections like "Brainstorming Framework" should be removed since Flow provides this)
    - Standardize status markers (✅ ⏳ 🚧 🎨 ❌ 🔮)
    - Add jump links to Progress Dashboard
    - Preserve all content, decisions, and context
    - Reformat sections to match Flow template
-   - Report: "Enhanced existing structure (preserved [X] phases, [Y] tasks, [Z] iterations)"
+   - Report: "Enhanced existing structure (preserved [X] phases, [Y] tasks, [Z] iterations, removed [N] duplicate sections)"
 
    **Path B - FLAT_LIST** (todos/bullets):
    - Ask: "Group items into phases? (Y/n)"
@@ -295,7 +298,10 @@ You are executing the `/flow-update-plan-version` command from the Flow framewor
      3. **Progress Dashboard** (if complex project, OR create if missing)
      4. Architecture
      5. Development Plan (Phases → Tasks → Iterations)
-   - Move Progress Dashboard if in wrong location
+   - Move Progress Dashboard if in wrong location (should be after Overview, before Architecture)
+   - **Remove duplicate progress sections** (search for old "Implementation Tasks", "Current Phase" headers, redundant trackers)
+   - **Update status pointers** (change old references like "Search for 'Current Phase' below" to jump link: `[Progress Dashboard](#-progress-dashboard)`)
+   - **Clean up redundant framework documentation** (if user has custom brainstorming/workflow docs that duplicate Flow, ask if they want to remove)
    - Add Progress Dashboard if missing and project is complex (10+ iterations)
    - Ensure all status markers are standardized (✅ ⏳ 🚧 🎨 ❌ 🔮)
    - Add jump links to Progress Dashboard if missing
@@ -322,8 +328,11 @@ You are executing the `/flow-update-plan-version` command from the Flow framewor
 
    Changes made:
      + Moved Progress Dashboard to correct location (after Overview, before Architecture)
+     + Removed [N] duplicate progress sections (old trackers)
+     + Updated status pointers to use jump links
      + Added [X] jump links to Progress Dashboard
      + Standardized [Y] status markers
+     + Cleaned up [Z] redundant framework documentation
      + [other changes specific to this update]
 
    Next steps:
@@ -586,9 +595,30 @@ You are executing the `/flow-brainstorm_resolve` command from the Flow framework
 5. **Prompt user for details**:
    - "What decision did you make for this subject?"
    - "What's the rationale? (comma-separated reasons)"
-   - "What action items resulted? (comma-separated, or 'none')"
 
-6. **Add resolution section** under "Resolved Subjects":
+6. **Determine resolution type** (IMPORTANT - choose ONE):
+
+   **Type A: Pre-Implementation Task** (code changes needed before implementing iteration)
+   - Ask: "Does this decision require code changes before implementing this iteration? (refactoring, bug fixes, system changes)"
+   - If YES:
+     - Create new pre-implementation task in "### **Pre-Implementation Tasks:**" section
+     - Include: Objective, Root Cause (if bug), Solution, Action Items, Files to Modify
+     - Mark subject resolution as: "**Action Items**: Pre-Implementation Task [N] created"
+     - Example: "Task 3: Fix Conversion Placeholder Requirement"
+
+   **Type B: Immediate Documentation** (architectural decision, no code changes yet)
+   - If NO code changes needed:
+     - Document decision in appropriate section (Architecture, Design Decisions, etc.)
+     - List conceptual action items (if any)
+     - Example: "Added `foundational: boolean` property to architecture docs"
+
+   **Type C: Auto-Resolved** (answered by another subject's decision)
+   - If subject was resolved by cascade effect:
+     - Mark as: "**Resolution**: Auto-resolved by Subject [X]'s decision"
+     - Briefly explain why it's answered
+     - No separate action items needed
+
+7. **Add resolution section** under "Resolved Subjects":
    ```markdown
    ### ✅ **Subject [N]: [Name]**
 
@@ -599,15 +629,23 @@ You are executing the `/flow-brainstorm_resolve` command from the Flow framework
    - [Reason 2]
 
    **Action Items**:
-   - [ ] [Action item 1]
-   - [ ] [Action item 2]
+   - [ ] Pre-Implementation Task [N] created (Type A)
+     OR
+   - [ ] Updated Architecture section with [decision] (Type B)
+     OR
+   - Auto-resolved by Subject [X] (Type C)
 
    ---
    ```
 
-7. **Update .flow/PLAN.md**: Update subject status and add resolution section
+8. **Update .flow/PLAN.md**: Update subject status, add resolution section, create pre-implementation task if Type A
 
-8. **Confirm to user**: "Resolved Subject [N]: [Name]. Use `/flow-brainstorm_subject` to add more, or `/flow-brainstorm_complete` when done."
+9. **Suggest next action**:
+   - Type A: "Created Pre-Implementation Task [N]. Continue with next subject or use `/flow-brainstorm_complete` when all subjects resolved."
+   - Type B: "Documented decision. Continue with next subject or use `/flow-brainstorm_complete` when all subjects resolved."
+   - Type C: "Auto-resolved. Continue with next subject or use `/flow-brainstorm_complete` when all subjects resolved."
+
+10. **Confirm to user**: "Resolved Subject [N]: [Name] ([Resolution Type]). Use `/flow-brainstorm_subject` to add more, or `/flow-brainstorm_complete` when done."
 
 **Output**: Update .flow/PLAN.md with resolved subject.
 ```
@@ -1458,5 +1496,5 @@ Repeat for next iteration
 
 ---
 
-**Version**: 1.0.6
+**Version**: 1.0.7
 **Last Updated**: 2025-10-02
