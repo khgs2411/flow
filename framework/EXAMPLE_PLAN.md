@@ -384,6 +384,25 @@ Need to decide:
 
 Created basic payment creation flow. Currently works for happy path (successful payment creation). Need to finalize error handling strategy before implementing failure cases.
 
+**🚨 Scope Boundary Example** (Discovery during implementation):
+
+While implementing payment validation middleware, I discovered that the existing `UserAuth.validateToken()` function has a bug - it doesn't check token expiration correctly.
+
+**What I did**:
+1. **STOPPED** implementation immediately
+2. **NOTIFIED** user: "Found bug in UserAuth.validateToken() - doesn't check expiration. This is NOT part of Iteration 2 (payment flow). Should I: (A) Add as new brainstorming subject for next iteration, (B) Create pre-implementation task, (C) Fix now?"
+3. **WAITED** for user decision
+4. User chose: "Create pre-implementation task - we need it fixed before webhooks (Iteration 3)"
+5. **CREATED** Pre-Implementation Task 3: "Fix UserAuth Token Expiration Bug"
+
+**Why this matters**: If I had "helpfully" fixed the auth bug immediately, it would have:
+- Added untracked changes to this iteration
+- Made code review confusing ("why are auth changes in payment PR?")
+- Potentially broken authentication for other services
+- Violated Flow's principle of intentional, scoped changes
+
+**Result**: Bug documented, will be fixed in proper scope, Iteration 2 stays focused on payment flow.
+
 **Files Modified**:
 - `src/routes/payment.routes.ts` - Payment API routes (78 lines)
 - `src/services/PaymentService.ts` - Core service logic (143 lines, partial)

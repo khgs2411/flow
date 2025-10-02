@@ -433,6 +433,13 @@ You are executing the `/flow-phase` command from the Flow framework.
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
 - **Working File**: .flow/PLAN.md (current project)
 
+**🚨 SCOPE BOUNDARY RULE**:
+If you discover NEW issues while working on this phase that are NOT part of the current work:
+1. **STOP** immediately
+2. **NOTIFY** user of the new issue
+3. **DISCUSS** what to do (add to brainstorm, create pre-task, defer, or handle now)
+4. **ONLY** proceed with user's explicit approval
+
 **Instructions**:
 
 1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
@@ -478,6 +485,13 @@ You are executing the `/flow-task` command from the Flow framework.
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
 - **Working File**: .flow/PLAN.md (current project)
 
+**🚨 SCOPE BOUNDARY RULE**:
+If you discover NEW issues while working on this task that are NOT part of the current work:
+1. **STOP** immediately
+2. **NOTIFY** user of the new issue
+3. **DISCUSS** what to do (add to brainstorm, create pre-task, defer, or handle now)
+4. **ONLY** proceed with user's explicit approval
+
 **Instructions**:
 
 1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
@@ -517,6 +531,13 @@ description: Add a new iteration under the current task
 You are executing the `/flow-iteration` command from the Flow framework.
 
 **Purpose**: Add a new iteration to the current task in PLAN.md.
+
+**🚨 SCOPE BOUNDARY RULE**:
+If you discover NEW issues while working on this iteration that are NOT part of the current work:
+1. **STOP** immediately
+2. **NOTIFY** user of the new issue
+3. **DISCUSS** what to do (add to brainstorm, create pre-task, defer, or handle now)
+4. **ONLY** proceed with user's explicit approval
 
 **Instructions**:
 
@@ -562,6 +583,13 @@ You are executing the `/flow-brainstorm_start` command from the Flow framework.
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
 - **Working File**: .flow/PLAN.md (current project)
 - **Framework Pattern**: See "Brainstorming Session Pattern" section in framework guide
+
+**🚨 SCOPE BOUNDARY RULE**:
+If you discover NEW issues during brainstorming that are NOT part of the current iteration:
+1. **STOP** immediately
+2. **NOTIFY** user of the new issue
+3. **DISCUSS** what to do (add to brainstorm, create pre-task, defer, or handle now)
+4. **ONLY** proceed with user's explicit approval
 
 **Instructions**:
 
@@ -777,6 +805,14 @@ You are executing the `/flow-implement_start` command from the Flow framework.
 - **Working File**: .flow/PLAN.md (current project)
 - **Framework Pattern**: See "Implementation Pattern" section in framework guide
 - **Prerequisite**: Brainstorming must be ✅ COMPLETE and all pre-implementation tasks done
+
+**🚨 SCOPE BOUNDARY RULE (CRITICAL)**:
+If you discover NEW issues during implementation that are NOT part of the current iteration's action items:
+1. **STOP** immediately
+2. **NOTIFY** user of the new issue
+3. **DISCUSS** what to do (add to brainstorm, create pre-task, defer, or handle now)
+4. **ONLY** proceed with user's explicit approval
+**Exception**: Syntax errors or blocking issues in files you must modify (document what you fixed)
 
 **Instructions**:
 
@@ -1559,14 +1595,14 @@ Repeat for next iteration
 
 ---
 
-**Version**: 1.0.7
+**Version**: 1.0.8
 **Last Updated**: 2025-10-02
 COMMANDS_DATA_EOF
 }
 
 get_framework_content() {
   cat <<'FRAMEWORK_DATA_EOF'
-**Version**: 1.0
+**Version**: 1.0.8
 
 # Domain-Driven Design with Agile Iterative Philosophy
 
@@ -1638,6 +1674,35 @@ PHASE → TASK → ITERATION → BRAINSTORM → IMPLEMENTATION → COMPLETE
 - Brainstorm BEFORE implementing to make correct decisions upfront
 - Split complex features into small, testable iterations
 - Each iteration is complete and stable before moving to next
+
+### 6. Scope Boundary Rule (CRITICAL)
+
+**🚨 NEVER fix out-of-scope issues without explicit user permission.**
+
+When working within **any Flow scope** (Phase/Task/Iteration/Brainstorming/Pre-Implementation Task), if you discover a NEW issue that is NOT part of the current work:
+
+1. **STOP** current work immediately
+2. **NOTIFY** user of the new issue discovered
+3. **DISCUSS** with user what to do:
+   - Add as new brainstorming subject?
+   - Create new pre-implementation task?
+   - Defer to next iteration?
+   - Handle immediately (only if user explicitly approves)?
+4. **ONLY** proceed with user's explicit approval
+
+**Examples of scope violations**:
+- Working on Pre-Implementation Task 2 (fix validation bug), discover Test 3 has unrelated placeholder parsing issue → **STOP, ask user**
+- Implementing Iteration 5 (add error handling), notice Iteration 2 code has typo → **STOP, ask user**
+- Resolving brainstorm Subject 3 (API design), realize database schema needs refactoring → **STOP, ask user**
+
+**Why this matters**:
+- Prevents scope creep and uncontrolled changes
+- Maintains Flow's intentional progression
+- Preserves user's ability to prioritize work
+- Keeps iterations focused and reviewable
+- Avoids "fixing" things that may be intentional or have hidden dependencies
+
+**The only exception**: Fixing issues that are **directly blocking** the current task (e.g., syntax error in file you must modify). Even then, document what you fixed and why.
 
 ---
 
@@ -2963,8 +3028,8 @@ By following this framework, you build complex features incrementally with minim
 
 ---
 
-**Version**: 1.0
-**Last Updated**: 2025-10-01
+**Version**: 1.0.8
+**Last Updated**: 2025-10-02
 FRAMEWORK_DATA_EOF
 }
 
@@ -3355,6 +3420,25 @@ Need to decide:
 **Implementation Notes**:
 
 Created basic payment creation flow. Currently works for happy path (successful payment creation). Need to finalize error handling strategy before implementing failure cases.
+
+**🚨 Scope Boundary Example** (Discovery during implementation):
+
+While implementing payment validation middleware, I discovered that the existing `UserAuth.validateToken()` function has a bug - it doesn't check token expiration correctly.
+
+**What I did**:
+1. **STOPPED** implementation immediately
+2. **NOTIFIED** user: "Found bug in UserAuth.validateToken() - doesn't check expiration. This is NOT part of Iteration 2 (payment flow). Should I: (A) Add as new brainstorming subject for next iteration, (B) Create pre-implementation task, (C) Fix now?"
+3. **WAITED** for user decision
+4. User chose: "Create pre-implementation task - we need it fixed before webhooks (Iteration 3)"
+5. **CREATED** Pre-Implementation Task 3: "Fix UserAuth Token Expiration Bug"
+
+**Why this matters**: If I had "helpfully" fixed the auth bug immediately, it would have:
+- Added untracked changes to this iteration
+- Made code review confusing ("why are auth changes in payment PR?")
+- Potentially broken authentication for other services
+- Violated Flow's principle of intentional, scoped changes
+
+**Result**: Bug documented, will be fixed in proper scope, Iteration 2 stays focused on payment flow.
 
 **Files Modified**:
 - `src/routes/payment.routes.ts` - Payment API routes (78 lines)

@@ -370,6 +370,13 @@ You are executing the `/flow-phase` command from the Flow framework.
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
 - **Working File**: .flow/PLAN.md (current project)
 
+**🚨 SCOPE BOUNDARY RULE**:
+If you discover NEW issues while working on this phase that are NOT part of the current work:
+1. **STOP** immediately
+2. **NOTIFY** user of the new issue
+3. **DISCUSS** what to do (add to brainstorm, create pre-task, defer, or handle now)
+4. **ONLY** proceed with user's explicit approval
+
 **Instructions**:
 
 1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
@@ -415,6 +422,13 @@ You are executing the `/flow-task` command from the Flow framework.
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
 - **Working File**: .flow/PLAN.md (current project)
 
+**🚨 SCOPE BOUNDARY RULE**:
+If you discover NEW issues while working on this task that are NOT part of the current work:
+1. **STOP** immediately
+2. **NOTIFY** user of the new issue
+3. **DISCUSS** what to do (add to brainstorm, create pre-task, defer, or handle now)
+4. **ONLY** proceed with user's explicit approval
+
 **Instructions**:
 
 1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
@@ -454,6 +468,13 @@ description: Add a new iteration under the current task
 You are executing the `/flow-iteration` command from the Flow framework.
 
 **Purpose**: Add a new iteration to the current task in PLAN.md.
+
+**🚨 SCOPE BOUNDARY RULE**:
+If you discover NEW issues while working on this iteration that are NOT part of the current work:
+1. **STOP** immediately
+2. **NOTIFY** user of the new issue
+3. **DISCUSS** what to do (add to brainstorm, create pre-task, defer, or handle now)
+4. **ONLY** proceed with user's explicit approval
 
 **Instructions**:
 
@@ -499,6 +520,13 @@ You are executing the `/flow-brainstorm_start` command from the Flow framework.
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
 - **Working File**: .flow/PLAN.md (current project)
 - **Framework Pattern**: See "Brainstorming Session Pattern" section in framework guide
+
+**🚨 SCOPE BOUNDARY RULE**:
+If you discover NEW issues during brainstorming that are NOT part of the current iteration:
+1. **STOP** immediately
+2. **NOTIFY** user of the new issue
+3. **DISCUSS** what to do (add to brainstorm, create pre-task, defer, or handle now)
+4. **ONLY** proceed with user's explicit approval
 
 **Instructions**:
 
@@ -714,6 +742,14 @@ You are executing the `/flow-implement_start` command from the Flow framework.
 - **Working File**: .flow/PLAN.md (current project)
 - **Framework Pattern**: See "Implementation Pattern" section in framework guide
 - **Prerequisite**: Brainstorming must be ✅ COMPLETE and all pre-implementation tasks done
+
+**🚨 SCOPE BOUNDARY RULE (CRITICAL)**:
+If you discover NEW issues during implementation that are NOT part of the current iteration's action items:
+1. **STOP** immediately
+2. **NOTIFY** user of the new issue
+3. **DISCUSS** what to do (add to brainstorm, create pre-task, defer, or handle now)
+4. **ONLY** proceed with user's explicit approval
+**Exception**: Syntax errors or blocking issues in files you must modify (document what you fixed)
 
 **Instructions**:
 
@@ -1496,5 +1532,5 @@ Repeat for next iteration
 
 ---
 
-**Version**: 1.0.7
+**Version**: 1.0.8
 **Last Updated**: 2025-10-02

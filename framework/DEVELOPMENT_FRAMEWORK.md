@@ -1,4 +1,4 @@
-**Version**: 1.0
+**Version**: 1.0.8
 
 # Domain-Driven Design with Agile Iterative Philosophy
 
@@ -70,6 +70,35 @@ PHASE → TASK → ITERATION → BRAINSTORM → IMPLEMENTATION → COMPLETE
 - Brainstorm BEFORE implementing to make correct decisions upfront
 - Split complex features into small, testable iterations
 - Each iteration is complete and stable before moving to next
+
+### 6. Scope Boundary Rule (CRITICAL)
+
+**🚨 NEVER fix out-of-scope issues without explicit user permission.**
+
+When working within **any Flow scope** (Phase/Task/Iteration/Brainstorming/Pre-Implementation Task), if you discover a NEW issue that is NOT part of the current work:
+
+1. **STOP** current work immediately
+2. **NOTIFY** user of the new issue discovered
+3. **DISCUSS** with user what to do:
+   - Add as new brainstorming subject?
+   - Create new pre-implementation task?
+   - Defer to next iteration?
+   - Handle immediately (only if user explicitly approves)?
+4. **ONLY** proceed with user's explicit approval
+
+**Examples of scope violations**:
+- Working on Pre-Implementation Task 2 (fix validation bug), discover Test 3 has unrelated placeholder parsing issue → **STOP, ask user**
+- Implementing Iteration 5 (add error handling), notice Iteration 2 code has typo → **STOP, ask user**
+- Resolving brainstorm Subject 3 (API design), realize database schema needs refactoring → **STOP, ask user**
+
+**Why this matters**:
+- Prevents scope creep and uncontrolled changes
+- Maintains Flow's intentional progression
+- Preserves user's ability to prioritize work
+- Keeps iterations focused and reviewable
+- Avoids "fixing" things that may be intentional or have hidden dependencies
+
+**The only exception**: Fixing issues that are **directly blocking** the current task (e.g., syntax error in file you must modify). Even then, document what you fixed and why.
 
 ---
 
@@ -1395,5 +1424,5 @@ By following this framework, you build complex features incrementally with minim
 
 ---
 
-**Version**: 1.0
-**Last Updated**: 2025-10-01
+**Version**: 1.0.8
+**Last Updated**: 2025-10-02
