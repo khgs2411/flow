@@ -70,9 +70,13 @@ chmod +x flow.sh
 ```
 
 **What just happened?**
-- ✅ Created `.claude/commands/` with 18 slash commands
+- ✅ Created `.claude/commands/` with 20 slash commands
 - ✅ Created `.flow/` with framework documentation
 - ✅ Your project is ready to use Flow!
+
+**Next Steps:**
+- **New project**: Run `/flow-blueprint [description]` to create your plan
+- **Existing project**: Run `/flow-migrate` to convert existing docs (PRD.md, PLAN.md, TODO.md, etc.)
 
 **Need to reinstall or update?**
 ```bash
@@ -104,13 +108,40 @@ The Flow framework is a spec-driven iterative development methodology that combi
 
 - **Planning before coding** through structured brainstorming sessions
 - **Iterating in small, testable increments** (skeleton → veins → flesh → fibers)
-- **Preserving context** in a PLAN.md file that survives across sessions
+- **Preserving context** in a `.flow/PLAN.md` file that survives across sessions
 - **Mandatory status markers** at every level (Phase/Task/Iteration/Subject) for rigorous progress tracking
 - **Enforcing patterns** through slash commands that update the plan automatically
+- **Mid-development adoption** via `/flow-migrate` - convert existing PRD.md/PLAN.md/TODO.md to Flow format
 
 ---
 
-## What's New (V1.0)
+## What's New in V1.0.5 🎉
+
+### Major Features
+- ✅ **`.flow/` Directory Standard** - Flow now manages plans from `.flow/PLAN.md` (single source of truth)
+- ✅ **`/flow-migrate` Command** - Convert existing PRD.md, PLAN.md, TODO.md to Flow format mid-development
+- ✅ **`/flow-blueprint` Enhanced** - Always creates fresh `.flow/PLAN.md`, ignoring existing plans
+- ✅ **Smart Migration Paths** - Auto-detects structured/flat/unstructured docs and migrates intelligently
+- ✅ **Backup System** - Migration creates timestamped backups of original files
+- ✅ **Universal Compatibility** - Works with TaskMaster AI, Spec-Kit, and custom documentation
+
+### Migration Features
+- 🔍 **Auto-discovery** - Searches for PRD.md, PLAN.md, TODO.md, DEVELOPMENT.md, etc.
+- 🧠 **Structure Detection** - Recognizes phases/tasks/iterations or flat lists
+- 💾 **Content Preservation** - NEVER discards original content, only enhances with Flow formatting
+- 🎯 **Three Migration Paths**:
+  - **Structured** (has phases/tasks) → Enhance with Flow features
+  - **Flat List** (todos) → Convert to Flow hierarchy
+  - **Unstructured** (notes) → Extract concepts into brainstorming subjects
+
+### Breaking Changes
+- ⚠️ **PLAN.md location changed** from project root to `.flow/PLAN.md`
+- ⚠️ All slash commands now read/write `.flow/PLAN.md`
+- ⚠️ Use `/flow-migrate` to move existing plans to new location
+
+---
+
+## What's New in V1.0 (Previous Release)
 
 ### Core Features
 - ✅ **Single File Distribution** - `flow.sh` is self-contained (~63KB, no dependencies)

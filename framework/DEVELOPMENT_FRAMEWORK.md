@@ -23,10 +23,27 @@ By splitting development into minuscule, well-planned iterations, you build a st
 
 ### 1. Plan File as Single Source of Truth
 
-- Every feature/project/issue has a dedicated `PLAN.md` file
+- Every feature/project/issue has a dedicated `.flow/PLAN.md` file
+- Flow manages the plan from the `.flow/` directory in your project root
 - The plan file survives across sessions and maintains complete context
 - All decisions, brainstorming results, and implementation progress are documented
 - AI agents and humans can resume work from any point by reading the plan
+
+**File Structure**:
+```
+your-project/
+├── .flow/
+│   ├── PLAN.md              # Flow-managed plan (single source of truth)
+│   └── DEVELOPMENT_FRAMEWORK.md (optional - project-specific framework guide)
+├── src/
+├── tests/
+└── ...
+```
+
+**Getting Started**:
+- **New project**: Use `/flow-blueprint [description]` to create fresh `.flow/PLAN.md`
+- **Existing project**: Use `/flow-migrate [file]` to convert existing documentation to Flow format
+- Both commands create `.flow/PLAN.md` and take full control of plan management
 
 ### 2. Iterative Development Loop
 

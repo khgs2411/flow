@@ -1,10 +1,12 @@
 # Payment Gateway Integration - Development Plan
 
-> **📖 Framework Guide**: See `.flow/DEVELOPMENT_FRAMEWORK.md` for complete methodology and patterns used in this plan
+> **📖 Framework Guide**: See DEVELOPMENT_FRAMEWORK.md for complete methodology and patterns used in this plan
+>
 > **🎯 Purpose**: This is a reference example showing the Flow framework in action - demonstrating brainstorming sessions, iterations, pre-implementation tasks, bug discoveries, and state tracking
 
 **Created**: 2025-10-01
 **Version**: V1
+**Plan Location**: `.flow/PLAN.md` (managed by Flow)
 
 ---
 

@@ -9,20 +9,31 @@ This file contains all slash command definitions for the Flow framework. Copy th
 **IMPORTANT**: Every command must:
 
 1. **Read the framework guide** at the start to understand patterns and structure
-2. **Find and parse PLAN.md** to understand current state
+2. **Find and parse .flow/PLAN.md** to understand current state
 3. **Follow framework patterns exactly** (status markers, section structure, etc.)
-4. **Update PLAN.md** according to framework conventions
+4. **Update .flow/PLAN.md** according to framework conventions
 5. **Provide clear next steps** to the user
 
-**Framework Location**: `DEVELOPMENT_FRAMEWORK.md` (searches in: `.claude/`, project root, or `~/.claude/flow/`)
+**File Locations**:
+- **Plan File**: `.flow/PLAN.md` (Flow manages the plan from this directory)
+- **Framework Guide**: Search in order:
+  1. `.flow/DEVELOPMENT_FRAMEWORK.md`
+  2. `.claude/DEVELOPMENT_FRAMEWORK.md`
+  3. `./DEVELOPMENT_FRAMEWORK.md` (project root)
+  4. `~/.claude/flow/DEVELOPMENT_FRAMEWORK.md` (global)
+
+**Finding PLAN.md** (all commands except `/flow-blueprint` and `/flow-migrate`):
+- Primary location: `.flow/PLAN.md`
+- If not found, search project root and traverse up
+- If still not found: Suggest `/flow-blueprint` (new project) or `/flow-migrate` (existing docs)
 
 **Status Markers** (use consistently):
 - ✅ Complete
 - ⏳ Pending
 - 🚧 In Progress
 - 🎨 Ready for Implementation
-- ❌ Rejected
-- 🔮 Future/Deferred
+- ❌ Cancelled
+- 🔮 Deferred
 
 ---
 
@@ -33,12 +44,15 @@ This file contains all slash command definitions for the Flow framework. Copy th
 ```markdown
 You are executing the `/flow-blueprint` command from the Flow framework.
 
-**Purpose**: Generate initial PLAN.md file with skeleton structure for a new feature/project/bug/issue.
+**Purpose**: Create a brand new PLAN.md file from scratch for a new feature/project/bug/issue.
+
+**IMPORTANT**: This command ALWAYS creates a fresh `.flow/PLAN.md`, overwriting any existing plan file. Use `/flow-migrate` if you want to convert existing documentation.
 
 **Instructions**:
 
 1. **Read the framework guide**:
    - Search for DEVELOPMENT_FRAMEWORK.md in these locations (in order):
+     - `.flow/DEVELOPMENT_FRAMEWORK.md`
      - `.claude/DEVELOPMENT_FRAMEWORK.md`
      - `./DEVELOPMENT_FRAMEWORK.md` (project root)
      - `~/.claude/flow/DEVELOPMENT_FRAMEWORK.md` (global)
@@ -54,9 +68,14 @@ You are executing the `/flow-blueprint` command from the Flow framework.
    - Otherwise, ask: "Do you have a reference implementation I should analyze? (Provide path or say 'no')"
    - If reference provided, read and analyze it to inform the planning
 
-4. **Generate PLAN.md** in current directory following the framework template:
+4. **Create .flow/ directory** if it doesn't exist:
+   - Run: `mkdir -p .flow`
+
+5. **Generate .flow/PLAN.md** following the framework template (ALWAYS overwrites if exists):
+   - **Framework reference**: Link to DEVELOPMENT_FRAMEWORK.md at top
    - **Overview section**: Purpose, goals, scope
    - **Architecture section**: High-level design, key components
+   - **Progress Dashboard**: For complex projects (optional, can add later)
    - **Development Plan**:
      - Estimate 2-4 phases (Foundation, Core Implementation, Testing, Enhancement/Polish)
      - For each phase: 1-5 tasks
@@ -64,17 +83,157 @@ You are executing the `/flow-blueprint` command from the Flow framework.
      - Mark everything as ⏳ PENDING
      - Add placeholder brainstorming sessions (empty subject lists)
 
-5. **Depth**: Medium detail
+6. **Depth**: Medium detail
    - Phase names and strategies
    - Task names and purposes
    - Iteration names only (no brainstorming subjects yet)
 
-6. **Confirm to user**:
-   - "Created PLAN.md with [X] phases, [Y] tasks, [Z] iterations"
+7. **Confirm to user**:
+   - "✨ Created .flow/PLAN.md with [X] phases, [Y] tasks, [Z] iterations"
+   - "📂 Flow is now managing this project from .flow/ directory"
    - "Use `/flow-status` to see current state"
    - "Use `/flow-brainstorm_start [topic]` to begin first iteration"
 
-**Output**: Create PLAN.md file and confirm creation to user.
+**Output**: Create `.flow/PLAN.md` file and confirm creation to user.
+```
+
+---
+
+## /flow-migrate
+
+**File**: `flow-migrate.md`
+
+```markdown
+You are executing the `/flow-migrate` command from the Flow framework.
+
+**Purpose**: Migrate existing project documentation (PLAN.md, TODO.md, etc.) to Flow-compliant `.flow/PLAN.md` format.
+
+**IMPORTANT**: This command ALWAYS creates a fresh `.flow/PLAN.md`, overwriting any existing plan file. It reads your current documentation and converts it to Flow format.
+
+**Instructions**:
+
+1. **Read the framework guide**:
+   - Search for DEVELOPMENT_FRAMEWORK.md in these locations (in order):
+     - `.flow/DEVELOPMENT_FRAMEWORK.md`
+     - `.claude/DEVELOPMENT_FRAMEWORK.md`
+     - `./DEVELOPMENT_FRAMEWORK.md` (project root)
+     - `~/.claude/flow/DEVELOPMENT_FRAMEWORK.md` (global)
+   - Understand Flow's hierarchy: PHASE → TASK → ITERATION → BRAINSTORM → IMPLEMENTATION
+   - Study the Progress Dashboard template
+   - Note all status markers (✅ ⏳ 🚧 🎨 ❌ 🔮)
+
+2. **Discover existing documentation**:
+   - Check if user provided path in `$ARGUMENTS`
+   - Otherwise, search project root for common files (in order):
+     - `PRD.md` (common in TaskMaster AI, Spec-Kit)
+     - `PLAN.md`
+     - `TODO.md`
+     - `DEVELOPMENT.md`
+     - `ROADMAP.md`
+     - `TASKS.md`
+   - If multiple found, list them and ask: "Found [X] files. Which should I migrate? (number or path)"
+   - If none found, ask: "No plan files found. Provide path to file you want to migrate, or use `/flow-blueprint` to start fresh."
+
+3. **Read and analyze source file**:
+   - Read entire source file
+   - Detect structure type:
+     - **STRUCTURED** (Path A): Has phases/tasks/iterations or similar hierarchy
+     - **FLAT_LIST** (Path B): Simple todo list or numbered items
+     - **UNSTRUCTURED** (Path C): Free-form notes, ideas, design docs
+   - Extract key information:
+     - Project context/purpose
+     - Existing work completed
+     - Current status/position
+     - Remaining work
+     - Architecture/design notes
+     - V1/V2 splits (if mentioned)
+     - Deferred items
+     - Cancelled items
+
+4. **Create backup**:
+   - Copy source file: `[original].pre-flow-backup-$(date +%Y-%m-%d-%H%M%S)`
+   - Confirm: "✅ Backed up [original] to [backup]"
+
+5. **Create .flow/ directory**:
+   - Run: `mkdir -p .flow`
+
+6. **Generate .flow/PLAN.md** based on detected structure (ALWAYS overwrites if exists):
+
+   **Path A - STRUCTURED** (already has phases/tasks):
+   - Keep existing hierarchy
+   - Add framework reference at top
+   - Add/enhance Progress Dashboard section
+   - Standardize status markers (✅ ⏳ 🚧 🎨 ❌ 🔮)
+   - Add jump links to Progress Dashboard
+   - Preserve all content, decisions, and context
+   - Reformat sections to match Flow template
+   - Report: "Enhanced existing structure (preserved [X] phases, [Y] tasks, [Z] iterations)"
+
+   **Path B - FLAT_LIST** (todos/bullets):
+   - Ask: "Group items into phases? (Y/n)"
+   - If yes, intelligently group related items
+   - If no, create single phase with items as iterations
+   - Add framework reference
+   - Add Progress Dashboard
+   - Convert items to Flow iteration format
+   - Add placeholder brainstorming sessions
+   - Mark completed items as ✅, pending as ⏳
+   - Report: "Converted flat list to Flow structure ([X] phases, [Y] tasks, [Z] iterations)"
+
+   **Path C - UNSTRUCTURED** (notes):
+   - Extract key concepts and features mentioned
+   - Create Framework reference
+   - Create Overview section from notes
+   - Create Architecture section if design mentioned
+   - Create Progress Dashboard (minimal - project just starting)
+   - Create initial brainstorming session with subjects from notes
+   - Mark everything as ⏳ PENDING
+   - Report: "Created Flow plan from notes (extracted [X] key concepts as brainstorming subjects)"
+
+7. **Add standard Flow sections** (all paths):
+   - Framework reference: `> **📖 Framework Guide**: See DEVELOPMENT_FRAMEWORK.md`
+   - Progress Dashboard (with proper format)
+   - Development Plan with proper hierarchy
+   - Status markers at every level
+
+8. **Smart content preservation**:
+   - NEVER discard user's original content
+   - Preserve all decisions, rationale, context
+   - Preserve code examples, file paths, references
+   - Preserve completion status and dates
+   - Enhance with Flow formatting, don't replace
+
+9. **Confirm to user**:
+   ```
+   ✨ Migration complete!
+
+   📂 Source: [original file path]
+   💾 Backup: [backup file path]
+   🎯 Output: .flow/PLAN.md
+
+   Migration type: [STRUCTURED/FLAT_LIST/UNSTRUCTURED]
+   Changes:
+     + Added Progress Dashboard with jump links
+     + Enhanced [X] status markers
+     + Preserved [Y] completed items
+     + Preserved [Z] pending items
+     + [other changes specific to migration type]
+
+   Next steps:
+     1. Review: diff [backup] .flow/PLAN.md
+     2. Verify: /flow-status
+     3. Start using Flow: /flow-brainstorm_start [topic]
+
+   📂 Flow is now managing this project from .flow/ directory
+   ```
+
+10. **Handle edge cases**:
+    - If source file is empty: Suggest `/flow-blueprint` instead
+    - If source file is already Flow-compliant: Mention it's already compatible, migrate anyway
+    - If can't determine structure: Default to Path C (unstructured)
+    - If migration fails: Keep backup safe, report error, suggest manual approach
+
+**Output**: Create `.flow/PLAN.md` from existing documentation, create backup, confirm migration to user.
 ```
 
 ---
@@ -90,11 +249,11 @@ You are executing the `/flow-phase` command from the Flow framework.
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
-- **Working File**: PLAN.md (current project)
+- **Working File**: .flow/PLAN.md (current project)
 
 **Instructions**:
 
-1. **Find PLAN.md**: Look in current directory, traverse up if needed
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
 2. **Verify framework understanding**: Know that phases are top-level milestones (e.g., "Foundation", "Core Implementation", "Testing")
 
@@ -111,11 +270,11 @@ You are executing the `/flow-phase` command from the Flow framework.
    ---
    ```
 
-4. **Update PLAN.md**: Append new phase to Development Plan section
+4. **Update .flow/PLAN.md**: Append new phase to Development Plan section
 
 5. **Confirm to user**: "Added Phase [N]: [$ARGUMENTS] to PLAN.md"
 
-**Output**: Update PLAN.md with new phase.
+**Output**: Update .flow/PLAN.md with new phase.
 ```
 
 ---
@@ -131,11 +290,11 @@ You are executing the `/flow-task` command from the Flow framework.
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
-- **Working File**: PLAN.md (current project)
+- **Working File**: .flow/PLAN.md (current project)
 
 **Instructions**:
 
-1. **Find PLAN.md**: Look in current directory, traverse up if needed
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
 2. **Parse arguments**: `$ARGUMENTS` = task description
 
@@ -151,11 +310,11 @@ You are executing the `/flow-task` command from the Flow framework.
    ---
    ```
 
-5. **Update PLAN.md**: Append task under current phase
+5. **Update .flow/PLAN.md**: Append task under current phase
 
 6. **Confirm to user**: "Added Task [N]: [$ARGUMENTS] to current phase"
 
-**Output**: Update PLAN.md with new task.
+**Output**: Update .flow/PLAN.md with new task.
 ```
 
 ---
@@ -171,7 +330,7 @@ You are executing the `/flow-iteration` command from the Flow framework.
 
 **Instructions**:
 
-1. **Find PLAN.md**: Look in current directory, traverse up if needed
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
 2. **Parse arguments**: `$ARGUMENTS` = iteration description
 
@@ -187,11 +346,11 @@ You are executing the `/flow-iteration` command from the Flow framework.
    ---
    ```
 
-5. **Update PLAN.md**: Append iteration under current task
+5. **Update .flow/PLAN.md**: Append iteration under current task
 
 6. **Confirm to user**: "Added Iteration [N]: [$ARGUMENTS] to current task. Use `/flow-brainstorm_start [topic]` to begin."
 
-**Output**: Update PLAN.md with new iteration.
+**Output**: Update .flow/PLAN.md with new iteration.
 ```
 
 ---
@@ -207,12 +366,12 @@ You are executing the `/flow-brainstorm_start` command from the Flow framework.
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
-- **Working File**: PLAN.md (current project)
+- **Working File**: .flow/PLAN.md (current project)
 - **Framework Pattern**: See "Brainstorming Session Pattern" section in framework guide
 
 **Instructions**:
 
-1. **Find PLAN.md**: Look in current directory, traverse up if needed
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
 2. **Parse arguments**: `$ARGUMENTS` = brainstorming topic
 
@@ -237,7 +396,7 @@ You are executing the `/flow-brainstorm_start` command from the Flow framework.
 
 7. **Confirm to user**: "Started brainstorming session: [$ARGUMENTS]. First subject: [subject name]. Use `/flow-brainstorm_subject [name]` to add more subjects."
 
-**Output**: Update PLAN.md with brainstorming section and status change.
+**Output**: Update .flow/PLAN.md with brainstorming section and status change.
 ```
 
 ---
@@ -253,7 +412,7 @@ You are executing the `/flow-brainstorm_subject` command from the Flow framework
 
 **Instructions**:
 
-1. **Find PLAN.md**: Look in current directory, traverse up if needed
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
 2. **Parse arguments**: `$ARGUMENTS` = subject name and optional brief description
 
@@ -263,11 +422,11 @@ You are executing the `/flow-brainstorm_subject` command from the Flow framework
    - Count existing subjects
    - Append: `[N]. ⏳ **[$ARGUMENTS]** - [Brief description if provided]`
 
-5. **Update PLAN.md**: Add subject to "Subjects to Discuss" list
+5. **Update .flow/PLAN.md**: Add subject to "Subjects to Discuss" list
 
 6. **Confirm to user**: "Added Subject [N]: [$ARGUMENTS] to brainstorming session."
 
-**Output**: Update PLAN.md with new subject.
+**Output**: Update .flow/PLAN.md with new subject.
 ```
 
 ---
@@ -283,7 +442,7 @@ You are executing the `/flow-brainstorm_resolve` command from the Flow framework
 
 **Instructions**:
 
-1. **Find PLAN.md**: Look in current directory, traverse up if needed
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
 2. **Parse arguments**: `$ARGUMENTS` = subject name/number
 
@@ -316,11 +475,11 @@ You are executing the `/flow-brainstorm_resolve` command from the Flow framework
    ---
    ```
 
-7. **Update PLAN.md**: Update subject status and add resolution section
+7. **Update .flow/PLAN.md**: Update subject status and add resolution section
 
 8. **Confirm to user**: "Resolved Subject [N]: [Name]. Use `/flow-brainstorm_subject` to add more, or `/flow-brainstorm_complete` when done."
 
-**Output**: Update PLAN.md with resolved subject.
+**Output**: Update .flow/PLAN.md with resolved subject.
 ```
 
 ---
@@ -338,7 +497,7 @@ You are executing the `/flow-brainstorm_complete` command from the Flow framewor
 
 **Instructions**:
 
-1. **Find PLAN.md**: Look in current directory, traverse up if needed
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
 2. **Verify all subjects resolved**: Check "Subjects to Discuss" - all should be ✅
 
@@ -360,7 +519,7 @@ You are executing the `/flow-brainstorm_complete` command from the Flow framewor
 
 6. **Confirm to user**: "Brainstorming session complete. Iteration is now 🎨 READY FOR IMPLEMENTATION. Use `/flow-implement_start` to begin."
 
-**Output**: Update PLAN.md with brainstorming completion status.
+**Output**: Update .flow/PLAN.md with brainstorming completion status.
 ```
 
 ---
@@ -376,13 +535,13 @@ You are executing the `/flow-implement_start` command from the Flow framework.
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
-- **Working File**: PLAN.md (current project)
+- **Working File**: .flow/PLAN.md (current project)
 - **Framework Pattern**: See "Implementation Pattern" section in framework guide
 - **Prerequisite**: Brainstorming must be ✅ COMPLETE and all pre-implementation tasks done
 
 **Instructions**:
 
-1. **Find PLAN.md**: Look in current directory, traverse up if needed
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
 2. **Find current iteration**: Look for iteration marked 🎨 READY FOR IMPLEMENTATION
 
@@ -418,7 +577,7 @@ You are executing the `/flow-implement_start` command from the Flow framework.
 
 6. **Confirm to user**: "Implementation started for Iteration [N]. Work through action items and check them off as you complete them. Use `/flow-implement_complete` when done."
 
-**Output**: Update PLAN.md with implementation section and status change.
+**Output**: Update .flow/PLAN.md with implementation section and status change.
 ```
 
 ---
@@ -434,7 +593,7 @@ You are executing the `/flow-implement_complete` command from the Flow framework
 
 **Instructions**:
 
-1. **Find PLAN.md**: Look in current directory, traverse up if needed
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
 2. **Find current iteration**: Look for iteration marked 🚧 IN PROGRESS
 
@@ -468,7 +627,7 @@ You are executing the `/flow-implement_complete` command from the Flow framework
 
 9. **Confirm to user**: "Iteration [N] marked complete! Use `/flow-iteration [description]` to start next iteration, or `/flow-status` to see current state."
 
-**Output**: Update PLAN.md with completion status and summary.
+**Output**: Update .flow/PLAN.md with completion status and summary.
 ```
 
 ---
@@ -484,7 +643,7 @@ You are executing the `/flow-status` command from the Flow framework.
 
 **Instructions**:
 
-1. **Find PLAN.md**: Look in current directory, traverse up if needed
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
 2. **Parse Progress Dashboard** (if exists):
    - Look for "## 📋 Progress Dashboard" section
@@ -571,7 +730,7 @@ You are executing the `/flow-summarize` command from the Flow framework.
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
-- **Working File**: PLAN.md (current project)
+- **Working File**: .flow/PLAN.md (current project)
 - **Use case**: "Bird's eye view" of project health, progress across all phases, quick status reports
 
 **Comparison to other commands**:
@@ -582,7 +741,7 @@ You are executing the `/flow-summarize` command from the Flow framework.
 
 **Instructions**:
 
-1. **Find PLAN.md**: Look in current directory, traverse up if needed
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
 2. **Parse entire PLAN.md structure**:
    - Extract Version (from metadata at top)
@@ -752,7 +911,7 @@ You are executing the `/flow-next-subject` command from the Flow framework.
 
 **Instructions**:
 
-1. **Find PLAN.md**: Look in current directory, traverse up if needed
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
 2. **Find current brainstorming session**: Look for "Subjects to Discuss" section
 
@@ -783,7 +942,7 @@ You are executing the `/flow-next-iteration` command from the Flow framework.
 
 **Instructions**:
 
-1. **Find PLAN.md**: Look in current directory, traverse up if needed
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
 2. **Find current iteration**: Look for last iteration with any active status (⏳ 🚧 🎨 ✅)
 
@@ -814,7 +973,7 @@ You are executing the `/flow-next` command from the Flow framework.
 
 **Instructions**:
 
-1. **Find PLAN.md**: Look in current directory, traverse up if needed
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
 2. **Determine current context**:
    - Check current iteration status (⏳ 🚧 🎨 ✅)
@@ -858,7 +1017,7 @@ You are executing the `/flow-rollback` command from the Flow framework.
 
 **Instructions**:
 
-1. **Find PLAN.md**: Look in current directory, traverse up if needed
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
 2. **Check if rollback is possible**:
    - Look for "Changelog" section at bottom of PLAN.md
@@ -898,12 +1057,12 @@ You are executing the `/flow-verify-plan` command from the Flow framework.
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
-- **Working File**: PLAN.md (current project)
+- **Working File**: .flow/PLAN.md (current project)
 - **Use case**: Run before starting new AI session or compacting conversation to ensure context is accurate
 
 **Instructions**:
 
-1. **Find PLAN.md**: Look in current directory, traverse up if needed
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
 2. **Find current iteration**: Look for iteration marked 🚧 IN PROGRESS or 🎨 READY FOR IMPLEMENTATION
 
@@ -941,8 +1100,8 @@ You are executing the `/flow-verify-plan` command from the Flow framework.
    ```
 
 7. **If discrepancies found**:
-   - Ask user: "PLAN.md is out of sync with project state. Update PLAN.md now? (yes/no)"
-   - If yes: Update PLAN.md to reflect actual state:
+   - Ask user: "PLAN.md is out of sync with project state. Update .flow/PLAN.md now? (yes/no)"
+   - If yes: Update .flow/PLAN.md to reflect actual state:
      - Uncheck items that aren't actually done
      - Add notes about files modified
      - Update status markers if needed
@@ -955,7 +1114,7 @@ You are executing the `/flow-verify-plan` command from the Flow framework.
 - Review PLAN.md action items manually
 - Check each completed item exists in codebase
 - Use `git status` and `git diff` to verify changes
-- Update PLAN.md to match reality
+- Update .flow/PLAN.md to match reality
 
 **Output**: Verification report and optional PLAN.md updates.
 ```
@@ -973,12 +1132,12 @@ You are executing the `/flow-compact` command from the Flow framework.
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
-- **Working File**: PLAN.md (current project)
+- **Working File**: .flow/PLAN.md (current project)
 - **Use case**: Before compacting conversation or starting new AI session - ensures zero context loss
 
 **Instructions**:
 
-1. **Find PLAN.md**: Look in current directory, traverse up if needed
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
 2. **Run status verification first**:
    - Execute `/flow-status` command logic to verify current position
@@ -1129,5 +1288,5 @@ Repeat for next iteration
 
 ---
 
-**Version**: 1.0.4
+**Version**: 1.0.5
 **Last Updated**: 2025-10-02
