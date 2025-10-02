@@ -764,12 +764,14 @@ If you discover NEW issues while working on this iteration that are NOT part of 
 
 ```markdown
 ---
-description: Start brainstorming session for current iteration
+description: Start brainstorming session with user-provided topics
 ---
 
 You are executing the `/flow-brainstorm-start` command from the Flow framework.
 
-**Purpose**: Begin a brainstorming session for the current iteration.
+**Purpose**: Begin a brainstorming session for the current iteration with subjects provided by the user.
+
+**Signature**: `/flow-brainstorm-start [optional: free-form text describing topics to discuss]`
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
@@ -787,30 +789,60 @@ If you discover NEW issues during brainstorming that are NOT part of the current
 
 1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
-2. **Parse arguments**: `$ARGUMENTS` = brainstorming topic
+2. **Find current iteration**: Look for last iteration marked ⏳ or 🚧
 
-3. **Find current iteration**: Look for last iteration marked ⏳ or 🚧
+3. **Determine mode** (two modes available):
 
-4. **Update iteration status**: Change to 🚧 IN PROGRESS
+   **MODE 1: With Argument** (user provides topics in command)
+   - Parse `$ARGUMENTS` = user's free-form text describing topics
+   - Extract individual subjects from the text (1-100+ topics)
+   - User controls WHAT to brainstorm, AI structures HOW
+   - Example: `/flow-brainstorm-start "API design, database schema, auth flow, error handling"`
+   - AI extracts: [API design, database schema, auth flow, error handling]
 
-5. **Add brainstorming section**:
+   **MODE 2: Without Argument** (interactive)
+   - No arguments provided
+   - Prompt user: "What subjects would you like to brainstorm in this session?"
+   - Wait for user response with topics
+   - Extract subjects from user's response
+
+4. **Extract subjects from user input**:
+   - Parse natural language text
+   - Identify distinct topics/subjects (comma-separated, "and", bullet points, etc.)
+   - Create numbered list
+   - Handle 1 to 100+ topics gracefully
+   - If ambiguous, use best judgment or ask user for clarification
+
+5. **Update iteration status**: Change to 🚧 IN PROGRESS (Brainstorming)
+
+6. **Create brainstorming section**:
    ```markdown
-   ### **Brainstorming Session - [$ARGUMENTS]**
+   ### **Brainstorming Session - [Brief description from user input]**
+
+   **Focus**: [Summarize the main goal based on subjects]
 
    **Subjects to Discuss** (tackle one at a time):
 
-   1. ⏳ [Suggest first subject based on iteration goal]
+   1. ⏳ **[Subject 1]** - [Brief description if needed]
+   2. ⏳ **[Subject 2]** - [Brief description if needed]
+   3. ⏳ **[Subject 3]** - [Brief description if needed]
+   ...
 
    **Resolved Subjects**:
 
    ---
    ```
 
-6. **Suggest first subject**: Based on iteration name/goal, suggest an initial subject to discuss
+7. **Update Progress Dashboard**: Update current iteration status to "🚧 BRAINSTORMING"
 
-7. **Confirm to user**: "Started brainstorming session: [$ARGUMENTS]. First subject: [subject name]. Use `/flow-brainstorm-subject [name]` to add more subjects."
+8. **Confirm to user**:
+   - "Started brainstorming session with [N] subjects."
+   - List all subjects
+   - "Use `/flow-next-subject` to start discussing the first subject."
 
-**Output**: Update .flow/PLAN.md with brainstorming section and status change.
+**Key Principle**: User always provides topics (via argument or interactive prompt). AI never invents subjects on its own.
+
+**Output**: Update .flow/PLAN.md with brainstorming section, subject list, and status change.
 ```
 
 ---
@@ -849,88 +881,82 @@ You are executing the `/flow-brainstorm-subject` command from the Flow framework
 
 ---
 
-## /flow-brainstorm-resolve
+## /flow-brainstorm-review
 
-**File**: `flow-brainstorm-resolve.md`
+**File**: `flow-brainstorm-review.md`
 
 ```markdown
 ---
-description: Resolve current subject with decision
+description: Review all resolved subjects, suggest follow-up work
 ---
 
-You are executing the `/flow-brainstorm-resolve` command from the Flow framework.
+You are executing the `/flow-brainstorm-review` command from the Flow framework.
 
-**Purpose**: Mark a brainstorming subject as resolved with a decision.
+**Purpose**: Review all resolved brainstorming subjects, verify completeness, summarize decisions, show action items, and suggest follow-up work (iterations/pre-tasks) before marking the brainstorming session complete.
+
+**This is the review gate before `/flow-brainstorm-complete`.**
 
 **Instructions**:
 
 1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
-2. **Parse arguments**: `$ARGUMENTS` = subject name/number
+2. **Read framework documentation**: Find and read DEVELOPMENT_FRAMEWORK.md (search in .claude/, project root, or ~/.claude/flow/)
 
-3. **Find subject**:
-   - If number provided, find subject [N]
-   - If name provided, find matching subject
-   - Default: Find first ⏳ subject (not yet resolved)
+3. **Locate current iteration**: Use "Progress Dashboard" to find current Phase/Task/Iteration
 
-4. **Update subject status**: Change ⏳ to ✅ in "Subjects to Discuss" list
+4. **Verify all subjects resolved**:
+   - Check "Subjects to Discuss" section under current iteration's "Brainstorming Session"
+   - Count total subjects vs ✅ resolved subjects
+   - If ANY subjects remain unmarked (⏳ PENDING), warn user: "Not all subjects resolved. Run `/flow-next-subject` to complete remaining subjects."
+   - If all subjects are ✅ resolved, proceed to next step
 
-5. **Prompt user for details**:
-   - "What decision did you make for this subject?"
-   - "What's the rationale? (comma-separated reasons)"
+5. **Summarize resolved subjects**:
+   - Read all entries in "Resolved Subjects" section
+   - Create concise summary of each resolution:
+     - Subject name
+     - Decision made
+     - Key rationale points
+   - Present in numbered list format
 
-6. **Determine resolution type** (IMPORTANT - choose ONE):
+6. **Show all action items**:
+   - Extract all documented action items from resolved subjects
+   - Categorize by type:
+     - **Pre-Implementation Tasks**: Work that must be done BEFORE implementing this iteration
+     - **Follow-up Iterations**: Future work to tackle after this iteration
+     - **Documentation Updates**: Files/docs that need changes
+     - **Other Actions**: Miscellaneous tasks
+   - Present in organized format
 
-   **Type A: Pre-Implementation Task** (code changes needed before implementing iteration)
-   - Ask: "Does this decision require code changes before implementing this iteration? (refactoring, bug fixes, system changes)"
-   - If YES:
-     - Create new pre-implementation task in "### **Pre-Implementation Tasks:**" section
-     - Include: Objective, Root Cause (if bug), Solution, Action Items, Files to Modify
-     - Mark subject resolution as: "**Action Items**: Pre-Implementation Task [N] created"
-     - Example: "Task 3: Fix Conversion Placeholder Requirement"
+7. **Suggest follow-up work**:
+   - Analyze all action items and suggest:
+     - Which items should become pre-implementation tasks (in current iteration)
+     - Which items should become new iterations (under current task)
+     - Which items can be deferred to future tasks/phases
+   - Present suggestions in this format:
+     ```
+     **Suggested Pre-Implementation Tasks** (complete before /flow-implement-start):
+     - [Task description]
+     - [Task description]
 
-   **Type B: Immediate Documentation** (architectural decision, no code changes yet)
-   - If NO code changes needed:
-     - Document decision in appropriate section (Architecture, Design Decisions, etc.)
-     - List conceptual action items (if any)
-     - Example: "Added `foundational: boolean` property to architecture docs"
+     **Suggested New Iterations** (add with /flow-iteration-add):
+     - Iteration N+1: [Name and description]
+     - Iteration N+2: [Name and description]
 
-   **Type C: Auto-Resolved** (answered by another subject's decision)
-   - If subject was resolved by cascade effect:
-     - Mark as: "**Resolution**: Auto-resolved by Subject [X]'s decision"
-     - Briefly explain why it's answered
-     - No separate action items needed
+     **Can Be Deferred**:
+     - [Task description] - Reason for deferral
+     ```
 
-7. **Add resolution section** under "Resolved Subjects":
-   ```markdown
-   ### ✅ **Subject [N]: [Name]**
+8. **Await user instructions**:
+   - Do NOT automatically create iterations or pre-tasks
+   - Prompt user: "Would you like me to create these pre-tasks/iterations, or would you prefer to adjust the suggestions?"
+   - Wait for user confirmation before taking action
 
-   **Decision**: [User's decision]
+**Next Steps After Review**:
+- If user wants to add pre-tasks → document in "Pre-Implementation Tasks" section
+- If user wants to add iterations → use `/flow-iteration-add` for each
+- Once all pre-tasks are complete → run `/flow-brainstorm-complete`
 
-   **Rationale**:
-   - [Reason 1]
-   - [Reason 2]
-
-   **Action Items**:
-   - [ ] Pre-Implementation Task [N] created (Type A)
-     OR
-   - [ ] Updated Architecture section with [decision] (Type B)
-     OR
-   - Auto-resolved by Subject [X] (Type C)
-
-   ---
-   ```
-
-8. **Update .flow/PLAN.md**: Update subject status, add resolution section, create pre-implementation task if Type A
-
-9. **Suggest next action**:
-   - Type A: "Created Pre-Implementation Task [N]. Continue with next subject or use `/flow-brainstorm-complete` when all subjects resolved."
-   - Type B: "Documented decision. Continue with next subject or use `/flow-brainstorm-complete` when all subjects resolved."
-   - Type C: "Auto-resolved. Continue with next subject or use `/flow-brainstorm-complete` when all subjects resolved."
-
-10. **Confirm to user**: "Resolved Subject [N]: [Name] ([Resolution Type]). Use `/flow-brainstorm-subject` to add more, or `/flow-brainstorm-complete` when done."
-
-**Output**: Update .flow/PLAN.md with resolved subject.
+**Output**: Comprehensive review summary with actionable suggestions, awaiting user confirmation.
 ```
 
 ---
@@ -1120,82 +1146,111 @@ description: Show current position and verify plan consistency
 
 You are executing the `/flow-status` command from the Flow framework.
 
-**Purpose**: Show current position in the plan.
+**Purpose**: Show current position in the plan and verify active work consistency.
+
+**PERFORMANCE NOTE**: This command uses Dashboard-first approach for token efficiency. For large PLAN.md files (2000+ lines), this reduces token usage by 95% (from 32,810 → ~1,530 tokens).
 
 **Instructions**:
 
 1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
-2. **Parse Progress Dashboard** (if exists):
-   - Look for "## 📋 Progress Dashboard" section
-   - Extract claimed current phase/task/iteration
-   - Extract completion percentages
-   - Note: Dashboard is manual, may need verification
+2. **Read Progress Dashboard ONLY** (Dashboard-first approach):
+   ```bash
+   # Use Grep to read ONLY the Progress Dashboard section (~50 lines)
+   Grep pattern: "^## 📋 Progress Dashboard"
+   Use -A 20 flag to read ~20 lines after match
+   ```
 
-3. **Parse status markers** (ground truth):
-   - Find current phase (last phase with ⏳ 🚧 🎨 ❌ 🔮)
-   - Find current task (last task with ⏳ 🚧 🎨 ❌ 🔮)
-   - Find current iteration (last iteration with ⏳ 🚧 🎨 ❌ 🔮)
-   - Count ✅ COMPLETE items (these are frozen, skip verification)
+   Extract from Dashboard text:
+   - Last Updated timestamp
+   - Current Phase number and name
+   - Current Task number and name
+   - Current Iteration number and name
+   - Current status (⏳ PENDING / 🚧 IMPLEMENTING / 🎨 READY / etc)
+   - Completion percentages
 
-4. **Smart verification** (active work only):
-   - **Skip ✅ COMPLETE items** - Already verified, now frozen
-   - **Verify active work** (🚧 ⏳ 🎨):
-     - Check if Progress Dashboard claims match markers
-     - Check if ❌ CANCELLED items have reasons
-     - Check if 🔮 DEFERRED items have reasons + destinations
-   - **Report**:
+3. **Verify current markers** (micro integrity - current work only):
+
+   Use 3 targeted Greps to verify ONLY the current items claimed by Dashboard:
+
+   **Grep 1 - Verify Current Phase**:
+   ```bash
+   # If Dashboard says "Phase 2", verify Phase 2 marker
+   pattern: "^#### Phase 2:"
+   Use -A 2 to read status line
+   Extract: Status emoji (⏳ 🚧 🎨 ✅ ❌ 🔮)
+   ```
+
+   **Grep 2 - Verify Current Task**:
+   ```bash
+   # If Dashboard says "Task 4", verify Task 4 marker
+   pattern: "^##### Task 4:"
+   Use -A 2 to read status line
+   Extract: Status emoji
+   ```
+
+   **Grep 3 - Verify Current Iteration**:
+   ```bash
+   # If Dashboard says "Iteration 6", verify Iteration 6 marker
+   pattern: "^###### Iteration 6:"
+   Use -A 2 to read status line
+   Extract: Status emoji
+   ```
+
+4. **Micro integrity check** (active work only):
+   - Compare Dashboard claims vs actual markers for current phase/task/iteration
+   - **Skip all ✅ COMPLETE items** - Already verified, now frozen
+   - Report verification results:
      ```
-     🔍 Consistency Check (Active Work Only):
+     🔍 Consistency Check (Current Work Only):
 
      ✅ Phase 2 marker: 🚧 IN PROGRESS ✓
-     ✅ Task 5 marker: 🚧 IN PROGRESS ✓
-     ✅ Iteration 6 marker: 🚧 IN PROGRESS ✓
+     ✅ Task 4 marker: 🚧 IN PROGRESS ✓
+     ✅ Iteration 6 marker: 🚧 IMPLEMENTING ✓
 
-     ⏭️  Skipped: 15 completed items (verified & frozen)
-
-     Status: All active markers aligned with Progress Dashboard ✓
+     Status: Dashboard aligned with markers ✓
      ```
 
 5. **If inconsistency detected**:
    ```
-   ⚠️  INCONSISTENCY (Active Work):
+   ⚠️  INCONSISTENCY DETECTED:
 
-   Progress Dashboard: Iteration 6 🚧 IN PROGRESS
-   Actual marker: Iteration 6 ⏳ PENDING
+   Dashboard claims: Iteration 6 🚧 IMPLEMENTING
+   Actual marker:    Iteration 6 ⏳ PENDING
 
    Action: Update Progress Dashboard to match markers
-   (Markers are ground truth)
-
-   ⏭️  Skipped: 15 completed items
+   (Status markers are ground truth, Dashboard is pointer)
    ```
 
-6. **Display hierarchy**:
+6. **Display current position**:
    ```
-   📋 Current Status:
+   📋 Current Position:
 
    Phase [N]: [Name] [Status]
      └─ Task [N]: [Name] [Status]
          └─ Iteration [N]: [Name] [Status]
 
-   Next Action: [Suggest next command based on status]
+   Last Updated: [Timestamp from Dashboard]
    ```
 
-7. **Suggest next action**:
-   - If ⏳ PENDING → "Use `/flow-brainstorm-start [topic]` to begin"
-   - If 🚧 IN PROGRESS (brainstorming) → "Continue resolving subjects with `/flow-brainstorm-resolve`"
+7. **Suggest next action** (based on current iteration status):
+   - If ⏳ PENDING → "Use `/flow-brainstorm-start [topics]` to begin brainstorming"
+   - If 🚧 IMPLEMENTING (in brainstorm phase) → "Continue with `/flow-next-subject` to resolve subjects"
    - If 🎨 READY → "Use `/flow-implement-start` to begin implementation"
-   - If 🚧 IN PROGRESS (implementing) → "Work through action items, use `/flow-implement-complete` when done"
-   - If ✅ COMPLETE → "Use `/flow-iteration [description]` to start next iteration"
+   - If 🚧 IMPLEMENTING (in implementation phase) → "Work through action items, use `/flow-implement-complete` when done"
+   - If ✅ COMPLETE → "Use `/flow-iteration-add [description]` to start next iteration"
 
-8. **Show progress summary**:
-   - Count completed vs total iterations
-   - Count completed vs total tasks
-   - Show percentage complete
-   - Show deferred count (🔮)
-   - Show cancelled count (❌)
+8. **Show completion summary** (from Dashboard percentages):
+   - Display Phase completion percentage
+   - Display Task completion percentage
+   - Display overall project completion
 
-**Output**: Display current status, smart verification results, and suggest next action.
+**Key Differences from `/flow-summarize`**:
+- `/flow-status` = **Micro scope** (current work only, ~1,530 tokens)
+- `/flow-summarize` = **Macro scope** (entire project tree, higher token usage)
+- Both verify integrity at their respective scopes
+
+**Output**: Display current position, micro verification results, next action suggestion.
 ```
 
 ---
@@ -1391,12 +1446,18 @@ You are executing the `/flow-summarize` command from the Flow framework.
 
 ```markdown
 ---
-description: Move to next brainstorming subject
+description: Discuss next subject, capture decision, and mark resolved
 ---
 
 You are executing the `/flow-next-subject` command from the Flow framework.
 
-**Purpose**: Move to the next unresolved subject in the current brainstorming session.
+**Purpose**: Show next unresolved subject, facilitate discussion, capture decision, and mark as ✅ resolved (all in one command).
+
+**New Workflow** (streamlined - one command per subject):
+```
+/flow-next-subject → discuss → capture decision → mark ✅ → auto-advance
+/flow-next-subject → (repeat for remaining subjects)
+```
 
 **Instructions**:
 
@@ -1406,16 +1467,54 @@ You are executing the `/flow-next-subject` command from the Flow framework.
 
 3. **Find first unresolved subject**: Look for first ⏳ subject in the list
 
-4. **If found**:
+4. **If found** (subject needs discussion):
+
+   **Step A: Present subject**
    - Display subject name and description
-   - Ask: "Ready to resolve this subject? Use `/flow-brainstorm-resolve [subject-name]`"
+   - Present relevant context from iteration goal
+
+   **Step B: Facilitate discussion**
+   - Discuss with user about the subject
+   - Present options, analysis, or recommendations
+   - User provides their decision/direction
+
+   **Step C: Capture decision**
+   - Prompt user: "What's your decision for this subject?"
+   - Prompt user: "What's the rationale?" (comma-separated reasons)
+   - Prompt user: "Any action items?" (optional)
+
+   **Step D: Document resolution**
+   - Mark subject ✅ in "Subjects to Discuss" list
+   - Add resolution section under "Resolved Subjects":
+     ```markdown
+     ### ✅ **Subject [N]: [Name]**
+
+     **Decision**: [User's decision]
+
+     **Rationale**:
+     - [Reason 1]
+     - [Reason 2]
+
+     **Action Items** (if any):
+     - [ ] [Item 1]
+     - [ ] [Item 2]
+
+     ---
+     ```
+
+   **Step E: Auto-advance**
+   - Update PLAN.md with resolution
+   - Show progress: "[N] of [Total] subjects resolved"
+   - Auto-show next unresolved subject (if any)
+   - If all resolved: "All subjects resolved! Use `/flow-brainstorm-complete` to finish."
 
 5. **If all resolved**:
    - Notify: "All subjects resolved! Use `/flow-brainstorm-complete` to finish brainstorming."
+   - Show summary of what was decided
 
-6. **Show progress**: "[N] of [Total] subjects resolved"
+**Key Principle**: Moving to next subject implies current is resolved. No separate "resolve" command needed.
 
-**Output**: Show next subject to work on.
+**Output**: Update .flow/PLAN.md with subject resolution and show next subject.
 ```
 
 ---

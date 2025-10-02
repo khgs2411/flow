@@ -316,10 +316,10 @@ vim framework/SLASH_COMMANDS.md
 ### 2. Start First Iteration
 
 ```bash
-/flow-brainstorm-start Conflict Resolution Architecture
+/flow-brainstorm-start "Conflict resolution strategy, CRDT vs OT comparison, WebSocket architecture, offline support design"
 ```
 
-**What happens**: Marks iteration as "In Progress", creates brainstorming section.
+**What happens**: AI extracts 4 subjects from your input, marks iteration as "In Progress", creates brainstorming section with subject list.
 
 ### 3. Add Subjects During Discussion
 
@@ -331,23 +331,22 @@ vim framework/SLASH_COMMANDS.md
 
 **What happens**: Subjects added to "Subjects to Discuss" list with ⏳ status.
 
-### 4. Resolve Each Subject
+### 4. Discuss and Resolve Each Subject
 
 ```bash
-/flow-brainstorm-resolve Data Structure (CRDT vs OT)
+/flow-next-subject
 ```
 
-**Prompts you for**:
+**What happens**: Shows first subject, you discuss with AI, AI captures your decision:
 - Decision: "Use CRDT (Conflict-free Replicated Data Types)"
 - Rationale: "Better eventual consistency, no central server needed, proven with Yjs library"
 - Action items: "Research Yjs library, prototype basic CRDT implementation, benchmark performance"
 
-**What happens**: Subject marked ✅, decision documented with rationale and action items.
+Subject automatically marked ✅, AI shows next subject.
 
 ```bash
-/flow-next-subject  # Shows next unresolved subject
-/flow-brainstorm-resolve WebSocket vs WebRTC
-# ...continue for remaining subjects
+/flow-next-subject  # Repeat for remaining subjects
+# ...AI shows each subject, captures decisions, marks ✅ resolved
 ```
 
 ### 5. Handle Pre-Implementation Tasks
@@ -478,22 +477,26 @@ Flow provides **24 slash commands** organized into **6 categories**. **Important
 - Adds new iteration under current task
 - **Manual**: Add `##### Iteration N: Name ⏳` under task
 
-**`/flow-brainstorm-start <topic>`** (was `/flow-brainstorm_start`)
-- Begins brainstorming session for current iteration
+**`/flow-brainstorm-start [optional: topics]`** (was `/flow-brainstorm_start`)
+- Begins brainstorming session with user-provided subjects
+- **Two modes**: With argument (AI parses free-form text) or without (interactive prompt)
+- User controls WHAT to brainstorm, AI structures HOW
+- Example: `/flow-brainstorm-start "API design, database, auth, testing"`
 - Marks iteration as 🚧 In Progress (brainstorming)
-- Creates "Subjects to Discuss" section
-- **Manual**: Add brainstorming section with subject list
+- **Manual**: Add brainstorming section with subject list from user input
 
 **`/flow-brainstorm-subject <subject-name>`** (was `/flow-brainstorm_subject`)
 - Adds subject to discussion list
 - Supports dynamic subject addition during brainstorming
 - **Manual**: Add `N. ⏳ Subject Name` to subject list
 
-**`/flow-brainstorm-resolve <subject>`** (was `/flow-brainstorm_resolve`)
-- Prompts for decision, rationale, action items
-- Marks subject ✅ Complete
-- Documents resolution in "Resolved Subjects"
-- **Manual**: Move subject to resolved, add decision/rationale/actions
+**`/flow-brainstorm-review`** ⭐ NEW
+- Review all resolved subjects and verify completeness
+- Summarize decisions made during brainstorming
+- Show all action items generated
+- Suggest follow-up work (iterations, pre-tasks) based on scope
+- Await user instructions before marking complete
+- **Manual**: Review PLAN.md, create follow-up work as needed
 
 **`/flow-brainstorm-complete`** (was `/flow-brainstorm_complete`)
 - Checks all subjects resolved
@@ -644,7 +647,7 @@ AI: [reads section, follows steps 1-8 manually]
    ```
    "Read framework/SLASH_COMMANDS.md section '/flow-brainstorm-start' and execute for 'API design'"
 
-   "Read framework/SLASH_COMMANDS.md section '/flow-brainstorm-resolve' and resolve Subject 1"
+   "Read framework/SLASH_COMMANDS.md section '/flow-next-subject' and discuss subjects"
 
    "Read framework/SLASH_COMMANDS.md section '/flow-implement-start' and begin implementation"
    ```
@@ -717,11 +720,11 @@ When you get to step 4 (testing methodology), here are my answers:
 - ✅ Progress tracking with status markers
 - ✅ Testing Strategy enforcement
 - ✅ Scope Boundary Rule
-- ✅ All 24 commands via manual prompts
+- ✅ All 23 commands via manual prompts
 
 ### Available Commands
 
-All 24 commands in SLASH_COMMANDS.md work this way:
+All 23 commands in SLASH_COMMANDS.md work this way:
 
 **Planning**: `/flow-blueprint`, `/flow-migrate`, `/flow-plan-update`
 
@@ -729,7 +732,7 @@ All 24 commands in SLASH_COMMANDS.md work this way:
 
 **Task Lifecycle**: `/flow-task-add`, `/flow-task-start`, `/flow-task-complete`
 
-**Iteration Lifecycle**: `/flow-iteration-add`, `/flow-brainstorm-start`, `/flow-brainstorm-subject`, `/flow-brainstorm-resolve`, `/flow-brainstorm-complete`, `/flow-implement-start`, `/flow-implement-complete`
+**Iteration Lifecycle**: `/flow-iteration-add`, `/flow-brainstorm-start`, `/flow-brainstorm-subject`, `/flow-brainstorm-review`, `/flow-brainstorm-complete`, `/flow-implement-start`, `/flow-implement-complete`
 
 **Navigation**: `/flow-next`, `/flow-next-subject`, `/flow-next-iteration`
 

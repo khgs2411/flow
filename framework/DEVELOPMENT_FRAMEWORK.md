@@ -458,7 +458,7 @@ AI: "Added Subject 2: Naming Convention to the list. Now, back to Subject 1..."
 4. **Continue brainstorming** other subjects
 5. **After all subjects resolved** → Complete pre-implementation tasks
 6. **Mark pre-tasks as ✅ COMPLETE** with verification notes
-7. **Then run `/flow-brainstorm_complete`**
+7. **Then run `/flow-brainstorm-complete`**
 
 **Example During Brainstorming**:
 
@@ -1538,9 +1538,10 @@ This framework is designed to work with slash commands that automate plan file u
 - `/flow-iteration-add [description]` - Create new iteration structure under current task
 
 **Brainstorming Phase** (design before code):
-- `/flow-brainstorm-start [topic]` - Begin brainstorming session, mark iteration as 🚧 IN PROGRESS (brainstorming)
+- `/flow-brainstorm-start [optional: topics]` - Begin brainstorming with user-provided subjects (free-form text or interactive)
 - `/flow-brainstorm-subject [name]` - Add new subject to discuss during brainstorming
-- `/flow-brainstorm-resolve [subject-name]` - Mark subject as resolved with decision (Type A: pre-task, Type B: documentation, Type C: auto-resolved)
+- `/flow-next-subject` - Show next unresolved subject, discuss, capture decision, mark ✅ resolved
+- `/flow-brainstorm-review` - Review all resolved subjects, suggest follow-up work (iterations/pre-tasks)
 - `/flow-brainstorm-complete` - Close brainstorming, mark iteration as 🎨 READY FOR IMPLEMENTATION (only after pre-tasks done)
 
 **Implementation Phase** (build the code):
@@ -1610,16 +1611,20 @@ This framework is designed to work with slash commands that automate plan file u
 
 ```
 1. /flow-iteration-add "Feature name"
-2. /flow-brainstorm-start "Feature design"
-3. /flow-brainstorm-subject "Architecture decision"
-4. /flow-brainstorm-resolve "Architecture decision"
-   (repeat subjects as needed)
-5. Complete pre-implementation tasks (if any from Type A resolutions)
-6. /flow-brainstorm-complete
-7. /flow-implement-start
-8. Work through action items, check off as complete
-9. /flow-implement-complete
-10. /flow-status (verify and move to next iteration)
+2. /flow-brainstorm-start "API design, database schema, auth flow, testing strategy"
+   (AI extracts 4 subjects from your input)
+3. /flow-next-subject
+   (discuss first subject, AI captures decision and marks ✅ resolved)
+4. /flow-next-subject
+   (repeat for remaining subjects)
+5. /flow-brainstorm-review
+   (review all decisions, AI suggests creating iterations/pre-tasks for major work)
+6. User creates follow-up work based on review suggestions
+7. /flow-brainstorm-complete
+8. /flow-implement-start
+9. Work through action items, check off as complete
+10. /flow-implement-complete
+11. /flow-status (verify and move to next iteration)
 ```
 
 **Helper commands at any time**:

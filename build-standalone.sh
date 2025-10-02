@@ -50,9 +50,9 @@ COMMANDS=(
   "flow-phase-add" "flow-phase-start" "flow-phase-complete"
   # Task Lifecycle (3 commands)
   "flow-task-add" "flow-task-start" "flow-task-complete"
-  # Iteration Lifecycle (6 commands)
+  # Iteration Lifecycle (6 commands: add, start, subject, review, complete, implement-start, implement-complete = 7 total)
   "flow-iteration-add"
-  "flow-brainstorm-start" "flow-brainstorm-subject" "flow-brainstorm-resolve" "flow-brainstorm-complete"
+  "flow-brainstorm-start" "flow-brainstorm-subject" "flow-brainstorm-review" "flow-brainstorm-complete"
   "flow-implement-start" "flow-implement-complete"
   # Navigation (3 commands)
   "flow-next" "flow-next-subject" "flow-next-iteration"
@@ -60,12 +60,13 @@ COMMANDS=(
   "flow-status" "flow-summarize" "flow-verify-plan" "flow-compact" "flow-rollback"
 )
 
-# Deprecated commands (renamed in v1.0.11+) - cleaned up during --force
+# Deprecated commands (renamed/removed in v1.0.11+) - cleaned up during --force
 DEPRECATED_COMMANDS=(
   "flow-phase" "flow-task" "flow-iteration"
   "flow-brainstorm_start" "flow-brainstorm_subject" "flow-brainstorm_resolve" "flow-brainstorm_complete"
   "flow-implement_start" "flow-implement_complete"
   "flow-update-plan-version"
+  "flow-brainstorm-resolve"  # Removed in v1.0.12 - redundant command
 )
 
 FORCE=false
