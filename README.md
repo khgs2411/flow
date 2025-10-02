@@ -23,11 +23,11 @@
   - [For Developers](#-for-developers-improving-the-framework)
 - [Example Workflow](#example-workflow)
 - [Slash Commands Reference](#slash-commands-reference)
-  - [Planning Commands](#planning-commands-1)
+  - [Planning Commands](#planning-commands-3)
   - [Structure Commands](#structure-commands-3)
   - [Brainstorming Commands](#brainstorming-commands-4)
   - [Implementation Commands](#implementation-commands-2)
-  - [Navigation Commands](#navigation-commands-5)
+  - [Navigation Commands](#navigation-commands-8)
   - [Using Flow Without Commands](#using-flow-without-slash-commands)
 - [Design Decisions](#design-decisions)
 - [Key Insights](#key-insights-from-development)
@@ -70,7 +70,7 @@ chmod +x flow.sh
 ```
 
 **What just happened?**
-- ✅ Created `.claude/commands/` with 21 slash commands
+- ✅ Created `.claude/commands/` with 20 slash commands
 - ✅ Created `.flow/` with framework documentation
 - ✅ Your project is ready to use Flow!
 
@@ -427,15 +427,31 @@ Work through the code, checking off action items as you complete them:
 
 ## Slash Commands Reference
 
-Flow provides 18 slash commands organized into 5 categories. **Important**: These are convenience tools - the real power is the methodology. You can use Flow WITHOUT commands by manually following the patterns.
+Flow provides 20 slash commands organized into 5 categories. **Important**: These are convenience tools - the real power is the methodology. You can use Flow WITHOUT commands by manually following the patterns.
 
-### Planning Commands (1)
+### Planning Commands (3)
 
 **`/flow-blueprint <feature-name>`**
-- Creates initial PLAN.md with skeleton structure
+- Creates fresh .flow/PLAN.md from scratch for new feature/project
 - Generates phases, tasks, and iteration placeholders
 - Asks about reference implementations to analyze
 - **Manual alternative**: Copy EXAMPLE_PLAN.md template, adapt to your feature
+
+**`/flow-migrate [file-path]`**
+- Migrates existing PRD.md/PLAN.md/TODO.md to Flow format
+- Auto-detects structure (structured/flat/unstructured)
+- Creates timestamped backup of original file
+- Generates .flow/PLAN.md with Flow patterns
+- **Use when**: Adopting Flow mid-development
+- **Manual alternative**: Manually restructure existing docs to Flow format
+
+**`/flow-update-plan-version`**
+- Updates existing .flow/PLAN.md to latest Flow framework structure
+- Reads DEVELOPMENT_FRAMEWORK.md and EXAMPLE_PLAN.md for current patterns
+- Creates backup before updating
+- Preserves all content, only enhances structure
+- **Use when**: Framework structure changes (e.g., Progress Dashboard moved)
+- **Manual alternative**: Manually compare with EXAMPLE_PLAN.md and update structure
 
 ### Structure Commands (3)
 

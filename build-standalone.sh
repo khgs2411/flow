@@ -44,7 +44,7 @@ COMMANDS=(
   "flow-brainstorm_start" "flow-brainstorm_subject" "flow-brainstorm_resolve" "flow-brainstorm_complete"
   "flow-implement_start" "flow-implement_complete"
   "flow-status" "flow-next" "flow-next-subject" "flow-next-iteration" "flow-rollback"
-  "flow-verify-plan" "flow-summarize"
+  "flow-verify-plan" "flow-summarize" "flow-compact"
 )
 
 FORCE=false
@@ -226,7 +226,7 @@ main() {
     echo "=================================================="
     echo -e "${GREEN}✅ Flow Framework Installed!${NC}\n"
     echo -e "${CYAN}📂 Structure:${NC}"
-    echo "   .claude/commands/       (21 slash commands)"
+    echo "   .claude/commands/       (20 slash commands)"
     echo "   .flow/                  (framework docs)"
     echo "     ├── DEVELOPMENT_FRAMEWORK.md"
     echo "     └── EXAMPLE_PLAN.md"
