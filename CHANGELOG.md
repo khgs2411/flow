@@ -17,6 +17,24 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
+**v1.0.14** - Command UX Enhancements (2025-10-03)
+
+**Enhancements**:
+- **`/flow-status`**: Added task completion detection - now suggests `/flow-task-start` before `/flow-brainstorm-start` when tasks complete
+- **`/flow-task-start`**: Made task number argument optional with auto-detection of next pending task
+- **Distribution**: Updated to 156,112 bytes (4,736 lines)
+
+**Technical Changes**:
+- `framework/SLASH_COMMANDS.md` lines 1279-1284: Added task status check as Step 1 in `/flow-status` decision tree
+- `framework/SLASH_COMMANDS.md` lines 651-677: Implemented dual-mode task selection (explicit number or auto-detect)
+- Commands now handle both workflows: manual task selection and automatic progression
+
+See the [v1.0.14 release](https://github.com/khgs2411/flow/releases/tag/v1.0.14) for full details.
+
+---
+
+## Previous Versions
+
 **v1.0.13** - Command Fixes: Pre-Implementation Task Detection (2025-10-02)
 
 **Critical Bug Fixes**:

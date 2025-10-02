@@ -648,7 +648,20 @@ If you discover NEW issues while working on this task that are NOT part of the c
 
 1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
-2. **Find current task**: Look for last task marked ⏳ PENDING in current phase
+2. **Determine target task** (argument is optional):
+
+   **If task number provided as argument**:
+   - Use the specified task number
+   - Verify task exists and is ⏳ PENDING
+   - If not found or not PENDING: "Task [N] not found or not in PENDING state"
+
+   **If no argument provided** (auto-detection):
+   - Find current phase (marked 🚧 IN PROGRESS)
+   - Find last ✅ COMPLETE task in that phase
+   - Calculate next task number (last complete + 1)
+   - Verify next task exists and is ⏳ PENDING
+   - If not found: List available ⏳ PENDING tasks in current phase and ask user to specify
+   - Example error: "Cannot auto-detect next task. Available pending tasks in Phase 2: Task 5, Task 7, Task 9. Use `/flow-task-start [number]` to specify."
 
 3. **Update task status**: Change marker from ⏳ to 🚧 IN PROGRESS
 
@@ -658,7 +671,10 @@ If you discover NEW issues while working on this task that are NOT part of the c
    - Update last updated timestamp
    - Add action description: "Task [N] started"
 
-5. **Confirm to user**: "Started Task [N]: [Name]. Use `/flow-iteration-add [description]` to create iterations."
+5. **Confirm to user**:
+   - If argument provided: "✅ Started Task [N]: [Name]"
+   - If auto-detected: "✅ Started Task [N]: [Name] (auto-detected next task)"
+   - Suggest next steps: "Use `/flow-iteration-add [description]` to create iterations, or `/flow-brainstorm-start [topics]` to brainstorm first."
 
 **Output**: Update .flow/PLAN.md with task status change and Progress Dashboard update.
 ```
@@ -1074,7 +1090,7 @@ If you discover NEW issues during implementation that are NOT part of the curren
    ---
    ```
 
-6. **Confirm to user**: "Implementation started for Iteration [N]. Work through action items and check them off as you complete them. Use `/flow-implement-complete` when done."
+6. **Confirm to user**: "Implementation started! Let's begin with the first action item."
 
 **Output**: Update .flow/PLAN.md with implementation section and status change.
 ```
@@ -1276,13 +1292,20 @@ You are executing the `/flow-status` command from the Flow framework.
 
 7. **Suggest next action** (comprehensive decision tree):
 
-   **Step 1: Check iteration status marker**
+   **Step 1: Check task status first**
+
+   **If current task is ✅ COMPLETE**:
+   → "Task complete! Use `/flow-task-start` [optional: task number] to begin next task"
+   → Display next pending task if available: "Next: Task [N]: [Name]"
+   → If all tasks in phase complete: "All tasks complete! Use `/flow-phase-complete` to mark phase done"
+
+   **Step 2: Check iteration status marker**
 
    **If ⏳ PENDING**:
    → "Use `/flow-brainstorm-start [topics]` to begin brainstorming"
 
    **If 🚧 IN PROGRESS**:
-   **Step 2: Determine which phase** (check in this order):
+   **Step 3: Determine which phase** (check in this order):
 
    A. **Check for unresolved subjects** (from Grep 5):
       If unresolved subjects exist:
@@ -1524,12 +1547,15 @@ description: Discuss next subject, capture decision, and mark resolved
 
 You are executing the `/flow-next-subject` command from the Flow framework.
 
-**Purpose**: Show next unresolved subject, facilitate discussion, capture decision, and mark as ✅ resolved (all in one command).
+**Purpose**: Show next unresolved subject, present options collaboratively, wait for user decision, then mark as ✅ resolved.
 
-**New Workflow** (streamlined - one command per subject):
+**New Collaborative Workflow** (two-phase approach):
 ```
-/flow-next-subject → discuss → capture decision → mark ✅ → auto-advance
-/flow-next-subject → (repeat for remaining subjects)
+Phase 1 (Present):
+/flow-next-subject → present subject + options → ask user → 🛑 STOP & WAIT
+
+Phase 2 (Capture - triggered by user response):
+User responds → capture decision → document → mark ✅ → auto-advance to next
 ```
 
 **Instructions**:
@@ -1546,15 +1572,23 @@ You are executing the `/flow-next-subject` command from the Flow framework.
    - Display subject name and description
    - Present relevant context from iteration goal
 
-   **Step B: Facilitate discussion**
-   - Discuss with user about the subject
-   - Present options, analysis, or recommendations
-   - User provides their decision/direction
+   **Step B: Present options and STOP** ⚠️ CRITICAL
+   - Analyze the subject and identify 2-4 viable options/approaches
+   - Present each option with brief pros/cons
+   - Format as numbered list for clarity
+   - Include option for "Your own approach"
+   - Ask user explicitly: "Which option do you prefer? Or provide your own approach."
+   - **🛑 STOP HERE - Wait for user response (do NOT proceed to capture decision)**
+   - **DO NOT** decide on behalf of user
+   - **DO NOT** document any decision yet
+   - Command execution ends here - user will respond in next message
 
-   **Step C: Capture decision**
-   - Prompt user: "What's your decision for this subject?"
-   - Prompt user: "What's the rationale?" (comma-separated reasons)
-   - Prompt user: "Any action items?" (optional)
+   **Step C: Capture user's decision** (only execute AFTER user responds)
+   - Read user's response from their message
+   - If decision is clear: proceed to document it
+   - If unclear: ask clarifying questions
+   - If rationale not provided: ask "What's your reasoning for this choice?"
+   - Optional: "Any action items to track for this decision?"
 
    **Step D: Document resolution**
    - Mark subject ✅ in "Subjects to Discuss" list
@@ -1562,10 +1596,10 @@ You are executing the `/flow-next-subject` command from the Flow framework.
      ```markdown
      ### ✅ **Subject [N]: [Name]**
 
-     **Decision**: [User's decision]
+     **Decision**: [User's decision from their response]
 
      **Rationale**:
-     - [Reason 1]
+     - [Reason 1 from user or follow-up]
      - [Reason 2]
 
      **Action Items** (if any):

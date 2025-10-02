@@ -1,4 +1,4 @@
-**Version**: 1.0.12
+**Version**: 1.0.14
 
 # Domain-Driven Design with Agile Iterative Philosophy
 
@@ -709,7 +709,7 @@ As your project grows (1000+ lines), status management becomes critical:
 **Created**: 2025-10-01
 **Status**: Phase 2, Task 5, Iteration 7 - In Progress
 **Version**: V1
-**Last Updated**: 2025-10-02
+**Last Updated**: 2025-10-03
 ```
 
 Update `**Status**` and `**Last Updated**` as you progress. **NEVER** add a second status section.
@@ -853,6 +853,80 @@ Insert this section **after Overview, before Architecture**:
 - **Status Markers** = Ground truth at every level (✅ ⏳ 🚧 🎨 ❌ 🔮)
 - **Commands** = Computed verification (`/flow-status`, `/flow-summarize`)
 
+### ⚠️ WHERE to Add Iteration Progress (CRITICAL)
+
+**Common Mistake**: When showing task/iteration progress, AIs often create NEW sections ABOVE the Progress Overview instead of updating WITHIN it.
+
+**❌ WRONG - Creating New Section Above Progress Overview:**
+
+```markdown
+## 📋 Progress Dashboard
+
+**Current Task 11 Iterations**:        ← ❌ NEW SECTION (WRONG!)
+- Iteration 1: Complete
+- Iteration 2: In Progress
+- Iteration 3: Pending
+
+**Progress Overview**:                  ← Existing section ignored
+- ✅ Phase 1: Complete
+- 🚧 Phase 2: In Progress
+  - Task 11: Name Generation
+```
+
+**✅ CORRECT - Update WITHIN Existing Progress Overview:**
+
+```markdown
+## 📋 Progress Dashboard
+
+**Progress Overview**:                  ← Update THIS section
+- ✅ Phase 1: Complete
+- 🚧 Phase 2: In Progress
+  - 🚧 Task 11: Name Generation        ← Expand this task
+    - ✅ Iteration 1: Complete
+    - 🚧 Iteration 2: In Progress
+    - ⏳ Iteration 3: Pending
+```
+
+**Rules for Updating Progress Dashboard:**
+
+1. **NEVER create new sections** above or below Progress Overview
+2. **ALWAYS update WITHIN** the existing Progress Overview section
+3. **Expand task items** by adding iteration details as sub-bullets
+4. **Keep it hierarchical**: Phase → Task → Iterations (indented)
+5. **Remove iteration details** when task completes (keep summary only)
+
+**Example - Showing Iteration Progress:**
+
+When user asks "Show me Task 11's iteration progress in the dashboard", do this:
+
+```markdown
+**Progress Overview**:
+- ✅ Phase 1: Foundation (3/3 tasks)
+- 🚧 Phase 2: Core Features ← **YOU ARE HERE**
+  - ✅ Task 10: Data Structure (complete)
+  - 🚧 Task 11: Name Generation (3/5 iterations)
+    - ✅ Iteration 1: Basic name templates
+    - ✅ Iteration 2: Advanced placeholders
+    - 🚧 Iteration 3: Validation system ← **CURRENT**
+    - ⏳ Iteration 4: Testing & edge cases
+    - ⏳ Iteration 5: Performance optimization
+  - ⏳ Task 12: Export system (pending)
+```
+
+**NOT this:**
+
+```markdown
+## Task 11 - Name Generation Progress    ← ❌ WRONG (new section!)
+
+Current Status: Iteration 3 of 5
+- ✅ Iteration 1: Basic name templates
+- ✅ Iteration 2: Advanced placeholders
+...
+
+**Progress Overview**:                   ← Original section ignored
+- Phase 2: In Progress
+```
+
 ### Maintaining the Dashboard
 
 **Update triggers:**
@@ -906,7 +980,7 @@ From a 3747-line game engine PLAN.md:
 ```markdown
 ## 📋 Progress Dashboard
 
-**Last Updated**: 2025-10-02
+**Last Updated**: 2025-10-03
 
 **Current Work**:
 - **Phase**: Phase 2 - Core Implementation → [Jump](#phase-2-core-implementation)
@@ -1719,5 +1793,5 @@ By following this framework, you build complex features incrementally with minim
 
 ---
 
-**Version**: 1.0.12
-**Last Updated**: 2025-10-02
+**Version**: 1.0.14
+**Last Updated**: 2025-10-03
