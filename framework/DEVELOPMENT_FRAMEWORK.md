@@ -1,4 +1,4 @@
-**Version**: 1.0.8
+**Version**: 1.0.9
 
 # Domain-Driven Design with Agile Iterative Philosophy
 
@@ -108,6 +108,10 @@ When working within **any Flow scope** (Phase/Task/Iteration/Brainstorming/Pre-I
 
 ```
 📋 PLAN.md (Feature/Project Plan File)
+├── Overview (purpose, goals, scope)
+├── Architecture (high-level design, components, dependencies)
+├── Testing Strategy (methodology, tooling, verification approach) ⭐ NEW
+├── Progress Dashboard (current status, completion %, deferred items)
 ├── 📊 PHASE (High-level milestone)
 │   ├── 📦 TASK (Feature/component to build)
 │   │   ├── 🔄 ITERATION (Incremental buildout)
@@ -118,9 +122,115 @@ When working within **any Flow scope** (Phase/Task/Iteration/Brainstorming/Pre-I
 │   │   │   │       └── Action Items (checkboxes)
 │   │   │   └── 🛠️ IMPLEMENTATION
 │   │   │       └── Execute action items
+│   │   │   └── ✅ VERIFICATION (per Testing Strategy)
 │   │   └── ✅ ITERATION COMPLETE
 │   └── 🎯 TASK COMPLETE
 └── 🏆 PHASE COMPLETE
+```
+
+### Testing Strategy Section (REQUIRED)
+
+**Purpose**: Define HOW you verify implementations so AI follows YOUR testing conventions exactly.
+
+**Must Include**:
+1. **Methodology**: How you test (simulation, unit tests, TDD, integration, manual QA, etc.)
+2. **Location**: Where test files live (directory path)
+3. **Naming Convention**: Test file naming pattern (CRITICAL - AI must follow exactly)
+4. **When to create**: When to create NEW test files vs. add to existing
+5. **When to add**: When to add test cases to existing files
+6. **Tooling**: What tools/frameworks you use (Jest, Vitest, custom scripts, etc.)
+
+**Common Approaches**:
+
+- **Simulation-based (per-service pattern)**: Each service has its own orchestration file
+  - Example: `scripts/{service}.scripts.ts` (blue.scripts.ts, green.scripts.ts, red.scripts.ts)
+  - AI creates `scripts/gold.scripts.ts` if working on new "gold" service
+  - AI adds to `scripts/blue.scripts.ts` if file already exists
+  - **Convention matters**: `{service}.scripts.ts` NOT `test.{service}.*.ts`
+
+- **Simulation-based (single file)**: All tests in one orchestration file
+  - Example: `scripts/run.scripts.ts` handles all services
+  - AI adds test cases to existing file, never creates new test files
+
+- **Unit tests after implementation**: Write tests after code works
+  - Example: `__tests__/{feature}.test.ts` created after iteration complete
+  - AI creates `__tests__/payment-gateway.test.ts` for new features
+  - AI adds test cases to existing file if feature already tested
+
+- **TDD (Test-Driven Development)**: Write tests before implementation
+  - Example: Red → Green → Refactor cycle
+  - AI creates `tests/{feature}.spec.ts` first, then implements to make it pass
+
+- **Integration/E2E focused**: Minimal unit tests, focus on workflows
+  - Example: `e2e/{workflow}.spec.ts` for critical user journeys
+  - AI creates new E2E test for each major workflow
+
+- **Manual QA only**: No automated tests
+  - AI never creates test files, provides manual verification checklist instead
+
+**Why This Matters**:
+- **Prevents convention violations**: AI won't create `test.blue.validation.ts` when your pattern is `blue.scripts.ts`
+- **Respects file structure**: AI knows WHERE to create test files (scripts/ vs __tests__ vs e2e/)
+- **Follows naming patterns**: AI matches YOUR naming convention exactly
+- **Knows when to create vs. add**: AI creates new files for new features, adds to existing for enhancements
+- **Ensures verification happens at the right time**: During iteration, after, or before (TDD)
+
+**Example 1 - Per-Service Simulation** (like RED project):
+```markdown
+## Testing Strategy
+
+**Methodology**: Simulation-based orchestration per service
+
+**Approach**:
+- Each service has its own orchestration file: `scripts/{service}.scripts.ts`
+- **Naming Convention**: `{service}.scripts.ts` (e.g., `blue.scripts.ts`, `green.scripts.ts`, `red.scripts.ts`)
+- **Location**: `scripts/` directory
+- **When to create**: If `scripts/{service}.scripts.ts` doesn't exist for new service, create it
+- **When to add**: If file exists, add new test cases to existing orchestration
+- Tests simulate real-world usage patterns (spell generation, validation, etc.)
+
+**Test Execution**:
+```bash
+bun run scripts/run.scripts.ts           # Run all services
+bun run scripts/{service}.scripts.ts      # Run specific service
+```
+
+**File Structure**:
+```
+scripts/
+├── run.scripts.ts        # Main orchestration (runs all services)
+├── blue.scripts.ts       # Blue service tests
+├── green.scripts.ts      # Green service tests
+├── red.scripts.ts        # Red service tests
+└── gold.scripts.ts       # Gold service tests (create if new service)
+```
+
+**IMPORTANT**:
+- ❌ Do NOT create `test.{service}.*.ts` files (wrong naming pattern)
+- ❌ Do NOT create files outside `scripts/` directory (wrong location)
+- ✅ DO follow `{service}.scripts.ts` pattern exactly
+- ✅ DO create new `{service}.scripts.ts` for new services
+```
+
+**Example 2 - Unit Tests After Implementation**:
+```markdown
+## Testing Strategy
+
+**Methodology**: Unit tests after implementation using Jest
+
+**Approach**:
+- Unit tests created AFTER implementation is verified manually
+- **Naming Convention**: `{feature}.test.ts` (e.g., `payment-gateway.test.ts`)
+- **Location**: `__tests__/` directory
+- **When to create**: After iteration implementation complete and working
+- **When to add**: If feature already has test file, add new test cases
+
+**Test Execution**: `npm test`
+
+**IMPORTANT**:
+- ✅ Create `__tests__/new-feature.test.ts` for new features
+- ✅ Add test cases to `__tests__/existing-feature.test.ts` for enhancements
+- ❌ Do NOT create tests before implementation (we're not doing TDD)
 ```
 
 ---
@@ -1424,5 +1534,5 @@ By following this framework, you build complex features incrementally with minim
 
 ---
 
-**Version**: 1.0.8
+**Version**: 1.0.9
 **Last Updated**: 2025-10-02

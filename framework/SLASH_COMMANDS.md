@@ -72,11 +72,51 @@ You are executing the `/flow-blueprint` command from the Flow framework.
    - Otherwise, ask: "Do you have a reference implementation I should analyze? (Provide path or say 'no')"
    - If reference provided, read and analyze it to inform the planning
 
-4. **Generate .flow/PLAN.md** following the framework template (ALWAYS overwrites if exists):
+4. **Gather testing methodology** (CRITICAL - if not in $ARGUMENTS):
+   - Ask: "How do you prefer to verify implementations? Choose or describe:
+     - **Simulation-based (per-service)**: Each service has its own test file (e.g., `{service}.scripts.ts`)
+     - **Simulation-based (single file)**: All tests in one orchestration file (e.g., `run.scripts.ts`)
+     - **Unit tests**: Test individual functions/classes after implementation (Jest/Vitest/etc.)
+     - **TDD**: Write tests before implementation, then make them pass
+     - **Integration/E2E**: Focus on end-to-end workflows, minimal unit tests
+     - **Manual QA**: No automated tests, manual verification only
+     - **Custom**: Describe your approach"
+   - **CRITICAL follow-up questions**:
+     - "What's your test file naming convention?" (e.g., `{service}.scripts.ts`, `{feature}.test.ts`, `{feature}.spec.ts`)
+     - "Where do test files live?" (e.g., `scripts/`, `__tests__/`, `tests/`, `e2e/`)
+     - "When should I create NEW test files vs. add to existing?" (e.g., "Create `{service}.scripts.ts` for new services, add to existing for enhancements")
+   - **IMPORTANT**: These answers determine how AI creates/modifies test files in every iteration
+
+5. **Gather any other project-specific patterns** (if not clear from $ARGUMENTS):
+   - File naming conventions (if mentioned or user specifies)
+   - Directory structure preferences (if relevant)
+   - Code style preferences (if mentioned)
+   - Skip if not applicable to project type
+
+6. **Generate .flow/PLAN.md** following the framework template (ALWAYS overwrites if exists):
    - Note: .flow/ directory already exists (created by flow.sh installation)
    - **Framework reference**: Link to DEVELOPMENT_FRAMEWORK.md at top
    - **Overview section**: Purpose, goals, scope
    - **Architecture section**: High-level design, key components
+   - **Testing Strategy section** (NEW - REQUIRED):
+     - Document the testing methodology from step 4
+     - **Must include**: Methodology, Location, Naming Convention, When to create, When to add, Tooling
+     - Include file structure example showing test file organization
+     - Add IMPORTANT section with ✅ DO and ❌ DO NOT examples
+     - Example for per-service simulation:
+       ```markdown
+       ## Testing Strategy
+       **Methodology**: Simulation-based orchestration per service
+       **Naming Convention**: `{service}.scripts.ts`
+       **Location**: `scripts/` directory
+       **When to create**: If `scripts/{service}.scripts.ts` doesn't exist for new service
+       **When to add**: If file exists, add test cases to existing file
+       **IMPORTANT**:
+       - ✅ Create `scripts/gold.scripts.ts` for new "gold" service
+       - ✅ Add to `scripts/blue.scripts.ts` for blue enhancements
+       - ❌ Do NOT create `test.*.ts` files (wrong naming pattern)
+       ```
+     - Example for unit tests: "Unit tests created after implementation in __tests__/ using Jest. Create `{feature}.test.ts` for new features, add to existing for enhancements."
    - **Progress Dashboard**: For complex projects (optional, can add later)
    - **Development Plan**:
      - Estimate 2-4 phases (Foundation, Core Implementation, Testing, Enhancement/Polish)
@@ -85,12 +125,12 @@ You are executing the `/flow-blueprint` command from the Flow framework.
      - Mark everything as ⏳ PENDING
      - Add placeholder brainstorming sessions (empty subject lists)
 
-6. **Depth**: Medium detail
+7. **Depth**: Medium detail
    - Phase names and strategies
    - Task names and purposes
    - Iteration names only (no brainstorming subjects yet)
 
-7. **Confirm to user**:
+8. **Confirm to user**:
    - "✨ Created .flow/PLAN.md with [X] phases, [Y] tasks, [Z] iterations"
    - "📂 Flow is now managing this project from .flow/ directory"
    - "Use `/flow-status` to see current state"
@@ -757,14 +797,20 @@ If you discover NEW issues during implementation that are NOT part of the curren
 
 2. **Find current iteration**: Look for iteration marked 🎨 READY FOR IMPLEMENTATION
 
-3. **Verify readiness**:
+3. **Read Testing Strategy section** (CRITICAL):
+   - Locate "## Testing Strategy" section in PLAN.md
+   - Understand the verification methodology (simulation, unit tests, TDD, manual QA, etc.)
+   - Note file locations, naming conventions, and when verification happens
+   - **IMPORTANT**: Follow Testing Strategy exactly - do NOT create test files that violate conventions
+
+4. **Verify readiness**:
    - Brainstorming should be marked ✅ COMPLETE
    - All pre-implementation tasks should be ✅ COMPLETE
    - If not ready: Warn user and ask to complete brainstorming first
 
-4. **Update iteration status**: Change from 🎨 to 🚧 IN PROGRESS
+5. **Update iteration status**: Change from 🎨 to 🚧 IN PROGRESS
 
-5. **Create implementation section**:
+6. **Create implementation section**:
    ```markdown
    ### **Implementation - Iteration [N]: [Name]**
 
@@ -1532,5 +1578,5 @@ Repeat for next iteration
 
 ---
 
-**Version**: 1.0.8
+**Version**: 1.0.9
 **Last Updated**: 2025-10-02

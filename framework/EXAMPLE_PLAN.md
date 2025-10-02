@@ -83,6 +83,52 @@ None
 
 ---
 
+## Testing Strategy
+
+**Methodology**: Integration tests + Manual QA
+
+**Approach**:
+- **Integration Tests**: Created after each iteration using Jest
+- **Location**: `tests/integration/payment/` directory
+- **Naming Convention**: `{feature}.integration.test.ts` (e.g., `payment-creation.integration.test.ts`)
+- **When to create**: After iteration implementation complete and working, if test file doesn't exist
+- **When to add**: If test file already exists for the feature, add new test cases to existing file
+- **Coverage**: Focus on happy path + critical error cases (insufficient funds, network errors, webhook failures)
+- **Manual QA**: Final end-to-end verification in staging environment before deployment
+
+**Test Execution**:
+```bash
+npm run test:integration                 # Run all integration tests
+npm run test:integration:payment         # Payment tests only
+```
+
+**File Structure**:
+```
+tests/integration/payment/
+├── payment-creation.integration.test.ts       # Payment creation tests
+├── webhook-handling.integration.test.ts       # Webhook tests
+└── payment-retry.integration.test.ts          # Retry logic tests (create if new feature)
+```
+
+**Verification Per Iteration**:
+Each iteration's "Verification" section will include:
+1. Integration test file created (if new feature) or updated (if enhancement)
+2. Test cases passing (list specific scenarios)
+3. Manual QA checklist (if applicable)
+
+**IMPORTANT**:
+- ✅ Create `tests/integration/payment/new-feature.integration.test.ts` for new features
+- ✅ Add test cases to existing files for enhancements to existing features
+- ❌ Do NOT create tests before implementation (we write tests after code works)
+- ❌ Do NOT create unit tests (focus on integration tests only)
+
+**Why This Approach**:
+- Integration tests catch real API interaction issues
+- Writing tests after implementation allows for faster prototyping
+- Manual QA ensures user experience quality before production
+
+---
+
 ## Development Plan
 
 ### Phase 1: Foundation 🚧

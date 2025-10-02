@@ -135,11 +135,51 @@ You are executing the `/flow-blueprint` command from the Flow framework.
    - Otherwise, ask: "Do you have a reference implementation I should analyze? (Provide path or say 'no')"
    - If reference provided, read and analyze it to inform the planning
 
-4. **Generate .flow/PLAN.md** following the framework template (ALWAYS overwrites if exists):
+4. **Gather testing methodology** (CRITICAL - if not in $ARGUMENTS):
+   - Ask: "How do you prefer to verify implementations? Choose or describe:
+     - **Simulation-based (per-service)**: Each service has its own test file (e.g., `{service}.scripts.ts`)
+     - **Simulation-based (single file)**: All tests in one orchestration file (e.g., `run.scripts.ts`)
+     - **Unit tests**: Test individual functions/classes after implementation (Jest/Vitest/etc.)
+     - **TDD**: Write tests before implementation, then make them pass
+     - **Integration/E2E**: Focus on end-to-end workflows, minimal unit tests
+     - **Manual QA**: No automated tests, manual verification only
+     - **Custom**: Describe your approach"
+   - **CRITICAL follow-up questions**:
+     - "What's your test file naming convention?" (e.g., `{service}.scripts.ts`, `{feature}.test.ts`, `{feature}.spec.ts`)
+     - "Where do test files live?" (e.g., `scripts/`, `__tests__/`, `tests/`, `e2e/`)
+     - "When should I create NEW test files vs. add to existing?" (e.g., "Create `{service}.scripts.ts` for new services, add to existing for enhancements")
+   - **IMPORTANT**: These answers determine how AI creates/modifies test files in every iteration
+
+5. **Gather any other project-specific patterns** (if not clear from $ARGUMENTS):
+   - File naming conventions (if mentioned or user specifies)
+   - Directory structure preferences (if relevant)
+   - Code style preferences (if mentioned)
+   - Skip if not applicable to project type
+
+6. **Generate .flow/PLAN.md** following the framework template (ALWAYS overwrites if exists):
    - Note: .flow/ directory already exists (created by flow.sh installation)
    - **Framework reference**: Link to DEVELOPMENT_FRAMEWORK.md at top
    - **Overview section**: Purpose, goals, scope
    - **Architecture section**: High-level design, key components
+   - **Testing Strategy section** (NEW - REQUIRED):
+     - Document the testing methodology from step 4
+     - **Must include**: Methodology, Location, Naming Convention, When to create, When to add, Tooling
+     - Include file structure example showing test file organization
+     - Add IMPORTANT section with ✅ DO and ❌ DO NOT examples
+     - Example for per-service simulation:
+       ```markdown
+       ## Testing Strategy
+       **Methodology**: Simulation-based orchestration per service
+       **Naming Convention**: `{service}.scripts.ts`
+       **Location**: `scripts/` directory
+       **When to create**: If `scripts/{service}.scripts.ts` doesn't exist for new service
+       **When to add**: If file exists, add test cases to existing file
+       **IMPORTANT**:
+       - ✅ Create `scripts/gold.scripts.ts` for new "gold" service
+       - ✅ Add to `scripts/blue.scripts.ts` for blue enhancements
+       - ❌ Do NOT create `test.*.ts` files (wrong naming pattern)
+       ```
+     - Example for unit tests: "Unit tests created after implementation in __tests__/ using Jest. Create `{feature}.test.ts` for new features, add to existing for enhancements."
    - **Progress Dashboard**: For complex projects (optional, can add later)
    - **Development Plan**:
      - Estimate 2-4 phases (Foundation, Core Implementation, Testing, Enhancement/Polish)
@@ -148,12 +188,12 @@ You are executing the `/flow-blueprint` command from the Flow framework.
      - Mark everything as ⏳ PENDING
      - Add placeholder brainstorming sessions (empty subject lists)
 
-6. **Depth**: Medium detail
+7. **Depth**: Medium detail
    - Phase names and strategies
    - Task names and purposes
    - Iteration names only (no brainstorming subjects yet)
 
-7. **Confirm to user**:
+8. **Confirm to user**:
    - "✨ Created .flow/PLAN.md with [X] phases, [Y] tasks, [Z] iterations"
    - "📂 Flow is now managing this project from .flow/ directory"
    - "Use `/flow-status` to see current state"
@@ -820,14 +860,20 @@ If you discover NEW issues during implementation that are NOT part of the curren
 
 2. **Find current iteration**: Look for iteration marked 🎨 READY FOR IMPLEMENTATION
 
-3. **Verify readiness**:
+3. **Read Testing Strategy section** (CRITICAL):
+   - Locate "## Testing Strategy" section in PLAN.md
+   - Understand the verification methodology (simulation, unit tests, TDD, manual QA, etc.)
+   - Note file locations, naming conventions, and when verification happens
+   - **IMPORTANT**: Follow Testing Strategy exactly - do NOT create test files that violate conventions
+
+4. **Verify readiness**:
    - Brainstorming should be marked ✅ COMPLETE
    - All pre-implementation tasks should be ✅ COMPLETE
    - If not ready: Warn user and ask to complete brainstorming first
 
-4. **Update iteration status**: Change from 🎨 to 🚧 IN PROGRESS
+5. **Update iteration status**: Change from 🎨 to 🚧 IN PROGRESS
 
-5. **Create implementation section**:
+6. **Create implementation section**:
    ```markdown
    ### **Implementation - Iteration [N]: [Name]**
 
@@ -1595,14 +1641,14 @@ Repeat for next iteration
 
 ---
 
-**Version**: 1.0.8
+**Version**: 1.0.9
 **Last Updated**: 2025-10-02
 COMMANDS_DATA_EOF
 }
 
 get_framework_content() {
   cat <<'FRAMEWORK_DATA_EOF'
-**Version**: 1.0.8
+**Version**: 1.0.9
 
 # Domain-Driven Design with Agile Iterative Philosophy
 
@@ -1712,6 +1758,10 @@ When working within **any Flow scope** (Phase/Task/Iteration/Brainstorming/Pre-I
 
 ```
 📋 PLAN.md (Feature/Project Plan File)
+├── Overview (purpose, goals, scope)
+├── Architecture (high-level design, components, dependencies)
+├── Testing Strategy (methodology, tooling, verification approach) ⭐ NEW
+├── Progress Dashboard (current status, completion %, deferred items)
 ├── 📊 PHASE (High-level milestone)
 │   ├── 📦 TASK (Feature/component to build)
 │   │   ├── 🔄 ITERATION (Incremental buildout)
@@ -1722,9 +1772,115 @@ When working within **any Flow scope** (Phase/Task/Iteration/Brainstorming/Pre-I
 │   │   │   │       └── Action Items (checkboxes)
 │   │   │   └── 🛠️ IMPLEMENTATION
 │   │   │       └── Execute action items
+│   │   │   └── ✅ VERIFICATION (per Testing Strategy)
 │   │   └── ✅ ITERATION COMPLETE
 │   └── 🎯 TASK COMPLETE
 └── 🏆 PHASE COMPLETE
+```
+
+### Testing Strategy Section (REQUIRED)
+
+**Purpose**: Define HOW you verify implementations so AI follows YOUR testing conventions exactly.
+
+**Must Include**:
+1. **Methodology**: How you test (simulation, unit tests, TDD, integration, manual QA, etc.)
+2. **Location**: Where test files live (directory path)
+3. **Naming Convention**: Test file naming pattern (CRITICAL - AI must follow exactly)
+4. **When to create**: When to create NEW test files vs. add to existing
+5. **When to add**: When to add test cases to existing files
+6. **Tooling**: What tools/frameworks you use (Jest, Vitest, custom scripts, etc.)
+
+**Common Approaches**:
+
+- **Simulation-based (per-service pattern)**: Each service has its own orchestration file
+  - Example: `scripts/{service}.scripts.ts` (blue.scripts.ts, green.scripts.ts, red.scripts.ts)
+  - AI creates `scripts/gold.scripts.ts` if working on new "gold" service
+  - AI adds to `scripts/blue.scripts.ts` if file already exists
+  - **Convention matters**: `{service}.scripts.ts` NOT `test.{service}.*.ts`
+
+- **Simulation-based (single file)**: All tests in one orchestration file
+  - Example: `scripts/run.scripts.ts` handles all services
+  - AI adds test cases to existing file, never creates new test files
+
+- **Unit tests after implementation**: Write tests after code works
+  - Example: `__tests__/{feature}.test.ts` created after iteration complete
+  - AI creates `__tests__/payment-gateway.test.ts` for new features
+  - AI adds test cases to existing file if feature already tested
+
+- **TDD (Test-Driven Development)**: Write tests before implementation
+  - Example: Red → Green → Refactor cycle
+  - AI creates `tests/{feature}.spec.ts` first, then implements to make it pass
+
+- **Integration/E2E focused**: Minimal unit tests, focus on workflows
+  - Example: `e2e/{workflow}.spec.ts` for critical user journeys
+  - AI creates new E2E test for each major workflow
+
+- **Manual QA only**: No automated tests
+  - AI never creates test files, provides manual verification checklist instead
+
+**Why This Matters**:
+- **Prevents convention violations**: AI won't create `test.blue.validation.ts` when your pattern is `blue.scripts.ts`
+- **Respects file structure**: AI knows WHERE to create test files (scripts/ vs __tests__ vs e2e/)
+- **Follows naming patterns**: AI matches YOUR naming convention exactly
+- **Knows when to create vs. add**: AI creates new files for new features, adds to existing for enhancements
+- **Ensures verification happens at the right time**: During iteration, after, or before (TDD)
+
+**Example 1 - Per-Service Simulation** (like RED project):
+```markdown
+## Testing Strategy
+
+**Methodology**: Simulation-based orchestration per service
+
+**Approach**:
+- Each service has its own orchestration file: `scripts/{service}.scripts.ts`
+- **Naming Convention**: `{service}.scripts.ts` (e.g., `blue.scripts.ts`, `green.scripts.ts`, `red.scripts.ts`)
+- **Location**: `scripts/` directory
+- **When to create**: If `scripts/{service}.scripts.ts` doesn't exist for new service, create it
+- **When to add**: If file exists, add new test cases to existing orchestration
+- Tests simulate real-world usage patterns (spell generation, validation, etc.)
+
+**Test Execution**:
+```bash
+bun run scripts/run.scripts.ts           # Run all services
+bun run scripts/{service}.scripts.ts      # Run specific service
+```
+
+**File Structure**:
+```
+scripts/
+├── run.scripts.ts        # Main orchestration (runs all services)
+├── blue.scripts.ts       # Blue service tests
+├── green.scripts.ts      # Green service tests
+├── red.scripts.ts        # Red service tests
+└── gold.scripts.ts       # Gold service tests (create if new service)
+```
+
+**IMPORTANT**:
+- ❌ Do NOT create `test.{service}.*.ts` files (wrong naming pattern)
+- ❌ Do NOT create files outside `scripts/` directory (wrong location)
+- ✅ DO follow `{service}.scripts.ts` pattern exactly
+- ✅ DO create new `{service}.scripts.ts` for new services
+```
+
+**Example 2 - Unit Tests After Implementation**:
+```markdown
+## Testing Strategy
+
+**Methodology**: Unit tests after implementation using Jest
+
+**Approach**:
+- Unit tests created AFTER implementation is verified manually
+- **Naming Convention**: `{feature}.test.ts` (e.g., `payment-gateway.test.ts`)
+- **Location**: `__tests__/` directory
+- **When to create**: After iteration implementation complete and working
+- **When to add**: If feature already has test file, add new test cases
+
+**Test Execution**: `npm test`
+
+**IMPORTANT**:
+- ✅ Create `__tests__/new-feature.test.ts` for new features
+- ✅ Add test cases to `__tests__/existing-feature.test.ts` for enhancements
+- ❌ Do NOT create tests before implementation (we're not doing TDD)
 ```
 
 ---
@@ -3028,7 +3184,7 @@ By following this framework, you build complex features incrementally with minim
 
 ---
 
-**Version**: 1.0.8
+**Version**: 1.0.9
 **Last Updated**: 2025-10-02
 FRAMEWORK_DATA_EOF
 }
@@ -3117,6 +3273,52 @@ None
 - Express.js for webhook endpoints
 - Redis for webhook deduplication
 - PostgreSQL for transaction storage
+
+---
+
+## Testing Strategy
+
+**Methodology**: Integration tests + Manual QA
+
+**Approach**:
+- **Integration Tests**: Created after each iteration using Jest
+- **Location**: `tests/integration/payment/` directory
+- **Naming Convention**: `{feature}.integration.test.ts` (e.g., `payment-creation.integration.test.ts`)
+- **When to create**: After iteration implementation complete and working, if test file doesn't exist
+- **When to add**: If test file already exists for the feature, add new test cases to existing file
+- **Coverage**: Focus on happy path + critical error cases (insufficient funds, network errors, webhook failures)
+- **Manual QA**: Final end-to-end verification in staging environment before deployment
+
+**Test Execution**:
+```bash
+npm run test:integration                 # Run all integration tests
+npm run test:integration:payment         # Payment tests only
+```
+
+**File Structure**:
+```
+tests/integration/payment/
+├── payment-creation.integration.test.ts       # Payment creation tests
+├── webhook-handling.integration.test.ts       # Webhook tests
+└── payment-retry.integration.test.ts          # Retry logic tests (create if new feature)
+```
+
+**Verification Per Iteration**:
+Each iteration's "Verification" section will include:
+1. Integration test file created (if new feature) or updated (if enhancement)
+2. Test cases passing (list specific scenarios)
+3. Manual QA checklist (if applicable)
+
+**IMPORTANT**:
+- ✅ Create `tests/integration/payment/new-feature.integration.test.ts` for new features
+- ✅ Add test cases to existing files for enhancements to existing features
+- ❌ Do NOT create tests before implementation (we write tests after code works)
+- ❌ Do NOT create unit tests (focus on integration tests only)
+
+**Why This Approach**:
+- Integration tests catch real API interaction issues
+- Writing tests after implementation allows for faster prototyping
+- Manual QA ensures user experience quality before production
 
 ---
 
