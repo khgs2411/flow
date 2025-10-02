@@ -20,7 +20,7 @@ CYAN='\033[0;36m'
 NC='\033[0m'
 
 COMMANDS=(
-  "flow-blueprint" "flow-migrate" "flow-phase" "flow-task" "flow-iteration"
+  "flow-blueprint" "flow-migrate" "flow-update-plan-version" "flow-phase" "flow-task" "flow-iteration"
   "flow-brainstorm_start" "flow-brainstorm_subject" "flow-brainstorm_resolve" "flow-brainstorm_complete"
   "flow-implement_start" "flow-implement_complete"
   "flow-status" "flow-next" "flow-next-subject" "flow-next-iteration" "flow-rollback"
@@ -293,6 +293,104 @@ You are executing the `/flow-migrate` command from the Flow framework.
     - If migration fails: Keep backup safe, report error, suggest manual approach
 
 **Output**: Create `.flow/PLAN.md` from existing documentation, create backup, confirm migration to user.
+```
+
+---
+
+## /flow-update-plan-version
+
+**File**: `flow-update-plan-version.md`
+
+```markdown
+You are executing the `/flow-update-plan-version` command from the Flow framework.
+
+**Purpose**: Update an existing `.flow/PLAN.md` to match the latest Flow framework structure and patterns.
+
+**IMPORTANT**: This command updates your current plan file to match framework changes (e.g., Progress Dashboard moved, new status markers, structural improvements).
+
+**Instructions**:
+
+1. **Read the framework guide**:
+   - Search for DEVELOPMENT_FRAMEWORK.md in these locations (in order):
+     - `.flow/DEVELOPMENT_FRAMEWORK.md`
+     - `.claude/DEVELOPMENT_FRAMEWORK.md`
+     - `./DEVELOPMENT_FRAMEWORK.md` (project root)
+     - `~/.claude/flow/DEVELOPMENT_FRAMEWORK.md` (global)
+   - Understand current framework structure and patterns
+   - Study the Progress Dashboard template and its location
+   - Note all status markers and section structure requirements
+
+2. **Read the example plan**:
+   - Search for EXAMPLE_PLAN.md in these locations (in order):
+     - `.flow/EXAMPLE_PLAN.md`
+     - `.claude/EXAMPLE_PLAN.md`
+     - `~/.claude/flow/EXAMPLE_PLAN.md` (global)
+   - Study the section order and formatting
+   - Note how Progress Dashboard is positioned
+   - Understand the complete structure template
+
+3. **Read current plan**:
+   - Read `.flow/PLAN.md` (your project's current plan)
+   - Analyze its current structure
+   - Identify what needs updating to match framework
+
+4. **Create backup**:
+   - Copy current plan: `.flow/PLAN.md.version-update-backup-$(date +%Y-%m-%d-%H%M%S)`
+   - Confirm: "✅ Backed up .flow/PLAN.md to [backup]"
+
+5. **Update plan structure** (preserve ALL content):
+   - **NEVER discard any user content** - only reformat and enhance
+   - Update section order to match framework:
+     1. Title + Framework Reference
+     2. Overview (Purpose, Goals, Scope)
+     3. **Progress Dashboard** (if complex project, OR create if missing)
+     4. Architecture
+     5. Development Plan (Phases → Tasks → Iterations)
+   - Move Progress Dashboard if in wrong location
+   - Add Progress Dashboard if missing and project is complex (10+ iterations)
+   - Ensure all status markers are standardized (✅ ⏳ 🚧 🎨 ❌ 🔮)
+   - Add jump links to Progress Dashboard if missing
+   - Update any deprecated patterns to new format
+   - Preserve all:
+     - Decisions and rationale
+     - Brainstorming subjects and resolutions
+     - Implementation notes
+     - Completion dates
+     - Bug discoveries
+     - Code examples
+
+6. **Verify consistency**:
+   - Check Progress Dashboard matches status markers
+   - Verify all sections follow framework structure
+   - Ensure no content was lost
+
+7. **Confirm to user**:
+   ```
+   ✨ Plan structure updated to match latest Flow framework!
+
+   💾 Backup: .flow/PLAN.md.version-update-backup-[timestamp]
+   🎯 Updated: .flow/PLAN.md
+
+   Changes made:
+     + Moved Progress Dashboard to correct location (after Overview, before Architecture)
+     + Added [X] jump links to Progress Dashboard
+     + Standardized [Y] status markers
+     + [other changes specific to this update]
+
+   Next steps:
+     1. Review changes: diff [backup] .flow/PLAN.md
+     2. Verify: /flow-status
+     3. Continue work: /flow-next
+
+   All your content preserved - only structure enhanced.
+   ```
+
+8. **Handle edge cases**:
+   - If `.flow/PLAN.md` doesn't exist: Suggest `/flow-blueprint` or `/flow-migrate`
+   - If plan already matches latest structure: Report "Already up to date!"
+   - If can't determine what to update: Ask user what framework version they're coming from
+
+**Output**: Update `.flow/PLAN.md` to latest framework structure, create backup, confirm changes to user.
 ```
 
 ---
@@ -1911,7 +2009,7 @@ The Progress Dashboard is **your mission control** - a single section at the top
 
 ### Template
 
-Insert this section **after Architecture, before Development Plan**:
+Insert this section **after Overview, before Architecture**:
 
 ```markdown
 ## 📋 Progress Dashboard
@@ -2711,29 +2809,6 @@ get_example_content() {
 
 ---
 
-## Architecture
-
-**High-Level Design**:
-- Service-oriented architecture with dedicated `PaymentService`
-- Webhook processor as separate background job
-- Transaction state machine for payment lifecycle management
-- Event-driven notifications for payment status changes
-
-**Key Components**:
-1. **PaymentService** - Core payment processing logic
-2. **MockPayAdapter** - Third-party API integration layer
-3. **WebhookProcessor** - Handles async payment notifications
-4. **TransactionRepository** - Persists payment records
-5. **PaymentEventEmitter** - Publishes payment events to message bus
-
-**Dependencies**:
-- MockPay Node.js SDK (v3.2.1)
-- Express.js for webhook endpoints
-- Redis for webhook deduplication
-- PostgreSQL for transaction storage
-
----
-
 ## 📋 Progress Dashboard
 
 **Last Updated**: 2025-10-01
@@ -2765,6 +2840,29 @@ get_example_content() {
 
 **Cancelled Items**:
 None
+
+---
+
+## Architecture
+
+**High-Level Design**:
+- Service-oriented architecture with dedicated `PaymentService`
+- Webhook processor as separate background job
+- Transaction state machine for payment lifecycle management
+- Event-driven notifications for payment status changes
+
+**Key Components**:
+1. **PaymentService** - Core payment processing logic
+2. **MockPayAdapter** - Third-party API integration layer
+3. **WebhookProcessor** - Handles async payment notifications
+4. **TransactionRepository** - Persists payment records
+5. **PaymentEventEmitter** - Publishes payment events to message bus
+
+**Dependencies**:
+- MockPay Node.js SDK (v3.2.1)
+- Express.js for webhook endpoints
+- Redis for webhook deduplication
+- PostgreSQL for transaction storage
 
 ---
 
@@ -3353,7 +3451,7 @@ main() {
     echo "=================================================="
     echo -e "${GREEN}✅ Flow Framework Installed!${NC}\n"
     echo -e "${CYAN}📂 Structure:${NC}"
-    echo "   .claude/commands/       (20 slash commands)"
+    echo "   .claude/commands/       (21 slash commands)"
     echo "   .flow/                  (framework docs)"
     echo "     ├── DEVELOPMENT_FRAMEWORK.md"
     echo "     └── EXAMPLE_PLAN.md"

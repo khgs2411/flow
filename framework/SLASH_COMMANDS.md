@@ -234,6 +234,104 @@ You are executing the `/flow-migrate` command from the Flow framework.
 
 ---
 
+## /flow-update-plan-version
+
+**File**: `flow-update-plan-version.md`
+
+```markdown
+You are executing the `/flow-update-plan-version` command from the Flow framework.
+
+**Purpose**: Update an existing `.flow/PLAN.md` to match the latest Flow framework structure and patterns.
+
+**IMPORTANT**: This command updates your current plan file to match framework changes (e.g., Progress Dashboard moved, new status markers, structural improvements).
+
+**Instructions**:
+
+1. **Read the framework guide**:
+   - Search for DEVELOPMENT_FRAMEWORK.md in these locations (in order):
+     - `.flow/DEVELOPMENT_FRAMEWORK.md`
+     - `.claude/DEVELOPMENT_FRAMEWORK.md`
+     - `./DEVELOPMENT_FRAMEWORK.md` (project root)
+     - `~/.claude/flow/DEVELOPMENT_FRAMEWORK.md` (global)
+   - Understand current framework structure and patterns
+   - Study the Progress Dashboard template and its location
+   - Note all status markers and section structure requirements
+
+2. **Read the example plan**:
+   - Search for EXAMPLE_PLAN.md in these locations (in order):
+     - `.flow/EXAMPLE_PLAN.md`
+     - `.claude/EXAMPLE_PLAN.md`
+     - `~/.claude/flow/EXAMPLE_PLAN.md` (global)
+   - Study the section order and formatting
+   - Note how Progress Dashboard is positioned
+   - Understand the complete structure template
+
+3. **Read current plan**:
+   - Read `.flow/PLAN.md` (your project's current plan)
+   - Analyze its current structure
+   - Identify what needs updating to match framework
+
+4. **Create backup**:
+   - Copy current plan: `.flow/PLAN.md.version-update-backup-$(date +%Y-%m-%d-%H%M%S)`
+   - Confirm: "✅ Backed up .flow/PLAN.md to [backup]"
+
+5. **Update plan structure** (preserve ALL content):
+   - **NEVER discard any user content** - only reformat and enhance
+   - Update section order to match framework:
+     1. Title + Framework Reference
+     2. Overview (Purpose, Goals, Scope)
+     3. **Progress Dashboard** (if complex project, OR create if missing)
+     4. Architecture
+     5. Development Plan (Phases → Tasks → Iterations)
+   - Move Progress Dashboard if in wrong location
+   - Add Progress Dashboard if missing and project is complex (10+ iterations)
+   - Ensure all status markers are standardized (✅ ⏳ 🚧 🎨 ❌ 🔮)
+   - Add jump links to Progress Dashboard if missing
+   - Update any deprecated patterns to new format
+   - Preserve all:
+     - Decisions and rationale
+     - Brainstorming subjects and resolutions
+     - Implementation notes
+     - Completion dates
+     - Bug discoveries
+     - Code examples
+
+6. **Verify consistency**:
+   - Check Progress Dashboard matches status markers
+   - Verify all sections follow framework structure
+   - Ensure no content was lost
+
+7. **Confirm to user**:
+   ```
+   ✨ Plan structure updated to match latest Flow framework!
+
+   💾 Backup: .flow/PLAN.md.version-update-backup-[timestamp]
+   🎯 Updated: .flow/PLAN.md
+
+   Changes made:
+     + Moved Progress Dashboard to correct location (after Overview, before Architecture)
+     + Added [X] jump links to Progress Dashboard
+     + Standardized [Y] status markers
+     + [other changes specific to this update]
+
+   Next steps:
+     1. Review changes: diff [backup] .flow/PLAN.md
+     2. Verify: /flow-status
+     3. Continue work: /flow-next
+
+   All your content preserved - only structure enhanced.
+   ```
+
+8. **Handle edge cases**:
+   - If `.flow/PLAN.md` doesn't exist: Suggest `/flow-blueprint` or `/flow-migrate`
+   - If plan already matches latest structure: Report "Already up to date!"
+   - If can't determine what to update: Ask user what framework version they're coming from
+
+**Output**: Update `.flow/PLAN.md` to latest framework structure, create backup, confirm changes to user.
+```
+
+---
+
 ## /flow-phase
 
 **File**: `flow-phase.md`

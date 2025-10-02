@@ -26,29 +26,6 @@
 
 ---
 
-## Architecture
-
-**High-Level Design**:
-- Service-oriented architecture with dedicated `PaymentService`
-- Webhook processor as separate background job
-- Transaction state machine for payment lifecycle management
-- Event-driven notifications for payment status changes
-
-**Key Components**:
-1. **PaymentService** - Core payment processing logic
-2. **MockPayAdapter** - Third-party API integration layer
-3. **WebhookProcessor** - Handles async payment notifications
-4. **TransactionRepository** - Persists payment records
-5. **PaymentEventEmitter** - Publishes payment events to message bus
-
-**Dependencies**:
-- MockPay Node.js SDK (v3.2.1)
-- Express.js for webhook endpoints
-- Redis for webhook deduplication
-- PostgreSQL for transaction storage
-
----
-
 ## 📋 Progress Dashboard
 
 **Last Updated**: 2025-10-01
@@ -80,6 +57,29 @@
 
 **Cancelled Items**:
 None
+
+---
+
+## Architecture
+
+**High-Level Design**:
+- Service-oriented architecture with dedicated `PaymentService`
+- Webhook processor as separate background job
+- Transaction state machine for payment lifecycle management
+- Event-driven notifications for payment status changes
+
+**Key Components**:
+1. **PaymentService** - Core payment processing logic
+2. **MockPayAdapter** - Third-party API integration layer
+3. **WebhookProcessor** - Handles async payment notifications
+4. **TransactionRepository** - Persists payment records
+5. **PaymentEventEmitter** - Publishes payment events to message bus
+
+**Dependencies**:
+- MockPay Node.js SDK (v3.2.1)
+- Express.js for webhook endpoints
+- Redis for webhook deduplication
+- PostgreSQL for transaction storage
 
 ---
 

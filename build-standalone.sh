@@ -40,7 +40,7 @@ CYAN='\033[0;36m'
 NC='\033[0m'
 
 COMMANDS=(
-  "flow-blueprint" "flow-migrate" "flow-phase" "flow-task" "flow-iteration"
+  "flow-blueprint" "flow-migrate" "flow-update-plan-version" "flow-phase" "flow-task" "flow-iteration"
   "flow-brainstorm_start" "flow-brainstorm_subject" "flow-brainstorm_resolve" "flow-brainstorm_complete"
   "flow-implement_start" "flow-implement_complete"
   "flow-status" "flow-next" "flow-next-subject" "flow-next-iteration" "flow-rollback"
@@ -214,7 +214,7 @@ main() {
     echo "=================================================="
     echo -e "${GREEN}✅ Flow Framework Installed!${NC}\n"
     echo -e "${CYAN}📂 Structure:${NC}"
-    echo "   .claude/commands/       (20 slash commands)"
+    echo "   .claude/commands/       (21 slash commands)"
     echo "   .flow/                  (framework docs)"
     echo "     ├── DEVELOPMENT_FRAMEWORK.md"
     echo "     └── EXAMPLE_PLAN.md"

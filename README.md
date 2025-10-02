@@ -70,7 +70,7 @@ chmod +x flow.sh
 ```
 
 **What just happened?**
-- ✅ Created `.claude/commands/` with 20 slash commands
+- ✅ Created `.claude/commands/` with 21 slash commands
 - ✅ Created `.flow/` with framework documentation
 - ✅ Your project is ready to use Flow!
 

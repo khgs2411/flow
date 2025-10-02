@@ -555,7 +555,7 @@ The Progress Dashboard is **your mission control** - a single section at the top
 
 ### Template
 
-Insert this section **after Architecture, before Development Plan**:
+Insert this section **after Overview, before Architecture**:
 
 ```markdown
 ## 📋 Progress Dashboard
