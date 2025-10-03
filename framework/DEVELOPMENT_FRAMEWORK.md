@@ -1,4 +1,4 @@
-**Version**: 1.0.14
+**Version**: 1.0.16
 
 # Domain-Driven Design with Agile Iterative Philosophy
 
@@ -3162,6 +3162,282 @@ This framework is designed to work with slash commands that automate plan file u
 
 ---
 
+## Bidirectional Reference System
+
+Flow uses a **three-layer bidirectional reference architecture** to ensure AI agents always consult the framework before making structural changes to PLAN.md. This prevents redundant documentation, enforces consistency, and enables better error recovery.
+
+**Core Principle**: DEVELOPMENT_FRAMEWORK.md is the **single source of truth** for all patterns, rules, and conventions. All other documents (PLAN.md headers, CLAUDE.md detection logic, slash commands) **reference** the framework rather than duplicating its content.
+
+---
+
+### The Three Reference Layers
+
+**Layer 1: PLAN.md Header Reference** 🔗
+- **Location**: Top of every `.flow/PLAN.md` file
+- **Purpose**: Warn AI agents to read framework BEFORE editing PLAN structure
+- **Audience**: Any AI working with an existing PLAN.md
+- **Pattern**: Reference with quick links to critical sections
+
+**Example** (from `/flow-blueprint` and `/flow-migrate`):
+```markdown
+# Project Name - Development Plan
+
+> **📖 Framework Guide**: See [DEVELOPMENT_FRAMEWORK.md](DEVELOPMENT_FRAMEWORK.md) for methodology and patterns
+>
+> **⚠️ IMPORTANT**: Before making structural changes to this PLAN.md, consult DEVELOPMENT_FRAMEWORK.md to understand:
+> - Plan file structure (phases → tasks → iterations)
+> - Status markers (✅ ⏳ 🚧 🎨 ❌ 🔮)
+> - Brainstorming patterns (subject resolution types A/B/C/D)
+> - Implementation patterns (pre-tasks, iteration lifecycle)
+
+**Created**: 2025-10-03
+**Version**: V1
+```
+
+**Why This Works**:
+- ✅ Visible at top of every PLAN.md (AI sees it immediately)
+- ✅ Links to framework with specific section reminders
+- ✅ Prevents structural mistakes (wrong hierarchy, invented markers, etc.)
+- ✅ Self-documenting - new contributors see framework reference first
+
+---
+
+**Layer 2: CLAUDE.md Detection Logic** 🤖
+- **Location**: Project-level `CLAUDE.md` file
+- **Purpose**: Auto-detect Flow usage and enforce framework consultation
+- **Audience**: AI agents working in ANY project (Flow-enabled or not)
+- **Pattern**: IF/THEN detection rules + framework section mapping
+
+**Example** (from Flow's CLAUDE.md):
+```markdown
+### Automatic Detection
+
+**When working in ANY project, if you detect `.flow/PLAN.md` exists:**
+
+1. **STOP** before making any structural changes to PLAN.md
+2. **READ** `DEVELOPMENT_FRAMEWORK.md` from one of these locations (in order):
+   - `.flow/DEVELOPMENT_FRAMEWORK.md` (project-specific)
+   - `.claude/DEVELOPMENT_FRAMEWORK.md` (project root)
+   - `./DEVELOPMENT_FRAMEWORK.md` (project root)
+   - `~/.claude/flow/DEVELOPMENT_FRAMEWORK.md` (global installation)
+3. **UNDERSTAND** the framework patterns before editing PLAN.md
+4. **FOLLOW** the framework conventions exactly
+
+### Detection Rules
+
+IF file_exists('.flow/PLAN.md'):
+    THEN project_uses_flow = TRUE
+    THEN read_framework_guide()
+    THEN follow_flow_conventions()
+```
+
+**Framework Section Mapping Table**:
+```markdown
+| Task | Framework Section | Lines | What to Learn |
+|------|-------------------|-------|---------------|
+| Creating new PLAN.md | Plan File Template | 2363-2560 | Template structure, required sections |
+| Adding phase | Development Workflow | 567-613 | Phase naming, purpose, scope |
+| Adding task | Task Structure Rules | 238-566 | Standalone vs iterations decision |
+| Adding iteration | Development Workflow | 567-613 | Iteration goals, action items |
+| Starting brainstorm | Brainstorming Session Pattern | 1167-1797 | Subject creation, resolution types |
+| Resolving subject | Subject Resolution Types | 1215-1313 | Types A/B/C/D, when to use each |
+| Completing iteration | Implementation Pattern | 1798-1836 | Verification, completion criteria |
+| Updating status | Status Markers | 1872-1968 | Correct marker usage, lifecycle |
+| Lost/confused | Complete Flow Workflow | 614-940 | Decision trees, command reference |
+```
+
+**Why This Works**:
+- ✅ Automatic - no user action required
+- ✅ Applies to ALL projects (global AI behavior)
+- ✅ Section mapping provides fast navigation (line numbers!)
+- ✅ Catches AI before making structural mistakes
+
+---
+
+**Layer 3: Slash Command Framework References** 📋
+- **Location**: Every slash command definition in `framework/SLASH_COMMANDS.md`
+- **Purpose**: Point command executors to canonical patterns
+- **Audience**: AI agents executing specific Flow commands
+- **Pattern**: "Framework Reference" section with line numbers and descriptions
+
+**Example** (from `/flow-task-add`):
+```markdown
+**Purpose**: Add a new task to the current phase in PLAN.md.
+
+**Framework Reference**: See "Task Structure Rules" section in DEVELOPMENT_FRAMEWORK.md (lines 238-566) for the Golden Rule (Standalone OR Iterations, Never Both), task patterns, and decision guide.
+```
+
+**Example** (from `/flow-brainstorm-start`):
+```markdown
+**Purpose**: Begin a brainstorming session for the current iteration with subjects provided by the user.
+
+**Framework Reference**: See "Brainstorming Session Pattern" section in DEVELOPMENT_FRAMEWORK.md (lines 1167-1797) for complete workflow, subject resolution types (A/B/C/D), and pre-implementation task patterns.
+```
+
+**All 25 Commands Have References**:
+1. `/flow-blueprint` → Plan File Template (2363-2560)
+2. `/flow-migrate` → Plan File Template (2363-2560)
+3. `/flow-task-add` → Task Structure Rules (238-566)
+4. `/flow-brainstorm-start` → Brainstorming Session Pattern (1167-1797)
+5. `/flow-implement-start` → Implementation Pattern (1798-1836)
+6. `/flow-status` → Progress Dashboard (2015-2314) + Status Markers (1872-1968)
+... (20 more commands - see SLASH_COMMANDS.md for complete mapping)
+
+**Why This Works**:
+- ✅ Command-specific guidance (only relevant sections)
+- ✅ Line numbers enable fast lookup (jump directly to pattern)
+- ✅ Brief descriptions explain what's covered
+- ✅ Every command enforces framework consultation
+
+---
+
+### Benefits of Bidirectional References
+
+**1. Prevents Documentation Redundancy** 📝
+- ❌ **Before**: Commands duplicated framework patterns (inconsistency risk)
+- ✅ **After**: Commands reference framework (single source of truth)
+- **Result**: Framework updates propagate automatically (no sync needed)
+
+**Example**:
+```markdown
+# Before (redundant)
+## /flow-task-add
+**Pattern**: Tasks can be standalone OR have iterations, NEVER both.
+Standalone tasks have action items. Tasks with iterations have NO action items...
+[300 more lines duplicating Task Structure Rules section]
+
+# After (reference-based)
+## /flow-task-add
+**Framework Reference**: See "Task Structure Rules" section (lines 238-566)
+[Framework contains canonical pattern, command just points to it]
+```
+
+---
+
+**2. Self-Documenting Architecture** 🏗️
+- ✅ PLAN.md headers explain what Flow is
+- ✅ CLAUDE.md detection shows how to use Flow
+- ✅ Commands point to canonical patterns
+- ✅ New contributors understand system by reading references
+
+**Discovery Flow**:
+```
+User opens PLAN.md
+  → Sees framework reference header at top
+  → Reads DEVELOPMENT_FRAMEWORK.md to understand structure
+  → Uses slash commands (which also reference framework)
+  → Makes correct structural changes (framework-aware)
+```
+
+---
+
+**3. Better Error Recovery** 🔧
+- AI agents can "recover" from mistakes by re-reading framework
+- Section mapping table (Layer 2) provides fast navigation
+- Line numbers enable precise lookup (no searching needed)
+
+**Example Recovery Scenario**:
+```
+AI creates task with BOTH action items AND iterations (❌ wrong)
+  ↓
+User: "This violates the Golden Rule"
+  ↓
+AI: *reads Task Structure Rules (238-566)*
+  ↓
+AI: "You're right - Task Structure Rules line 240 says 'Standalone OR Iterations, Never Both'"
+  ↓
+AI: *fixes structure* (converts to proper pattern)
+```
+
+---
+
+**4. Enforces Consistency Across Sessions** 🔄
+- Different AI agents always consult same framework
+- No "drift" in interpretation of Flow patterns
+- Framework version tracks with plan file
+
+**Cross-Session Consistency**:
+```
+Session 1 (AI Agent A): Creates task using Task Structure Rules (238-566)
+Session 2 (AI Agent B): Edits same task, reads same section (238-566)
+Result: Both agents follow identical pattern (no inconsistency)
+```
+
+---
+
+### Implementation Timeline
+
+**Iteration 1** (Design): ✅ COMPLETE
+- Brainstormed bidirectional reference approach
+- Chose Option E (three-layer system)
+- Planned Iterations 2-6
+
+**Iteration 2** (PLAN Header): ✅ COMPLETE
+- Added framework reference header to `/flow-blueprint` command
+- Added framework reference header to `/flow-migrate` command
+- Result: All new PLAN.md files now include reference header
+
+**Iteration 3** (CLAUDE.md Detection): ✅ COMPLETE
+- Added "Flow Framework Integration" section to CLAUDE.md (~126 lines)
+- Included detection rules, section mapping table, behavior expectations
+- Result: AI auto-detects Flow usage and consults framework
+
+**Iteration 4** (Command References): ✅ COMPLETE
+- Added "Framework Reference" section to all 25 slash commands
+- Each reference includes: section name, line range, brief description
+- Result: Every command now points to canonical framework pattern
+
+**Iteration 5** (Documentation): 🚧 IN PROGRESS
+- Document the bidirectional reference system (this section!)
+- Explain three layers, benefits, implementation timeline
+- Result: Framework documents its own reference architecture
+
+**Iteration 6** (Build Validation): ⏳ PENDING
+- Add validation to `build-standalone.sh`
+- Verify all commands have valid framework references
+- Fail build if line numbers are invalid or references missing
+
+---
+
+### Usage Guidelines for AI Agents
+
+**When you see `.flow/PLAN.md`**:
+1. ✅ **DO** read DEVELOPMENT_FRAMEWORK.md before structural changes
+2. ✅ **DO** use section mapping table to find relevant patterns
+3. ✅ **DO** cite framework sections when explaining patterns (e.g., "Task Structure Rules line 240 says...")
+4. ✅ **DO** trust framework as source of truth (not memory/assumptions)
+
+**When executing slash commands**:
+1. ✅ **DO** read the Framework Reference section in command definition
+2. ✅ **DO** jump to specified line numbers in DEVELOPMENT_FRAMEWORK.md
+3. ✅ **DO** follow framework patterns exactly (don't invent variations)
+4. ✅ **DO** update PLAN.md according to framework conventions
+
+**When recovering from errors**:
+1. ✅ **DO** re-read framework section for the pattern you violated
+2. ✅ **DO** explain what you learned from framework (quote line numbers)
+3. ✅ **DO** fix mistake according to canonical pattern
+4. ✅ **DO** verify fix matches framework convention
+
+---
+
+### Cross-References
+
+**Related Framework Sections**:
+- **Framework Structure** (lines 105-179) - Complete hierarchy and required sections
+- **Task Structure Rules** (lines 238-566) - Golden Rule, standalone vs iterations
+- **Brainstorming Session Pattern** (lines 1167-1797) - Subject resolution workflow
+- **Implementation Pattern** (lines 1798-1836) - Pre-tasks, iteration lifecycle
+- **Status Markers** (lines 1872-1968) - All 7 markers with lifecycle rules
+- **Quick Reference Guide** (lines 3223-3602) - Decision trees, command cheat sheet
+
+**Related Files**:
+- `.flow/PLAN.md` - Contains framework reference header (Layer 1)
+- `CLAUDE.md` - Contains detection rules and section mapping (Layer 2)
+- `framework/SLASH_COMMANDS.md` - Contains command-level references (Layer 3)
+
+---
+
 ## Command Usage Flow
 
 **Typical workflow for a new iteration**:
@@ -3616,5 +3892,5 @@ By following this framework, you build complex features incrementally with minim
 
 ---
 
-**Version**: 1.0.14
+**Version**: 1.0.16
 **Last Updated**: 2025-10-03

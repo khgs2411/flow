@@ -12,7 +12,108 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FRAMEWORK_DIR="$SCRIPT_DIR/framework"
 OUTPUT_FILE="$SCRIPT_DIR/flow.sh"
-FLOW_VERSION="1.0.13"  # Update this with each release
+FLOW_VERSION="1.0.16"  # Update this with each release
+
+echo "🔨 Building standalone Flow framework script v${FLOW_VERSION}..."
+echo ""
+
+# Validation function: Check command-framework mappings
+validate_framework_references() {
+  echo "🔍 Validating command→framework references..."
+  echo ""
+
+  local commands_file="$FRAMEWORK_DIR/SLASH_COMMANDS.md"
+  local framework_file="$FRAMEWORK_DIR/DEVELOPMENT_FRAMEWORK.md"
+  local errors=0
+  local warnings=0
+
+  # Get total number of command sections
+  local total_commands=$(grep -c "^## /" "$commands_file")
+
+  echo "📋 Found $total_commands command definitions in SLASH_COMMANDS.md"
+  echo ""
+
+  # Extract all command names
+  local cmd_names=($(grep "^## /" "$commands_file" | sed 's/^## \///'))
+
+  for cmd in "${cmd_names[@]}"; do
+    # Check if command has Framework Reference section (inside markdown code block)
+    # Get line number of command header
+    local cmd_line=$(grep -n "^## /$cmd\$" "$commands_file" | cut -d: -f1)
+
+    # Get line number of next command (or end of file)
+    local next_cmd_line=$(grep -n "^## /" "$commands_file" | awk -F: -v line="$cmd_line" '$1 > line {print $1; exit}')
+    [ -z "$next_cmd_line" ] && next_cmd_line=$(wc -l < "$commands_file")
+
+    # Extract command section
+    local cmd_section=$(sed -n "${cmd_line},${next_cmd_line}p" "$commands_file")
+    local has_reference=$(echo "$cmd_section" | grep -c "^\*\*Framework Reference\*\*:")
+
+    if [ "$has_reference" -eq 0 ]; then
+      echo "❌ /$cmd: Missing Framework Reference section"
+      ((errors++))
+      continue
+    fi
+
+    # Extract Framework Reference line
+    local ref_line=$(echo "$cmd_section" | grep "^\*\*Framework Reference\*\*:" | head -1)
+
+    # Extract line numbers using regex (matches patterns like "lines 123-456" or "line 123")
+    local line_ranges=$(echo "$ref_line" | grep -oE '\(lines? [0-9]+-?[0-9]*\)|\(line [0-9]+\)')
+
+    if [ -z "$line_ranges" ]; then
+      echo "⚠️  /$cmd: Framework Reference found but no line numbers detected"
+      ((warnings++))
+      continue
+    fi
+
+    # Extract all line numbers from the reference
+    local line_numbers=$(echo "$line_ranges" | grep -oE '[0-9]+')
+
+    # Get total lines in framework file
+    local framework_lines=$(wc -l < "$framework_file")
+
+    # Verify each line number is valid
+    local invalid_lines=0
+    for line_num in $line_numbers; do
+      if [ "$line_num" -gt "$framework_lines" ]; then
+        echo "❌ /$cmd: Line $line_num exceeds framework file size ($framework_lines lines)"
+        ((errors++))
+        invalid_lines=1
+        break
+      fi
+    done
+
+    if [ "$invalid_lines" -eq 0 ]; then
+      echo "✅ /$cmd: Valid reference ($line_ranges)"
+    fi
+  done
+
+  echo ""
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+  if [ "$errors" -gt 0 ]; then
+    echo "❌ Validation FAILED: $errors error(s), $warnings warning(s)"
+    echo ""
+    echo "Please fix the errors before building:"
+    echo "  - Ensure all commands have **Framework Reference**: sections"
+    echo "  - Verify all line numbers are within framework file bounds"
+    echo "  - Check SLASH_COMMANDS.md and DEVELOPMENT_FRAMEWORK.md"
+    echo ""
+    return 1
+  elif [ "$warnings" -gt 0 ]; then
+    echo "⚠️  Validation passed with $warnings warning(s)"
+    echo ""
+  else
+    echo "✅ All $total_commands commands have valid framework references!"
+    echo ""
+  fi
+
+  return 0
+}
+
+# Run validation before building
+validate_framework_references || exit 1
 
 echo "🔨 Building standalone Flow framework script v${FLOW_VERSION}..."
 echo ""

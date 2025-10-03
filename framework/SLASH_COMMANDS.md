@@ -50,6 +50,8 @@ You are executing the `/flow-blueprint` command from the Flow framework.
 
 **Purpose**: Create a brand new PLAN.md file from scratch for a new feature/project/bug/issue.
 
+**Framework Reference**: See "Plan File Template" section in DEVELOPMENT_FRAMEWORK.md (lines 2363-2560) for complete template structure, required sections, and examples.
+
 **IMPORTANT**: This command ALWAYS creates a fresh `.flow/PLAN.md`, overwriting any existing plan file. Use `/flow-migrate` if you want to convert existing documentation.
 
 **💡 TIP FOR USERS**: Provide rich context in $ARGUMENTS! You are the domain expert - the more details you provide upfront, the better the plan.
@@ -200,6 +202,8 @@ description: Migrate existing PRD/PLAN/TODO to Flow's .flow/PLAN.md format
 You are executing the `/flow-migrate` command from the Flow framework.
 
 **Purpose**: Migrate existing project documentation (PLAN.md, TODO.md, etc.) to Flow-compliant `.flow/PLAN.md` format.
+
+**Framework Reference**: See "Plan File Template" section in DEVELOPMENT_FRAMEWORK.md (lines 2363-2560) for complete template structure, required sections, and examples.
 
 **IMPORTANT**: This command ALWAYS creates a fresh `.flow/PLAN.md`, overwriting any existing plan file. It reads your current documentation and converts it to Flow format.
 
@@ -354,6 +358,8 @@ You are executing the `/flow-plan-update` command from the Flow framework.
 
 **Purpose**: Update an existing `.flow/PLAN.md` to match the latest Flow framework structure and patterns.
 
+**Framework Reference**: See "Framework Structure" section in DEVELOPMENT_FRAMEWORK.md (lines 105-179) for hierarchy, required sections, and structural patterns.
+
 **IMPORTANT**: This command updates your current plan file to match framework changes (e.g., Progress Dashboard moved, new status markers, structural improvements).
 
 **Instructions**:
@@ -462,6 +468,8 @@ You are executing the `/flow-phase-add` command from the Flow framework.
 
 **Purpose**: Add a new phase to the current PLAN.md file.
 
+**Framework Reference**: See "Development Workflow" section in DEVELOPMENT_FRAMEWORK.md (lines 567-613) for phase management patterns, naming conventions, and lifecycle rules.
+
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
 - **Working File**: .flow/PLAN.md (current project)
@@ -514,6 +522,8 @@ You are executing the `/flow-phase-start` command from the Flow framework.
 
 **Purpose**: Mark the current phase as 🚧 IN PROGRESS (when first task starts).
 
+**Framework Reference**: See "Development Workflow" section in DEVELOPMENT_FRAMEWORK.md (lines 567-613) for phase lifecycle management and status transition rules.
+
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
 - **Working File**: .flow/PLAN.md (current project)
@@ -558,6 +568,8 @@ description: Mark current phase as complete
 You are executing the `/flow-phase-complete` command from the Flow framework.
 
 **Purpose**: Mark the current phase as ✅ COMPLETE (when all tasks done).
+
+**Framework Reference**: See "Development Workflow" section in DEVELOPMENT_FRAMEWORK.md (lines 567-613) for phase completion criteria and transition rules.
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
@@ -604,6 +616,8 @@ description: Add a new task under the current phase
 You are executing the `/flow-task-add` command from the Flow framework.
 
 **Purpose**: Add a new task to the current phase in PLAN.md.
+
+**Framework Reference**: See "Task Structure Rules" section in DEVELOPMENT_FRAMEWORK.md (lines 238-566) for the Golden Rule (Standalone OR Iterations, Never Both), task patterns, and decision guide.
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
@@ -655,6 +669,8 @@ description: Mark current task as in progress
 You are executing the `/flow-task-start` command from the Flow framework.
 
 **Purpose**: Mark the current task as 🚧 IN PROGRESS (when first iteration starts).
+
+**Framework Reference**: See "Development Workflow" section in DEVELOPMENT_FRAMEWORK.md (lines 567-613) for task lifecycle management and status transition rules.
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
@@ -717,6 +733,8 @@ You are executing the `/flow-task-complete` command from the Flow framework.
 
 **Purpose**: Mark the current task as ✅ COMPLETE (when all iterations done).
 
+**Framework Reference**: See "Development Workflow" section in DEVELOPMENT_FRAMEWORK.md (lines 567-613) for task completion criteria and transition rules.
+
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
 - **Working File**: .flow/PLAN.md (current project)
@@ -762,6 +780,8 @@ description: Add a new iteration under the current task
 You are executing the `/flow-iteration-add` command from the Flow framework.
 
 **Purpose**: Add a new iteration to the current task in PLAN.md.
+
+**Framework Reference**: See "Development Workflow" section in DEVELOPMENT_FRAMEWORK.md (lines 567-613) for iteration management patterns, scope definition, and action item structure.
 
 **🚨 SCOPE BOUNDARY RULE**:
 If you discover NEW issues while working on this iteration that are NOT part of the current work:
@@ -809,6 +829,8 @@ description: Start brainstorming session with user-provided topics
 You are executing the `/flow-brainstorm-start` command from the Flow framework.
 
 **Purpose**: Begin a brainstorming session for the current iteration with subjects provided by the user.
+
+**Framework Reference**: See "Brainstorming Session Pattern" section in DEVELOPMENT_FRAMEWORK.md (lines 1167-1797) for complete workflow, subject resolution types (A/B/C/D), and pre-implementation task patterns.
 
 **Signature**: `/flow-brainstorm-start [optional: free-form text describing topics to discuss]`
 
@@ -899,6 +921,8 @@ You are executing the `/flow-brainstorm-subject` command from the Flow framework
 
 **Purpose**: Add a new subject to the current brainstorming session.
 
+**Framework Reference**: See "Brainstorming Session Pattern > Subject Resolution Types" section in DEVELOPMENT_FRAMEWORK.md (lines 1215-1313) for subject structure and resolution type definitions.
+
 **Instructions**:
 
 1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
@@ -932,6 +956,8 @@ description: Review all resolved subjects, suggest follow-up work
 You are executing the `/flow-brainstorm-review` command from the Flow framework.
 
 **Purpose**: Review all resolved brainstorming subjects, verify completeness, summarize decisions, show action items, and suggest follow-up work (iterations/pre-tasks) before marking the brainstorming session complete.
+
+**Framework Reference**: See "Brainstorming Session Pattern" section in DEVELOPMENT_FRAMEWORK.md (lines 1167-1797) for resolution verification, action item extraction, and pre-task identification patterns.
 
 **This is the review gate before `/flow-brainstorm-complete`.**
 
@@ -1013,6 +1039,8 @@ You are executing the `/flow-brainstorm-complete` command from the Flow framewor
 
 **Purpose**: Close the current brainstorming session (only after pre-implementation tasks are done).
 
+**Framework Reference**: See "Brainstorming Session Pattern > Completion Criteria" section in DEVELOPMENT_FRAMEWORK.md (lines 1740-1797) for completion rules and transition to implementation.
+
 **IMPORTANT**: Pre-implementation tasks should be documented IN PLAN.md during brainstorming, then completed BEFORE running this command.
 
 **Instructions**:
@@ -1056,6 +1084,8 @@ description: Begin implementation of current iteration
 You are executing the `/flow-implement-start` command from the Flow framework.
 
 **Purpose**: Begin implementation phase for the current iteration.
+
+**Framework Reference**: See "Implementation Pattern" section in DEVELOPMENT_FRAMEWORK.md (lines 1798-1836) for implementation workflow, action item extraction, and verification patterns.
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
@@ -1133,6 +1163,8 @@ You are executing the `/flow-implement-complete` command from the Flow framework
 
 **Purpose**: Mark the current iteration as complete.
 
+**Framework Reference**: See "Implementation Pattern" section in DEVELOPMENT_FRAMEWORK.md (lines 1798-1836) for completion criteria, verification requirements, and status transition rules.
+
 **Instructions**:
 
 1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
@@ -1186,6 +1218,8 @@ description: Show current position and verify plan consistency
 You are executing the `/flow-status` command from the Flow framework.
 
 **Purpose**: Show current position in the plan and verify active work consistency.
+
+**Framework Reference**: See "Progress Dashboard" section (lines 2015-2314) and "Status Markers" section (lines 1872-1968) in DEVELOPMENT_FRAMEWORK.md for dashboard structure and status marker lifecycle.
 
 **PERFORMANCE NOTE**: This command uses Dashboard-first approach for token efficiency. For large PLAN.md files (2000+ lines), this reduces token usage by 95% (from 32,810 → ~1,530 tokens).
 
@@ -1387,6 +1421,8 @@ You are executing the `/flow-summarize` command from the Flow framework.
 
 **Purpose**: Generate high-level overview of entire project structure and completion state.
 
+**Framework Reference**: See "Framework Structure" section in DEVELOPMENT_FRAMEWORK.md (lines 105-179) for complete hierarchy (PHASE → TASK → ITERATION) and structural patterns.
+
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
 - **Working File**: .flow/PLAN.md (current project)
@@ -1572,6 +1608,8 @@ You are executing the `/flow-next-subject` command from the Flow framework.
 
 **Purpose**: Show next unresolved subject, present options collaboratively, wait for user decision, then mark as ✅ resolved.
 
+**Framework Reference**: See "Brainstorming Session Pattern > Subject Resolution" section in DEVELOPMENT_FRAMEWORK.md (lines 1314-1572) for resolution types (A/B/C/D) and collaborative decision workflow.
+
 **New Collaborative Workflow** (two-phase approach):
 ```
 Phase 1 (Present):
@@ -1662,6 +1700,8 @@ You are executing the `/flow-next-iteration` command from the Flow framework.
 
 **Purpose**: Display details about the next pending iteration in the current task.
 
+**Framework Reference**: See "Development Workflow" section in DEVELOPMENT_FRAMEWORK.md (lines 567-613) for iteration sequencing and lifecycle management.
+
 **Pattern**: Works like `/flow-next-subject` but for iterations - shows what's coming next.
 
 **Instructions**:
@@ -1711,6 +1751,8 @@ description: Smart helper - suggests next action based on current context
 You are executing the `/flow-next` command from the Flow framework.
 
 **Purpose**: Auto-detect current context and suggest the next logical step.
+
+**Framework Reference**: See "Quick Reference Guide > Decision Tree 5: What Command Do I Run Next?" section in DEVELOPMENT_FRAMEWORK.md (lines 3277-3356) for complete decision logic and command suggestions.
 
 **Instructions**:
 
@@ -1787,6 +1829,8 @@ You are executing the `/flow-rollback` command from the Flow framework.
 
 **Purpose**: Undo the last change made to PLAN.md.
 
+**Framework Reference**: See "Status Management Best Practices" section in DEVELOPMENT_FRAMEWORK.md (lines 1969-2014) for rollback patterns, error recovery, and state restoration.
+
 **Instructions**:
 
 1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
@@ -1830,6 +1874,8 @@ description: Verify plan file matches actual codebase state
 You are executing the `/flow-verify-plan` command from the Flow framework.
 
 **Purpose**: Verify that PLAN.md is synchronized with the actual project state.
+
+**Framework Reference**: See "Framework Structure" section in DEVELOPMENT_FRAMEWORK.md (lines 105-179) for structural validation rules, required sections, and integrity checks.
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
@@ -1905,6 +1951,8 @@ You are executing the `/flow-verify-plan` command from the Flow framework.
 You are executing the `/flow-compact` command from the Flow framework.
 
 **Purpose**: Generate comprehensive conversation report for context transfer to new AI instance.
+
+**Framework Reference**: See "Progress Tracking" section in DEVELOPMENT_FRAMEWORK.md (lines 2327-2362) for context preservation patterns and session continuity practices.
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
@@ -2077,6 +2125,8 @@ description: Archive old completed tasks to reduce PLAN.md size
 You are executing the `/flow-plan-split` command from the Flow framework.
 
 **Purpose**: Archive old completed tasks outside the recent context window to `.flow/ARCHIVE.md`, reducing PLAN.md size while preserving full project history.
+
+**Framework Reference**: See "Plan File Template" section in DEVELOPMENT_FRAMEWORK.md (lines 2363-2560) for archival patterns, file structure maintenance, and context window management.
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
