@@ -2137,6 +2137,126 @@ Repeat for next iteration
 - `/flow-next` - Auto-advance to next step
 - `/flow-rollback` - Undo last change
 - `/flow-phase-add`, `/flow-task-add`, `/flow-iteration-add` - Add structure as needed
+- `/flow-plan-split` - Archive old completed tasks to reduce PLAN.md size
+
+---
+
+## /flow-plan-split
+
+**File**: `flow-plan-split.md`
+
+```markdown
+---
+description: Archive old completed tasks to reduce PLAN.md size
+---
+
+You are executing the `/flow-plan-split` command from the Flow framework.
+
+**Purpose**: Archive old completed tasks outside the recent context window to `.flow/ARCHIVE.md`, reducing PLAN.md size while preserving full project history.
+
+**Context**:
+- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
+- **Working File**: .flow/PLAN.md (current project)
+- **Archive File**: .flow/ARCHIVE.md (created/appended)
+
+**When to Use**: When PLAN.md exceeds 2000 lines or has 10+ completed tasks, causing performance issues or difficult navigation.
+
+**Archiving Strategy - Recent Context Window**:
+- **Keep in PLAN.md**: Current task + 3 previous tasks (regardless of status)
+- **Archive to ARCHIVE.md**: All ✅ COMPLETE tasks older than "current - 3"
+- **Always Keep**: Non-complete tasks (⏳ 🚧 ❌ 🔮) regardless of age
+
+**Instructions**:
+
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+
+2. **Find current task number**:
+   - Read Progress Dashboard to identify current task
+   - Extract task number (e.g., if "Task 13" is current, task number = 13)
+
+3. **Calculate archiving threshold**:
+   - Threshold = Current task number - 3
+   - Example: Current = 13, Threshold = 10
+   - **Archive candidates**: Tasks 1-9 (if ✅ COMPLETE)
+   - **Keep in PLAN.md**: Tasks 10, 11, 12, 13 (current + 3 previous)
+
+4. **Extract archivable tasks**:
+   - Find all tasks with number < threshold AND status = ✅ COMPLETE
+   - Extract FULL task content:
+     - Task header and metadata
+     - All iterations (brainstorming, implementation, verification)
+     - All nested content
+   - **IMPORTANT**: Keep tasks that are ❌ ⏳ 🚧 🔮 even if old (incomplete work stays visible)
+
+5. **Create or append to ARCHIVE.md**:
+
+   **If .flow/ARCHIVE.md does NOT exist** (first split):
+   ```markdown
+   # Project Archive
+
+   This file contains completed tasks that have been archived from PLAN.md to reduce file size.
+
+   **Archive Info**:
+   - All content preserved (nothing deleted)
+   - Organized by Phase → Task → Iteration
+   - Reference: See PLAN.md Progress Dashboard for full project history
+
+   **Last Updated**: [Current date]
+   **Tasks Archived**: [Count]
+
+   ---
+
+   [Archived task content here - preserve phase structure]
+   ```
+
+   **If .flow/ARCHIVE.md ALREADY exists** (subsequent split):
+   - Read existing ARCHIVE.md
+   - Update "Last Updated" and "Tasks Archived" count
+   - Append new archived tasks to appropriate phase sections
+   - Maintain phase hierarchy (don't duplicate phase headers if they exist)
+
+6. **Update PLAN.md**:
+
+   **A. Remove archived task content**:
+   - Delete full task sections for archived tasks from Development Plan
+   - Preserve phase headers (even if all tasks archived)
+
+   **B. Update Progress Dashboard**:
+   - Add 📦 marker to archived tasks
+   - Format: `- ✅📦 Task 5: Feature Name (archived)`
+   - Keep full project history visible in Progress Overview
+
+   **C. Update phase headers** (if all tasks archived):
+   ```markdown
+   ### Phase 1: Foundation Setup ✅
+   **Status**: COMPLETE (tasks archived)
+   **Completed**: [Date]
+   **Tasks**: [Count] tasks (📦 archived)
+   ```
+
+7. **Verify and confirm**:
+   - Count lines before/after (use `wc -l`)
+   - Calculate reduction: `before - after = saved lines`
+   - Confirm to user:
+     ```
+     ✅ Plan split complete!
+
+     **Archived**: X tasks to .flow/ARCHIVE.md
+     **PLAN.md size**: Reduced from Y lines to Z lines (-W lines, -P%)
+     **Recent context**: Kept Task [threshold] through Task [current]
+
+     Your Progress Dashboard still shows complete project history.
+     Archived content available in .flow/ARCHIVE.md
+     ```
+
+**Edge Cases**:
+
+- **No old completed tasks**: "No tasks to archive. All completed tasks are within recent context window (current + 3 previous)."
+- **Current task < 4**: "Current task is Task [N]. Need at least Task 4 to enable archiving (keeps current + 3 previous)."
+- **Non-complete old tasks**: Keep them in PLAN.md with note: "Task [N] kept in PLAN.md (not complete - status: [status])"
+
+**Output**: Update .flow/PLAN.md (reduced) and create/append .flow/ARCHIVE.md (full history preserved).
+```
 
 ---
 
@@ -3670,6 +3790,161 @@ All pre-tasks complete → AI: "All pre-tasks complete! Use
 ```
 
 **Why this matters**: `/flow-brainstorm-complete` will BLOCK if pre-tasks are incomplete. The AI should guide users through the correct workflow to avoid confusion.
+
+### 10. Plan File Size Management
+
+**When PLAN.md becomes too large** (2000+ lines or 10+ completed tasks), it can cause:
+- Slow AI processing (token-heavy context)
+- Difficult navigation
+- Performance bottleneck for slash commands
+
+**Solution**: Use `/flow-plan-split` to archive old completed work while preserving full project history.
+
+#### Recent Context Window Strategy
+
+**Keep in PLAN.md**:
+- Current task + 3 previous tasks (regardless of status)
+- All non-complete tasks (⏳ 🚧 ❌ 🔮) regardless of age
+
+**Archive to .flow/ARCHIVE.md**:
+- All ✅ COMPLETE tasks older than "current - 3"
+
+**Example** (Current = Task 13):
+- **Keep**: Tasks 10 ✅, 11 ✅, 12 ✅, 13 🚧 (current + 3 previous)
+- **Archive**: Tasks 1-9 (only if ✅ COMPLETE)
+- **Keep old non-complete**: Task 5 ❌ CANCELLED stays in PLAN.md even though old
+
+#### ARCHIVE.md Structure
+
+```markdown
+# Project Archive
+
+This file contains completed tasks archived from PLAN.md to reduce file size.
+
+**Archive Info**:
+- All content preserved (nothing deleted)
+- Organized by Phase → Task → Iteration
+- Reference: See PLAN.md Progress Dashboard for full project history
+
+**Last Updated**: 2025-10-03
+**Tasks Archived**: 9
+
+---
+
+### Phase 1: Foundation Setup ✅
+
+**Status**: COMPLETE
+**Completed**: 2025-09-30
+
+#### Task 1: Migrate Constants ✅
+
+**Status**: COMPLETE
+**File**: `src/core/red/common/consts.ts`
+
+[Full task content including iterations, brainstorming, implementation...]
+
+#### Task 2: Define Enums ✅
+
+[Full task content...]
+```
+
+#### Progress Dashboard with 📦 Markers
+
+After splitting, Progress Dashboard shows FULL project history with archive markers:
+
+```markdown
+**Progress Overview**:
+- ✅ **Phase 1**: Foundation Setup (complete)
+  - ✅📦 Task 1: Migrate Constants (archived)
+  - ✅📦 Task 2: Define Enums (archived)
+  - ✅📦 Task 3: Define Types (archived)
+  - ✅📦 Task 4: Refactor Constants (archived)
+- ✅ **Phase 2**: Core Implementation
+  - ✅📦 Tasks 1-6: [Names] (archived - outside recent context)
+  - ✅ Task 7: Feature X (recent context - full details in PLAN.md)
+  - ✅ Task 8: Feature Y (recent context - full details in PLAN.md)
+  - ✅ Task 9: Feature Z (recent context - full details in PLAN.md)
+  - 🚧 Task 10: Feature W (current - full details in PLAN.md)
+```
+
+**Key insight**: 📦 marker indicates "details in ARCHIVE.md" but progress record stays in PLAN.md.
+
+#### Phase Headers After Archiving
+
+When all tasks in a phase are archived:
+
+```markdown
+### Phase 1: Foundation Setup ✅
+
+**Status**: COMPLETE (tasks archived)
+**Completed**: 2025-09-30
+**Tasks**: 4 tasks (📦 archived)
+```
+
+Phase structure preserved even when content archived.
+
+#### Before/After Example
+
+**Before Split** (PLAN.md at 4,400 lines):
+```markdown
+### Phase 1: Foundation Setup ✅
+
+#### Task 1: Migrate Constants ✅
+[150 lines of brainstorming, iterations, implementation]
+
+#### Task 2: Define Enums ✅
+[120 lines of content]
+
+#### Task 3: Define Types ✅
+[180 lines of content]
+...
+[Tasks 1-9: ~1,800 lines total]
+```
+
+**After Split** (PLAN.md at ~2,600 lines):
+```markdown
+### Phase 1: Foundation Setup ✅
+
+**Status**: COMPLETE (tasks archived)
+**Tasks**: 4 tasks (📦 archived)
+
+### Phase 2: Core Implementation ✅
+
+**Status**: COMPLETE (6 tasks archived, 3 kept in recent context)
+
+[Tasks 1-6 removed - ~900 lines saved]
+
+#### Task 7: Feature X ✅
+[Full content - in recent context window]
+
+#### Task 8: Feature Y ✅
+[Full content - in recent context window]
+
+#### Task 9: Feature Z ✅
+[Full content - in recent context window]
+
+#### Task 10: Feature W 🚧
+[Full content - current task]
+```
+
+**Result**: ~1,800 lines archived, 40% reduction, recent context preserved.
+
+#### When to Split
+
+**Guidelines**:
+- PLAN.md exceeds 2000 lines
+- 10+ completed tasks exist
+- Navigation becoming difficult
+- AI mentioning large context/token usage
+
+**How to Split**:
+1. User runs `/flow-plan-split` when ready
+2. Command calculates threshold (current - 3)
+3. Archives old completed tasks
+4. Updates Progress Dashboard with 📦 markers
+5. Creates/appends to ARCHIVE.md
+
+**No Automation**: Splitting is manual (user controls when it happens). AI can mention file size organically but won't auto-split.
 
 ---
 

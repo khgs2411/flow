@@ -17,19 +17,31 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.0.14** - Command UX Enhancements (2025-10-03)
+**v1.0.15** - Plan File Size Management (2025-10-03)
 
-**Enhancements**:
-- **`/flow-status`**: Added task completion detection - now suggests `/flow-task-start` before `/flow-brainstorm-start` when tasks complete
-- **`/flow-task-start`**: Made task number argument optional with auto-detection of next pending task
-- **Distribution**: Updated to 156,112 bytes (4,736 lines)
+**New Command**:
+- **`/flow-plan-split`**: Archive old completed tasks to reduce PLAN.md size
+  - Uses recent context window strategy (current + 3 previous tasks)
+  - Creates/appends to `.flow/ARCHIVE.md` with full task content
+  - Updates Progress Dashboard with 📦 ARCHIVED markers
+  - Preserves full project history while improving performance
+
+**Documentation**:
+- Added "Plan File Size Management" section to DEVELOPMENT_FRAMEWORK.md
+  - When to split guidelines (2000+ lines, 10+ completed tasks)
+  - Recent context window explained with examples
+  - ARCHIVE.md structure and Progress Dashboard with 📦 markers
+  - Before/after examples showing 40% file size reduction
+
+**Distribution**:
+- Final size: 164,792 bytes (5,011 lines)
 
 **Technical Changes**:
-- `framework/SLASH_COMMANDS.md` lines 1279-1284: Added task status check as Step 1 in `/flow-status` decision tree
-- `framework/SLASH_COMMANDS.md` lines 651-677: Implemented dual-mode task selection (explicit number or auto-detect)
-- Commands now handle both workflows: manual task selection and automatic progression
+- Added `/flow-plan-split` command to `framework/SLASH_COMMANDS.md` (119 lines)
+- Added "Plan File Size Management" to `framework/DEVELOPMENT_FRAMEWORK.md` (154 lines)
+- All edge cases handled: first split, subsequent splits, task < 4, non-complete old tasks
 
-See the [v1.0.14 release](https://github.com/khgs2411/flow/releases/tag/v1.0.14) for full details.
+See the [v1.0.15 release](https://github.com/khgs2411/flow/releases/tag/v1.0.15) for full details.
 
 ---
 

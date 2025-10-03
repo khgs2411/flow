@@ -1522,6 +1522,161 @@ All pre-tasks complete → AI: "All pre-tasks complete! Use
 
 **Why this matters**: `/flow-brainstorm-complete` will BLOCK if pre-tasks are incomplete. The AI should guide users through the correct workflow to avoid confusion.
 
+### 10. Plan File Size Management
+
+**When PLAN.md becomes too large** (2000+ lines or 10+ completed tasks), it can cause:
+- Slow AI processing (token-heavy context)
+- Difficult navigation
+- Performance bottleneck for slash commands
+
+**Solution**: Use `/flow-plan-split` to archive old completed work while preserving full project history.
+
+#### Recent Context Window Strategy
+
+**Keep in PLAN.md**:
+- Current task + 3 previous tasks (regardless of status)
+- All non-complete tasks (⏳ 🚧 ❌ 🔮) regardless of age
+
+**Archive to .flow/ARCHIVE.md**:
+- All ✅ COMPLETE tasks older than "current - 3"
+
+**Example** (Current = Task 13):
+- **Keep**: Tasks 10 ✅, 11 ✅, 12 ✅, 13 🚧 (current + 3 previous)
+- **Archive**: Tasks 1-9 (only if ✅ COMPLETE)
+- **Keep old non-complete**: Task 5 ❌ CANCELLED stays in PLAN.md even though old
+
+#### ARCHIVE.md Structure
+
+```markdown
+# Project Archive
+
+This file contains completed tasks archived from PLAN.md to reduce file size.
+
+**Archive Info**:
+- All content preserved (nothing deleted)
+- Organized by Phase → Task → Iteration
+- Reference: See PLAN.md Progress Dashboard for full project history
+
+**Last Updated**: 2025-10-03
+**Tasks Archived**: 9
+
+---
+
+### Phase 1: Foundation Setup ✅
+
+**Status**: COMPLETE
+**Completed**: 2025-09-30
+
+#### Task 1: Migrate Constants ✅
+
+**Status**: COMPLETE
+**File**: `src/core/red/common/consts.ts`
+
+[Full task content including iterations, brainstorming, implementation...]
+
+#### Task 2: Define Enums ✅
+
+[Full task content...]
+```
+
+#### Progress Dashboard with 📦 Markers
+
+After splitting, Progress Dashboard shows FULL project history with archive markers:
+
+```markdown
+**Progress Overview**:
+- ✅ **Phase 1**: Foundation Setup (complete)
+  - ✅📦 Task 1: Migrate Constants (archived)
+  - ✅📦 Task 2: Define Enums (archived)
+  - ✅📦 Task 3: Define Types (archived)
+  - ✅📦 Task 4: Refactor Constants (archived)
+- ✅ **Phase 2**: Core Implementation
+  - ✅📦 Tasks 1-6: [Names] (archived - outside recent context)
+  - ✅ Task 7: Feature X (recent context - full details in PLAN.md)
+  - ✅ Task 8: Feature Y (recent context - full details in PLAN.md)
+  - ✅ Task 9: Feature Z (recent context - full details in PLAN.md)
+  - 🚧 Task 10: Feature W (current - full details in PLAN.md)
+```
+
+**Key insight**: 📦 marker indicates "details in ARCHIVE.md" but progress record stays in PLAN.md.
+
+#### Phase Headers After Archiving
+
+When all tasks in a phase are archived:
+
+```markdown
+### Phase 1: Foundation Setup ✅
+
+**Status**: COMPLETE (tasks archived)
+**Completed**: 2025-09-30
+**Tasks**: 4 tasks (📦 archived)
+```
+
+Phase structure preserved even when content archived.
+
+#### Before/After Example
+
+**Before Split** (PLAN.md at 4,400 lines):
+```markdown
+### Phase 1: Foundation Setup ✅
+
+#### Task 1: Migrate Constants ✅
+[150 lines of brainstorming, iterations, implementation]
+
+#### Task 2: Define Enums ✅
+[120 lines of content]
+
+#### Task 3: Define Types ✅
+[180 lines of content]
+...
+[Tasks 1-9: ~1,800 lines total]
+```
+
+**After Split** (PLAN.md at ~2,600 lines):
+```markdown
+### Phase 1: Foundation Setup ✅
+
+**Status**: COMPLETE (tasks archived)
+**Tasks**: 4 tasks (📦 archived)
+
+### Phase 2: Core Implementation ✅
+
+**Status**: COMPLETE (6 tasks archived, 3 kept in recent context)
+
+[Tasks 1-6 removed - ~900 lines saved]
+
+#### Task 7: Feature X ✅
+[Full content - in recent context window]
+
+#### Task 8: Feature Y ✅
+[Full content - in recent context window]
+
+#### Task 9: Feature Z ✅
+[Full content - in recent context window]
+
+#### Task 10: Feature W 🚧
+[Full content - current task]
+```
+
+**Result**: ~1,800 lines archived, 40% reduction, recent context preserved.
+
+#### When to Split
+
+**Guidelines**:
+- PLAN.md exceeds 2000 lines
+- 10+ completed tasks exist
+- Navigation becoming difficult
+- AI mentioning large context/token usage
+
+**How to Split**:
+1. User runs `/flow-plan-split` when ready
+2. Command calculates threshold (current - 3)
+3. Archives old completed tasks
+4. Updates Progress Dashboard with 📦 markers
+5. Creates/appends to ARCHIVE.md
+
+**No Automation**: Splitting is manual (user controls when it happens). AI can mention file size organically but won't auto-split.
+
 ---
 
 ## Example: Iteration Lifecycle
