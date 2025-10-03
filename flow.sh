@@ -227,7 +227,21 @@ Testing:
 
 6. **Generate .flow/PLAN.md** following the framework template (ALWAYS overwrites if exists):
    - Note: .flow/ directory already exists (created by flow.sh installation)
-   - **Framework reference**: Link to DEVELOPMENT_FRAMEWORK.md at top
+   - **Framework reference header** (REQUIRED - include this exact block at top):
+     ```markdown
+     # [Project Name] - Development Plan
+
+     > **📖 Framework Guide**: See [DEVELOPMENT_FRAMEWORK.md](DEVELOPMENT_FRAMEWORK.md) for methodology and patterns
+     >
+     > **⚠️ IMPORTANT**: Before making structural changes to this PLAN.md, consult DEVELOPMENT_FRAMEWORK.md to understand:
+     > - Plan file structure (phases → tasks → iterations)
+     > - Status markers (✅ ⏳ 🚧 🎨 ❌ 🔮)
+     > - Brainstorming patterns (subject resolution types A/B/C/D)
+     > - Implementation patterns (pre-tasks, iteration lifecycle)
+
+     **Created**: [Date]
+     **Version**: V1
+     ```
    - **Overview section**: Purpose, goals, scope
    - **Architecture section**: High-level design, key components
    - **Testing Strategy section** (NEW - REQUIRED):
@@ -337,7 +351,16 @@ You are executing the `/flow-migrate` command from the Flow framework.
 
    **Path A - STRUCTURED** (already has phases/tasks):
    - Keep existing hierarchy
-   - Add framework reference at top
+   - **Add framework reference header at top** (same format as `/flow-blueprint`):
+     ```markdown
+     > **📖 Framework Guide**: See [DEVELOPMENT_FRAMEWORK.md](DEVELOPMENT_FRAMEWORK.md) for methodology and patterns
+     >
+     > **⚠️ IMPORTANT**: Before making structural changes to this PLAN.md, consult DEVELOPMENT_FRAMEWORK.md to understand:
+     > - Plan file structure (phases → tasks → iterations)
+     > - Status markers (✅ ⏳ 🚧 🎨 ❌ 🔮)
+     > - Brainstorming patterns (subject resolution types A/B/C/D)
+     > - Implementation patterns (pre-tasks, iteration lifecycle)
+     ```
    - Add/enhance Progress Dashboard section (after Overview, before Architecture)
    - **Remove duplicate progress sections** (search for patterns like "Current Phase:", "Implementation Tasks", old progress trackers)
    - **Update status pointers** (change "Search for 'Current Phase' below" to jump link to Progress Dashboard)
@@ -352,7 +375,7 @@ You are executing the `/flow-migrate` command from the Flow framework.
    - Ask: "Group items into phases? (Y/n)"
    - If yes, intelligently group related items
    - If no, create single phase with items as iterations
-   - Add framework reference
+   - **Add framework reference header** (same format as Path A)
    - Add Progress Dashboard
    - Convert items to Flow iteration format
    - Add placeholder brainstorming sessions
@@ -361,7 +384,7 @@ You are executing the `/flow-migrate` command from the Flow framework.
 
    **Path C - UNSTRUCTURED** (notes):
    - Extract key concepts and features mentioned
-   - Create Framework reference
+   - **Create Framework reference header** (same format as Path A)
    - Create Overview section from notes
    - Create Architecture section if design mentioned
    - Create Progress Dashboard (minimal - project just starting)
@@ -370,7 +393,7 @@ You are executing the `/flow-migrate` command from the Flow framework.
    - Report: "Created Flow plan from notes (extracted [X] key concepts as brainstorming subjects)"
 
 7. **Add standard Flow sections** (all paths):
-   - Framework reference: `> **📖 Framework Guide**: See DEVELOPMENT_FRAMEWORK.md`
+   - **Framework reference header** (detailed format shown in Path A - includes IMPORTANT warning block)
    - Progress Dashboard (with proper format)
    - Development Plan with proper hierarchy
    - Status markers at every level
@@ -2504,6 +2527,335 @@ scripts/
 
 ---
 
+## Task Structure Rules
+
+### The Golden Rule: Standalone OR Iterations, Never Both
+
+**Every task must follow ONE of these two patterns:**
+
+#### Pattern 1: Standalone Task (Direct Action Items)
+
+**Structure**:
+```markdown
+#### Task N: [Task Name] ⏳
+
+**Status**: PENDING
+**Purpose**: [What this task accomplishes]
+
+**Action Items**:
+- [ ] Action item 1
+- [ ] Action item 2
+- [ ] Action item 3
+```
+
+**When to Use**:
+- ✅ Task is straightforward with clear steps
+- ✅ No design decisions needed
+- ✅ Can complete in one work session
+- ✅ Small scope (5-10 simple steps)
+- ✅ Single focus (e.g., "Migrate constants", "Update README")
+
+**Examples**:
+- "Migrate constants from Blue to shared file" (5 simple steps)
+- "Update documentation with new API endpoints" (straightforward)
+- "Rename service files to match naming convention" (clear steps)
+- "Install dependencies and configure linter" (setup task)
+
+---
+
+#### Pattern 2: Task with Iterations (NO Direct Action Items)
+
+**Structure**:
+```markdown
+#### Task N: [Task Name] ⏳
+
+**Status**: PENDING
+**Purpose**: [What this task accomplishes]
+
+**Scope**: [High-level description]
+
+---
+
+##### Iteration 1: [Iteration Name] ⏳
+
+**Status**: PENDING
+**Goal**: [What this iteration builds]
+
+[Brainstorming → Implementation → Complete]
+
+---
+
+##### Iteration 2: [Iteration Name] ⏳
+
+**Status**: PENDING
+**Goal**: [What this iteration builds]
+
+[Brainstorming → Implementation → Complete]
+```
+
+**When to Use**:
+- ✅ Task is large or complex
+- ✅ Needs design decisions (brainstorming required)
+- ✅ Multiple stages of implementation (V1 → V2 → V3)
+- ✅ Natural splitting points exist
+- ✅ Want to ship incremental progress
+
+**Examples**:
+- "Implement Green Service" → Iteration 1: Tier Generation, Iteration 2: Validation, Iteration 3: Testing
+- "Build Payment Gateway Integration" → Iteration 1: API Setup, Iteration 2: Payment Processing, Iteration 3: Webhooks
+- "Add Error Handling System" → Iteration 1: Basic Errors, Iteration 2: Retry Logic, Iteration 3: Logging
+
+---
+
+### ❌ Anti-Pattern: Task with BOTH Action Items AND Iterations
+
+**NEVER DO THIS**:
+
+```markdown
+#### Task 5: Implement Validation System ⏳
+
+**Status**: PENDING
+
+**Action Items**:  ← ❌ WRONG: Task has both action items...
+- [ ] Design validation rules
+- [ ] Create validator interface
+
+---
+
+##### Iteration 1: Basic Validation ⏳  ← ❌ ...AND iterations!
+
+**Status**: PENDING
+**Goal**: Implement basic input validation
+```
+
+**Why This is Wrong**:
+- ❓ Unclear what "task complete" means (action items done? iterations done? both?)
+- ❓ Are action items prerequisites for iterations or parallel work?
+- ❓ Should iterations start immediately or after action items?
+- 🚫 Creates confusion and ambiguity
+
+**How to Fix**:
+
+**Option A** - Make it standalone (if simple):
+```markdown
+#### Task 5: Implement Basic Validation ⏳
+
+**Action Items**:
+- [ ] Design validation rules
+- [ ] Create validator interface
+- [ ] Implement basic input validation
+- [ ] Add unit tests
+```
+
+**Option B** - Make it have iterations (if complex):
+```markdown
+#### Task 5: Implement Validation System ⏳
+
+**Purpose**: Build comprehensive validation system with retry logic
+
+---
+
+##### Iteration 1: Design & Interface ⏳
+
+**Goal**: Design validation rules and create validator interface
+
+[Brainstorming → Implementation]
+
+---
+
+##### Iteration 2: Basic Validation ⏳
+
+**Goal**: Implement basic input validation
+
+[Implementation]
+```
+
+---
+
+### Exception: Pre-Implementation Tasks
+
+**Tasks with iterations CAN have pre-implementation tasks** (from brainstorming):
+
+```markdown
+#### Task 7: Implement Error Handling 🚧
+
+**Status**: IN PROGRESS
+
+---
+
+##### Iteration 1: Basic Error Types 🚧
+
+**Status**: IN PROGRESS
+
+### **Brainstorming Session - Error Handling Design**
+
+[Subjects resolved...]
+
+### **Pre-Implementation Tasks:**  ← ✅ ALLOWED: Pre-tasks from brainstorming
+
+#### ✅ Task 1: Update I_Error interface (COMPLETE)
+#### ✅ Task 2: Rename error.ts to errorHandler.ts (COMPLETE)
+
+### **Implementation - Iteration 1**
+
+**Action Items**:
+- [ ] Implement basic error types
+- [ ] Add error messages
+```
+
+**Why Pre-Tasks Are Allowed**:
+- Pre-tasks are NOT task-level action items
+- Pre-tasks come FROM brainstorming (Type A resolutions)
+- Pre-tasks are completed BEFORE iteration implementation starts
+- Structure: Task → Iteration → Brainstorming → Pre-tasks → Implementation
+
+**Pre-Task Scope**:
+- ✅ Small preparatory work (< 30 min)
+- ✅ Setup before iteration (interface changes, file renames, bug fixes)
+- ✅ Blocking issues that must be fixed first
+
+---
+
+### Decision Guide: Should This Be Standalone or Have Iterations?
+
+Ask yourself these questions:
+
+| Question | Standalone Task | Task with Iterations |
+|----------|----------------|---------------------|
+| **Is this task complex?** | No, straightforward | Yes, needs design |
+| **Design decisions needed?** | No | Yes (brainstorming required) |
+| **Can complete in one session?** | Yes | No, needs splitting |
+| **Natural splitting points?** | No | Yes (V1 → V2, stages) |
+| **Want incremental shipping?** | No, ship all at once | Yes, ship by iteration |
+| **How many steps?** | 5-10 simple steps | Many complex steps |
+
+**Rule of Thumb**:
+- **If you need brainstorming** → Use iterations
+- **If steps are obvious** → Use standalone
+- **If task is one concept** → Use standalone
+- **If task has multiple stages** → Use iterations
+
+---
+
+### Examples of Well-Structured Tasks
+
+#### Good Example 1: Standalone Task
+
+```markdown
+#### Task 3: Migrate Constants to Shared File ⏳
+
+**Status**: PENDING
+**Purpose**: Move all service constants to shared constants file for reusability
+
+**Action Items**:
+- [ ] Create src/shared/constants.ts file
+- [ ] Move Blue service constants
+- [ ] Move Green service constants
+- [ ] Move Red service constants
+- [ ] Update imports in all services
+- [ ] Verify no build errors
+```
+
+**Why This Works**: Clear, simple, straightforward steps. No design decisions. Can complete in one session.
+
+---
+
+#### Good Example 2: Task with Iterations
+
+```markdown
+#### Task 5: Implement Green Service 🚧
+
+**Status**: IN PROGRESS
+**Purpose**: Build Green service for tier generation with validation and selection
+
+**Scope**: Create complete Green service following RED pattern with tier generation, filtering, selection, and validation logic.
+
+---
+
+##### Iteration 1: Tier Generation ✅
+
+**Status**: COMPLETE
+**Completed**: 2025-09-30
+**Goal**: Generate spell tiers based on tier type and constraints
+
+[Brainstorming → Implementation → Complete]
+
+---
+
+##### Iteration 2: Spell Filtering ⏳
+
+**Status**: PENDING
+**Goal**: Filter spells by tier and element type
+
+---
+
+##### Iteration 3: Spell Selection 🚧
+
+**Status**: IN PROGRESS
+**Goal**: Select spells using weight-based constraint solver
+
+[Currently implementing...]
+```
+
+**Why This Works**: Large complex task split into focused iterations. Each iteration has clear goal. Natural progression (generate → filter → select).
+
+---
+
+#### Bad Example 1: Task with Both
+
+```markdown
+❌ BAD:
+
+#### Task 8: Implement Validation System ⏳
+
+**Action Items**:  ← Mixing task-level action items...
+- [ ] Design validation rules
+- [ ] Create interfaces
+
+##### Iteration 1: Basic Validation ⏳  ← ...with iterations
+
+**Goal**: Implement basic input validation
+```
+
+**Fix**: Choose standalone OR iterations, not both.
+
+---
+
+#### Bad Example 2: Iteration Disguised as Standalone
+
+```markdown
+❌ BAD:
+
+#### Task 10: Implement Complete Payment Gateway ⏳
+
+**Action Items**:
+- [ ] Set up Stripe SDK
+- [ ] Design API endpoints  ← This needs brainstorming!
+- [ ] Implement payment processing  ← This is large!
+- [ ] Add webhook handlers  ← Multiple stages needed!
+- [ ] Create retry logic  ← Complex algorithm!
+- [ ] Add error handling  ← Another full feature!
+- [ ] Write integration tests
+```
+
+**Fix**: This should be a task with iterations, each tackling one stage.
+
+---
+
+### Summary: Task Structure Checklist
+
+Before creating a task, ask:
+
+- [ ] Does this task need design decisions? **YES** → Use iterations
+- [ ] Can I complete this in one session? **NO** → Use iterations
+- [ ] Does this have natural splitting points? **YES** → Use iterations
+- [ ] Are all steps obvious and simple? **YES** → Use standalone
+- [ ] Is this one focused concept? **YES** → Use standalone
+
+**Remember**: Standalone OR iterations, never both. Pre-implementation tasks (from brainstorming) are the only exception.
+
+---
+
 ## Development Workflow
 
 ### Step 1: Decide What to Work On
@@ -2551,6 +2903,559 @@ Move to next iteration, applying lessons learned.
 
 ---
 
+## Complete Flow Workflow
+
+This section documents the complete end-to-end Flow workflow from project initialization to completion, including all decision points and command usage.
+
+### Overview: The Flow Journey
+
+```mermaid
+graph TD
+    A[Start] --> B{New or Existing?}
+    B -->|New Project| C[/flow-blueprint]
+    B -->|Existing Docs| D[/flow-migrate]
+    C --> E[Review Generated Plan]
+    D --> E
+    E --> F{Need More Structure?}
+    F -->|Yes| G[/flow-phase-add<br/>/flow-task-add]
+    F -->|No| H[Ready to Start]
+    G --> H
+    H --> I[/flow-phase-start]
+    I --> J[/flow-task-start]
+    J --> K{Complex Task?}
+    K -->|Yes - Need Design| L[/flow-brainstorm-start]
+    K -->|No - Straightforward| M{Split Work?}
+    L --> N[Resolve Subjects]
+    N --> O{Pre-tasks Needed?}
+    O -->|Yes| P[Complete Pre-tasks]
+    O -->|No| Q[/flow-brainstorm-complete]
+    P --> Q
+    Q --> M
+    M -->|Yes| R[/flow-iteration-add]
+    M -->|No| S[Work on Task Action Items]
+    R --> T[/flow-implement-start]
+    T --> U[Complete Implementation]
+    S --> V[/flow-task-complete]
+    U --> W[/flow-implement-complete]
+    W --> X{More Iterations?}
+    X -->|Yes| R
+    X -->|No| V
+    V --> Y{More Tasks?}
+    Y -->|Yes| J
+    Y -->|No| Z[/flow-phase-complete]
+    Z --> AA{More Phases?}
+    AA -->|Yes| I
+    AA -->|No| AB[Project Complete]
+```
+
+### Step-by-Step Workflow
+
+#### 1. Initialize Project
+
+**Command**: `/flow-blueprint [description]` OR `/flow-migrate [file-path]`
+
+**Purpose**: Create `.flow/PLAN.md` with initial structure
+
+**What Happens**:
+- **flow-blueprint**: AI generates phases/tasks/iterations based on feature description
+- **flow-migrate**: Converts existing documentation to Flow format
+
+**Output**: `.flow/PLAN.md` created with project structure
+
+**Next Step**: Review generated plan, add/modify phases and tasks if needed
+
+---
+
+#### 2. Add Structure (Optional)
+
+**Commands**: `/flow-phase-add [description]`, `/flow-task-add [description]`
+
+**Purpose**: Add additional phases or tasks not generated by blueprint
+
+**When to Use**:
+- Blueprint missed important milestones (add phase)
+- Need to break down work further (add task)
+- Discovered new requirements during planning
+
+**Output**: Updated PLAN.md with new structure
+
+**Next Step**: Start working on first phase
+
+---
+
+#### 3. Start Phase
+
+**Command**: `/flow-phase-start [phase-number]`
+
+**Purpose**: Mark phase as 🚧 IN PROGRESS
+
+**When to Use**: Ready to begin work on the phase
+
+**What Happens**:
+- Phase status changes from ⏳ PENDING → 🚧 IN PROGRESS
+- Progress Dashboard updated to point to this phase
+
+**Output**: Phase marked in progress
+
+**Next Step**: Start first task in the phase
+
+---
+
+#### 4. Start Task
+
+**Command**: `/flow-task-start [task-number]`
+
+**Purpose**: Mark task as 🚧 IN PROGRESS
+
+**When to Use**: Ready to begin work on the task
+
+**Decision Point**: Does this task need design decisions?
+- **YES (complex task)** → Go to Step 5 (Brainstorming)
+- **NO (straightforward task)** → Go to Step 6 (Optional Iterations) or directly to Step 8 (Work on Action Items)
+
+**Output**: Task marked in progress
+
+**Next Step**: Brainstorm (if complex) or work directly (if simple)
+
+---
+
+#### 5. Brainstorm (Optional - for Complex Tasks)
+
+**Command**: `/flow-brainstorm-start [topics]`
+
+**Purpose**: Design before coding - make architectural decisions upfront
+
+**When to Use**:
+- Task requires architectural decisions
+- Multiple implementation approaches possible
+- Edge cases need discussion
+- Data structure choices needed
+- Algorithm selection required
+
+**When to Skip**:
+- Task is straightforward (e.g., "Update README")
+- No design decisions needed
+- Implementation approach is obvious
+
+**Workflow**:
+
+```
+/flow-brainstorm-start "API design, data structure, error handling"
+  ↓
+AI creates subjects from your topics
+  ↓
+/flow-next-subject (discuss first subject)
+  ↓
+Resolve subject → Document decision → Create action items
+  ↓
+Repeat for all subjects
+  ↓
+/flow-brainstorm-review
+  ↓
+AI suggests follow-up work:
+  - Type A: Pre-implementation tasks (small quick fixes)
+  - Type B: Immediate documentation updates
+  - Type C: Auto-resolved subjects
+  - Type D: Iteration action items (feature work)
+  ↓
+Complete any pre-implementation tasks
+  ↓
+/flow-brainstorm-complete
+```
+
+**Subject Resolution Types**:
+
+| Type | Name | When | Action | Example |
+|------|------|------|--------|---------|
+| **A** | Pre-Implementation Task | Small code changes needed BEFORE iteration | Create pre-task (< 30 min work) | Fix interface, rename file, migrate enum |
+| **B** | Immediate Documentation | Architectural decision, no code yet | Update Architecture section NOW | Design pattern choice, API contract |
+| **C** | Auto-Resolved | Answered by another subject's decision | Mark as resolved by Subject N | Cascade decisions |
+| **D** | Iteration Action Items | Substantial feature work that IS the iteration | Action items become iteration implementation | Build API endpoint, implement validator |
+
+**Output**: Brainstorming complete, iteration marked 🎨 READY
+
+**Next Step**: Optional iterations (Step 6) or direct implementation (Step 8)
+
+---
+
+#### 6. Add Iterations (Optional - for Split Work)
+
+**Command**: `/flow-iteration-add [description]`
+
+**Purpose**: Break task into smaller incremental buildouts
+
+**When to Use**:
+- Task is large and needs splitting
+- Multiple stages of implementation (V1 → V2 → V3)
+- Want to ship incremental progress
+
+**When to Skip**:
+- Task is small enough to complete in one go
+- No natural splitting points
+
+**Decision**: **Task Structure Rules** (CRITICAL)
+
+**Option 1: Standalone Task** (NO iterations)
+- Task has direct action items
+- Work is straightforward
+- Example: "Migrate constants" with 5 simple steps
+
+**Option 2: Task with Iterations** (NO direct task action items)
+- Task has NO direct action items, ONLY iterations
+- Complex work split into stages
+- Example: "Implement Green Service" → Iteration 1: Tier Gen, Iteration 2: Validation
+
+**NEVER: Task with BOTH**
+- ❌ Don't mix task action items AND iterations
+- ❌ Creates confusion about what "task complete" means
+
+**Exception**: Pre-Implementation Tasks
+- Tasks with iterations CAN have pre-tasks (from brainstorming)
+- Pre-tasks completed BEFORE iterations start
+- Structure: Task → Brainstorming → Pre-tasks → Iterations
+
+**Output**: Iteration(s) created
+
+**Next Step**: Start implementation (Step 7)
+
+---
+
+#### 7. Implement Iteration
+
+**Command**: `/flow-implement-start`
+
+**Purpose**: Begin coding/building the iteration
+
+**When to Use**: Brainstorming complete (or skipped) and ready to code
+
+**Workflow**:
+```
+/flow-implement-start
+  ↓
+Work through action items
+  ↓
+Check off items as complete
+  ↓
+Update implementation notes
+  ↓
+Verify work (tests, manual checks)
+  ↓
+/flow-implement-complete
+```
+
+**Output**: Iteration marked ✅ COMPLETE
+
+**Next Step**:
+- **More iterations** → Add next iteration (Step 6) or implement next (Step 7)
+- **All iterations done** → Complete task (Step 9)
+
+---
+
+#### 8. Work on Task Action Items (for Standalone Tasks)
+
+**No Command** - Direct implementation
+
+**Purpose**: Complete task without iterations
+
+**When to Use**: Task is standalone (has direct action items, no iterations)
+
+**Workflow**:
+```
+Work through task action items
+  ↓
+Check off items as complete
+  ↓
+Verify work
+  ↓
+/flow-task-complete
+```
+
+**Output**: Task marked ✅ COMPLETE
+
+**Next Step**: More tasks (Step 4) or complete phase (Step 10)
+
+---
+
+#### 9. Complete Task
+
+**Command**: `/flow-task-complete`
+
+**Purpose**: Mark task as ✅ COMPLETE
+
+**When to Use**: All iterations/action items done and verified
+
+**What Happens**:
+- Task status changes to ✅ COMPLETE
+- Progress Dashboard updated
+- Auto-advances to next task (if available)
+
+**Output**: Task marked complete
+
+**Next Step**:
+- **More tasks in phase** → Start next task (Step 4)
+- **All tasks done** → Complete phase (Step 10)
+
+---
+
+#### 10. Complete Phase
+
+**Command**: `/flow-phase-complete`
+
+**Purpose**: Mark phase as ✅ COMPLETE
+
+**When to Use**: All tasks in phase done
+
+**What Happens**:
+- Phase status changes to ✅ COMPLETE
+- Progress Dashboard updated
+- Auto-advances to next phase (if available)
+
+**Output**: Phase marked complete
+
+**Next Step**:
+- **More phases** → Start next phase (Step 3)
+- **All phases done** → Project complete! 🎉
+
+---
+
+#### 11. Project Complete
+
+**No Command** - All phases done
+
+**What Now?**:
+- Create new blueprint for next feature
+- Migrate new documentation
+- Add new phase to extend current project
+- Archive completed work
+
+---
+
+### Decision Trees
+
+#### Decision Tree 1: Should I Brainstorm or Go Straight to Implementation?
+
+```mermaid
+graph TD
+    A[Starting Task] --> B{Architectural<br/>decisions needed?}
+    B -->|Yes| C{Multiple implementation<br/>approaches?}
+    B -->|No| D[Skip Brainstorming]
+    C -->|Yes| E[USE BRAINSTORMING]
+    C -->|No| F{Edge cases or<br/>constraints to discuss?}
+    F -->|Yes| E
+    F -->|No| G{Data structure or<br/>algorithm choices?}
+    G -->|Yes| E
+    G -->|No| D
+    D --> H[Go directly to implementation]
+    E --> I[/flow-brainstorm-start]
+
+    style E fill:#90EE90
+    style D fill:#FFB6C1
+```
+
+**Use Brainstorming When**:
+- ✅ Architectural decisions needed
+- ✅ Multiple implementation approaches
+- ✅ Complex edge cases to discuss
+- ✅ Data structure choices required
+- ✅ Algorithm selection needed
+- ✅ Uncertain about best approach
+
+**Skip Brainstorming When**:
+- ✅ Task is straightforward (e.g., "Update README", "Fix typo")
+- ✅ Implementation approach is obvious
+- ✅ No design decisions needed
+- ✅ Simple refactoring with clear steps
+
+---
+
+#### Decision Tree 2: Should This Be a Pre-Task or Iteration?
+
+```mermaid
+graph TD
+    A[Action Item from<br/>Subject Resolution] --> B{Is this small<br/>preparatory work?}
+    B -->|Yes| C{Can complete in<br/>&lt; 30 minutes?}
+    B -->|No| D{Is this core<br/>feature work?}
+    C -->|Yes| E[PRE-IMPLEMENTATION TASK<br/>Type A]
+    C -->|No| F{Is this setup work<br/>before main iteration?}
+    D -->|Yes| G[ITERATION ACTION ITEM<br/>Type D]
+    D -->|No| H{Architectural<br/>documentation only?}
+    F -->|Yes| E
+    F -->|No| G
+    H -->|Yes| I[IMMEDIATE DOCUMENTATION<br/>Type B]
+    H -->|No| J{Answered by another<br/>subject decision?}
+    J -->|Yes| K[AUTO-RESOLVED<br/>Type C]
+    J -->|No| G
+
+    style E fill:#FFE4B5
+    style G fill:#90EE90
+    style I fill:#ADD8E6
+    style K fill:#D3D3D3
+```
+
+**Pre-Implementation Task (Type A)** when:
+- ✅ Interface change needed
+- ✅ File rename required
+- ✅ Bug fix discovered
+- ✅ Enum → const migration
+- ✅ Quick setup work (< 30 min)
+
+**Iteration Action Item (Type D)** when:
+- ✅ Building core feature logic
+- ✅ Implementing API endpoints
+- ✅ Creating UI components
+- ✅ Adding validation system
+- ✅ Feature work that IS the iteration
+
+---
+
+#### Decision Tree 3: Should This Task Be Standalone or Have Iterations?
+
+```mermaid
+graph TD
+    A[Creating Task] --> B{Is task large<br/>or complex?}
+    B -->|No| C[STANDALONE TASK]
+    B -->|Yes| D{Natural splitting<br/>points exist?}
+    D -->|No| E{Can complete in<br/>one session?}
+    D -->|Yes| F[TASK WITH ITERATIONS]
+    E -->|Yes| C
+    E -->|No| G{Would benefit from<br/>incremental progress?}
+    G -->|Yes| F
+    G -->|No| C
+    C --> H[Add action items<br/>directly to task]
+    F --> I[Add iterations<br/>NO direct action items]
+
+    style C fill:#ADD8E6
+    style F fill:#90EE90
+```
+
+**Standalone Task** when:
+- ✅ Small scope (5-10 simple steps)
+- ✅ Single focus (e.g., "Migrate constants")
+- ✅ No natural splitting points
+- ✅ Can complete in one session
+
+**Task with Iterations** when:
+- ✅ Large scope (multi-stage buildout)
+- ✅ Complex work (needs design decisions)
+- ✅ Natural splitting points (V1 → V2 → V3)
+- ✅ Want incremental shipping
+
+**NEVER**:
+- ❌ Task with BOTH action items AND iterations
+- ❌ Creates confusion about completion criteria
+
+---
+
+### Command Reference by Workflow Phase
+
+| Workflow Phase | Commands | Purpose |
+|----------------|----------|---------|
+| **Initialization** | `/flow-blueprint`<br/>`/flow-migrate` | Start new project or migrate docs |
+| **Structure** | `/flow-phase-add`<br/>`/flow-task-add` | Add phases and tasks |
+| **Phase Lifecycle** | `/flow-phase-start`<br/>`/flow-phase-complete` | Start and complete phases |
+| **Task Lifecycle** | `/flow-task-start`<br/>`/flow-task-complete` | Start and complete tasks |
+| **Brainstorming** | `/flow-brainstorm-start`<br/>`/flow-next-subject`<br/>`/flow-brainstorm-subject`<br/>`/flow-brainstorm-review`<br/>`/flow-brainstorm-complete` | Design before coding |
+| **Iterations** | `/flow-iteration-add`<br/>`/flow-implement-start`<br/>`/flow-implement-complete` | Split work and implement |
+| **Navigation** | `/flow-status`<br/>`/flow-next`<br/>`/flow-next-subject`<br/>`/flow-next-iteration` | Find your way |
+| **Validation** | `/flow-verify-plan`<br/>`/flow-summarize` | Verify and overview |
+
+---
+
+### Common Workflow Patterns
+
+#### Pattern 1: Simple Standalone Task
+
+```
+1. /flow-task-start 5
+2. Work on task action items
+3. Check off items as complete
+4. /flow-task-complete
+```
+
+**Use when**: Task is straightforward, no design needed, no iterations
+
+---
+
+#### Pattern 2: Task with Brainstorming (No Iterations)
+
+```
+1. /flow-task-start 7
+2. /flow-brainstorm-start "API design, error handling"
+3. /flow-next-subject (resolve all subjects)
+4. /flow-brainstorm-review
+5. Complete pre-tasks (if any)
+6. /flow-brainstorm-complete
+7. Work on action items from brainstorming
+8. /flow-task-complete
+```
+
+**Use when**: Need design decisions, but no iteration splitting needed
+
+---
+
+#### Pattern 3: Task with Iterations (Full Workflow)
+
+```
+1. /flow-task-start 3
+2. /flow-iteration-add "Iteration 1: Basic validation"
+3. /flow-brainstorm-start "validation rules, error messages"
+4. /flow-next-subject (resolve subjects)
+5. /flow-brainstorm-review
+6. Complete pre-tasks
+7. /flow-brainstorm-complete
+8. /flow-implement-start
+9. Complete action items
+10. /flow-implement-complete
+11. Repeat 2-10 for more iterations
+12. /flow-task-complete
+```
+
+**Use when**: Complex task needs splitting + design decisions
+
+---
+
+#### Pattern 4: Task with Iterations (No Brainstorming)
+
+```
+1. /flow-task-start 8
+2. /flow-iteration-add "Iteration 1: Setup infrastructure"
+3. /flow-implement-start
+4. Complete action items
+5. /flow-implement-complete
+6. /flow-iteration-add "Iteration 2: Core logic"
+7. /flow-implement-start
+8. Complete action items
+9. /flow-implement-complete
+10. /flow-task-complete
+```
+
+**Use when**: Need splitting but no design decisions (straightforward work)
+
+---
+
+### Quick Reference: What Command Do I Run Next?
+
+Use `/flow-next` for smart context-aware suggestions, or refer to this table:
+
+| Current State | Next Command | Why |
+|---------------|--------------|-----|
+| Just ran `/flow-blueprint` | `/flow-phase-start 1` | Start first phase |
+| Phase ⏳ PENDING | `/flow-phase-start [N]` | Begin phase work |
+| Phase 🚧 IN PROGRESS, no task started | `/flow-task-start [N]` | Start first task |
+| Task 🚧 IN PROGRESS, need design | `/flow-brainstorm-start` | Design before code |
+| Brainstorming, subjects ⏳ | `/flow-next-subject` | Resolve next subject |
+| All subjects ✅, pre-tasks needed | Work on pre-tasks | Complete setup work |
+| Brainstorming done, pre-tasks ✅ | `/flow-brainstorm-complete` | Finish brainstorming |
+| Iteration 🎨 READY | `/flow-implement-start` | Start coding |
+| Iteration 🚧 IMPLEMENTING | Complete action items | Do the work |
+| All action items ✅ | `/flow-implement-complete` | Finish iteration |
+| Iteration ✅, more work needed | `/flow-iteration-add` | Add next iteration |
+| All iterations ✅ | `/flow-task-complete` | Finish task |
+| All tasks ✅ | `/flow-phase-complete` | Finish phase |
+| All phases ✅ | Project complete! 🎉 | Celebrate |
+
+---
+
 ## Brainstorming Session Pattern
 
 ### Structure
@@ -2584,7 +3489,9 @@ Move to next iteration, applying lessons learned.
 - **Option A**: Description (✅ CHOSEN / ❌ REJECTED)
 - **Option B**: Description (✅ CHOSEN / ❌ REJECTED)
 
-**Action Items**:
+**Resolution Type**: A / B / C / D
+
+**Action Items** (if Type A or D):
 
 - [ ] Action item 1
 - [ ] Action item 2
@@ -2602,8 +3509,15 @@ Move to next iteration, applying lessons learned.
 **Every resolved subject falls into ONE of these types:**
 
 **Type A: Pre-Implementation Task** 🔧
-- **When**: Decision requires code changes BEFORE implementing the iteration
-- **Examples**: Refactoring, bug fixes, system-wide changes, removing deprecated code
+- **When**: Decision requires SMALL code changes BEFORE implementing the iteration
+- **Scope**: Quick tasks (< 30 minutes), preparatory work, setup - NOT feature building
+- **Examples**:
+  - Interface/type changes (add field to interface)
+  - File renames or moves
+  - Bug fixes discovered during brainstorming
+  - Enum → const migrations
+  - Dependency updates
+  - Test infrastructure setup
 - **Action**: Create new task in "### **Pre-Implementation Tasks:**" section
 - **Template**:
   ```markdown
@@ -2635,19 +3549,108 @@ Move to next iteration, applying lessons learned.
 - **Action**: Mark as "Auto-resolved by Subject [N]", explain why
 - **Result**: No separate action needed, decision flows from parent subject
 
-**Example from Real Project**:
-```markdown
-Subject 1 (Architecture): Add `foundational: boolean` property
-→ Resolution Type: B (Immediate Documentation)
-→ Action: Updated architecture section
+**Type D: Iteration Action Items** 🎯
+- **When**: Decision requires substantial feature work that IS the iteration itself
+- **Scope**: Core feature building, NOT preparatory work
+- **Examples**:
+  - Implementing API endpoints
+  - Building UI components
+  - Creating validation system
+  - Adding error handling logic
+  - Developing parser/transformer
+  - Building core business logic
+- **Action**: Action items become part of iteration implementation (NOT pre-tasks)
+- **Distinction**: Pre-tasks are "setup work" (rename, fix, change). Iteration work is "feature building" (implement, create, build).
 
-Subject 7 (Bug Fix): Conversion placeholder requires 2+ elements
+---
+
+### Decision Matrix: Is This Pre-Task (Type A) or Iteration Work (Type D)?
+
+Ask these questions to determine the correct type:
+
+| Question | Type A (Pre-Task) | Type D (Iteration) |
+|----------|-------------------|-------------------|
+| **Time to complete?** | < 30 minutes | 30+ minutes |
+| **Is this setup/preparation?** | Yes | No |
+| **Is this core feature work?** | No | Yes |
+| **Can skip without breaking iteration?** | No (blocks iteration) | Yes (IS the iteration) |
+| **Examples** | Fix interface, rename file, update enum | Build API, implement validator, create UI |
+
+**Rule of Thumb**:
+- ✅ **Pre-Task**: If you can finish it in one coffee break, it's a pre-task
+- ✅ **Iteration**: If it's the actual feature you're building, it's iteration work
+
+**Anti-Patterns to Avoid**:
+
+❌ **Don't make iterations into pre-tasks**:
+```markdown
+BAD:
+#### Pre-Implementation Task 1: Implement validation system
+
+GOOD:
+Action Items (in iteration implementation):
+- [ ] Implement validation system
+- [ ] Add error messages
+- [ ] Create test cases
+```
+
+❌ **Don't make pre-tasks into iterations**:
+```markdown
+BAD:
+##### Iteration 2: Rename Blue.ts to BlueService.ts
+
+GOOD:
+#### Pre-Implementation Task 1: Rename Blue.ts to BlueService.ts
+```
+
+---
+
+### Examples from Real Flow Projects
+
+**RED RPG Skill Generation Project**:
+```markdown
+Subject 1 (Architecture): Add `foundational: boolean` property to spell tiers
+→ Resolution Type: B (Immediate Documentation)
+→ Action: Updated architecture section with new property definition
+→ Why: Design decision, no code changes yet
+
+Subject 3 (Interface Change): Update I_Tier interface with foundational field
+→ Resolution Type: A (Pre-Implementation Task)
+→ Action: Created pre-task to update interface (< 5 min work)
+→ Why: Small preparatory change needed before building tier generator
+
+Subject 4 (Core Feature): Implement tier generation algorithm with weight constraints
+→ Resolution Type: D (Iteration Action Items)
+→ Action: Action items added to iteration implementation
+→ Why: This IS the iteration - building the core feature
+
+Subject 7 (Bug Fix): Conversion placeholder requires 2+ elements validation
 → Resolution Type: A (Pre-Implementation Task)
 → Action: Created Task 3 with code changes, test cases, files to modify
+→ Why: Bug discovered during design, needs fixing before iteration starts
 
-Subjects 2-5: Element type semantics, validation, etc.
+Subjects 2, 5-6: Element semantics, validation rules
 → Resolution Type: C (Auto-Resolved by Subject 1)
 → Action: Marked as "answered by Subject 1's foundational decision"
+→ Why: Subject 1's decision cascaded to answer these questions
+```
+
+**Payment Gateway Integration Project**:
+```markdown
+Subject 1 (API Design): REST endpoints structure and authentication
+→ Resolution Type: D (Iteration Action Items)
+→ Action: Build endpoints as part of iteration
+→ Why: Core feature work, substantial implementation effort
+
+Subject 2 (Dependency): Install Stripe SDK
+→ Resolution Type: A (Pre-Implementation Task)
+→ Action: npm install stripe (2 min task)
+→ Why: Quick setup work needed before building integration
+
+Subject 3 (Error Handling Strategy): Retry logic with exponential backoff
+→ Resolution Type: B (Immediate Documentation)
+→ Action: Document strategy in Architecture section
+→ Why: Design decision, actual implementation comes later in iteration
 ```
 
 ### Brainstorming Guidelines
@@ -2655,7 +3658,7 @@ Subjects 2-5: Element type semantics, validation, etc.
 1. **One subject at a time** - Don't overwhelm yourself
 2. **Document all options** - Even rejected ones (future reference)
 3. **Explain rationale** - Why did you choose this approach?
-4. **Choose resolution type** - Pre-Implementation Task, Immediate Doc, or Auto-Resolved
+4. **Choose resolution type** - Type A (Pre-Task), Type B (Documentation), Type C (Auto-Resolved), or Type D (Iteration Work)
 5. **Mark resolved** - Use ✅ to track progress
 6. **Add subjects dynamically** - New topics can emerge during discussion
 
@@ -2773,6 +3776,314 @@ Discussing Subject 2: Parser Architecture
 - Prevents forgetting important topics
 - Maintains focus on current subject
 - Natural, organic planning process
+
+---
+
+### Subject Resolution Flowchart
+
+After resolving each subject, determine which resolution type applies:
+
+```mermaid
+graph TD
+    A[Subject Resolved] --> B{Requires code<br/>changes?}
+    B -->|No| C{Architectural<br/>decision only?}
+    B -->|Yes| D{Small quick task<br/>&lt; 30 min?}
+    C -->|Yes| E[Type B:<br/>Immediate Documentation]
+    C -->|No| F{Answered by<br/>another subject?}
+    D -->|Yes| G[Type A:<br/>Pre-Implementation Task]
+    D -->|No| H[Type D:<br/>Iteration Action Items]
+    F -->|Yes| I[Type C:<br/>Auto-Resolved]
+    F -->|No| J[Review decision again]
+
+    E --> K[Update Architecture/Design<br/>sections in PLAN.md NOW]
+    G --> L[Create pre-task in<br/>Pre-Implementation Tasks section]
+    H --> M[Add action items to<br/>iteration implementation]
+    I --> N[Mark as resolved by Subject N,<br/>explain why]
+
+    style E fill:#ADD8E6
+    style G fill:#FFE4B5
+    style H fill:#90EE90
+    style I fill:#D3D3D3
+```
+
+**Decision Path**:
+
+1. **Does subject require code changes?**
+   - **NO** → Check if architectural decision only
+     - **YES** → **Type B** (Immediate Documentation)
+     - **NO** → Check if answered by another subject
+       - **YES** → **Type C** (Auto-Resolved)
+       - **NO** → Review decision (might be Type B or C)
+   - **YES** → Check if small quick task (< 30 min)
+     - **YES** → **Type A** (Pre-Implementation Task)
+     - **NO** → **Type D** (Iteration Action Items)
+
+---
+
+### Using `/flow-brainstorm-review`
+
+**When**: After all subjects are resolved (all marked ✅)
+
+**Purpose**: Review all brainstorming decisions and suggest follow-up work
+
+**Command**: `/flow-brainstorm-review`
+
+**What It Does**:
+
+1. **Analyzes all resolved subjects** - Reads through all ✅ subjects
+2. **Identifies action items** - Extracts all action items from subjects
+3. **Categorizes by resolution type** - Groups items by Type A/B/C/D
+4. **Suggests follow-up work**:
+   - **Type A items** → Suggests creating pre-implementation tasks
+   - **Type B items** → Confirms architecture sections updated
+   - **Type C items** → Notes auto-resolved dependencies
+   - **Type D items** → Confirms iteration implementation ready
+
+**Example Output**:
+
+```
+📊 Brainstorming Review for Iteration 5:
+
+✅ All 7 subjects resolved!
+
+📦 Type A (Pre-Implementation Tasks) - 2 found:
+  - Subject 3: Update I_Tier interface with foundational field
+  - Subject 7: Fix validation placeholder bug (2+ elements required)
+
+  Suggestion: Create 2 pre-implementation tasks before starting iteration.
+
+📝 Type B (Immediate Documentation) - 1 found:
+  - Subject 1: Add `foundational: boolean` property
+
+  Action required: Update Architecture section in PLAN.md with new property.
+
+🔄 Type C (Auto-Resolved) - 3 found:
+  - Subjects 2, 5, 6: Answered by Subject 1's foundational decision
+
+  No action needed - dependencies resolved.
+
+🎯 Type D (Iteration Action Items) - 1 found:
+  - Subject 4: Implement tier generation algorithm
+
+  These will be implemented during iteration (main feature work).
+
+📋 Next Steps:
+1. Complete Type A pre-tasks (2 tasks)
+2. Update Architecture section (Type B)
+3. Run `/flow-brainstorm-complete` when done
+4. Run `/flow-implement-start` to begin iteration
+```
+
+**Benefits**:
+- Ensures no action items forgotten
+- Clear categorization of follow-up work
+- Validates brainstorming completeness before implementation
+- Helps decide when to create pre-tasks vs when to implement directly
+
+---
+
+### After Brainstorming: Complete Workflow
+
+**Once all subjects are resolved**, follow this workflow to move from brainstorming to implementation:
+
+#### Step 1: Review Brainstorming Results
+
+**Command**: `/flow-brainstorm-review`
+
+**Actions**:
+- Analyze all ✅ resolved subjects
+- Identify action items by type (A/B/C/D)
+- Determine what work needs to happen
+
+#### Step 2: Handle Type A (Pre-Implementation Tasks)
+
+**If Type A items exist**:
+
+1. Create pre-implementation tasks in PLAN.md:
+   ```markdown
+   ### **Pre-Implementation Tasks:**
+
+   #### ⏳ Task 1: [Name] (PENDING)
+
+   **Objective**: [What this accomplishes]
+
+   **Action Items**:
+   - [ ] Item 1
+   - [ ] Item 2
+
+   **Files to Modify**:
+   - path/to/file.ts
+   ```
+
+2. Complete each pre-task:
+   - Work through action items
+   - Mark items as complete ✅
+   - Add verification notes
+
+3. Mark pre-task as ✅ COMPLETE
+
+**If no Type A items**:
+- Skip to Step 3
+
+#### Step 3: Handle Type B (Immediate Documentation)
+
+**If Type B items exist**:
+
+1. Update Architecture/Design sections in PLAN.md immediately
+2. Document architectural decisions
+3. Add design pattern explanations
+
+**If no Type B items**:
+- Skip to Step 4
+
+#### Step 4: Verify All Pre-Work Complete
+
+**Check**:
+- [ ] All Type A pre-tasks completed (if any)
+- [ ] All Type B documentation updated (if any)
+- [ ] All Type C auto-resolved subjects documented
+- [ ] Type D items identified for iteration implementation
+
+#### Step 5: Complete Brainstorming
+
+**Command**: `/flow-brainstorm-complete`
+
+**What happens**:
+- Marks brainstorming session as ✅ COMPLETE
+- Changes iteration status to 🎨 READY FOR IMPLEMENTATION
+- Updates Progress Dashboard
+
+**Validation**: Command will ERROR if:
+- ❌ Unresolved subjects remain (⏳ status)
+- ❌ Pre-implementation tasks incomplete (⏳ status)
+
+#### Step 6: Begin Implementation
+
+**Command**: `/flow-implement-start`
+
+**What happens**:
+- Changes iteration status to 🚧 IN PROGRESS (IMPLEMENTING)
+- Creates Implementation section in PLAN.md
+- Copies action items (mostly Type D items)
+
+**Now**: Work through Type D action items (core feature work)
+
+---
+
+### Complete Brainstorming Example
+
+**Example: Iteration 5 - Tier Generation**
+
+```markdown
+### **Brainstorming Session - Tier Generation Design**
+
+**Subjects to Discuss**:
+1. ✅ Foundational Property Design
+2. ✅ Tier Generation Algorithm
+3. ✅ Interface Update Strategy
+4. ✅ Validation Bug Fix
+
+**Resolved Subjects**:
+
+---
+
+### ✅ Subject 1: Foundational Property Design
+
+**Decision**: Add `foundational: boolean` to I_Tier interface
+
+**Resolution Type**: B (Immediate Documentation)
+
+**Action**: Update Architecture section in PLAN.md
+
+---
+
+### ✅ Subject 2: Tier Generation Algorithm
+
+**Decision**: Use weighted random selection with constraint solver
+
+**Resolution Type**: D (Iteration Action Items)
+
+**Action Items**:
+- [ ] Implement generateTiers() method
+- [ ] Add weight-based constraint solver
+- [ ] Create selection algorithm
+
+---
+
+### ✅ Subject 3: Interface Update
+
+**Decision**: Add foundational field to I_Tier
+
+**Resolution Type**: A (Pre-Implementation Task)
+
+**Action**: Create pre-task to update interface (< 5 min work)
+
+---
+
+### ✅ Subject 4: Validation Bug Fix
+
+**Decision**: Fix placeholder validation requiring 2+ elements
+
+**Resolution Type**: A (Pre-Implementation Task)
+
+**Action**: Create pre-task with bug fix
+
+---
+
+[User runs /flow-brainstorm-review]
+
+AI: "Found 2 Type A tasks, 1 Type B update, 1 Type D implementation.
+     Creating pre-tasks..."
+
+---
+
+### **Pre-Implementation Tasks:**
+
+#### ✅ Task 1: Update I_Tier Interface (COMPLETE)
+
+**Objective**: Add foundational: boolean field
+
+**Action Items**:
+- [x] Add foundational field to interface
+- [x] Update type exports
+
+**Verification**: TypeScript compiles with no errors
+
+---
+
+#### ✅ Task 2: Fix Validation Placeholder Bug (COMPLETE)
+
+**Objective**: Require 2+ elements for conversion placeholders
+
+**Action Items**:
+- [x] Update validation logic
+- [x] Add test case
+
+**Verification**: Test passes
+
+---
+
+[User runs /flow-brainstorm-complete - pre-tasks done ✅]
+
+AI: "Brainstorming complete! Iteration 5 is 🎨 READY FOR IMPLEMENTATION"
+
+[User runs /flow-implement-start]
+
+### **Implementation - Iteration 5: Tier Generation**
+
+**Action Items**:
+- [ ] Implement generateTiers() method
+- [ ] Add weight-based constraint solver
+- [ ] Create selection algorithm
+
+[User works through Type D action items - core feature work]
+```
+
+**Key Points**:
+- **Pre-tasks (A) done BEFORE** `/flow-brainstorm-complete`
+- **Documentation (B) updated** during brainstorming
+- **Auto-resolved (C) noted** but no action needed
+- **Iteration work (D) implemented** after `/flow-implement-start`
 
 ---
 
@@ -4201,6 +5512,386 @@ See `.claude/commands/` for complete slash command implementations.
 
 ---
 
+## Quick Reference Guide
+
+### Decision Tree 4: What Subject Resolution Type Is This?
+
+When resolving a brainstorming subject, use this tree to determine the correct resolution type:
+
+```mermaid
+graph TD
+    A[Resolved Subject] --> B{Does this require<br/>code changes?}
+    B -->|No| C{Is this architectural<br/>documentation only?}
+    B -->|Yes| D{Is this answered by<br/>another subject?}
+    C -->|Yes| E[TYPE B<br/>Immediate Documentation]
+    C -->|No| F{Decision cascades<br/>from other subject?}
+    D -->|Yes| G[TYPE C<br/>Auto-Resolved]
+    D -->|No| H{Is this small<br/>preparatory work?}
+    F -->|Yes| G
+    F -->|No| E
+    H -->|Yes| I{Can complete<br/>in &lt; 30 min?}
+    H -->|No| J[TYPE D<br/>Iteration Action Item]
+    I -->|Yes| K[TYPE A<br/>Pre-Implementation Task]
+    I -->|No| J
+
+    style K fill:#FFE4B5
+    style E fill:#ADD8E6
+    style G fill:#D3D3D3
+    style J fill:#90EE90
+```
+
+**Type A: Pre-Implementation Task** 🔧
+- Small code changes (< 30 min)
+- Preparatory work before iteration
+- Examples: Fix interface, rename file, migrate enum
+- Action: Create pre-task, complete BEFORE `/flow-brainstorm-complete`
+
+**Type B: Immediate Documentation** 📝
+- Architectural decision, no code yet
+- Design pattern choice, API contract
+- Examples: Choose architecture, define schema
+- Action: Update Architecture/Design section NOW
+
+**Type C: Auto-Resolved** ↪️
+- Answered by another subject's decision
+- Cascade decisions
+- Examples: "Database choice" resolved by "Use PostgreSQL"
+- Action: Mark resolved, reference deciding subject
+
+**Type D: Iteration Action Items** 🎯
+- Substantial feature work that IS the iteration
+- Core feature building
+- Examples: Implement validator, build API, create UI
+- Action: Action items become iteration implementation (after `/flow-implement-start`)
+
+---
+
+### Decision Tree 5: What Command Do I Run Next?
+
+Use this comprehensive decision tree to determine your next command based on current state:
+
+```mermaid
+graph TD
+    A[What should I do?] --> B{Have PLAN.md?}
+    B -->|No| C{Have existing docs<br/>PRD/SPEC/TODO?}
+    B -->|Yes| D{Current phase<br/>status?}
+    C -->|Yes| E[/flow-migrate]
+    C -->|No| F[/flow-blueprint]
+    E --> D
+    F --> D
+    D -->|⏳ PENDING| G[/flow-phase-start]
+    D -->|🚧 IN PROGRESS| H{Current task<br/>status?}
+    D -->|✅ COMPLETE| I{More phases?}
+    G --> H
+    H -->|No task| J[/flow-task-start N]
+    H -->|⏳ PENDING| J
+    H -->|🚧 IN PROGRESS| K{Need design<br/>decisions?}
+    H -->|🎨 READY| L[/flow-implement-start]
+    H -->|✅ COMPLETE| M{More tasks<br/>in phase?}
+    I -->|Yes| N[/flow-phase-add]
+    I -->|No| O[Project Complete!]
+    J --> K
+    K -->|Yes| P{Brainstorm<br/>status?}
+    K -->|No| Q{Has iterations?}
+    M -->|Yes| R[/flow-task-start next]
+    M -->|No| S[/flow-phase-complete]
+    P -->|Not started| T[/flow-brainstorm-start]
+    P -->|Subject ⏳| U[/flow-next-subject]
+    P -->|All subjects ✅| V[/flow-brainstorm-review]
+    P -->|Review done| W{Pre-tasks exist?}
+    Q -->|Yes| X{Current iteration<br/>status?}
+    Q -->|No| Y[Work on task items]
+    S --> I
+    T --> U
+    V --> W
+    W -->|Yes| Z[Complete pre-tasks]
+    W -->|No| AA[/flow-brainstorm-complete]
+    X -->|⏳ PENDING| AB[/flow-implement-start]
+    X -->|🚧 IN PROGRESS| AC[Complete action items]
+    X -->|✅ COMPLETE| AD{More iterations?}
+    Y --> AE{Task complete?}
+    Z --> AA
+    AA --> L
+    L --> AC
+    AC --> AF[/flow-implement-complete]
+    AD -->|Yes| AG[/flow-iteration-add]
+    AD -->|No| AH[/flow-task-complete]
+    AE -->|Yes| AH
+    AE -->|No| Y
+    AF --> AD
+    AG --> AB
+    AH --> M
+
+    style E fill:#FFE4B5
+    style F fill:#FFE4B5
+    style T fill:#ADD8E6
+    style L fill:#90EE90
+    style O fill:#FFD700
+```
+
+**Key Decision Points**:
+
+1. **No PLAN.md yet?** → Start with `/flow-blueprint` or `/flow-migrate`
+2. **Phase ⏳ PENDING?** → Run `/flow-phase-start`
+3. **Task 🚧 IN PROGRESS but no brainstorm?** → Decide: brainstorm or direct work
+4. **Brainstorm subjects ⏳?** → Run `/flow-next-subject` until all resolved
+5. **All subjects ✅?** → Run `/flow-brainstorm-review` then handle pre-tasks
+6. **Iteration 🎨 READY?** → Run `/flow-implement-start`
+7. **Iteration 🚧 IN PROGRESS?** → Complete action items then `/flow-implement-complete`
+
+**Lost? Run these commands**:
+- `/flow-status` - See exactly where you are
+- `/flow-next` - Get AI's suggestion for next step
+- `/flow-next-iteration` - Preview what's coming next
+
+---
+
+### Status Marker Reference
+
+Flow uses emoji status markers throughout the PLAN.md to track progress at every level (phases, tasks, iterations, action items, subjects).
+
+| Marker | Name | Meaning | Typical Usage |
+|--------|------|---------|---------------|
+| ⏳ | **PENDING** | Not started yet, waiting | Default state for new phases/tasks/iterations |
+| 🚧 | **IN PROGRESS** | Currently being worked on | Active work happening now |
+| 🎨 | **READY FOR IMPLEMENTATION** | Brainstorming complete, ready to code | Iteration after `/flow-brainstorm-complete` |
+| ✅ | **COMPLETE** | Finished successfully | Work done, verified, moving on |
+| ❌ | **CANCELLED** | Abandoned, not pursuing | Decision to skip this work |
+| 🔮 | **FUTURE** | Deferred to later version (V2/V3) | Documented but not implemented yet |
+| 🎯 | **ACTIVE SUBJECT** | Currently discussing this subject | One subject at a time during brainstorming |
+
+**Status Flow Examples**:
+
+**Phase Lifecycle**:
+```
+⏳ PENDING → 🚧 IN PROGRESS → ✅ COMPLETE
+```
+
+**Task Lifecycle (with brainstorming)**:
+```
+⏳ PENDING → 🚧 IN PROGRESS → 🎨 READY → ✅ COMPLETE
+```
+
+**Iteration Lifecycle**:
+```
+⏳ PENDING → 🎨 READY → 🚧 IN PROGRESS → ✅ COMPLETE
+```
+
+**Subject Lifecycle**:
+```
+⏳ PENDING → 🎯 ACTIVE → ✅ RESOLVED
+```
+
+**Action Items**:
+```
+- [ ] Not started (unchecked)
+- [x] Complete (checked)
+```
+
+---
+
+### Command Cheat Sheet
+
+**Quick command reference organized by frequency of use**:
+
+#### Most Common Commands (Daily Use)
+
+| Command | When to Use | Output |
+|---------|-------------|--------|
+| `/flow-status` | "Where am I?" | Current position, next steps |
+| `/flow-next` | "What should I do?" | AI suggests next command |
+| `/flow-implement-start` | Begin iteration work | Mark 🎨 → 🚧, create implementation section |
+| `/flow-implement-complete` | Finish iteration | Mark 🚧 → ✅, update dashboard |
+| `/flow-next-subject` | Discuss next brainstorming subject | Resolve subject, capture decision |
+
+#### Structure Commands (Project Setup)
+
+| Command | When to Use | Output |
+|---------|-------------|--------|
+| `/flow-blueprint` | Start new project from scratch | Generate complete PLAN.md |
+| `/flow-migrate` | Import existing PRD/SPEC/TODO | Convert to Flow PLAN.md |
+| `/flow-phase-add` | Add major development phase | New phase ⏳ PENDING |
+| `/flow-task-add` | Add work unit to phase | New task ⏳ PENDING |
+| `/flow-iteration-add` | Split task into stages | New iteration ⏳ PENDING |
+
+#### Lifecycle Commands (Start/Complete)
+
+| Command | When to Use | Output |
+|---------|-------------|--------|
+| `/flow-phase-start` | Begin work on phase | ⏳ → 🚧 |
+| `/flow-phase-complete` | Finish phase | 🚧 → ✅ |
+| `/flow-task-start` | Begin work on task | ⏳ → 🚧 |
+| `/flow-task-complete` | Finish task | 🚧 → ✅ |
+
+#### Brainstorming Commands (Design Phase)
+
+| Command | When to Use | Output |
+|---------|-------------|--------|
+| `/flow-brainstorm-start` | Start design discussion | Extract subjects from topics |
+| `/flow-next-subject` | Discuss & resolve subject | Capture decision, mark ✅ |
+| `/flow-brainstorm-subject` | Add new subject on-the-fly | Append to subject list |
+| `/flow-brainstorm-review` | Review all decisions | Suggest pre-tasks/iterations |
+| `/flow-brainstorm-complete` | Finish brainstorming | Mark 🎨 READY |
+
+#### Navigation Commands (Find Your Way)
+
+| Command | When to Use | Output |
+|---------|-------------|--------|
+| `/flow-status` | Check current position | Where you are, what's next |
+| `/flow-next` | Get next step suggestion | AI recommends command |
+| `/flow-next-iteration` | Preview upcoming work | Show next iteration details |
+| `/flow-next-subject` | Move to next brainstorm subject | Resolve next ⏳ subject |
+
+#### Validation Commands (Quality Assurance)
+
+| Command | When to Use | Output |
+|---------|-------------|--------|
+| `/flow-verify-plan` | Check PLAN matches code | Find inconsistencies |
+| `/flow-summarize` | Get project overview | Phase/task/iteration summary |
+
+#### Utility Commands (Special Cases)
+
+| Command | When to Use | Output |
+|---------|-------------|--------|
+| `/flow-plan-update` | Update plan structure | Migrate to latest format |
+| `/flow-rollback` | Undo last change | Restore previous state |
+
+---
+
+### Common Pattern Templates
+
+Quick copy-paste templates for common Flow patterns:
+
+#### Template 1: Standalone Task (No Iterations)
+
+```markdown
+#### Task N: [Task Name] 🚧
+
+**Status**: IN PROGRESS
+**Started**: 2025-10-03
+**Purpose**: [Clear objective statement]
+
+**Scope**:
+- [Action item 1]
+- [Action item 2]
+- [Action item 3]
+
+**Files to Modify**:
+- `path/to/file1.ts` - [What changes]
+- `path/to/file2.ts` - [What changes]
+
+**Verification**: [How to verify task is complete]
+```
+
+**Use when**: Simple task, no design decisions, no iterations needed
+
+---
+
+#### Template 2: Task with Iterations
+
+```markdown
+#### Task N: [Task Name] 🚧
+
+**Status**: IN PROGRESS
+**Started**: 2025-10-03
+**Purpose**: [Clear objective statement]
+
+**Scope**: Complex task split into incremental iterations
+
+##### Iteration 1: [First Stage] ⏳
+
+**Status**: PENDING
+**Goal**: [What this iteration achieves]
+
+**Action Items**:
+- [ ] [Step 1]
+- [ ] [Step 2]
+
+**Files to Modify**:
+- `path/to/file.ts` - [Changes]
+
+##### Iteration 2: [Second Stage] ⏳
+
+**Status**: PENDING
+**Goal**: [What this iteration achieves]
+
+**Action Items**:
+- [ ] [Step 1]
+- [ ] [Step 2]
+```
+
+**Use when**: Large task needs splitting, natural V1 → V2 → V3 progression
+
+---
+
+#### Template 3: Brainstorming Session
+
+```markdown
+### **Brainstorming - Iteration N: [Name]**
+
+**Status**: 🚧 IN PROGRESS
+**Started**: 2025-10-03
+
+**Topics**: [List of topics to discuss]
+
+**Subjects**:
+
+#### Subject 1: [Topic Name] ⏳
+
+**Status**: PENDING
+**Question**: [What needs to be decided?]
+
+**Options Considered**:
+1. [Option A] - [Pros/cons]
+2. [Option B] - [Pros/cons]
+
+**Decision**: [To be filled after discussion]
+
+**Resolution Type**: A / B / C / D
+
+**Action Items**:
+- [ ] [Step 1]
+- [ ] [Step 2]
+
+#### Subject 2: [Topic Name] ⏳
+
+[Repeat pattern]
+```
+
+**Use when**: Complex task needs design decisions before coding
+
+---
+
+#### Template 4: Pre-Implementation Task
+
+```markdown
+### **Pre-Implementation Tasks - Iteration N: [Name]**
+
+**Purpose**: Small preparatory work to complete BEFORE starting main iteration
+
+**Tasks**:
+
+#### Pre-Task 1: [Task Name] ⏳
+
+**Status**: PENDING
+**Scope**: [What needs to be done]
+**Time Estimate**: < 30 minutes
+**Why Needed**: [Blocks iteration work how?]
+
+**Action Items**:
+- [ ] [Quick step 1]
+- [ ] [Quick step 2]
+
+**Files to Modify**:
+- `path/to/file.ts` - [Change]
+
+**Verification**: [How to verify]
+```
+
+**Use when**: Brainstorming identifies small blocking work (Type A resolution)
+
+---
+
 ## Summary
 
 This framework provides:
@@ -4404,6 +6095,8 @@ Each iteration's "Verification" section will include:
 
 **Decision**: Use environment variables with .env file + secret manager in production
 
+**Resolution Type**: B (Immediate Documentation)
+
 **Rationale**:
 - Industry standard approach (12-factor app)
 - Easy to rotate credentials without code changes
@@ -4427,6 +6120,8 @@ Each iteration's "Verification" section will include:
 
 **Decision**: Use official MockPay SDK for V1, abstract behind adapter pattern
 
+**Resolution Type**: D (Iteration Action Items)
+
 **Rationale**:
 - SDK handles authentication, retries, and rate limiting automatically
 - Reduces development time for V1
@@ -4449,6 +6144,8 @@ Each iteration's "Verification" section will include:
 ### ✅ **Subject 3: Environment Configuration**
 
 **Decision**: Use NODE_ENV with separate .env files per environment
+
+**Resolution Type**: B (Immediate Documentation)
 
 **Rationale**:
 - Clear separation of concerns
@@ -4540,6 +6237,8 @@ Also added a health check endpoint `/api/payment/health` that verifies API conne
 
 **Decision**: Use REST with POST /api/payments to create payment intents
 
+**Resolution Type**: B (Immediate Documentation)
+
 **Rationale**:
 - Standard RESTful convention (POST = create resource)
 - Returns payment intent ID that frontend can use with SDK
@@ -4562,6 +6261,8 @@ Also added a health check endpoint `/api/payment/health` that verifies API conne
 ### ✅ **Subject 2: Payment State Machine**
 
 **Decision**: Use enum-based state machine with explicit transitions
+
+**Resolution Type**: D (Iteration Action Items)
 
 **Rationale**:
 - Makes valid state transitions explicit and enforceable

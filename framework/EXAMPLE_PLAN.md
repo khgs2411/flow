@@ -178,6 +178,8 @@ Each iteration's "Verification" section will include:
 
 **Decision**: Use environment variables with .env file + secret manager in production
 
+**Resolution Type**: B (Immediate Documentation)
+
 **Rationale**:
 - Industry standard approach (12-factor app)
 - Easy to rotate credentials without code changes
@@ -201,6 +203,8 @@ Each iteration's "Verification" section will include:
 
 **Decision**: Use official MockPay SDK for V1, abstract behind adapter pattern
 
+**Resolution Type**: D (Iteration Action Items)
+
 **Rationale**:
 - SDK handles authentication, retries, and rate limiting automatically
 - Reduces development time for V1
@@ -223,6 +227,8 @@ Each iteration's "Verification" section will include:
 ### ✅ **Subject 3: Environment Configuration**
 
 **Decision**: Use NODE_ENV with separate .env files per environment
+
+**Resolution Type**: B (Immediate Documentation)
 
 **Rationale**:
 - Clear separation of concerns
@@ -314,6 +320,8 @@ Also added a health check endpoint `/api/payment/health` that verifies API conne
 
 **Decision**: Use REST with POST /api/payments to create payment intents
 
+**Resolution Type**: B (Immediate Documentation)
+
 **Rationale**:
 - Standard RESTful convention (POST = create resource)
 - Returns payment intent ID that frontend can use with SDK
@@ -336,6 +344,8 @@ Also added a health check endpoint `/api/payment/health` that verifies API conne
 ### ✅ **Subject 2: Payment State Machine**
 
 **Decision**: Use enum-based state machine with explicit transitions
+
+**Resolution Type**: D (Iteration Action Items)
 
 **Rationale**:
 - Makes valid state transitions explicit and enforceable

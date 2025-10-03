@@ -113,6 +113,133 @@ Every command MUST:
 4. Update `PLAN.md` according to conventions
 5. Provide clear next steps to user
 
+## Flow Framework Integration
+
+### Automatic Detection
+
+**When working in ANY project, if you detect `.flow/PLAN.md` exists:**
+
+1. **STOP** before making any structural changes to PLAN.md
+2. **READ** `DEVELOPMENT_FRAMEWORK.md` from one of these locations (in order):
+   - `.flow/DEVELOPMENT_FRAMEWORK.md` (project-specific)
+   - `.claude/DEVELOPMENT_FRAMEWORK.md` (project root)
+   - `./DEVELOPMENT_FRAMEWORK.md` (project root)
+   - `~/.claude/flow/DEVELOPMENT_FRAMEWORK.md` (global installation)
+3. **UNDERSTAND** the framework patterns before editing PLAN.md
+4. **FOLLOW** the framework conventions exactly
+
+### Detection Rules
+
+```
+IF file_exists('.flow/PLAN.md'):
+    THEN project_uses_flow = TRUE
+    THEN read_framework_guide()
+    THEN follow_flow_conventions()
+```
+
+**Flow-managed projects have**:
+- `.flow/PLAN.md` - Main plan file (Flow manages this)
+- `.flow/DEVELOPMENT_FRAMEWORK.md` - Framework methodology docs
+- `.claude/commands/flow-*.md` - 23 slash commands for Flow operations
+
+### Framework Consultation Requirements
+
+**Before making ANY changes to .flow/PLAN.md, consult these framework sections:**
+
+#### For Plan Structure Changes
+- **Section**: "Framework Structure" (DEVELOPMENT_FRAMEWORK.md, ~lines 105-180)
+- **Learn**: PHASE → TASK → ITERATION → BRAINSTORM → IMPLEMENTATION hierarchy
+- **Never**: Create wrong hierarchy (e.g., iterations directly under phases)
+
+#### For Status Markers
+- **Section**: "Status Markers" (DEVELOPMENT_FRAMEWORK.md, ~lines 1872-1968)
+- **Learn**: ✅ COMPLETE, ⏳ PENDING, 🚧 IN PROGRESS, 🎨 READY, ❌ CANCELLED, 🔮 FUTURE, 🎯 ACTIVE
+- **Never**: Invent new status markers or use wrong markers
+
+#### For Brainstorming
+- **Section**: "Brainstorming Session Pattern" (DEVELOPMENT_FRAMEWORK.md, ~lines 1167-1797)
+- **Learn**: Subject resolution types (A: Pre-Task, B: Documentation, C: Auto-Resolved, D: Iteration Items)
+- **Learn**: When to use `/flow-brainstorm-start`, `/flow-next-subject`, `/flow-brainstorm-complete`
+- **Never**: Skip brainstorming for complex tasks
+
+#### For Task Structure
+- **Section**: "Task Structure Rules" (DEVELOPMENT_FRAMEWORK.md, ~lines 238-566)
+- **Learn**: Golden Rule - Standalone OR Iterations, Never Both
+- **Learn**: Pattern 1 (Standalone Task with action items) vs Pattern 2 (Task with iterations, NO action items)
+- **Never**: Mix task action items AND iterations in same task
+
+#### For Implementation
+- **Section**: "Implementation Pattern" (DEVELOPMENT_FRAMEWORK.md, ~lines 1798-1836)
+- **Learn**: Pre-implementation tasks vs iteration work
+- **Learn**: When to mark iteration 🎨 READY vs 🚧 IN PROGRESS
+- **Never**: Start implementation before brainstorming is ✅ COMPLETE
+
+#### For Complete Workflow
+- **Section**: "Complete Flow Workflow" (DEVELOPMENT_FRAMEWORK.md, ~lines 614-940)
+- **Learn**: 11-step workflow from blueprint to completion
+- **Learn**: Decision trees for common questions
+- **Learn**: Command reference by workflow phase
+
+### Quick Reference Guide
+
+**Section**: "Quick Reference Guide" (DEVELOPMENT_FRAMEWORK.md, ~lines 3223-3602)
+
+**Use this section for**:
+- Decision Tree 4: What subject resolution type is this? (A/B/C/D)
+- Decision Tree 5: What command do I run next?
+- Status Marker Reference (all 7 markers with lifecycle examples)
+- Command Cheat Sheet (23 commands organized by frequency)
+- Common Pattern Templates (4 copy-paste ready templates)
+
+### Common Tasks → Framework Sections
+
+| Task | Framework Section | Lines | What to Learn |
+|------|-------------------|-------|---------------|
+| Creating new PLAN.md | Plan File Template | 2363-2560 | Template structure, required sections |
+| Adding phase | Development Workflow | 567-613 | Phase naming, purpose, scope |
+| Adding task | Task Structure Rules | 238-566 | Standalone vs iterations decision |
+| Adding iteration | Development Workflow | 567-613 | Iteration goals, action items |
+| Starting brainstorm | Brainstorming Session Pattern | 1167-1797 | Subject creation, resolution types |
+| Resolving subject | Subject Resolution Types | 1215-1313 | Types A/B/C/D, when to use each |
+| Completing iteration | Implementation Pattern | 1798-1836 | Verification, completion criteria |
+| Updating status | Status Markers | 1872-1968 | Correct marker usage, lifecycle |
+| Lost/confused | Complete Flow Workflow | 614-940 | Decision trees, command reference |
+
+### AI Behavior Expectations
+
+**When you detect Flow usage (`flow/PLAN.md` exists):**
+
+✅ **DO**:
+- Read DEVELOPMENT_FRAMEWORK.md before any PLAN.md edits
+- Follow exact framework patterns (structure, markers, sections)
+- Use slash commands for Flow operations (don't edit PLAN.md directly for state changes)
+- Consult Quick Reference Guide for common questions
+- Reference specific framework sections when explaining patterns
+
+❌ **DON'T**:
+- Edit PLAN.md structure without reading framework first
+- Invent new status markers or section structures
+- Mix task patterns (standalone + iterations in same task)
+- Skip brainstorming for complex tasks
+- Make assumptions about Flow patterns (read the framework!)
+
+### Example: Detecting Flow and Consulting Framework
+
+```markdown
+User: "Add a new task to the PLAN.md"
+
+AI Response:
+1. [Detects .flow/PLAN.md exists]
+2. [Reads DEVELOPMENT_FRAMEWORK.md]
+3. [Consults "Task Structure Rules" section (lines 238-566)]
+4. [Asks user]: "Should this task be:
+   - **Standalone** (with direct action items, no iterations), or
+   - **Task with Iterations** (no direct action items, only iterations)?
+
+   See DEVELOPMENT_FRAMEWORK.md lines 238-566 for the Golden Rule."
+5. [Based on answer, follows correct pattern from framework]
+```
+
 ## Important Design Decisions
 
 ### Why Single-File Distribution?

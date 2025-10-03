@@ -128,7 +128,21 @@ Testing:
 
 6. **Generate .flow/PLAN.md** following the framework template (ALWAYS overwrites if exists):
    - Note: .flow/ directory already exists (created by flow.sh installation)
-   - **Framework reference**: Link to DEVELOPMENT_FRAMEWORK.md at top
+   - **Framework reference header** (REQUIRED - include this exact block at top):
+     ```markdown
+     # [Project Name] - Development Plan
+
+     > **📖 Framework Guide**: See [DEVELOPMENT_FRAMEWORK.md](DEVELOPMENT_FRAMEWORK.md) for methodology and patterns
+     >
+     > **⚠️ IMPORTANT**: Before making structural changes to this PLAN.md, consult DEVELOPMENT_FRAMEWORK.md to understand:
+     > - Plan file structure (phases → tasks → iterations)
+     > - Status markers (✅ ⏳ 🚧 🎨 ❌ 🔮)
+     > - Brainstorming patterns (subject resolution types A/B/C/D)
+     > - Implementation patterns (pre-tasks, iteration lifecycle)
+
+     **Created**: [Date]
+     **Version**: V1
+     ```
    - **Overview section**: Purpose, goals, scope
    - **Architecture section**: High-level design, key components
    - **Testing Strategy section** (NEW - REQUIRED):
@@ -238,7 +252,16 @@ You are executing the `/flow-migrate` command from the Flow framework.
 
    **Path A - STRUCTURED** (already has phases/tasks):
    - Keep existing hierarchy
-   - Add framework reference at top
+   - **Add framework reference header at top** (same format as `/flow-blueprint`):
+     ```markdown
+     > **📖 Framework Guide**: See [DEVELOPMENT_FRAMEWORK.md](DEVELOPMENT_FRAMEWORK.md) for methodology and patterns
+     >
+     > **⚠️ IMPORTANT**: Before making structural changes to this PLAN.md, consult DEVELOPMENT_FRAMEWORK.md to understand:
+     > - Plan file structure (phases → tasks → iterations)
+     > - Status markers (✅ ⏳ 🚧 🎨 ❌ 🔮)
+     > - Brainstorming patterns (subject resolution types A/B/C/D)
+     > - Implementation patterns (pre-tasks, iteration lifecycle)
+     ```
    - Add/enhance Progress Dashboard section (after Overview, before Architecture)
    - **Remove duplicate progress sections** (search for patterns like "Current Phase:", "Implementation Tasks", old progress trackers)
    - **Update status pointers** (change "Search for 'Current Phase' below" to jump link to Progress Dashboard)
@@ -253,7 +276,7 @@ You are executing the `/flow-migrate` command from the Flow framework.
    - Ask: "Group items into phases? (Y/n)"
    - If yes, intelligently group related items
    - If no, create single phase with items as iterations
-   - Add framework reference
+   - **Add framework reference header** (same format as Path A)
    - Add Progress Dashboard
    - Convert items to Flow iteration format
    - Add placeholder brainstorming sessions
@@ -262,7 +285,7 @@ You are executing the `/flow-migrate` command from the Flow framework.
 
    **Path C - UNSTRUCTURED** (notes):
    - Extract key concepts and features mentioned
-   - Create Framework reference
+   - **Create Framework reference header** (same format as Path A)
    - Create Overview section from notes
    - Create Architecture section if design mentioned
    - Create Progress Dashboard (minimal - project just starting)
@@ -271,7 +294,7 @@ You are executing the `/flow-migrate` command from the Flow framework.
    - Report: "Created Flow plan from notes (extracted [X] key concepts as brainstorming subjects)"
 
 7. **Add standard Flow sections** (all paths):
-   - Framework reference: `> **📖 Framework Guide**: See DEVELOPMENT_FRAMEWORK.md`
+   - **Framework reference header** (detailed format shown in Path A - includes IMPORTANT warning block)
    - Progress Dashboard (with proper format)
    - Development Plan with proper hierarchy
    - Status markers at every level
