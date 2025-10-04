@@ -30,33 +30,35 @@
 
 **Last Updated**: 2025-10-01
 
+<!-- ESSENTIAL: Always keep this updated with current phase/task/iteration -->
 **Current Work**:
-- **Phase**: Phase 1 - Foundation → [Jump](#phase-1-foundation-)
-- **Task**: Task 1 - Setup & API Integration → [Jump](#task-1-setup--api-integration-)
-- **Iteration**: Iteration 2 - Basic Payment Flow → [Jump](#iteration-2-basic-payment-flow-)
+
+- **Phase**: [Phase 1 - Foundation](#phase-1-foundation-)
+- **Task**: [Task 1 - Setup & API Integration](#task-1-setup--api-integration-)
+- **Iteration**: [Iteration 2 - Basic Payment Flow](#iteration-2-basic-payment-flow-) 🚧 IN PROGRESS
 
 **Completion Status**:
+
 - Phase 1: 🚧 50% | Phase 2: ⏳ 0% | Phase 3: ⏳ 0%
 
 **Progress Overview**:
-- ✅ **Iteration 1**: Project Setup & SDK Integration (verified & frozen)
-- 🚧 **Iteration 2**: Basic Payment Flow ← **YOU ARE HERE**
-- ⏳ **Iteration 3-5**: Webhook system, error handling, testing
 
-**V1 Remaining Work**:
-1. Complete Iteration 2 (basic payment flow)
-2. Implement Iteration 3 (webhook system)
-3. Implement Iteration 4 (error handling)
-4. Phase 2: Advanced features
-5. Phase 3: Testing & polish
-
-**V2 Deferred Items**:
-1. Task 6: Multiple Payment Providers (complexity - abstraction layer needed)
-2. Task 7: Saved Payment Methods (out of V1 scope - security considerations)
-3. Task 8: Subscription Billing (V3 - recurring payments infrastructure)
-
-**Cancelled Items**:
-None
+- 🚧 **Phase 1**: Foundation ← **YOU ARE HERE**
+  - ✅ Task 1: Setup & API Integration (2/3 iterations complete)
+    - ✅ Iteration 1: Project Setup & SDK Integration
+    - 🚧 Iteration 2: Basic Payment Flow ← **CURRENT**
+    - ⏳ Iteration 3: Error Handling & Validation
+  - ⏳ Task 2: Webhook Integration (0/3 iterations)
+- ⏳ **Phase 2**: Core Implementation
+  - ⏳ Task 1: Transaction Logging & Audit Trail
+  - ⏳ Task 2: Payment Retry Logic
+- ⏳ **Phase 3**: Testing & Validation
+  - ⏳ Task 1: Integration Tests
+  - ⏳ Task 2: Load Testing
+- 🔮 **Phase 4**: Enhancement & Polish (DEFERRED TO V2)
+  - 🔮 Task 1: Multiple Payment Providers
+  - 🔮 Task 2: Saved Payment Methods
+  - 🔮 Task 3: Subscription Billing (V3)
 
 ---
 
@@ -274,23 +276,16 @@ Each iteration's "Verification" section will include:
 - [x] Document environment setup in CONTRIBUTING.md
 
 **Implementation Notes**:
-
-Discovered that MockPay SDK has a sandbox mode that can be enabled via flag, added `MOCKPAY_SANDBOX=true` to development environment. This will prevent accidental charges during testing.
-
-Also added a health check endpoint `/api/payment/health` that verifies API connectivity without making actual requests.
+- Discovered MockPay SDK sandbox mode - added `MOCKPAY_SANDBOX=true` for dev
+- Added health check endpoint `/api/payment/health` for connectivity testing
 
 **Files Modified**:
-- `package.json` - Added mockpay SDK and dotenv-flow dependencies
-- `src/config/mockpay.ts` - Created configuration loader with validation
-- `src/adapters/MockPayAdapter.ts` - Implemented adapter class (127 lines)
-- `src/types/PaymentGateway.ts` - Defined interface for payment gateways
-- `tests/unit/MockPayAdapter.test.ts` - Added 8 test cases
-- `.env.example` - Documented required environment variables
-- `.gitignore` - Added .env* to ignore list
-- `README.md` - Added setup instructions
-- `CONTRIBUTING.md` - Documented environment configuration
+- `src/adapters/MockPayAdapter.ts` - Adapter implementation (127 lines)
+- `src/config/mockpay.ts` - Config loader with validation
+- `tests/unit/MockPayAdapter.test.ts` - 8 test cases
+- Environment setup: .env.example, README.md, CONTRIBUTING.md
 
-**Verification**: All 8 unit tests passing. Successfully connected to MockPay sandbox environment and retrieved account details.
+**Verification**: All 8 unit tests passing. Connected to MockPay sandbox successfully.
 
 **Completed**: 2025-10-01
 
@@ -347,27 +342,13 @@ Also added a health check endpoint `/api/payment/health` that verifies API conne
 
 **Resolution Type**: D (Iteration Action Items)
 
-**Rationale**:
-- Makes valid state transitions explicit and enforceable
-- Easier to debug payment issues by examining state history
-- Prevents invalid state transitions (e.g., pending → refunded without complete)
-- Foundation for future workflow features (partial refunds, disputes)
+**Rationale**: Explicit state transitions prevent invalid states, easier debugging, foundation for V2 refunds
 
-**States**: `PENDING → PROCESSING → COMPLETED | FAILED | CANCELLED`
-
-**Transitions**:
-```
-PENDING → PROCESSING (payment initiated)
-PROCESSING → COMPLETED (payment succeeded)
-PROCESSING → FAILED (payment declined)
-PENDING → CANCELLED (user cancelled)
-COMPLETED → REFUNDING → REFUNDED (future V2)
-```
+**States**: `PENDING → PROCESSING → COMPLETED | FAILED | CANCELLED` (+ REFUNDING/REFUNDED in V2)
 
 **Action Items**:
-- [x] Create PaymentStatus enum with all states
-- [x] Define state transition validation function
-- [x] Add created_at, updated_at, status_changed_at timestamps
+- [x] Create PaymentStatus enum with state transition validation
+- [x] Add timestamps (created_at, updated_at, status_changed_at)
 - [x] Create database migration for payment_transactions table
 
 ---
@@ -394,27 +375,19 @@ Need to decide:
 
 #### ✅ Task 1: Refactor Config Module (COMPLETED)
 
-**Objective**: Current config module doesn't support nested configuration objects. Need to refactor before adding payment config.
+**Objective**: Refactor config module to support nested configuration for payment settings
 
-**Changes Made**:
-- Migrated from flat key-value config to hierarchical structure
-- Updated all existing services to use new config.get() API
-- Added TypeScript interfaces for type-safe config access
-- Updated 23 test files to use new config structure
+**Changes**: Migrated to hierarchical structure, updated 23 test files, added TypeScript interfaces
 
-**Verification**: All existing tests passing (187/187). No breaking changes in other services.
+**Verification**: All 187 tests passing
 
 ---
 
 #### ⏳ Task 2: Add Request ID Middleware (PENDING)
 
-**Objective**: Need request ID tracking for debugging payment flows across services
+**Objective**: Add request ID tracking for debugging payment flows
 
-**Action Items**:
-- [ ] Install express-request-id package
-- [ ] Add middleware to Express app
-- [ ] Update logger to include request ID in all log entries
-- [ ] Update existing payment logging to use request ID
+**Action Items**: Install express-request-id, add middleware, update logger
 
 ---
 
@@ -437,36 +410,23 @@ Need to decide:
 - [ ] Update API documentation
 
 **Implementation Notes**:
+- Created basic payment creation flow (happy path working)
+- Error handling strategy still being resolved (Subject 3 in progress)
 
-Created basic payment creation flow. Currently works for happy path (successful payment creation). Need to finalize error handling strategy before implementing failure cases.
+**🚨 Scope Boundary Example**: Discovered bug in `UserAuth.validateToken()` (doesn't check expiration). Instead of fixing immediately:
+1. STOPPED implementation
+2. NOTIFIED user - not part of Iteration 2 scope
+3. User decided: Create pre-implementation task for Iteration 3
+4. Documented bug, stayed focused on payment flow
 
-**🚨 Scope Boundary Example** (Discovery during implementation):
-
-While implementing payment validation middleware, I discovered that the existing `UserAuth.validateToken()` function has a bug - it doesn't check token expiration correctly.
-
-**What I did**:
-1. **STOPPED** implementation immediately
-2. **NOTIFIED** user: "Found bug in UserAuth.validateToken() - doesn't check expiration. This is NOT part of Iteration 2 (payment flow). Should I: (A) Add as new brainstorming subject for next iteration, (B) Create pre-implementation task, (C) Fix now?"
-3. **WAITED** for user decision
-4. User chose: "Create pre-implementation task - we need it fixed before webhooks (Iteration 3)"
-5. **CREATED** Pre-Implementation Task 3: "Fix UserAuth Token Expiration Bug"
-
-**Why this matters**: If I had "helpfully" fixed the auth bug immediately, it would have:
-- Added untracked changes to this iteration
-- Made code review confusing ("why are auth changes in payment PR?")
-- Potentially broken authentication for other services
-- Violated Flow's principle of intentional, scoped changes
-
-**Result**: Bug documented, will be fixed in proper scope, Iteration 2 stays focused on payment flow.
+**Why this matters**: Prevents scope creep, keeps iterations focused, tracks all changes intentionally.
 
 **Files Modified**:
-- `src/routes/payment.routes.ts` - Payment API routes (78 lines)
-- `src/services/PaymentService.ts` - Core service logic (143 lines, partial)
-- `src/types/PaymentStatus.ts` - State machine enum and validation
-- `migrations/002_create_payment_transactions.sql` - Database schema
-- `docs/api/openapi.yaml` - API specification
+- `src/services/PaymentService.ts` - Core logic (143 lines, partial)
+- `src/routes/payment.routes.ts` - API routes (78 lines)
+- Database migration, API spec
 
-**Verification**: Manual testing in Postman shows successful payment creation. Automated tests pending error handling decisions.
+**Verification**: Manual testing successful. Automated tests pending error handling completion.
 
 ---
 
@@ -549,44 +509,11 @@ While implementing payment validation middleware, I discovered that the existing
 
 ---
 
-### Phase 4: Enhancement & Polish 🔮 FUTURE
-
-**Strategy**: V2 features and optimizations
-
-**Goal**: Advanced payment features for better UX
-
-**Deferred Tasks**:
-- Multiple payment provider support (Stripe, PayPal)
-- Saved payment methods / tokenization
-- Recurring billing / subscriptions
-- Partial refunds
-- Payment disputes handling
-- Advanced fraud detection
-
----
-
-## Testing Strategy
-
-**V1 Testing**:
-- [x] Unit tests for adapter layer (8 tests)
-- [x] Unit tests for state machine (5 tests)
-- [ ] Integration tests for payment creation flow
-- [ ] Integration tests for webhook processing
-- [ ] Manual testing with MockPay test cards
-- [ ] Security audit of credential handling
-
-**V2 Testing** (Deferred):
-- [ ] Load tests (1000 concurrent payments)
-- [ ] Chaos engineering tests (simulate API downtime)
-- [ ] PCI compliance validation
-
 ---
 
 ## Future Enhancements (V2+)
 
-**Phase 4: Enhancement & Polish** (FUTURE)
-
-**Deferred Features**:
+**Deferred to V2/V3**:
 - [ ] Multi-provider support (Stripe, PayPal, etc.)
 - [ ] Saved payment methods with tokenization
 - [ ] Subscription billing engine
@@ -616,25 +543,6 @@ While implementing payment validation middleware, I discovered that the existing
 
 ## Changelog
 
-**2025-10-01** - Phase 1, Task 1, Iteration 1 complete
-- Implemented MockPay SDK integration
-- Created adapter pattern for payment gateway
-- Set up environment configuration
-- Added 8 unit tests for adapter layer
-- Discovered sandbox mode feature
-
-**2025-10-01** - Phase 1, Task 1, Iteration 2 in progress
-- Started brainstorming session for payment flow
-- Resolved API endpoint structure (RESTful)
-- Resolved payment state machine design
-- Created database schema migration
-- Completed pre-implementation task: config refactoring
-- Currently resolving error handling strategy
-- Implemented basic payment creation endpoint (happy path only)
-
----
-
-**Next Steps**:
-- Complete brainstorming for error handling strategy
-- Finish Iteration 2 implementation
-- Move to Iteration 3: Error handling & validation
+**2025-10-01**:
+- ✅ Iteration 1: MockPay SDK integration, adapter pattern, 8 unit tests
+- 🚧 Iteration 2: Payment flow design, state machine, basic endpoint (in progress)

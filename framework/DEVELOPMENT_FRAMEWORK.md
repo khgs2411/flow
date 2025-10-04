@@ -1,5 +1,364 @@
 **Version**: 1.0.16
 
+---
+
+<!-- AI_SCAN:QUICK_REFERENCE:5-353 -->
+# Quick Reference for AI (Read This First!)
+
+> **Purpose**: This section provides essential Flow framework knowledge in ~300 lines (~15k tokens) instead of reading the entire 3897-line file (~200k tokens). Read this first, then use the Section Index to jump to specific sections only when needed.
+
+---
+
+<!-- AI_SCAN:CORE_HIERARCHY:12-28 -->
+## Core Hierarchy
+
+```
+PHASE → TASK → ITERATION → BRAINSTORM → IMPLEMENTATION → COMPLETE
+```
+
+**Structure**:
+- **PHASE**: High-level milestone (e.g., "Core Implementation", "Testing")
+- **TASK**: Feature/component to build (e.g., "Database Schema", "API Endpoints")
+- **ITERATION**: Incremental buildout (e.g., "V1: Basic validation", "V2: Advanced rules")
+- **BRAINSTORM**: Design before code (subjects → decisions → action items)
+- **IMPLEMENTATION**: Execute action items from brainstorming
+
+**Golden Rule**: Brainstorm → Pre-Tasks → Implementation (never skip brainstorming for complex work)
+
+---
+
+<!-- AI_SCAN:STATUS_MARKERS_QUICK:30-48 -->
+## Status Markers
+
+| Marker | Meaning | When to Use |
+|--------|---------|-------------|
+| ✅ | COMPLETE | Finished and verified (frozen, skip re-verification) |
+| ⏳ | PENDING | Not started yet |
+| 🚧 | IN PROGRESS | Currently working on this |
+| 🎨 | READY | Brainstorming done, ready to implement |
+| ❌ | CANCELLED | Decided against (must document WHY) |
+| 🔮 | DEFERRED | Moved to V2/V3/later (must document WHY + WHERE) |
+| 🎯 | ACTIVE | Current focus (optional, used in some contexts) |
+
+**Rules**:
+- Every Phase/Task/Iteration/Subject MUST have a status marker
+- ✅ COMPLETE items are verified & frozen (skip re-verification)
+- ❌ CANCELLED and 🔮 DEFERRED must document reason
+
+---
+
+<!-- AI_SCAN:TASK_STRUCTURE_QUICK:50-108 -->
+## Task Structure Rules
+
+**The Golden Rule**: Tasks must be **EITHER** Standalone **OR** have Iterations - **NEVER BOTH**
+
+### Pattern 1: Standalone Task (Direct Action Items)
+
+```markdown
+#### Task 5: Update Documentation ⏳
+
+**Action Items**:
+- [ ] Update README.md
+- [ ] Fix typos in guide
+- [ ] Add examples
+```
+
+**When to Use**:
+- Straightforward work (5-10 simple steps)
+- No design decisions needed
+- Can complete in one session
+- Single focus
+
+### Pattern 2: Task with Iterations (NO Direct Action Items)
+
+```markdown
+#### Task 7: Implement Payment Gateway 🚧
+
+**Purpose**: Integrate Stripe API for payment processing
+
+---
+
+##### Iteration 1: API Setup ⏳
+
+**Goal**: Configure Stripe SDK and credentials
+
+[Brainstorming → Implementation]
+
+---
+
+##### Iteration 2: Payment Processing 🚧
+
+**Goal**: Implement charge creation and webhooks
+
+[Currently implementing...]
+```
+
+**When to Use**:
+- Large/complex task
+- Needs design decisions (brainstorming required)
+- Multiple stages (V1 → V2 → V3)
+- Want incremental shipping
+
+**NEVER**:
+- ❌ Task with BOTH action items AND iterations (creates confusion about completion criteria)
+
+**Exception**:
+- ✅ Pre-implementation tasks (from brainstorming) are allowed
+- Pre-tasks completed BEFORE iterations start
+- Structure: Task → Iteration → Brainstorming → Pre-tasks → Implementation
+
+---
+
+<!-- AI_SCAN:SUBJECT_RESOLUTION:112-129 -->
+## Subject Resolution Types
+
+When brainstorming, every resolved subject falls into ONE of these types:
+
+| Type | Name | When | Action | Example |
+|------|------|------|--------|---------|
+| **A** | Pre-Implementation Task | Small code changes needed BEFORE iteration | Create pre-task (< 30 min work) | Fix interface, rename file, update enum |
+| **B** | Immediate Documentation | Architectural decision, no code yet | Update Architecture section NOW | Design pattern choice, API contract |
+| **C** | Auto-Resolved | Answered by another subject's decision | Mark as resolved by Subject N | Cascade decisions |
+| **D** | Iteration Action Items | Substantial feature work that IS the iteration | Action items become iteration implementation | Build API endpoint, implement validator |
+
+**Decision Flow**:
+1. Does subject require code changes?
+   - **NO** → Type B (Documentation) or Type C (Auto-resolved)
+   - **YES** → Continue to #2
+2. Is it small quick task (< 30 min)?
+   - **YES** → Type A (Pre-task)
+   - **NO** → Type D (Iteration work)
+
+---
+
+<!-- AI_SCAN:COMMON_PATTERNS:134-207 -->
+## Common Patterns Quick Reference
+
+### Brainstorming Pattern
+
+```markdown
+### **Brainstorming Session - [Topic]**
+
+**Subjects to Discuss**:
+1. ⏳ Subject 1
+2. ⏳ Subject 2
+
+**Resolved Subjects**:
+
+---
+
+### ✅ Subject 1: [Name]
+
+**Decision**: [Your decision]
+
+**Resolution Type**: A / B / C / D
+
+**Action Items** (if Type A or D):
+- [ ] Action item 1
+- [ ] Action item 2
+```
+
+**Workflow**:
+1. `/flow-brainstorm-start` - Create session
+2. `/flow-next-subject` - Resolve each subject (choose Type A/B/C/D)
+3. Complete pre-tasks (Type A) if any
+4. `/flow-brainstorm-complete` - Mark ready for implementation
+5. `/flow-implement-start` - Begin coding
+
+### Pre-Implementation Tasks Pattern
+
+```markdown
+### **Pre-Implementation Tasks:**
+
+#### ⏳ Task 1: [Name] (PENDING)
+
+**Objective**: [What this accomplishes]
+
+**Action Items**:
+- [ ] Item 1
+- [ ] Item 2
+
+**Files to Modify**:
+- path/to/file.ts (what to change)
+```
+
+**When to Use**:
+- Small preparatory work discovered during brainstorming
+- Must be completed BEFORE `/flow-brainstorm-complete`
+- Examples: Interface changes, file renames, bug fixes
+
+### Implementation Pattern
+
+```markdown
+### **Implementation - Iteration [N]: [Name]**
+
+**Status**: 🚧 IN PROGRESS
+
+**Action Items**:
+- [x] Completed item
+- [ ] Pending item
+
+**Implementation Notes**:
+[Document discoveries during work]
+
+**Files Modified**:
+- `path/to/file.ts` - Description of changes
+
+**Verification**: [How you verified it works]
+```
+
+---
+
+<!-- AI_SCAN:SECTION_INDEX:212-240 -->
+## Section Index (Use Read Tool with Offset/Limit)
+
+**How to Use**: Instead of reading the entire file, use `Read(file, offset=X, limit=Y)` to read only the section you need.
+
+| Section | Lines | What It Covers |
+|---------|-------|----------------|
+| **Philosophy & Principles** | 361-456 | Core metaphor, principles, scope boundary rule |
+| **Framework Structure** | 464-590 | Hierarchy, testing strategy section |
+| **Task Structure Rules** | 597-920 | Golden rule, standalone vs iterations, examples |
+| **Development Workflow** | 928-967 | Step-by-step workflow (decide → brainstorm → implement) |
+| **Complete Flow Workflow** | 977-1523 | 11-step workflow, decision trees, command reference |
+| **Brainstorming Session Pattern** | 1531-2156 | Structure, resolution types A/B/C/D, dynamic subjects |
+| **Implementation Pattern** | 2162-2195 | Guidelines, verification, file tracking |
+| **Version Management** | 2203-2230 | V1/V2/V3 approach, deferring complexity |
+| **Status Markers** | 2238-2327 | Marker reference, smart verification, lifecycle |
+| **Status Management** | 2328-2379 | Single source of truth, long-running projects |
+| **Progress Dashboard** | 2382-2729 | Template, when to use, update rules |
+| **Plan File Template** | 2731-2928 | Complete template structure |
+| **Archiving & Splitting** | 2929-3337 | Managing large PLAN.md files (2000+ lines) |
+| **Iteration Lifecycle** | 3338-3420 | State transitions, examples |
+| **Command Overview** | 3421-3590 | All 25 commands organized by category |
+| **Quick Reference Guide** | 3868-4247 | Decision trees, cheat sheets, common patterns |
+| **Bidirectional References** | 3534-3867 | Command-framework integration |
+
+**Pro Tip**: Most common sections you'll need:
+- Creating task → Read lines 597-920 (Task Structure Rules)
+- Starting brainstorm → Read lines 1531-1700 (Brainstorming Pattern)
+- Resolving subject → Read lines 1570-1660 (Resolution Types)
+- Updating status → Read lines 2238-2327 (Status Markers)
+- Lost/confused → Read lines 977-1300 (Complete Workflow)
+
+---
+
+## When to Read Full Sections
+
+Use this guide to know when to dive deep into specific sections:
+
+| Your Task | Read This Section | Lines | Why |
+|-----------|------------------|-------|-----|
+| **Creating new PLAN.md** | Plan File Template | 2731-2928 | Template structure, required sections |
+| **Adding phase** | Development Workflow | 928-967 | Phase naming, purpose, scope |
+| **Adding task** | Task Structure Rules | 597-920 | Standalone vs iterations decision |
+| **Adding iteration** | Development Workflow | 928-967 | Iteration goals, action items |
+| **Starting brainstorm** | Brainstorming Session Pattern | 1531-1680 | Subject creation, resolution types |
+| **Resolving subject** | Subject Resolution Types | 1570-1680 | Types A/B/C/D, when to use each |
+| **Completing iteration** | Implementation Pattern | 2162-2195 | Verification, completion criteria |
+| **Updating status** | Status Markers | 2238-2327 | Correct marker usage, lifecycle |
+| **Lost/confused** | Complete Workflow | 977-1300 | Decision trees, command reference |
+| **Managing large PLAN** | Archiving & Splitting | 2929-3337 | When/how to split files |
+| **Command behavior** | Command Overview | 3421-3590 | What each command does |
+
+---
+
+## AI Reading Strategy (IMPORTANT!)
+
+### ❌ **DON'T DO THIS**:
+- Reading entire 3897-line file (~200k tokens)
+- Reading framework when not needed
+- Reading same sections repeatedly
+
+### ✅ **DO THIS INSTEAD**:
+
+**Step 1**: Read Quick Reference (this section, lines 1-300, ~15k tokens)
+
+**Step 2**: Identify what you need from Section Index
+
+**Step 3**: Read ONLY that section using offset/limit:
+```
+Read(framework/DEVELOPMENT_FRAMEWORK.md, offset=238, limit=328)  # Task Structure Rules
+```
+
+**Step 4**: Skip framework entirely if not needed (e.g., `/flow-status` works from PLAN.md only)
+
+**Token Savings**: 75-90% reduction (15-50k tokens vs 200k)
+
+---
+
+## Framework Reading Requirements by Command
+
+**Category A - MUST READ Quick Reference** (~10 commands):
+- `/flow-blueprint` - Needs patterns to generate plan structure
+- `/flow-migrate` - Needs structure to convert existing docs
+- `/flow-verify-plan` - Needs rules to validate plan consistency
+- `/flow-brainstorm-start` - Needs subject resolution patterns
+- `/flow-next-subject` - Needs resolution type guidance (A/B/C/D)
+- `/flow-brainstorm-complete` - Needs completion criteria
+- `/flow-task-add` - Needs task structure rules
+- `/flow-iteration-add` - Needs iteration patterns
+
+**Category B - NO FRAMEWORK NEEDED** (~15 commands):
+- `/flow-status` - Dashboard-first approach, reads PLAN.md only ✅ PERFECT EXAMPLE
+- `/flow-summarize` - Reads PLAN.md structure only
+- `/flow-next` - Uses Dashboard + iteration markers
+- `/flow-implement-start` - Simple state transition
+- `/flow-implement-complete` - Simple state transition
+- `/flow-phase-start/complete` - Simple state transition
+- `/flow-task-start/complete` - Simple state transition
+- All simple PLAN.md state management commands
+
+---
+
+## Key Principles (Core Rules to Remember)
+
+1. **Plan File as Single Source of Truth** - Everything documented in `.flow/PLAN.md`
+2. **Brainstorm Before Code** - Design decisions upfront reduce refactoring
+3. **Progressive Disclosure** - Focus only on what's needed NOW, defer V2/V3
+4. **State Preservation** - Checkboxes and status markers track all progress
+5. **Minimal Refactoring** - Small iterations, complete before moving to next
+6. **Scope Boundary Rule** - NEVER fix out-of-scope issues without user permission
+
+---
+
+## Testing Strategy Section (CRITICAL)
+
+Every PLAN.md MUST have a Testing Strategy section that defines:
+- **Methodology**: How you test (simulation, unit tests, TDD, manual QA)
+- **Location**: Where test files live
+- **Naming Convention**: Exact pattern (e.g., `{service}.scripts.ts` NOT `test.{service}.ts`)
+- **When to create**: New file vs add to existing
+- **Tooling**: What tools/frameworks you use
+
+**Why**: AI must follow YOUR testing conventions exactly (prevents convention violations)
+
+---
+
+## Scope Boundary Rule (CRITICAL)
+
+🚨 **If you discover NEW issues during implementation that are NOT part of current work:**
+
+1. **STOP** immediately
+2. **NOTIFY** user of the new issue
+3. **DISCUSS** what to do:
+   - Add as new brainstorming subject?
+   - Create new pre-implementation task?
+   - Defer to next iteration?
+   - Handle immediately (only if user explicitly approves)?
+4. **ONLY** proceed with user's explicit approval
+
+**Exception**: Syntax errors or blocking issues in files you must modify (document what you fixed)
+
+**Why**: Prevents scope creep, maintains intentional progression, preserves user's ability to prioritize
+
+---
+
+**End of Quick Reference** - Full documentation continues below ⬇️
+
+---
+
+<!-- AI_SCAN:PHILOSOPHY_PRINCIPLES:361-456 -->
 # Domain-Driven Design with Agile Iterative Philosophy
 
 **A spec-driven iterative development framework for building complex features with minimal refactoring.**
@@ -102,6 +461,7 @@ When working within **any Flow scope** (Phase/Task/Iteration/Brainstorming/Pre-I
 
 ---
 
+<!-- AI_SCAN:FRAMEWORK_STRUCTURE:464-590 -->
 ## Framework Structure
 
 ### Hierarchy
@@ -235,6 +595,7 @@ scripts/
 
 ---
 
+<!-- AI_SCAN:TASK_STRUCTURE:597-920 -->
 ## Task Structure Rules
 
 ### The Golden Rule: Standalone OR Iterations, Never Both
@@ -564,6 +925,7 @@ Before creating a task, ask:
 
 ---
 
+<!-- AI_SCAN:DEVELOPMENT_WORKFLOW:928-967 -->
 ## Development Workflow
 
 ### Step 1: Decide What to Work On
@@ -611,6 +973,7 @@ Move to next iteration, applying lessons learned.
 
 ---
 
+<!-- AI_SCAN:COMPLETE_WORKFLOW:977-1523 -->
 ## Complete Flow Workflow
 
 This section documents the complete end-to-end Flow workflow from project initialization to completion, including all decision points and command usage.
@@ -1164,6 +1527,7 @@ Use `/flow-next` for smart context-aware suggestions, or refer to this table:
 
 ---
 
+<!-- AI_SCAN:BRAINSTORMING_PATTERN:1531-2156 -->
 ## Brainstorming Session Pattern
 
 ### Structure
@@ -1795,6 +2159,7 @@ AI: "Brainstorming complete! Iteration 5 is 🎨 READY FOR IMPLEMENTATION"
 
 ---
 
+<!-- AI_SCAN:IMPLEMENTATION_PATTERN:2162-2195 -->
 ## Implementation Pattern
 
 ### Structure
@@ -1834,6 +2199,7 @@ AI: "Brainstorming complete! Iteration 5 is 🎨 READY FOR IMPLEMENTATION"
 
 ---
 
+<!-- AI_SCAN:VERSION_MANAGEMENT:2203-2230 -->
 ## Version Management
 
 Features can be split into versions:
@@ -1869,6 +2235,7 @@ Features can be split into versions:
 
 ---
 
+<!-- AI_SCAN:STATUS_MARKERS:2238-2327 -->
 ## Status Markers
 
 **CRITICAL**: Status markers are **MANDATORY** at every level (Phase, Task, Iteration, Brainstorm, Subject). They are the ground truth for your project state.
@@ -2012,6 +2379,7 @@ Before starting a new AI session or after a long break:
 
 ---
 
+<!-- AI_SCAN:PROGRESS_DASHBOARD:2382-2729 -->
 ## Progress Dashboard (Required for Complex Projects)
 
 ### When to Use
@@ -2360,6 +2728,7 @@ Next Task: Task 5 - Implement Blue (Validator)
 
 ---
 
+<!-- AI_SCAN:PLAN_TEMPLATE:2731-2928 -->
 ## Plan File Template
 
 **Complete Example**: See `.flow/EXAMPLE_PLAN.md` for a full working example of a payment gateway integration project showing multiple completed iterations, brainstorming sessions, bug discoveries, and improvements.
@@ -3041,7 +3410,7 @@ This framework is designed to work with slash commands that automate plan file u
 
 **Prefix**: All commands use `flow-` prefix to prevent conflicts with other frameworks.
 
-**Total Commands**: 23 commands organized into 6 categories
+**Total Commands**: 25 commands organized into 6 categories
 
 **Design Principles**:
 - ✅ **Consistent Naming**: All separators use hyphens (no underscores)
@@ -3469,11 +3838,13 @@ Result: Both agents follow identical pattern (no inconsistency)
 
 ## Command Design Rationale
 
-**Why 23 commands instead of fewer?**
+**Why 25 commands instead of fewer?**
 - Explicit is better than implicit - users want clear control
 - Symmetric naming is predictable and discoverable
 - Each command has single responsibility (no overloading)
-- Removed redundant commands (v1.0.12: `/flow-brainstorm-resolve` → integrated into `/flow-next-subject`)
+- Command history:
+  - v1.0.12: Removed `/flow-brainstorm-resolve` → integrated into `/flow-next-subject`
+  - v1.0.16: Added `/flow-compact` and `/flow-plan-split` for large project management
 
 **Why hyphens instead of underscores?**
 - Standard in CLI tools (kubectl, docker, gh, npm)
@@ -3496,6 +3867,7 @@ See `.claude/commands/` for complete slash command implementations.
 
 ---
 
+<!-- AI_SCAN:QUICK_REFERENCE_GUIDE:3868-4247 -->
 ## Quick Reference Guide
 
 ### Decision Tree 4: What Subject Resolution Type Is This?
