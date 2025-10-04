@@ -487,45 +487,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contributor guide.
 
 ---
 
-## Who Should Use Flow?
-
-### ✅ Perfect For:
-- **AI-assisted development** - Claude Code, ChatGPT, Gemini users
-- **Complex features** - Multi-week projects with many edge cases
-- **Team projects** - Context sharing across developers
-- **Learning developers** - Forces good planning habits
-- **Consultants** - Handoff documentation built-in
-
-### ⚠️ Maybe Overkill For:
-- **Trivial features** - Simple CRUD, one-off scripts
-- **Prototypes** - Throwaway code experiments
-- **Well-established patterns** - Copy-paste implementations
-
-### ❌ Not Suitable For:
-- **Research projects** - Too structured for exploration
-- **Creative coding** - Art, games, experimental work
-
----
-
 ## What's New
 
-### v1.1.4 - Brainstorm Workflow Fix
-- Fixed AI suggesting `/flow-brainstorm-complete` instead of `/flow-brainstorm-review`
-- Added CRITICAL guidance to Quick Reference for proper workflow
-
-### v1.1.3 - Version Increment Flags
-- `./release.sh --patch/--minor/--major` for automatic version bumping
-- Improved release automation
-
-### v1.1.2 - Jump Link Format Fix
-- Standardized Progress Dashboard jump links
-- Enhanced `/flow-plan-update` command
-
-### v1.1.1 - Backlog Management
-- `/flow-backlog-add`, `/flow-backlog-view`, `/flow-backlog-pull`
-- Token efficiency for large projects
-
-See [GitHub Releases](https://github.com/khgs2411/flow/releases) for full changelog.
+**Latest**: v1.1.4 - See [GitHub Releases](https://github.com/khgs2411/flow/releases) for full changelog.
 
 ---
 
