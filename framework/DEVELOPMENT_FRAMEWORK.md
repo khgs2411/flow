@@ -157,9 +157,12 @@ When brainstorming, every resolved subject falls into ONE of these types:
 **Workflow**:
 1. `/flow-brainstorm-start` - Create session
 2. `/flow-next-subject` - Resolve each subject (choose Type A/B/C/D)
-3. `/flow-brainstorm-review` - Review the subject resolutions - AI suggests followup work
-4. `/flow-brainstorm-complete` - Mark ready for implementation
-5. `/flow-implement-start` - Begin coding
+3. **When all subjects resolved** → Suggest `/flow-brainstorm-review` (NOT `/flow-brainstorm-complete`!)
+4. `/flow-brainstorm-review` - AI suggests iterations/pre-tasks based on decisions
+5. Complete any pre-tasks → Then `/flow-brainstorm-complete`
+6. `/flow-implement-start` - Begin coding
+
+**CRITICAL**: After resolving last subject, ALWAYS suggest `/flow-brainstorm-review` first. This command creates iterations and identifies pre-implementation work. Only after review is complete should you suggest `/flow-brainstorm-complete`.
 
 ### Pre-Implementation Tasks Pattern
 

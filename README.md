@@ -40,26 +40,39 @@
 
 ## 🚀 Quick Start (30 seconds)
 
-**Just cloned this repo? Two ways to use it:**
+**Three ways to get Flow:**
 
-### Option A: Run from Flow Repo (Recommended)
+### Option A: Direct Download (No Git Required) ⭐
 
 ```bash
-# 1. Make flow.sh executable (one-time setup)
-chmod +x flow.sh
-
-# 2. Run it from YOUR project directory
+# Download flow.sh directly to your project
 cd /path/to/your/project
-~/path/to/flow-repo/flow.sh
+curl -O https://raw.githubusercontent.com/khgs2411/flow/master/flow.sh
+chmod +x flow.sh
+./flow.sh
+
+# That's it! Framework is now installed.
+# (You can delete flow.sh after installation if you want)
+```
+
+### Option B: Run from Flow Repo
+
+```bash
+# 1. Clone once (one-time setup)
+git clone https://github.com/khgs2411/flow.git ~/flow-framework
+
+# 2. Run from ANY project directory
+cd /path/to/your/project
+~/flow-framework/flow.sh
 
 # That's it! Framework is now installed.
 ```
 
-### Option B: Copy to Your Project
+### Option C: Copy to Your Project
 
 ```bash
 # 1. Copy flow.sh to your project
-cp flow.sh /path/to/your/project/
+cp ~/flow-framework/flow.sh /path/to/your/project/
 
 # 2. Run it there
 cd /path/to/your/project
