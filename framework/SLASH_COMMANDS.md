@@ -1105,7 +1105,13 @@ If you discover NEW issues during implementation that are NOT part of the curren
 
 1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
-2. **Find current iteration**: Look for iteration marked 🎨 READY FOR IMPLEMENTATION
+2. **Find current iteration**:
+   - **First**, look for iteration marked 🎨 READY FOR IMPLEMENTATION
+   - **If not found**, check if previous iteration is ✅ COMPLETE and next iteration is ⏳ PENDING
+     - If YES: Ask user "Previous iteration complete. Do you want to brainstorm this iteration first (recommended) or skip directly to implementation?"
+       - **User chooses brainstorm**: Respond "Please run `/flow-brainstorm-start` first to design this iteration"
+       - **User chooses skip**: Proceed with step 3 (treat ⏳ PENDING as ready to implement)
+     - If NO: Error "No iteration ready for implementation. Run `/flow-brainstorm-complete` first or check iteration status."
 
 3. **Read Testing Strategy section** (CRITICAL):
    - Locate "## Testing Strategy" section in PLAN.md
@@ -1113,12 +1119,12 @@ If you discover NEW issues during implementation that are NOT part of the curren
    - Note file locations, naming conventions, and when verification happens
    - **IMPORTANT**: Follow Testing Strategy exactly - do NOT create test files that violate conventions
 
-4. **Verify readiness**:
+4. **Verify readiness** (if iteration was 🎨 READY):
    - Brainstorming should be marked ✅ COMPLETE
    - All pre-implementation tasks should be ✅ COMPLETE
-   - If not ready: Warn user and ask to complete brainstorming first
+   - If not ready: Warn user and ask to complete brainstorming/pre-tasks first
 
-5. **Update iteration status**: Change from 🎨 to 🚧 IN PROGRESS
+5. **Update iteration status**: Change from 🎨 (or ⏳ if skipping brainstorm) to 🚧 IN PROGRESS
 
 6. **Create implementation section**:
    ```markdown
@@ -1126,9 +1132,10 @@ If you discover NEW issues during implementation that are NOT part of the curren
 
    **Status**: 🚧 IN PROGRESS
 
-   **Action Items** (from brainstorming):
+   **Action Items**:
 
-   [Copy all unchecked action items from resolved subjects]
+   [If brainstorming was done: Copy all unchecked action items from resolved subjects]
+   [If brainstorming was skipped: Copy action items from iteration definition OR create from iteration goal]
 
    **Implementation Notes**:
 
@@ -1143,7 +1150,9 @@ If you discover NEW issues during implementation that are NOT part of the curren
    ---
    ```
 
-6. **Confirm to user**: "Implementation started! Let's begin with the first action item."
+7. **Confirm to user**:
+   - If brainstorming was done: "Implementation started! Let's begin with the first action item."
+   - If brainstorming was skipped: "Implementation started (brainstorming skipped). Let's begin with the first action item."
 
 **Output**: Update .flow/PLAN.md with implementation section and status change.
 ```

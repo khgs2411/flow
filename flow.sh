@@ -1204,7 +1204,13 @@ If you discover NEW issues during implementation that are NOT part of the curren
 
 1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
 
-2. **Find current iteration**: Look for iteration marked 🎨 READY FOR IMPLEMENTATION
+2. **Find current iteration**:
+   - **First**, look for iteration marked 🎨 READY FOR IMPLEMENTATION
+   - **If not found**, check if previous iteration is ✅ COMPLETE and next iteration is ⏳ PENDING
+     - If YES: Ask user "Previous iteration complete. Do you want to brainstorm this iteration first (recommended) or skip directly to implementation?"
+       - **User chooses brainstorm**: Respond "Please run `/flow-brainstorm-start` first to design this iteration"
+       - **User chooses skip**: Proceed with step 3 (treat ⏳ PENDING as ready to implement)
+     - If NO: Error "No iteration ready for implementation. Run `/flow-brainstorm-complete` first or check iteration status."
 
 3. **Read Testing Strategy section** (CRITICAL):
    - Locate "## Testing Strategy" section in PLAN.md
@@ -1212,12 +1218,12 @@ If you discover NEW issues during implementation that are NOT part of the curren
    - Note file locations, naming conventions, and when verification happens
    - **IMPORTANT**: Follow Testing Strategy exactly - do NOT create test files that violate conventions
 
-4. **Verify readiness**:
+4. **Verify readiness** (if iteration was 🎨 READY):
    - Brainstorming should be marked ✅ COMPLETE
    - All pre-implementation tasks should be ✅ COMPLETE
-   - If not ready: Warn user and ask to complete brainstorming first
+   - If not ready: Warn user and ask to complete brainstorming/pre-tasks first
 
-5. **Update iteration status**: Change from 🎨 to 🚧 IN PROGRESS
+5. **Update iteration status**: Change from 🎨 (or ⏳ if skipping brainstorm) to 🚧 IN PROGRESS
 
 6. **Create implementation section**:
    ```markdown
@@ -1225,9 +1231,10 @@ If you discover NEW issues during implementation that are NOT part of the curren
 
    **Status**: 🚧 IN PROGRESS
 
-   **Action Items** (from brainstorming):
+   **Action Items**:
 
-   [Copy all unchecked action items from resolved subjects]
+   [If brainstorming was done: Copy all unchecked action items from resolved subjects]
+   [If brainstorming was skipped: Copy action items from iteration definition OR create from iteration goal]
 
    **Implementation Notes**:
 
@@ -1242,7 +1249,9 @@ If you discover NEW issues during implementation that are NOT part of the curren
    ---
    ```
 
-6. **Confirm to user**: "Implementation started! Let's begin with the first action item."
+7. **Confirm to user**:
+   - If brainstorming was done: "Implementation started! Let's begin with the first action item."
+   - If brainstorming was skipped: "Implementation started (brainstorming skipped). Let's begin with the first action item."
 
 **Output**: Update .flow/PLAN.md with implementation section and status change.
 ```
@@ -2341,6 +2350,357 @@ COMMANDS_DATA_EOF
 get_framework_content() {
   cat <<'FRAMEWORK_DATA_EOF'
 **Version**: 1.0.16
+
+---
+
+# Quick Reference for AI (Read This First!)
+
+> **Purpose**: This section provides essential Flow framework knowledge in ~300 lines (~15k tokens) instead of reading the entire 3897-line file (~200k tokens). Read this first, then use the Section Index to jump to specific sections only when needed.
+
+---
+
+## Core Hierarchy
+
+```
+PHASE → TASK → ITERATION → BRAINSTORM → IMPLEMENTATION → COMPLETE
+```
+
+**Structure**:
+- **PHASE**: High-level milestone (e.g., "Core Implementation", "Testing")
+- **TASK**: Feature/component to build (e.g., "Database Schema", "API Endpoints")
+- **ITERATION**: Incremental buildout (e.g., "V1: Basic validation", "V2: Advanced rules")
+- **BRAINSTORM**: Design before code (subjects → decisions → action items)
+- **IMPLEMENTATION**: Execute action items from brainstorming
+
+**Golden Rule**: Brainstorm → Pre-Tasks → Implementation (never skip brainstorming for complex work)
+
+---
+
+## Status Markers
+
+| Marker | Meaning | When to Use |
+|--------|---------|-------------|
+| ✅ | COMPLETE | Finished and verified (frozen, skip re-verification) |
+| ⏳ | PENDING | Not started yet |
+| 🚧 | IN PROGRESS | Currently working on this |
+| 🎨 | READY | Brainstorming done, ready to implement |
+| ❌ | CANCELLED | Decided against (must document WHY) |
+| 🔮 | DEFERRED | Moved to V2/V3/later (must document WHY + WHERE) |
+| 🎯 | ACTIVE | Current focus (optional, used in some contexts) |
+
+**Rules**:
+- Every Phase/Task/Iteration/Subject MUST have a status marker
+- ✅ COMPLETE items are verified & frozen (skip re-verification)
+- ❌ CANCELLED and 🔮 DEFERRED must document reason
+
+---
+
+## Task Structure Rules
+
+**The Golden Rule**: Tasks must be **EITHER** Standalone **OR** have Iterations - **NEVER BOTH**
+
+### Pattern 1: Standalone Task (Direct Action Items)
+
+```markdown
+#### Task 5: Update Documentation ⏳
+
+**Action Items**:
+- [ ] Update README.md
+- [ ] Fix typos in guide
+- [ ] Add examples
+```
+
+**When to Use**:
+- Straightforward work (5-10 simple steps)
+- No design decisions needed
+- Can complete in one session
+- Single focus
+
+### Pattern 2: Task with Iterations (NO Direct Action Items)
+
+```markdown
+#### Task 7: Implement Payment Gateway 🚧
+
+**Purpose**: Integrate Stripe API for payment processing
+
+---
+
+##### Iteration 1: API Setup ⏳
+
+**Goal**: Configure Stripe SDK and credentials
+
+[Brainstorming → Implementation]
+
+---
+
+##### Iteration 2: Payment Processing 🚧
+
+**Goal**: Implement charge creation and webhooks
+
+[Currently implementing...]
+```
+
+**When to Use**:
+- Large/complex task
+- Needs design decisions (brainstorming required)
+- Multiple stages (V1 → V2 → V3)
+- Want incremental shipping
+
+**NEVER**:
+- ❌ Task with BOTH action items AND iterations (creates confusion about completion criteria)
+
+**Exception**:
+- ✅ Pre-implementation tasks (from brainstorming) are allowed
+- Pre-tasks completed BEFORE iterations start
+- Structure: Task → Iteration → Brainstorming → Pre-tasks → Implementation
+
+---
+
+## Subject Resolution Types
+
+When brainstorming, every resolved subject falls into ONE of these types:
+
+| Type | Name | When | Action | Example |
+|------|------|------|--------|---------|
+| **A** | Pre-Implementation Task | Small code changes needed BEFORE iteration | Create pre-task (< 30 min work) | Fix interface, rename file, update enum |
+| **B** | Immediate Documentation | Architectural decision, no code yet | Update Architecture section NOW | Design pattern choice, API contract |
+| **C** | Auto-Resolved | Answered by another subject's decision | Mark as resolved by Subject N | Cascade decisions |
+| **D** | Iteration Action Items | Substantial feature work that IS the iteration | Action items become iteration implementation | Build API endpoint, implement validator |
+
+**Decision Flow**:
+1. Does subject require code changes?
+   - **NO** → Type B (Documentation) or Type C (Auto-resolved)
+   - **YES** → Continue to #2
+2. Is it small quick task (< 30 min)?
+   - **YES** → Type A (Pre-task)
+   - **NO** → Type D (Iteration work)
+
+---
+
+## Common Patterns Quick Reference
+
+### Brainstorming Pattern
+
+```markdown
+### **Brainstorming Session - [Topic]**
+
+**Subjects to Discuss**:
+1. ⏳ Subject 1
+2. ⏳ Subject 2
+
+**Resolved Subjects**:
+
+---
+
+### ✅ Subject 1: [Name]
+
+**Decision**: [Your decision]
+
+**Resolution Type**: A / B / C / D
+
+**Action Items** (if Type A or D):
+- [ ] Action item 1
+- [ ] Action item 2
+```
+
+**Workflow**:
+1. `/flow-brainstorm-start` - Create session
+2. `/flow-next-subject` - Resolve each subject (choose Type A/B/C/D)
+3. Complete pre-tasks (Type A) if any
+4. `/flow-brainstorm-complete` - Mark ready for implementation
+5. `/flow-implement-start` - Begin coding
+
+### Pre-Implementation Tasks Pattern
+
+```markdown
+### **Pre-Implementation Tasks:**
+
+#### ⏳ Task 1: [Name] (PENDING)
+
+**Objective**: [What this accomplishes]
+
+**Action Items**:
+- [ ] Item 1
+- [ ] Item 2
+
+**Files to Modify**:
+- path/to/file.ts (what to change)
+```
+
+**When to Use**:
+- Small preparatory work discovered during brainstorming
+- Must be completed BEFORE `/flow-brainstorm-complete`
+- Examples: Interface changes, file renames, bug fixes
+
+### Implementation Pattern
+
+```markdown
+### **Implementation - Iteration [N]: [Name]**
+
+**Status**: 🚧 IN PROGRESS
+
+**Action Items**:
+- [x] Completed item
+- [ ] Pending item
+
+**Implementation Notes**:
+[Document discoveries during work]
+
+**Files Modified**:
+- `path/to/file.ts` - Description of changes
+
+**Verification**: [How you verified it works]
+```
+
+---
+
+## Section Index (Use Read Tool with Offset/Limit)
+
+**How to Use**: Instead of reading the entire file, use `Read(file, offset=X, limit=Y)` to read only the section you need.
+
+| Section | Lines | What It Covers |
+|---------|-------|----------------|
+| **Philosophy & Principles** | 9-103 | Core metaphor, principles, scope boundary rule |
+| **Framework Structure** | 105-237 | Hierarchy, testing strategy section |
+| **Task Structure Rules** | 238-566 | Golden rule, standalone vs iterations, examples |
+| **Development Workflow** | 567-613 | Step-by-step workflow (decide → brainstorm → implement) |
+| **Complete Flow Workflow** | 614-1166 | 11-step workflow, decision trees, command reference |
+| **Brainstorming Session Pattern** | 1167-1797 | Structure, resolution types A/B/C/D, dynamic subjects |
+| **Implementation Pattern** | 1798-1836 | Guidelines, verification, file tracking |
+| **Version Management** | 1837-1871 | V1/V2/V3 approach, deferring complexity |
+| **Status Markers** | 1872-1968 | Marker reference, smart verification, lifecycle |
+| **Status Management** | 1969-2014 | Single source of truth, long-running projects |
+| **Progress Dashboard** | 2015-2314 | Template, when to use, update rules |
+| **Plan File Template** | 2363-2560 | Complete template structure |
+| **Archiving & Splitting** | 2561-2969 | Managing large PLAN.md files (2000+ lines) |
+| **Iteration Lifecycle** | 2970-3052 | State transitions, examples |
+| **Command Overview** | 3053-3222 | All 25 commands organized by category |
+| **Quick Reference Guide** | 3223-3602 | Decision trees, cheat sheets, common patterns |
+| **Bidirectional References** | 3603-3897 | Command-framework integration |
+
+**Pro Tip**: Most common sections you'll need:
+- Creating task → Read lines 238-566 (Task Structure Rules)
+- Starting brainstorm → Read lines 1167-1314 (Brainstorming Pattern)
+- Resolving subject → Read lines 1215-1313 (Resolution Types)
+- Updating status → Read lines 1872-1968 (Status Markers)
+- Lost/confused → Read lines 614-940 (Complete Workflow)
+
+---
+
+## When to Read Full Sections
+
+Use this guide to know when to dive deep into specific sections:
+
+| Your Task | Read This Section | Lines | Why |
+|-----------|------------------|-------|-----|
+| **Creating new PLAN.md** | Plan File Template | 2363-2560 | Template structure, required sections |
+| **Adding phase** | Development Workflow | 567-613 | Phase naming, purpose, scope |
+| **Adding task** | Task Structure Rules | 238-566 | Standalone vs iterations decision |
+| **Adding iteration** | Development Workflow | 567-613 | Iteration goals, action items |
+| **Starting brainstorm** | Brainstorming Session Pattern | 1167-1314 | Subject creation, resolution types |
+| **Resolving subject** | Subject Resolution Types | 1215-1313 | Types A/B/C/D, when to use each |
+| **Completing iteration** | Implementation Pattern | 1798-1836 | Verification, completion criteria |
+| **Updating status** | Status Markers | 1872-1968 | Correct marker usage, lifecycle |
+| **Lost/confused** | Complete Flow Workflow | 614-940 | Decision trees, command reference |
+| **Managing large PLAN** | Archiving & Splitting | 2561-2969 | When/how to split files |
+| **Command behavior** | Command Overview | 3053-3222 | What each command does |
+
+---
+
+## AI Reading Strategy (IMPORTANT!)
+
+### ❌ **DON'T DO THIS**:
+- Reading entire 3897-line file (~200k tokens)
+- Reading framework when not needed
+- Reading same sections repeatedly
+
+### ✅ **DO THIS INSTEAD**:
+
+**Step 1**: Read Quick Reference (this section, lines 1-300, ~15k tokens)
+
+**Step 2**: Identify what you need from Section Index
+
+**Step 3**: Read ONLY that section using offset/limit:
+```
+Read(framework/DEVELOPMENT_FRAMEWORK.md, offset=238, limit=328)  # Task Structure Rules
+```
+
+**Step 4**: Skip framework entirely if not needed (e.g., `/flow-status` works from PLAN.md only)
+
+**Token Savings**: 75-90% reduction (15-50k tokens vs 200k)
+
+---
+
+## Framework Reading Requirements by Command
+
+**Category A - MUST READ Quick Reference** (~10 commands):
+- `/flow-blueprint` - Needs patterns to generate plan structure
+- `/flow-migrate` - Needs structure to convert existing docs
+- `/flow-verify-plan` - Needs rules to validate plan consistency
+- `/flow-brainstorm-start` - Needs subject resolution patterns
+- `/flow-next-subject` - Needs resolution type guidance (A/B/C/D)
+- `/flow-brainstorm-complete` - Needs completion criteria
+- `/flow-task-add` - Needs task structure rules
+- `/flow-iteration-add` - Needs iteration patterns
+
+**Category B - NO FRAMEWORK NEEDED** (~15 commands):
+- `/flow-status` - Dashboard-first approach, reads PLAN.md only ✅ PERFECT EXAMPLE
+- `/flow-summarize` - Reads PLAN.md structure only
+- `/flow-next` - Uses Dashboard + iteration markers
+- `/flow-implement-start` - Simple state transition
+- `/flow-implement-complete` - Simple state transition
+- `/flow-phase-start/complete` - Simple state transition
+- `/flow-task-start/complete` - Simple state transition
+- All simple PLAN.md state management commands
+
+---
+
+## Key Principles (Core Rules to Remember)
+
+1. **Plan File as Single Source of Truth** - Everything documented in `.flow/PLAN.md`
+2. **Brainstorm Before Code** - Design decisions upfront reduce refactoring
+3. **Progressive Disclosure** - Focus only on what's needed NOW, defer V2/V3
+4. **State Preservation** - Checkboxes and status markers track all progress
+5. **Minimal Refactoring** - Small iterations, complete before moving to next
+6. **Scope Boundary Rule** - NEVER fix out-of-scope issues without user permission
+
+---
+
+## Testing Strategy Section (CRITICAL)
+
+Every PLAN.md MUST have a Testing Strategy section that defines:
+- **Methodology**: How you test (simulation, unit tests, TDD, manual QA)
+- **Location**: Where test files live
+- **Naming Convention**: Exact pattern (e.g., `{service}.scripts.ts` NOT `test.{service}.ts`)
+- **When to create**: New file vs add to existing
+- **Tooling**: What tools/frameworks you use
+
+**Why**: AI must follow YOUR testing conventions exactly (prevents convention violations)
+
+---
+
+## Scope Boundary Rule (CRITICAL)
+
+🚨 **If you discover NEW issues during implementation that are NOT part of current work:**
+
+1. **STOP** immediately
+2. **NOTIFY** user of the new issue
+3. **DISCUSS** what to do:
+   - Add as new brainstorming subject?
+   - Create new pre-implementation task?
+   - Defer to next iteration?
+   - Handle immediately (only if user explicitly approves)?
+4. **ONLY** proceed with user's explicit approval
+
+**Exception**: Syntax errors or blocking issues in files you must modify (document what you fixed)
+
+**Why**: Prevents scope creep, maintains intentional progression, preserves user's ability to prioritize
+
+---
+
+**End of Quick Reference** - Full documentation continues below ⬇️
+
+---
 
 # Domain-Driven Design with Agile Iterative Philosophy
 
