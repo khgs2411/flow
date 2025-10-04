@@ -2621,6 +2621,355 @@ You are executing the `/flow-plan-split` command from the Flow framework.
 
 ---
 
+## /flow-backlog-add
+
+**File**: `flow-backlog-add.md`
+
+```markdown
+---
+description: Move task(s) to backlog to reduce active plan clutter
+---
+
+You are executing the `/flow-backlog-add` command from the Flow framework.
+
+**Purpose**: Move pending tasks from PLAN.md to BACKLOG.md to reduce active plan size while preserving all task context (iterations, brainstorming, everything).
+
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+
+- Moves full task content to backlog (token efficiency feature)
+- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 3407-3682 for backlog management patterns
+
+**Context**:
+
+- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
+- **Working File**: .flow/PLAN.md (current project)
+- **Backlog File**: .flow/BACKLOG.md (created/updated)
+
+**Key Insight**: Backlog is for **token efficiency**, not prioritization. Tasks aren't "low priority" - they're just "not now" (weeks/months away).
+
+**Signature**: `/flow-backlog-add <task-number>` or `/flow-backlog-add <start>-<end>`
+
+**Examples**:
+- `/flow-backlog-add 14` - Move Task 14 to backlog
+- `/flow-backlog-add 14-22` - Move Tasks 14 through 22 to backlog
+
+**Instructions**:
+
+1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+
+2. **Parse arguments**:
+   - Single task: `$ARGUMENTS` = task number (e.g., "14")
+   - Range: `$ARGUMENTS` = start-end (e.g., "14-22")
+   - Extract task number(s) to move
+
+3. **Validate tasks**:
+   - Verify each task exists in PLAN.md
+   - Check task status - warn if moving tasks that are 🚧 IN PROGRESS or ✅ COMPLETE
+   - Recommended: Only move ⏳ PENDING tasks
+   - If user confirms moving non-pending tasks, proceed
+
+4. **Extract full task content from PLAN.md**:
+   - For each task number, extract COMPLETE task section:
+     - Task header: `#### Task [N]: [Name] [Status]`
+     - All task metadata (Status, Purpose, etc.)
+     - ALL iterations (full content with brainstorming, implementation, verification)
+     - ALL nested content (pre-tasks, bugs discovered, etc.)
+   - Use awk range extraction:
+     ```bash
+     awk '/^#### Task 14:/,/^####[^#]|^###[^#]/ {print}' PLAN.md
+     ```
+
+5. **Create or update .flow/BACKLOG.md**:
+
+   **If BACKLOG.md does NOT exist** (first time):
+
+   ```markdown
+   # Project Backlog
+
+   This file contains tasks moved from PLAN.md to reduce active plan size while preserving all context.
+
+   **Backlog Info**:
+   - Tasks retain original numbers for easy reference
+   - Full content preserved (brainstorming, iterations, everything)
+   - Pull tasks back to active plan when ready to work on them
+
+   **Last Updated**: [Current date]
+   **Tasks in Backlog**: [Count]
+
+   ---
+
+   ## 📋 Backlog Dashboard
+
+   **Tasks Waiting**:
+   - **Task [N]**: [Name]
+   - **Task [N]**: [Name]
+
+   ---
+
+   ### Phase [N]: [Phase Name from PLAN.md]
+
+   [Extracted task content here - preserve original task numbers]
+   ```
+
+   **If BACKLOG.md ALREADY exists**:
+   - Read existing BACKLOG.md
+   - Update "Last Updated" timestamp
+   - Update "Tasks in Backlog" count
+   - Add tasks to Backlog Dashboard list
+   - Append task content to appropriate phase section
+   - Maintain phase hierarchy (don't duplicate phase headers if they exist)
+
+6. **Update PLAN.md**:
+
+   **A. Remove task content**:
+   - Delete full task sections for backlogged tasks
+   - Leave gap in task numbering (don't renumber)
+   - Add comment marking removal:
+     ```markdown
+     [Task 14 moved to backlog - see .flow/BACKLOG.md]
+     [Task 15 moved to backlog - see .flow/BACKLOG.md]
+     ```
+
+   **B. Do NOT update Progress Dashboard**:
+   - Backlog tasks are invisible to dashboard (no 📦 marker)
+   - Keep task numbers in dashboard but mark as moved:
+     ```markdown
+     - ⏳ Task 14: Potency system (moved to backlog)
+     ```
+   - Or simply remove from dashboard (user preference)
+
+7. **Reset task status to ⏳ PENDING** (in BACKLOG.md):
+   - All backlogged tasks reset to ⏳ PENDING
+   - Fresh start when pulled back
+
+8. **Verify and confirm**:
+   - Count lines before/after PLAN.md (use `wc -l`)
+   - Calculate reduction
+   - Confirm to user:
+
+     ```
+     ✅ Moved to backlog!
+
+     **Backlogged**: [N] task(s) to .flow/BACKLOG.md
+     **PLAN.md size**: Reduced from Y lines to Z lines (-W lines, -P%)
+     **Tasks moved**: Task [list of numbers]
+
+     Use `/flow-backlog-view` to see backlog contents.
+     Use `/flow-backlog-pull <task-number>` to bring a task back when ready.
+     ```
+
+**Edge Cases**:
+- **Task doesn't exist**: "Task [N] not found in PLAN.md"
+- **Invalid range**: "Invalid range format. Use: /flow-backlog-add 14-22"
+- **Empty range**: "No tasks found in range 14-22"
+- **Already in backlog**: Check BACKLOG.md first, warn if task already there
+
+**Output**: Update .flow/PLAN.md (reduced), create/update .flow/BACKLOG.md (tasks preserved).
+
+```
+
+---
+
+## /flow-backlog-view
+
+**File**: `flow-backlog-view.md`
+
+```markdown
+---
+description: Show backlog contents (tasks waiting)
+---
+
+You are executing the `/flow-backlog-view` command from the Flow framework.
+
+**Purpose**: Display backlog dashboard showing all tasks currently in backlog.
+
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from BACKLOG.md**
+
+- Simple read operation (shows backlog dashboard)
+- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 3407-3682 for backlog context
+
+**Context**:
+
+- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
+- **Backlog File**: .flow/BACKLOG.md (read-only for this command)
+
+**Instructions**:
+
+1. **Check if .flow/BACKLOG.md exists**:
+   - If NOT found: "📦 Backlog is empty. Use `/flow-backlog-add <task>` to move tasks from active plan."
+   - If found: Proceed to step 2
+
+2. **Read Backlog Dashboard section**:
+   - Use Grep to extract dashboard:
+     ```bash
+     grep -A 20 "^## 📋 Backlog Dashboard" BACKLOG.md
+     ```
+   - Extract task list from "Tasks Waiting" section
+
+3. **Parse backlog metadata**:
+   - Extract "Last Updated" timestamp
+   - Extract "Tasks in Backlog" count
+   - Parse task list (task numbers and names)
+
+4. **Display backlog contents**:
+
+   ```
+   📦 Backlog Contents ([N] tasks):
+
+   **Last Updated**: [Date]
+
+   **Tasks Waiting**:
+   - **Task 14**: Potency system
+   - **Task 15**: Points & Luck systems
+   - **Task 16**: Database persistence
+   - **Task 17**: Damage variance
+   - **Task 18**: Game integration
+   - **Task 19**: Attribute Guarantee - HIGH
+   - **Task 20**: Context Modifiers - CRITICAL
+   - **Task 21**: Affix Synergy - MEDIUM
+   - **Task 22**: Retry Handler - HIGH
+
+   ---
+
+   **Next Steps**:
+   - Use `/flow-backlog-pull <task-number>` to move a task back to active plan
+   - Example: `/flow-backlog-pull 14` brings Task 14 back as next task in active phase
+   ```
+
+5. **Optional: Show task details** (if user wants more info):
+   - Can read full task content from BACKLOG.md on request
+   - Default view is just dashboard (lightweight)
+
+**Output**: Display backlog dashboard with task list and guidance.
+
+```
+
+---
+
+## /flow-backlog-pull
+
+**File**: `flow-backlog-pull.md`
+
+```markdown
+---
+description: Pull task from backlog back into active plan
+---
+
+You are executing the `/flow-backlog-pull` command from the Flow framework.
+
+**Purpose**: Move a task from BACKLOG.md back to PLAN.md with sequential renumbering in active phase.
+
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md and BACKLOG.md**
+
+- Moves task content back to active plan
+- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 3407-3682 for backlog patterns
+
+**Context**:
+
+- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
+- **Working File**: .flow/PLAN.md (current project)
+- **Backlog File**: .flow/BACKLOG.md (read and remove from)
+
+**Signature**: `/flow-backlog-pull <task-number> [instruction-text]`
+
+**Examples**:
+- `/flow-backlog-pull 14` - Pull Task 14, insert at end of active phase with next available number
+- `/flow-backlog-pull 14 insert after task 13` - Pull Task 14, position after Task 13 (but still renumber sequentially)
+- `/flow-backlog-pull 14 add to phase 5` - Pull Task 14, add to Phase 5 instead of active phase
+
+**Instructions**:
+
+1. **Check if .flow/BACKLOG.md exists**:
+   - If NOT found: "📦 Backlog is empty. Nothing to pull."
+   - If found: Proceed
+
+2. **Parse arguments**:
+   - Required: Task number to pull (e.g., "14")
+   - Optional: Instruction text for positioning (e.g., "insert after task 13")
+   - Extract task number and instruction (if provided)
+
+3. **Validate task exists in backlog**:
+   - Search BACKLOG.md for `#### Task [N]:`
+   - If NOT found: "Task [N] not found in backlog. Use `/flow-backlog-view` to see what's available."
+   - If found: Proceed
+
+4. **Extract full task content from BACKLOG.md**:
+   - Use awk to extract complete task section:
+     ```bash
+     awk '/^#### Task 14:/,/^####[^#]|^###[^#]/ {print}' BACKLOG.md
+     ```
+   - Preserve ALL content (iterations, brainstorming, metadata, etc.)
+
+5. **Determine insertion position in PLAN.md**:
+
+   **A. Find active phase**:
+   - Read Progress Dashboard to identify current phase
+   - If instruction specifies different phase, use that instead
+
+   **B. Calculate new task number**:
+   - Find highest task number in target phase
+   - New task number = highest + 1
+   - Example: Phase 4 has Tasks 11, 12, 13 → New task becomes Task 14
+
+   **C. Determine insertion point** (where in file):
+   - **Default** (no instruction): Insert after last task in target phase
+   - **With instruction**: Parse instruction for positioning
+     - "insert after task 13" → Find Task 13, insert after it
+     - "insert before task 12" → Find Task 12, insert before it
+     - "add to phase 5" → Find Phase 5, insert at end
+   - **Position ≠ Number**: Task positioned after 13 but numbered as 14 (sequential)
+
+6. **Renumber task header**:
+   - Change `#### Task 14:` (old backlog number) to `#### Task [new-number]:`
+   - Example: Backlog Task 14 becomes PLAN.md Task 14 (if next available)
+   - Update task metadata with new number
+
+7. **Insert task into PLAN.md**:
+   - Insert full task content at determined position
+   - Maintain proper markdown hierarchy
+   - Preserve all nested content
+
+8. **Remove task from BACKLOG.md**:
+   - Delete complete task section from BACKLOG.md
+   - Update Backlog Dashboard:
+     - Remove task from "Tasks Waiting" list
+     - Decrement "Tasks in Backlog" count
+     - Update "Last Updated" timestamp
+   - **No trace left** - as if task was never in backlog
+
+9. **Update PLAN.md Progress Dashboard** (if it exists):
+   - Add pulled task to dashboard
+   - Update task count for target phase
+   - Mark as ⏳ PENDING (fresh start)
+
+10. **Verify and confirm**:
+    - Confirm to user:
+
+      ```
+      ✅ Pulled from backlog!
+
+      **Task**: Task [old-number] from backlog → Task [new-number] in PLAN.md
+      **Phase**: Phase [N]: [Name]
+      **Position**: [Description based on instruction or default]
+      **Status**: ⏳ PENDING (ready to start)
+
+      **Backlog**: [N-1] tasks remaining
+
+      Use `/flow-task-start [new-number]` to begin this task when ready.
+      ```
+
+**Edge Cases**:
+- **Backlog empty**: "Backlog is empty. Nothing to pull."
+- **Task not in backlog**: "Task [N] not in backlog. Use `/flow-backlog-view` to see available tasks."
+- **Invalid instruction**: Warn and use default positioning
+- **No active phase**: Ask user which phase to add task to
+
+**Output**: Update .flow/PLAN.md (task added), update .flow/BACKLOG.md (task removed).
+
+```
+
+---
+
 **Version**: 1.0.9
 **Last Updated**: 2025-10-02
 ```

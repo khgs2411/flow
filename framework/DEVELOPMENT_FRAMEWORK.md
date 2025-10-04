@@ -1,8 +1,4 @@
-**Version**: 1.1.0
-
----
-
-<!-- AI_SCAN:QUICK_REFERENCE:5-353 -->
+<!-- AI_SCAN:QUICK_REFERENCE:1-349 -->
 # Quick Reference for AI (Read This First!)
 
 > **Purpose**: This section provides essential Flow framework knowledge in ~300 lines (~15k tokens) instead of reading the entire 3897-line file (~200k tokens). Read this first, then use the Section Index to jump to specific sections only when needed.
@@ -229,8 +225,9 @@ When brainstorming, every resolved subject falls into ONE of these types:
 | **Progress Dashboard** | 2382-2729 | Template, when to use, update rules |
 | **Plan File Template** | 2731-2928 | Complete template structure |
 | **Archiving & Splitting** | 2929-3337 | Managing large PLAN.md files (2000+ lines) |
-| **Iteration Lifecycle** | 3338-3420 | State transitions, examples |
-| **Command Overview** | 3421-3590 | All 25 commands organized by category |
+| **Backlog Management** | 3407-3682 | Moving pending tasks out of active plan (token efficiency) |
+| **Iteration Lifecycle** | 3338-3405 | State transitions, examples |
+| **Command Overview** | 3685-3854 | All 28 commands organized by category |
 | **Quick Reference Guide** | 3868-4247 | Decision trees, cheat sheets, common patterns |
 | **Bidirectional References** | 3534-3867 | Command-framework integration |
 
@@ -259,6 +256,7 @@ Use this guide to know when to dive deep into specific sections:
 | **Updating status** | Status Markers | 2238-2327 | Correct marker usage, lifecycle |
 | **Lost/confused** | Complete Workflow | 977-1300 | Decision trees, command reference |
 | **Managing large PLAN** | Archiving & Splitting | 2929-3337 | When/how to split files |
+| **Managing pending tasks** | Backlog Management | 3407-3682 | Moving tasks to backlog (token efficiency) |
 | **Command behavior** | Command Overview | 3421-3590 | What each command does |
 
 ---
@@ -3404,13 +3402,291 @@ Phase structure preserved even when content archived.
 
 ---
 
+## Backlog Management
+
+**When PLAN.md contains too many pending tasks that you won't work on soon**, they create noise and consume tokens without adding value to current work. The backlog system lets you move future work out of the active plan while preserving all context.
+
+### Purpose
+
+**Backlog solves the "cluttered plan" problem**:
+- You have 9 tasks (1000+ lines) that won't be touched for weeks/months
+- These tasks are important (you don't want to delete them)
+- But they clutter your active PLAN.md and waste AI tokens
+- Solution: Move them to `.flow/BACKLOG.md` temporarily
+
+**Key Insight**: Backlog is for **token efficiency**, not prioritization. Tasks in backlog aren't "low priority" - they're just "not now".
+
+### File Location
+
+`.flow/BACKLOG.md` - Sits alongside PLAN.md and ARCHIVE.md
+
+### Structure
+
+**BACKLOG.md contains**:
+1. **Progress Dashboard** - Unnumbered task list (just titles + iteration counts)
+2. **Task Sections** - Full task content (exactly as it appeared in PLAN.md, **WITH original task numbers**)
+
+**Example**:
+
+```markdown
+# Project Backlog
+
+This file contains tasks moved from PLAN.md to reduce active plan size while preserving all context.
+
+**Backlog Info**:
+- Tasks retain original numbers for easy reference
+- Full content preserved (brainstorming, iterations, everything)
+- Pull tasks back to active plan when ready to work on them
+
+**Last Updated**: 2025-10-04
+**Tasks in Backlog**: 9
+
+---
+
+## 📋 Backlog Dashboard
+
+**Tasks Waiting**:
+- **Task 14**: Potency system
+- **Task 15**: Points & Luck systems
+- **Task 16**: Database persistence
+- **Task 17**: Damage variance
+- **Task 18**: Game integration
+- **Task 19**: Attribute Guarantee - HIGH
+- **Task 20**: Context Modifiers - CRITICAL
+- **Task 21**: Affix Synergy - MEDIUM
+- **Task 22**: Retry Handler - HIGH
+
+---
+
+### Phase 4: Enhancement & Polish (V2)
+
+#### Task 14: Potency system ⏳
+
+**Status**: PENDING
+**Purpose**: Implement potency scaling system for dynamic spell power
+
+[Full task content with iterations, brainstorming, etc...]
+
+---
+
+#### Task 15: Points & Luck systems ⏳
+
+**Status**: PENDING
+**Purpose**: Add points allocation and luck mechanics
+
+[Full task content...]
+
+---
+
+[... Tasks 16-22 ...]
+```
+
+### Backlog vs Archive
+
+**Different purposes, different use cases**:
+
+| Aspect | **BACKLOG.md** | **ARCHIVE.md** |
+|--------|---------------|---------------|
+| **Purpose** | Reduce active plan clutter (token efficiency) | Historical record (completed work) |
+| **Status** | ⏳ PENDING tasks (future work) | ✅ COMPLETE tasks (past work) |
+| **Temporary?** | YES (tasks move back to PLAN.md) | NO (permanent archive) |
+| **Task Numbers** | Keep original numbers | Keep original numbers |
+| **When to use** | Too many pending tasks cluttering plan | Old completed tasks no longer relevant |
+| **Visibility** | NOT shown in Progress Dashboard | Shown with 📦 marker in dashboard |
+
+**Example scenario**:
+- Phase 4 has Tasks 11-22
+- Currently on Task 13
+- Tasks 14-22 are pending but won't start for weeks
+- **Backlog** Tasks 14-22 (pending future work)
+- **Archive** Tasks 1-9 (completed past work)
+- **Keep in PLAN.md** Tasks 10-13 (recent context)
+
+### Workflow: Moving to Backlog
+
+**Command**: `/flow-backlog-add <task-number>` or `/flow-backlog-add <start>-<end>`
+
+**What happens**:
+1. Remove task from PLAN.md (leaves gap in numbering)
+2. Add task to BACKLOG.md (full content, original number)
+3. Reset status to ⏳ PENDING (fresh start when pulled back)
+4. Update BACKLOG.md dashboard
+
+**Example**:
+
+```bash
+# Move single task
+/flow-backlog-add 14
+
+# Move range
+/flow-backlog-add 14-22
+```
+
+**Before** (PLAN.md):
+```markdown
+### Phase 4: Enhancement & Polish
+
+#### Task 13: V2 Placeholders ✅
+[content]
+
+#### Task 14: Potency system ⏳
+[content - 100 lines]
+
+#### Task 15: Points & Luck ⏳
+[content - 80 lines]
+```
+
+**After** (PLAN.md):
+```markdown
+### Phase 4: Enhancement & Polish
+
+#### Task 13: V2 Placeholders ✅
+[content]
+
+[Task 14 moved to backlog]
+[Task 15 moved to backlog]
+```
+
+**BACKLOG.md** now contains Tasks 14-15 with full content.
+
+### Workflow: Viewing Backlog
+
+**Command**: `/flow-backlog-view`
+
+**What happens**:
+1. Read BACKLOG.md Progress Dashboard
+2. Display task list with numbers
+
+**Example output**:
+
+```
+📦 Backlog Contents (9 tasks):
+
+Phase 4: Enhancement & Polish (V2)
+  - Task 14: Potency system
+  - Task 15: Points & Luck systems
+  - Task 16: Database persistence
+  - Task 17: Damage variance
+  - Task 18: Game integration
+  - Task 19: Attribute Guarantee - HIGH
+  - Task 20: Context Modifiers - CRITICAL
+  - Task 21: Affix Synergy - MEDIUM
+  - Task 22: Retry Handler - HIGH
+
+Use /flow-backlog-pull <task-number> to move a task back to active plan.
+```
+
+### Workflow: Pulling from Backlog
+
+**Command**: `/flow-backlog-pull <task-number> [instruction-text]`
+
+**What happens**:
+1. Remove task from BACKLOG.md (completely, no trace)
+2. Insert into PLAN.md with **next available task number in active phase**
+3. Position according to instruction (or default: after last task in phase)
+4. Update BACKLOG.md dashboard
+
+**Examples**:
+
+```bash
+# Pull task, insert at end of active phase (default)
+/flow-backlog-pull 14
+
+# Pull task, insert after specific task (but renumber sequentially)
+/flow-backlog-pull 14 insert after task 13
+```
+
+**Numbering behavior**:
+
+If active phase is Phase 4 with Tasks 11, 12, 13:
+- Pull Task 14 from backlog → becomes **Task 14** (next available number)
+- Positioned after Task 13 (default)
+- Even if instruction says "after task 13", number is still 14
+
+If active phase is Phase 4 with Tasks 11, 12, 13, and there are 20 tasks total:
+- Pull Task 17 from backlog → becomes **Task 14** (next in sequence)
+- Old Task 17 number discarded
+- Always sequential numbering in active phase
+
+**Why renumber?** Keeps active plan clean and sequential. Old task number (from backlog) is just a reference identifier.
+
+### Key Rules
+
+1. **Only full tasks can be backlogged** - No phases, no standalone iterations
+2. **Tasks keep original numbers in BACKLOG.md** - Easy reference, no confusion
+3. **Tasks get renumbered when pulled back** - Next available number in active phase
+4. **Gaps left in PLAN.md numbering** - User can ask AI to renumber if desired (saves tokens otherwise)
+5. **Status reset to ⏳ PENDING** - Fresh start when pulled from backlog
+6. **No dashboard visibility** - Backlog is "out of sight, out of mind" (use `/flow-backlog-view` to see)
+7. **Always insert into active phase** - Unless user specifies otherwise in instruction text
+
+### When to Use Backlog
+
+**Use backlog when**:
+- ✅ PLAN.md has many pending tasks you won't touch soon (weeks/months away)
+- ✅ File size growing but tasks aren't ready to archive (not complete)
+- ✅ Want to focus on current work without distraction
+- ✅ Token efficiency matters (large context windows)
+
+**Don't use backlog for**:
+- ❌ Completed tasks → Use archive instead
+- ❌ Tasks starting this week → Keep in active plan
+- ❌ Just 1-2 tasks → Not worth the overhead
+
+### Example: Full Backlog Lifecycle
+
+**Scenario**: Phase 4 has Tasks 11-22, currently on Task 13
+
+**Step 1: Move to backlog**
+```bash
+/flow-backlog-add 14-22
+```
+
+**Result**:
+- PLAN.md: Tasks 11, 12, 13 (current + 2 recent)
+- BACKLOG.md: Tasks 14-22 (future work, 1000 lines)
+- Token savings: ~50k tokens per AI request
+
+**Step 2: Complete Task 13, ready for Task 14**
+```bash
+/flow-task-complete  # Complete Task 13
+```
+
+**Step 3: Pull Task 14 from backlog**
+```bash
+/flow-backlog-pull 14
+```
+
+**Result**:
+- PLAN.md: Tasks 11, 12, 13 ✅, 14 ⏳ (pulled from backlog, renumbered as 14)
+- BACKLOG.md: Tasks 15-22 (8 tasks remaining)
+
+**Step 4: Later, pull Task 15**
+```bash
+/flow-backlog-pull 15 insert after task 14
+```
+
+**Result**:
+- PLAN.md: Tasks 11, 12, 13, 14, 15 (Task 15 pulled, becomes 15)
+- BACKLOG.md: Tasks 16-22 (7 tasks remaining)
+
+### Commands Summary
+
+| Command | Purpose | Example |
+|---------|---------|---------|
+| `/flow-backlog-add <task>` | Move task(s) to backlog | `/flow-backlog-add 14` or `/flow-backlog-add 14-22` |
+| `/flow-backlog-view` | Show backlog contents | `/flow-backlog-view` |
+| `/flow-backlog-pull <task> [instruction]` | Pull task back to active plan | `/flow-backlog-pull 14` or `/flow-backlog-pull 14 insert after 13` |
+
+---
+
 ## Integration with Slash Commands
 
 This framework is designed to work with slash commands that automate plan file updates.
 
 **Prefix**: All commands use `flow-` prefix to prevent conflicts with other frameworks.
 
-**Total Commands**: 25 commands organized into 6 categories
+**Total Commands**: 28 commands organized into 7 categories
 
 **Design Principles**:
 - ✅ **Consistent Naming**: All separators use hyphens (no underscores)
@@ -3528,6 +3804,40 @@ This framework is designed to work with slash commands that automate plan file u
 - `/flow-rollback` - Undo last change to PLAN.md (limited to one step)
   - Emergency undo for accidental changes
   - Uses changelog to identify last change
+
+---
+
+### 7. Backlog Management (3 commands)
+
+**Use Case**: Manage pending tasks that won't be worked on soon (token efficiency)
+
+- `/flow-backlog-add <task>` or `/flow-backlog-add <start>-<end>` - Move task(s) from PLAN.md to BACKLOG.md
+  - Reduces active plan size (1000+ lines → backlog)
+  - Preserves full task content (iterations, brainstorming, everything)
+  - Tasks retain original numbers in backlog for easy reference
+  - Leaves gap in PLAN.md numbering (token savings)
+
+- `/flow-backlog-view` - Show backlog dashboard (tasks waiting)
+  - Lightweight view of what's in backlog
+  - Shows task numbers and names
+  - No impact on PLAN.md dashboard (out of sight, out of mind)
+
+- `/flow-backlog-pull <task> [instruction]` - Pull task from backlog back to active plan
+  - Renumbers task sequentially in active phase
+  - Position based on instruction or default (end of phase)
+  - Removes from backlog completely (no trace)
+  - Fresh start with ⏳ PENDING status
+
+**Key Insight**: Backlog is for **token efficiency**, not prioritization. Tasks aren't "low priority" - they're just "not now" (weeks/months away).
+
+**When to use**:
+- ✅ PLAN.md has 9+ pending tasks you won't touch for weeks
+- ✅ File size growing but tasks aren't ready to archive (not complete)
+- ✅ Want to focus on current work without distraction
+
+**Don't use for**:
+- ❌ Completed tasks → Use `/flow-plan-split` to archive instead
+- ❌ Tasks starting this week → Keep in active plan
 
 ---
 

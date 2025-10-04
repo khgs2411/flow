@@ -12,7 +12,14 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FRAMEWORK_DIR="$SCRIPT_DIR/framework"
 OUTPUT_FILE="$SCRIPT_DIR/flow.sh"
-FLOW_VERSION="1.1.0"  # Update this with each release
+VERSION_FILE="$SCRIPT_DIR/VERSION"
+
+# Read version from VERSION file (single source of truth)
+if [ ! -f "$VERSION_FILE" ]; then
+  echo "❌ VERSION file not found!"
+  exit 1
+fi
+FLOW_VERSION=$(cat "$VERSION_FILE" | tr -d '[:space:]')
 
 echo "🔨 Building standalone Flow framework script v${FLOW_VERSION}..."
 echo ""
@@ -162,6 +169,8 @@ COMMANDS=(
   "flow-next" "flow-next-subject" "flow-next-iteration"
   # Status & Validation (5 commands)
   "flow-status" "flow-summarize" "flow-verify-plan" "flow-compact" "flow-rollback"
+  # Backlog Management (3 commands)
+  "flow-backlog-add" "flow-backlog-view" "flow-backlog-pull"
 )
 
 # Deprecated commands (renamed/removed in v1.0.11+) - cleaned up during --force
@@ -189,7 +198,7 @@ OPTIONS:
   --help, -h        Show this help
 
 DEPLOYMENT STRUCTURE:
-  .claude/commands/          Slash commands (20 files)
+  .claude/commands/          Slash commands (\${#COMMANDS[@]} files)
   .flow/                     Framework documentation
     ├── DEVELOPMENT_FRAMEWORK.md
     └── EXAMPLE_PLAN.md
@@ -381,7 +390,7 @@ main() {
     echo "=================================================="
     echo -e "${GREEN}✅ Flow Framework Installed!${NC}\n"
     echo -e "${CYAN}📂 Structure:${NC}"
-    echo "   .claude/commands/       (20 slash commands)"
+    echo "   .claude/commands/       (${#COMMANDS[@]} slash commands)"
     echo "   .flow/                  (framework docs)"
     echo "     ├── DEVELOPMENT_FRAMEWORK.md"
     echo "     └── EXAMPLE_PLAN.md"

@@ -177,6 +177,90 @@ Keep these in mind when proposing changes!
 
 ---
 
+## Releasing (Maintainers Only)
+
+### Single Source of Truth: VERSION File
+
+The `VERSION` file is the **single source of truth** for versioning:
+
+```bash
+# VERSION file contains just the version number
+1.1.1
+```
+
+All other files read from this:
+- `build-standalone.sh` reads VERSION to build flow.sh
+- `release.sh` reads VERSION for git tags and GitHub releases
+
+### Release Process
+
+```bash
+# 1. Update VERSION file
+echo "1.1.1" > VERSION
+
+# 2. Run release script (handles everything)
+./release.sh
+```
+
+The `release.sh` script automates:
+1. ✅ Builds flow.sh with VERSION number
+2. ✅ Prompts for changelog entry
+3. ✅ Updates CHANGELOG.md
+4. ✅ Creates git commit
+5. ✅ Creates git tag (v1.1.1)
+6. ✅ Pushes to GitHub
+7. ✅ Creates GitHub release with flow.sh asset
+
+### What to Include in Changelog
+
+Follow this format:
+
+```markdown
+**v1.1.1** - Feature Name (YYYY-MM-DD)
+
+**Changes**:
+- Added new feature X
+- Fixed bug Y
+- Improved documentation Z
+
+See the [v1.1.1 release](https://github.com/khgs2411/flow/releases/tag/v1.1.1) for full details.
+```
+
+### Version Numbering
+
+Flow follows semantic versioning: `MAJOR.MINOR.PATCH`
+
+- **MAJOR** (X.0.0): Breaking changes to framework structure or commands
+- **MINOR** (0.X.0): New features, new commands, significant enhancements
+- **PATCH** (0.0.X): Bug fixes, documentation updates, minor improvements
+
+**Examples**:
+- `1.0.0 → 1.0.1`: Fixed bug in `/flow-status` command (patch)
+- `1.0.1 → 1.1.0`: Added backlog management commands (minor)
+- `1.1.0 → 2.0.0`: Changed PLAN.md structure (breaking - major)
+
+### Pre-Release Checklist
+
+Before running `./release.sh`:
+
+- [ ] All tests pass
+- [ ] Documentation updated
+- [ ] EXAMPLE_PLAN.md reflects new features
+- [ ] Rebuilt flow.sh (`./build-standalone.sh`)
+- [ ] Tested installation (`./flow.sh --force` in test directory)
+- [ ] Git status is clean (commit everything first)
+
+### Post-Release Tasks
+
+After release is published:
+
+- [ ] Verify GitHub release shows correct version
+- [ ] Verify flow.sh download works
+- [ ] Update README.md if needed (screenshots, feature list)
+- [ ] Announce in project channels
+
+---
+
 ## Questions?
 
 - 💬 **Open an issue** for questions or discussions
