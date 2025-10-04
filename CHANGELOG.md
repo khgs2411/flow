@@ -17,6 +17,40 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
+**v1.0.16** - Bidirectional Reference Architecture (2025-10-03)
+
+**Major Feature**:
+- **Bidirectional Reference System**: Three-layer architecture ensuring AI agents consult framework
+  - PLAN.md header warnings with auto-detection rules
+  - CLAUDE.md framework consultation patterns with three-layer reading strategy
+  - All 25 commands reference framework sections with line numbers
+  - Build-time validation of command→framework mappings
+
+**Impact**: Prevents structural mistakes, enforces consistency, establishes single source of truth
+
+**Quick Reference Enhancement**:
+- Added 353-line Quick Reference section to DEVELOPMENT_FRAMEWORK.md (lines 1-353)
+- 19 AI_SCAN section markers for programmatic navigation
+- Command categorization: 11 Category A (require Quick Reference), 14 Category B (PLAN.md only)
+- Token efficiency: 92% reduction (15k vs 200k tokens) for framework reading
+
+**Documentation Improvements**:
+- Updated EXAMPLE_PLAN.md with improved Progress Dashboard structure
+- Simplified from 640 to 548 lines (14% reduction)
+- Added "Current Work" emphasis with <!-- ESSENTIAL --> markers
+- Removed redundant sections, enhanced hierarchical structure
+
+**Command Enhancements**:
+- Added tool usage guidance (Grep vs awk patterns)
+- Added Dashboard update requirements to all state-changing commands
+- Refined Category A reading instructions: "read once per session if not in context"
+
+See the [v1.0.16 release](https://github.com/khgs2411/flow/releases/tag/v1.0.16) for full details.
+
+---
+
+## Previous Versions
+
 **v1.0.15** - Plan File Size Management (2025-10-03)
 
 **New Command**:
@@ -33,19 +67,7 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
   - ARCHIVE.md structure and Progress Dashboard with 📦 markers
   - Before/after examples showing 40% file size reduction
 
-**Distribution**:
-- Final size: 164,792 bytes (5,011 lines)
-
-**Technical Changes**:
-- Added `/flow-plan-split` command to `framework/SLASH_COMMANDS.md` (119 lines)
-- Added "Plan File Size Management" to `framework/DEVELOPMENT_FRAMEWORK.md` (154 lines)
-- All edge cases handled: first split, subsequent splits, task < 4, non-complete old tasks
-
 See the [v1.0.15 release](https://github.com/khgs2411/flow/releases/tag/v1.0.15) for full details.
-
----
-
-## Previous Versions
 
 **v1.0.13** - Command Fixes: Pre-Implementation Task Detection (2025-10-02)
 

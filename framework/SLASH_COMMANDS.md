@@ -684,9 +684,21 @@ You are executing the `/flow-phase-complete` command from the Flow framework.
    - If next phase exists: Auto-advance to next phase (show name)
    - If no next phase: "All phases complete! Project finished."
 
-7. **Confirm to user**: "Phase [N] marked complete! Next: Phase [N+1]: [Name]. Use `/flow-phase-start` when ready."
+7. **Show "What's Next" Section**:
+   ```markdown
+   ## 🎯 What's Next
 
-**Output**: Update .flow/PLAN.md with phase completion and Progress Dashboard update.
+   Phase [N]: [Name] marked complete!
+
+   **Decision Tree**:
+   - **Next phase exists?** → Use `/flow-phase-start [optional: number]` to begin next phase
+   - **All phases complete?** → Project finished! 🎉 Consider archiving or starting V2 planning
+   - **Want to review progress?** → Use `/flow-summarize` to see complete project overview
+
+   **Next phase**: Phase [N+1]: [Name] (if applicable)
+   ```
+
+**Output**: Update .flow/PLAN.md with phase completion, Progress Dashboard update, and clear next-step guidance.
 ```
 
 ---
@@ -874,9 +886,21 @@ You are executing the `/flow-task-complete` command from the Flow framework.
    - If all tasks in phase are ✅ COMPLETE: Suggest `/flow-phase-complete`
    - If more tasks: Auto-advance to next task (show name)
 
-7. **Confirm to user**: "Task [N] marked complete! Next: Task [N+1]: [Name]. Use `/flow-task-start` when ready."
+7. **Show "What's Next" Section**:
+   ```markdown
+   ## 🎯 What's Next
 
-**Output**: Update .flow/PLAN.md with task completion and Progress Dashboard update.
+   Task [N]: [Name] marked complete!
+
+   **Decision Tree**:
+   - **All tasks in phase complete?** → Use `/flow-phase-complete` to mark phase as ✅ COMPLETE
+   - **More tasks in phase?** → Use `/flow-task-start [optional: number]` to begin next task
+   - **Want to see current state?** → Use `/flow-status` to see suggestions
+
+   **Next task**: Task [N+1]: [Name] (if applicable)
+   ```
+
+**Output**: Update .flow/PLAN.md with task completion, Progress Dashboard update, and clear next-step guidance.
 ```
 
 ---
@@ -1161,11 +1185,20 @@ You are executing the `/flow-brainstorm-review` command from the Flow framework.
    - Prompt user: "Would you like me to create these pre-tasks/iterations, or would you prefer to adjust the suggestions?"
    - Wait for user confirmation before taking action
 
-**Next Steps After Review**:
+9. **Show "What's Next" Section**:
+   ```markdown
+   ## 🎯 What's Next
 
-- If user wants to add pre-tasks → document in "Pre-Implementation Tasks" section
-- If user wants to add iterations → use `/flow-iteration-add` for each
-- Once all pre-tasks are complete → run `/flow-brainstorm-complete`
+   **After reviewing**:
+   1. If pre-implementation tasks were identified → Create them in "Pre-Implementation Tasks" section
+   2. If new iterations were suggested → Use `/flow-iteration-add` to create each one
+   3. Once all pre-tasks are ✅ COMPLETE → Run `/flow-brainstorm-complete` to mark iteration 🎨 READY
+
+   **Decision Tree**:
+   - Pre-tasks needed? → Create them, complete them, THEN run `/flow-brainstorm-complete`
+   - No pre-tasks? → Run `/flow-brainstorm-complete` immediately
+   - Need more iterations? → Use `/flow-iteration-add [description]` first
+   ```
 
 **Output**: Comprehensive review summary with actionable suggestions, awaiting user confirmation.
 ````
@@ -1216,9 +1249,18 @@ You are executing the `/flow-brainstorm-complete` command from the Flow framewor
 
 5. **Add note**: "**Status**: All brainstorming complete, pre-implementation tasks done, ready for implementation"
 
-6. **Confirm to user**: "Brainstorming session complete. Iteration is now 🎨 READY FOR IMPLEMENTATION. Use `/flow-implement-start` to begin."
+6. **Show "What's Next" Section**:
+   ```markdown
+   ## 🎯 What's Next
 
-**Output**: Update .flow/PLAN.md with brainstorming completion status.
+   Brainstorming session complete! Iteration marked 🎨 READY FOR IMPLEMENTATION.
+
+   **REQUIRED NEXT STEP**: Use `/flow-implement-start` to begin implementation.
+
+   **Before implementing**: Review your action items and ensure you understand the scope. If you discover new issues during implementation (scope violations), STOP and discuss with the user before proceeding.
+   ```
+
+**Output**: Update .flow/PLAN.md with brainstorming completion status and clear next-step guidance.
 ```
 
 ---
@@ -1388,9 +1430,22 @@ You are executing the `/flow-implement-complete` command from the Flow framework
    - Update "Last Updated" timestamp
    - Update completion percentages if tracked
 
-10. **Confirm to user**: "Iteration [N] marked complete! Use `/flow-iteration-add [description]` to start next iteration, or `/flow-status` to see current state."
+10. **Show "What's Next" Section**:
+    ```markdown
+    ## 🎯 What's Next
 
-**Output**: Update .flow/PLAN.md with completion status, summary, and Dashboard update.
+    Iteration [N] marked complete!
+
+    **Decision Tree**:
+    - **More iterations planned?** → Use `/flow-iteration-add [description]` to create next iteration
+    - **Task complete (all iterations done)?** → Use `/flow-task-complete` to mark task as ✅ COMPLETE
+    - **Not sure what's next?** → Use `/flow-status` to see current state and suggestions
+    - **Want to see full project status?** → Use `/flow-summarize` for complete overview
+
+    **Current state**: [Show iteration count, e.g., "3/5 iterations complete" OR "All iterations complete - task ready to close"]
+    ```
+
+**Output**: Update .flow/PLAN.md with completion status, summary, Dashboard update, and clear next-step guidance.
 
 ````
 
@@ -1919,19 +1974,23 @@ User responds → capture decision → document → mark ✅ → auto-advance to
      - **If NO** (all resolved): Show workflow prompt below
 
 5. **If all resolved** (this was the last subject):
-   - **IMPORTANT**: Show explicit next-step prompt:
-     ```
+   - **Show brief summary** of decisions made
+   - **⚠️ CRITICAL - Show "What's Next" Section**:
+     ```markdown
      ✅ All subjects resolved!
 
-     📋 Next step: Run `/flow-brainstorm-review` to:
+     ## 🎯 What's Next
+
+     **REQUIRED NEXT STEP**: Run `/flow-brainstorm-review` to:
      - Analyze all resolved subjects
      - Categorize by Type A/B/C/D
      - Identify pre-implementation tasks (Type A)
      - Plan follow-up work
 
-     After review and completing any pre-tasks, run `/flow-brainstorm-complete` to mark iteration as 🎨 READY FOR IMPLEMENTATION.
+     **DO NOT** run `/flow-brainstorm-complete` yet - review comes first!
+
+     **After review**: Complete any pre-tasks, then run `/flow-brainstorm-complete` to mark iteration as 🎨 READY FOR IMPLEMENTATION.
      ```
-   - Show brief summary of decisions made
 
 **Key Principle**: Moving to next subject implies current is resolved. No separate "resolve" command needed.
 
