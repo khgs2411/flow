@@ -108,7 +108,7 @@ All commands use `flow-` prefix to avoid conflicts:
 
 Commands are categorized into two types based on framework reading requirements:
 
-#### Category A Commands (11 commands) - MUST READ Quick Reference
+#### Category A Commands (11 commands) - Quick Reference Required
 These commands require framework knowledge to execute correctly:
 - `/flow-blueprint`, `/flow-migrate`, `/flow-plan-update`
 - `/flow-task-add`, `/flow-iteration-add`
@@ -116,7 +116,7 @@ These commands require framework knowledge to execute correctly:
 - `/flow-verify-plan`
 
 **Reading pattern for Category A**:
-1. **MUST READ**: Quick Reference section (lines 1-353) first
+1. **Quick Reference (once per session)**: If Quick Reference (lines 1-353) is NOT already in context, read it first. If it's already been read in this session, skip to step 2.
 2. **Use section index** to find relevant deep-dive section if needed
 3. **Read ONLY that section** using Read(offset, limit) - never read entire 3897-line file
 4. **Example**: For brainstorming, read lines 1167-1797 for Brainstorming Session Pattern
@@ -138,10 +138,10 @@ These commands work entirely from PLAN.md structure:
 
 **IMPORTANT**: NEVER read the entire 3897-line DEVELOPMENT_FRAMEWORK.md file. Use this three-layer strategy:
 
-**Layer 1: Quick Reference (ALWAYS START HERE for Category A commands)**
+**Layer 1: Quick Reference (Read once per session if not in context)**
 - Lines 1-353: Quick Reference Guide
 - Contains: Decision trees, command cheat sheet, status markers, common patterns
-- **Read this first** for all Category A commands
+- **Read once per session** for Category A commands (if not already in context, skip if already read)
 
 **Layer 2: Section Index (FIND RELEVANT SECTION)**
 - Use Quick Reference section index to locate relevant deep-dive section
@@ -242,7 +242,7 @@ IF file_exists('.flow/PLAN.md'):
 
 ✅ **DO**:
 - Use three-layer reading strategy (Quick Reference → Section Index → Deep Dive)
-- Read Quick Reference (lines 1-353) for Category A commands
+- Read Quick Reference (lines 1-353) once per session for Category A commands (if not already in context)
 - Use Dashboard-first/grep-based approaches for Category B commands
 - Follow exact framework patterns (structure, markers, sections)
 - Use slash commands for Flow operations (don't edit PLAN.md directly for state changes)
@@ -250,7 +250,7 @@ IF file_exists('.flow/PLAN.md'):
 
 ❌ **DON'T**:
 - Read entire 3897-line DEVELOPMENT_FRAMEWORK.md file (use offset/limit!)
-- Skip Quick Reference for Category A commands
+- Re-read Quick Reference if already in context from earlier in the session
 - Read framework for Category B commands (use PLAN.md only)
 - Invent new status markers or section structures
 - Mix task patterns (standalone + iterations in same task)

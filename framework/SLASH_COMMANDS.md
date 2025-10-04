@@ -82,7 +82,7 @@ You are executing the `/flow-blueprint` command from the Flow framework.
 **Purpose**: Create a brand new PLAN.md file from scratch for a new feature/project/bug/issue.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
-- **MUST READ**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section)
+- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Plan File Template pattern (lines 134-207), Task Structure Rules (lines 47-107)
 - **Deep dive if needed**: Read lines 2731-2928 for complete Plan File Template using Read(offset=2731, limit=197)
 
@@ -240,7 +240,7 @@ You are executing the `/flow-migrate` command from the Flow framework.
 **Purpose**: Migrate existing project documentation (PLAN.md, TODO.md, etc.) to Flow-compliant `.flow/PLAN.md` format.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
-- **MUST READ**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section)
+- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Plan File Template pattern (lines 134-207), Task Structure Rules (lines 47-107), Status Markers (lines 28-46)
 - **Deep dive if needed**: Read lines 2731-2928 for complete Plan File Template using Read(offset=2731, limit=197)
 
@@ -400,7 +400,7 @@ You are executing the `/flow-plan-update` command from the Flow framework.
 **Purpose**: Update an existing `.flow/PLAN.md` to match the latest Flow framework structure and patterns.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
-- **MUST READ**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section)
+- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Plan File Template (lines 272-353)
 - **Deep dive if needed**: Read lines 105-179 for Framework Structure using Read(offset=105, limit=75)
 
@@ -673,7 +673,7 @@ You are executing the `/flow-task-add` command from the Flow framework.
 **Purpose**: Add a new task to the current phase in PLAN.md.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
-- **MUST READ**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section)
+- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Task Structure Rules (lines 47-107) - Golden Rule: Standalone OR Iterations, Never Both
 - **Deep dive if needed**: Read lines 597-920 for complete Task Structure Rules using Read(offset=597, limit=323)
 
@@ -851,7 +851,7 @@ You are executing the `/flow-iteration-add` command from the Flow framework.
 **Purpose**: Add a new iteration to the current task in PLAN.md.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
-- **MUST READ**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section)
+- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Iteration Patterns (lines in Quick Reference)
 - **Deep dive if needed**: Read lines 567-613 for Development Workflow using Read(offset=567, limit=47)
 
@@ -908,7 +908,7 @@ You are executing the `/flow-brainstorm-start` command from the Flow framework.
 **Purpose**: Begin a brainstorming session for the current iteration with subjects provided by the user.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
-- **MUST READ**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section)
+- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Subject Resolution Types (lines 108-128), Common Patterns (lines 134-207)
 - **Deep dive if needed**: Read lines 1531-2156 for complete Brainstorming Pattern using Read(offset=1531, limit=625)
 
@@ -1004,7 +1004,7 @@ You are executing the `/flow-brainstorm-subject` command from the Flow framework
 **Purpose**: Add a new subject to the current brainstorming session.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
-- **MUST READ**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section)
+- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Subject Creation Patterns (lines in Quick Reference)
 - **Deep dive if needed**: Read lines 1215-1313 for Subject Resolution Types using Read(offset=1215, limit=99)
 
@@ -1043,7 +1043,7 @@ You are executing the `/flow-brainstorm-review` command from the Flow framework.
 **Purpose**: Review all resolved brainstorming subjects, verify completeness, summarize decisions, show action items, and suggest follow-up work (iterations/pre-tasks) before marking the brainstorming session complete.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
-- **MUST READ**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section)
+- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Subject Resolution Types (A/B/C/D) (lines in Quick Reference)
 - **Deep dive if needed**: Read lines 1167-1797 for Brainstorming Session Pattern using Read(offset=1167, limit=631)
 
@@ -1128,7 +1128,7 @@ You are executing the `/flow-brainstorm-complete` command from the Flow framewor
 **Purpose**: Close the current brainstorming session (only after pre-implementation tasks are done).
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
-- **MUST READ**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section)
+- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Completion Criteria (lines in Quick Reference)
 - **Deep dive if needed**: Read lines 1740-1797 for Completion Criteria using Read(offset=1740, limit=58)
 
@@ -1732,7 +1732,7 @@ You are executing the `/flow-next-subject` command from the Flow framework.
 **Purpose**: Show next unresolved subject, present options collaboratively, wait for user decision, then mark as ✅ resolved.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
-- **MUST READ**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section)
+- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Subject Resolution Types (lines 108-128) - Types A/B/C/D decision matrix
 - **Deep dive if needed**: Read lines 1570-1680 for Subject Resolution details using Read(offset=1570, limit=110)
 
@@ -2022,7 +2022,7 @@ You are executing the `/flow-verify-plan` command from the Flow framework.
 **Purpose**: Verify that PLAN.md is synchronized with the actual project state.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
-- **MUST READ**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section)
+- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Framework Structure validation (lines in Quick Reference)
 - **Deep dive if needed**: Read lines 105-179 for Framework Structure using Read(offset=105, limit=75)
 

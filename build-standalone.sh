@@ -66,10 +66,10 @@ validate_framework_references() {
       local is_category_a=$(echo "$cmd_section" | grep -c "^\*\*🔴 REQUIRED:")
 
       if [ "$is_category_a" -gt 0 ]; then
-        # Verify it has "MUST READ" line with line numbers
-        local must_read_line=$(echo "$cmd_section" | grep "^- \*\*MUST READ\*\*:")
-        if [ -z "$must_read_line" ]; then
-          echo "⚠️  /$cmd: Category A command missing 'MUST READ' section"
+        # Verify it has Quick Reference reading instruction (either old "MUST READ" or new "Read once per session")
+        local read_instruction=$(echo "$cmd_section" | grep -E "^- \*\*(MUST READ|Read once per session)\*\*:")
+        if [ -z "$read_instruction" ]; then
+          echo "⚠️  /$cmd: Category A command missing Quick Reference reading instruction"
           ((warnings++))
         else
           echo "✅ /$cmd: Category A (🔴 REQUIRED - Quick Reference)"
