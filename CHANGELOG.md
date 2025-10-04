@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.1.2** - Progress Dashboard Jump Link Fix (2025-10-04)
+**v1.1.3** - Version Increment Flags (2025-10-04)
 
 **Changes**:
 
-- Fixed inconsistent Current Work jump link formats between DEVELOPMENT_FRAMEWORK.md and EXAMPLE_PLAN.md\n- Updated /flow-plan-update command with specific jump link format instructions\n- Standardized to inline markdown link format: [Phase Name](#link)\n- Added explicit examples showing Phase/Task/Iteration link syntax\n
-See the [v1.1.2 release](https://github.com/khgs2411/flow/releases/tag/v1.1.2) for full details.
+- Added --patch, --minor, --major flags to release.sh for automatic version incrementing\n- Updated CONTRIBUTING.md with examples of new increment flags\n- Simplified release workflow (no manual VERSION file editing needed)\n
+See the [v1.1.3 release](https://github.com/khgs2411/flow/releases/tag/v1.1.3) for full details.
 
 ---
 
