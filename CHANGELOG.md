@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.1.3** - Version Increment Flags (2025-10-04)
+**v1.1.4** - Brainstorm Workflow Guidance Fix (2025-10-04)
 
 **Changes**:
 
-- Added --patch, --minor, --major flags to release.sh for automatic version incrementing\n- Updated CONTRIBUTING.md with examples of new increment flags\n- Simplified release workflow (no manual VERSION file editing needed)\n
-See the [v1.1.3 release](https://github.com/khgs2411/flow/releases/tag/v1.1.3) for full details.
+- Added CRITICAL guidance to Quick Reference: suggest /flow-brainstorm-review (NOT /flow-brainstorm-complete) after resolving all subjects\n- Updated workflow to explicitly show review step creates iterations/pre-tasks\n- Prevents AI from incorrectly skipping the review step\n
+See the [v1.1.4 release](https://github.com/khgs2411/flow/releases/tag/v1.1.4) for full details.
 
 ---
 
