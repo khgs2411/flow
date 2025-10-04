@@ -3842,10 +3842,6 @@ Result: Both agents follow identical pattern (no inconsistency)
 - Explicit is better than implicit - users want clear control
 - Symmetric naming is predictable and discoverable
 - Each command has single responsibility (no overloading)
-- Command history:
-  - v1.0.12: Removed `/flow-brainstorm-resolve` → integrated into `/flow-next-subject`
-  - v1.0.16: Added `/flow-compact` and `/flow-plan-split` for large project management
-  - v1.1.0: Enhanced workflow guidance with "What's Next" sections, fixed 7 commands with incorrect markdown fences
 
 **Why hyphens instead of underscores?**
 - Standard in CLI tools (kubectl, docker, gh, npm)
