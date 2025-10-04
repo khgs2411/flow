@@ -2548,9 +2548,23 @@ Insert this section **after Overview, before Architecture**:
 
 1. **NEVER create new sections** above or below Progress Overview
 2. **ALWAYS update WITHIN** the existing Progress Overview section
-3. **Expand task items** by adding iteration details as sub-bullets
+3. **Expand task items** by adding iteration details as indented sub-bullets
 4. **Keep it hierarchical**: Phase → Task → Iterations (indented)
 5. **Remove iteration details** when task completes (keep summary only)
+
+**CRITICAL - Iteration List Format (when showing task iterations):**
+- **Task line**: `- 🚧 **Task 11**: Name Generation (3/5 iterations)` ← Shows iteration count
+- **Iteration sub-bullets** (indented under task):
+  ```markdown
+  - 🚧 **Task 11**: Name Generation (3/5 iterations)
+    - ✅ **Iteration 1**: Basic Templates - COMPLETE
+    - ✅ **Iteration 2**: Advanced Placeholders - COMPLETE
+    - 🚧 **Iteration 3**: Validation System - IN PROGRESS ← **CURRENT**
+    - ⏳ **Iteration 4**: Testing - PENDING
+    - ⏳ **Iteration 5**: Optimization - PENDING
+  ```
+- **Each iteration must be listed** with number, name, and status
+- **Update task count** when adding iterations: `(3/5 iterations)` → `(3/6 iterations)`
 
 **Example - Showing Iteration Progress:**
 

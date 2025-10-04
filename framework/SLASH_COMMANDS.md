@@ -484,6 +484,18 @@ You are executing the `/flow-plan-update` command from the Flow framework.
      - Use inline markdown links (NOT `→ [Jump](#link)` format)
      - Include status emoji (🚧 IN PROGRESS, 🎨 READY, etc.) on iteration line
      - See EXAMPLE_PLAN.md lines 34-38 for reference
+   - **CRITICAL - Validate Progress Dashboard Iteration Lists**:
+     - Read DEVELOPMENT_FRAMEWORK.md lines 2555-2567 for iteration list format requirements
+     - Check if tasks with multiple iterations show them as indented sub-bullets
+     - **Invalid**: `- 🚧 **Task 23**: Refactor RED Service Architecture - Pre-tasks complete, Iteration 1 ready (3 iterations total)` ← NO iteration list!
+     - **Valid**: Task expanded with ALL iterations listed:
+       ```markdown
+       - 🚧 **Task 23**: Refactor RED Service Architecture (3/3 iterations)
+         - ✅ **Iteration 1**: Separate Concerns - COMPLETE
+         - ⏳ **Iteration 2**: Extract Core Logic - PENDING
+         - ⏳ **Iteration 3**: Optimize Performance - PENDING
+       ```
+     - Fix any tasks that say "(X iterations total)" without actually listing them
    - Update any deprecated patterns to new format
    - Preserve all:
      - Decisions and rationale
@@ -962,9 +974,15 @@ If you discover NEW issues while working on this iteration that are NOT part of 
 
 6. **Update Progress Dashboard** (if it exists):
 
-   - Update iteration count in Progress Overview (e.g., "3/6 iterations complete" → "3/7 iterations complete")
-   - Add new iteration to task's iteration list
-   - No need to change "Current Work" pointer (new iteration is ⏳ PENDING)
+   **CRITICAL - Read Framework Reference for Iteration List Format**:
+   - **Read DEVELOPMENT_FRAMEWORK.md lines 2555-2567** for CRITICAL iteration list format
+   - The framework specifies EXACT format for showing iterations in Progress Dashboard
+   - Key rules from framework:
+     - Task line shows count: `- 🚧 **Task 11**: Name Generation (3/5 iterations)`
+     - Each iteration MUST be listed as indented sub-bullet with number, name, and status
+     - Update both task count AND overall iteration count
+   - **DO NOT** write "(X iterations total)" without actually listing them
+   - **ALWAYS** expand the task to show full iteration list when adding iterations
 
 7. **Confirm to user**: "Added Iteration [N]: [$ARGUMENTS] to current task. Use `/flow-brainstorm-start [topic]` to begin."
 
