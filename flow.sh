@@ -2728,7 +2728,7 @@ COMMANDS_DATA_EOF
 
 get_framework_content() {
   cat <<'FRAMEWORK_DATA_EOF'
-**Version**: 1.0.16
+**Version**: 1.1.0
 
 ---
 
@@ -6575,6 +6575,7 @@ Result: Both agents follow identical pattern (no inconsistency)
 - Command history:
   - v1.0.12: Removed `/flow-brainstorm-resolve` → integrated into `/flow-next-subject`
   - v1.0.16: Added `/flow-compact` and `/flow-plan-split` for large project management
+  - v1.1.0: Enhanced workflow guidance with "What's Next" sections, fixed 7 commands with incorrect markdown fences
 
 **Why hyphens instead of underscores?**
 - Standard in CLI tools (kubectl, docker, gh, npm)
@@ -6994,7 +6995,7 @@ By following this framework, you build complex features incrementally with minim
 
 ---
 
-**Version**: 1.0.16
+**Version**: 1.1.0
 **Last Updated**: 2025-10-03
 FRAMEWORK_DATA_EOF
 }
