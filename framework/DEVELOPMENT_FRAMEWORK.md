@@ -161,7 +161,7 @@ When brainstorming, every resolved subject falls into ONE of these types:
 **Workflow**:
 1. `/flow-brainstorm-start` - Create session
 2. `/flow-next-subject` - Resolve each subject (choose Type A/B/C/D)
-3. Complete pre-tasks (Type A) if any
+3. `/flow-brainstorm-review` - Review the subject resolutions - AI suggests followup work
 4. `/flow-brainstorm-complete` - Mark ready for implementation
 5. `/flow-implement-start` - Begin coding
 

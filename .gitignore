@@ -13,3 +13,6 @@
 # Editor
 .vscode/
 .idea/
+
+.prettierrc
+.prettierignore
