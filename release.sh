@@ -5,11 +5,18 @@
 #
 # Automates the release process:
 # 1. Validates VERSION file exists
-# 2. Builds flow.sh with version from VERSION file
-# 3. Updates CHANGELOG.md with new version entry
-# 4. Creates git commit + tag
-# 5. Pushes to GitHub
-# 6. Creates GitHub release with flow.sh as asset
+# 2. Optionally increments version (--patch, --minor, --major)
+# 3. Builds flow.sh with version from VERSION file
+# 4. Updates CHANGELOG.md with new version entry
+# 5. Creates git commit + tag
+# 6. Pushes to GitHub
+# 7. Creates GitHub release with flow.sh as asset
+#
+# Usage:
+#   ./release.sh              # Use current VERSION
+#   ./release.sh --patch      # Increment patch (1.1.1 → 1.1.2)
+#   ./release.sh --minor      # Increment minor (1.1.1 → 1.2.0)
+#   ./release.sh --major      # Increment major (1.1.1 → 2.0.0)
 ################################################################################
 
 set -e
@@ -28,6 +35,43 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
+# Parse arguments for version increment
+INCREMENT_TYPE=""
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --patch)
+      INCREMENT_TYPE="patch"
+      shift
+      ;;
+    --minor)
+      INCREMENT_TYPE="minor"
+      shift
+      ;;
+    --major)
+      INCREMENT_TYPE="major"
+      shift
+      ;;
+    --help|-h)
+      echo "Usage: ./release.sh [--patch|--minor|--major]"
+      echo ""
+      echo "Options:"
+      echo "  --patch    Increment patch version (1.1.1 → 1.1.2)"
+      echo "  --minor    Increment minor version (1.1.1 → 1.2.0)"
+      echo "  --major    Increment major version (1.1.1 → 2.0.0)"
+      echo "  (none)     Use current VERSION file as-is"
+      echo ""
+      echo "Example:"
+      echo "  ./release.sh --patch    # Quick patch release"
+      exit 0
+      ;;
+    *)
+      echo -e "${RED}Unknown option: $1${NC}"
+      echo "Use --help for usage information"
+      exit 1
+      ;;
+  esac
+done
+
 # Check if VERSION file exists
 if [ ! -f "$VERSION_FILE" ]; then
   echo -e "${RED}❌ VERSION file not found!${NC}"
@@ -36,12 +80,58 @@ if [ ! -f "$VERSION_FILE" ]; then
   exit 1
 fi
 
-# Read version from VERSION file
-VERSION=$(cat "$VERSION_FILE" | tr -d '[:space:]')
+# Read current version from VERSION file
+CURRENT_VERSION=$(cat "$VERSION_FILE" | tr -d '[:space:]')
 
-if [ -z "$VERSION" ]; then
+if [ -z "$CURRENT_VERSION" ]; then
   echo -e "${RED}❌ VERSION file is empty!${NC}"
   exit 1
+fi
+
+# Increment version if requested
+if [ -n "$INCREMENT_TYPE" ]; then
+  # Parse current version (MAJOR.MINOR.PATCH)
+  if [[ ! "$CURRENT_VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+    echo -e "${RED}❌ Invalid version format: $CURRENT_VERSION${NC}"
+    echo "Expected format: MAJOR.MINOR.PATCH (e.g., 1.1.1)"
+    exit 1
+  fi
+
+  MAJOR="${BASH_REMATCH[1]}"
+  MINOR="${BASH_REMATCH[2]}"
+  PATCH="${BASH_REMATCH[3]}"
+
+  case $INCREMENT_TYPE in
+    patch)
+      PATCH=$((PATCH + 1))
+      ;;
+    minor)
+      MINOR=$((MINOR + 1))
+      PATCH=0
+      ;;
+    major)
+      MAJOR=$((MAJOR + 1))
+      MINOR=0
+      PATCH=0
+      ;;
+  esac
+
+  NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+
+  echo -e "${BLUE}📈 Version Increment${NC}"
+  echo ""
+  echo -e "Current: ${YELLOW}v${CURRENT_VERSION}${NC}"
+  echo -e "New:     ${GREEN}v${NEW_VERSION}${NC} (${INCREMENT_TYPE})"
+  echo ""
+
+  # Update VERSION file
+  echo "$NEW_VERSION" > "$VERSION_FILE"
+  VERSION="$NEW_VERSION"
+
+  echo -e "${GREEN}✅ Updated VERSION file${NC}"
+  echo ""
+else
+  VERSION="$CURRENT_VERSION"
 fi
 
 echo -e "${BLUE}🚀 Flow Framework Release Script${NC}"

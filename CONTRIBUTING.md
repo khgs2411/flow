@@ -194,11 +194,26 @@ All other files read from this:
 
 ### Release Process
 
-```bash
-# 1. Update VERSION file
-echo "1.1.1" > VERSION
+**Option 1: Automatic version increment** (recommended)
 
-# 2. Run release script (handles everything)
+```bash
+# Patch release (1.1.2 → 1.1.3) - Bug fixes, minor changes
+./release.sh --patch
+
+# Minor release (1.1.2 → 1.2.0) - New features, backward compatible
+./release.sh --minor
+
+# Major release (1.1.2 → 2.0.0) - Breaking changes
+./release.sh --major
+```
+
+**Option 2: Manual version** (if you want specific version)
+
+```bash
+# 1. Update VERSION file manually
+echo "1.5.0" > VERSION
+
+# 2. Run release script (uses VERSION as-is)
 ./release.sh
 ```
 
