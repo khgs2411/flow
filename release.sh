@@ -209,13 +209,14 @@ else
 fi
 echo ""
 
-# Step 3: Git status check
+# Step 3: Git status check (before making changes)
 echo -e "${BLUE}📊 Step 3/6: Checking git status...${NC}"
 echo ""
 
-if ! git diff-index --quiet HEAD --; then
-  echo -e "${YELLOW}⚠️  You have uncommitted changes:${NC}"
-  git status --short
+# Check for uncommitted changes EXCLUDING the files we're about to modify
+git diff-index --quiet HEAD -- ':!VERSION' ':!CHANGELOG.md' ':!flow.sh' ':!build-standalone.sh' || {
+  echo -e "${YELLOW}⚠️  You have uncommitted changes (excluding release files):${NC}"
+  git status --short | grep -v -E '(VERSION|CHANGELOG.md|flow.sh|build-standalone.sh)'
   echo ""
   read -p "Continue with release? (y/n): " -n 1 -r
   echo ""
@@ -223,14 +224,21 @@ if ! git diff-index --quiet HEAD --; then
     echo -e "${RED}❌ Release cancelled${NC}"
     exit 1
   fi
-fi
+}
 
 # Step 4: Create git commit
 echo -e "${BLUE}📝 Step 4/6: Creating git commit...${NC}"
 echo ""
 
-git add VERSION CHANGELOG.md flow.sh build-standalone.sh
-git commit -m "Release v${VERSION}: ${RELEASE_TITLE}
+# Stage the release files
+git add VERSION CHANGELOG.md flow.sh build-standalone.sh framework/DEVELOPMENT_FRAMEWORK.md framework/SLASH_COMMANDS.md framework/EXAMPLE_PLAN.md README.md 2>/dev/null || true
+
+# Check if there are changes to commit
+if git diff --cached --quiet; then
+  echo -e "${YELLOW}⚠️  No changes to commit for release files${NC}"
+  echo ""
+else
+  git commit -m "Release v${VERSION}: ${RELEASE_TITLE}
 
 ${CHANGELOG_NOTES}
 - Updated VERSION file to ${VERSION}
@@ -238,8 +246,9 @@ ${CHANGELOG_NOTES}
 - Updated CHANGELOG.md with release notes
 "
 
-echo -e "${GREEN}✅ Created commit${NC}"
-echo ""
+  echo -e "${GREEN}✅ Created commit${NC}"
+  echo ""
+fi
 
 # Step 5: Create git tag
 echo -e "${BLUE}🏷️  Step 5/6: Creating git tag...${NC}"
