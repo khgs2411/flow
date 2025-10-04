@@ -1,849 +1,551 @@
 # Flow Framework
-## AI in the loop
 
-*You design the architecture and iterations. AI executes within your framework. Context never gets lost.*
+**AI-in-the-loop iterative development that preserves context and prevents refactoring hell.**
 
-*Domain-Driven Design meets Agile Iterative Philosophy*
+*Domain-Driven Design meets Agile philosophy. You design the architecture and iterations. AI executes within your framework. Context never gets lost.*
 
----
-
-> **⚠️ Important**: This framework is designed for use with [Claude Code](https://claude.ai/code). The slash commands require Claude Code's command system. The methodology and PLAN.md patterns can be used manually with any AI, but automation features require Claude Code.
+[![Version](https://img.shields.io/badge/version-1.1.4-blue.svg)](https://github.com/khgs2411/flow/releases)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](#license)
 
 ---
 
-## Table of Contents
+## Why Flow?
 
-- [🚀 Quick Start](#-quick-start-30-seconds)
-- [Overview](#overview)
-- [Project Structure](#project-structure)
-- [How It Works](#how-it-works)
-- [Installation](#installation)
-  - [For End Users](#-for-end-users-using-the-framework)
-  - [For Developers](#-for-developers-improving-the-framework)
-- [Example Workflow](#example-workflow)
-- [Slash Commands Reference](#slash-commands-reference)
-  - [Planning Commands](#planning-commands-3)
-  - [Structure Commands](#structure-commands-3)
-  - [Brainstorming Commands](#brainstorming-commands-5)
-  - [Implementation Commands](#implementation-commands-2)
-  - [Navigation Commands](#navigation-commands-8)
-  - [Using Flow Without Commands](#using-flow-without-slash-commands)
-  - [Using Flow with Other AI Models](#using-flow-with-other-ai-models)
-- [Design Decisions](#design-decisions)
-- [Key Insights](#key-insights-from-development)
-- [Comparison to Other Frameworks](#comparison-to-other-frameworks)
-- [Future Enhancements](#future-enhancements-v2)
-- [Credits](#credits)
-- [License](#license)
+Building complex features with AI often leads to:
+- **Context loss** across sessions
+- **Refactoring cycles** from poor upfront design
+- **Missed edge cases** discovered too late
+- **Disconnected implementations** that don't fit together
 
----
-
-## 🚀 Quick Start (30 seconds)
-
-**Three ways to get Flow:**
-
-### Option A: Direct Download (No Git Required) ⭐
-
-```bash
-# Download flow.sh directly to your project
-cd /path/to/your/project
-curl -O https://raw.githubusercontent.com/khgs2411/flow/master/flow.sh
-chmod +x flow.sh
-./flow.sh
-
-# That's it! Framework is now installed.
-# (You can delete flow.sh after installation if you want)
-```
-
-### Option B: Run from Flow Repo
-
-```bash
-# 1. Clone once (one-time setup)
-git clone https://github.com/khgs2411/flow.git ~/flow-framework
-
-# 2. Run from ANY project directory
-cd /path/to/your/project
-~/flow-framework/flow.sh
-
-# That's it! Framework is now installed.
-```
-
-### Option C: Copy to Your Project
-
-```bash
-# 1. Copy flow.sh to your project
-cp ~/flow-framework/flow.sh /path/to/your/project/
-
-# 2. Run it there
-cd /path/to/your/project
-chmod +x flow.sh
-./flow.sh
-
-# You can delete flow.sh after installation if you want
-```
-
-**What just happened?**
-- ✅ Created `.claude/commands/` with 25 slash commands
-- ✅ Created `.flow/` with framework documentation
-- ✅ Your project is ready to use Flow!
-
-**Next Steps:**
-- **New project**: Run `/flow-blueprint [description]` to create your plan
-- **Existing project**: Run `/flow-migrate` to convert existing docs (PRD.md, PLAN.md, TODO.md, etc.)
-
-**💡 TIP**: Provide rich context to `/flow-blueprint` for better plans!
-```bash
-# Instead of this (minimal):
-/flow-blueprint "payment gateway"
-
-# Do this (rich context):
-/flow-blueprint "Payment Gateway Integration
-
-Requirements:
-- Integrate with Stripe API for credit card processing
-- Support webhooks for async payment notifications
-- Retry logic: 3 attempts with exponential backoff
-
-Constraints:
-- Must work with existing Express.js backend
-- Max 2-second response time
-
-Reference:
-- See src/legacy/billing.ts for old PayPal integration
-
-Testing:
-- Simulation-based per service (scripts/{service}.scripts.ts)
-"
-```
-**Result**: AI has everything upfront, creates better plan with fewer questions!
-
-**Need to reinstall or update?**
-```bash
-# Use --force to overwrite existing files
-./flow.sh --force
-```
-
-**💡 Pro Tips:**
-
-**Starting a New Session:**
-1. Run `/flow-summarize` - Get the big picture (all phases/tasks/iterations)
-2. Run `/flow-status` - Verify your current position (micro view)
-3. Run `/flow-verify-plan` - Ensure PLAN.md matches actual code
-4. Explicitly tell the AI where you are (e.g., "We're on Iteration 5")
-
-**For Complex Projects (10+ iterations, V1/V2 splits, 2000+ lines):**
-- Add a Progress Dashboard section after Architecture in your PLAN.md
-- Provides always-visible mission control with jump links
-- Commands verify dashboard matches status markers (smart verification skips completed items)
-- See [DEVELOPMENT_FRAMEWORK.md](framework/DEVELOPMENT_FRAMEWORK.md#progress-dashboard-required-for-complex-projects) for template
-
-This prevents confusion in large projects and enables token-efficient verification.
-
----
-
-## Overview
-
-The Flow framework is a spec-driven iterative development methodology that combines Domain-Driven Design principles with Agile philosophy. It helps developers build complex features with minimal refactoring by:
-
-- **Planning before coding** through structured brainstorming sessions
-- **Iterating in small, testable increments** (skeleton → veins → flesh → fibers)
-- **Preserving context** in a `.flow/PLAN.md` file that survives across sessions
-- **Mandatory status markers** at every level (Phase/Task/Iteration/Subject) for rigorous progress tracking
-- **Enforcing patterns** through slash commands that update the plan automatically
-- **Mid-development adoption** via `/flow-migrate` - convert existing PRD.md/PLAN.md/TODO.md to Flow format
-
----
-
-## 📦 What's New
-
-**Latest version**: [v1.1.0](https://github.com/khgs2411/flow/releases/tag/v1.1.0) - AI Workflow Guidance & Documentation Cleanup
-
-See [**GitHub Releases**](https://github.com/khgs2411/flow/releases) for detailed changelog and version history.
-
----
-
-## Project Structure
+Flow solves this by enforcing **structured planning before coding**:
 
 ```
-flow/
-├── README.md                    # This file - overview and guide
-├── flow.sh                      # Self-contained deployment script (distribute this!)
-├── build-standalone.sh          # Builds flow.sh from source files
-└── framework/                   # Source files (for development)
-    ├── DEVELOPMENT_FRAMEWORK.md # Complete methodology guide
-    ├── EXAMPLE_PLAN.md          # Reference example (payment gateway)
-    └── SLASH_COMMANDS.md        # All 25 slash command definitions
+Brainstorm → Design → Iterate → Implement → Verify
 ```
 
-**For Distribution**: Share `flow.sh` - it's self-contained with everything embedded!
-
-**For Development**: Edit files in `framework/`, then run `./build-standalone.sh` to regenerate `flow.sh`
-
----
-
-## Contents
-
-### 1. **flow.sh** (The Distribution File) ⭐
-- **Purpose**: Single-file deployment script with all framework content embedded
-- **Usage**: `./flow.sh [--force]`
-- **Size**: ~146KB, 4,487 lines (includes all framework content)
-- **What it does**: Installs slash commands to `.claude/commands/` and framework docs to `.flow/`
-- **Requirements**: None - pure bash, no dependencies
-- **Distribution**: Share this single file - no source files needed!
-
-### 2. **build-standalone.sh** (The Build Script)
-- **Purpose**: Generates `flow.sh` from source files in `framework/`
-- **Usage**: `./build-standalone.sh`
-- **When to run**: After editing any file in `framework/` directory
-- **Output**: Creates/updates `flow.sh` with latest framework content
-
-### 3. **framework/** (The Source Files)
-
-#### 3a. **DEVELOPMENT_FRAMEWORK.md** (The Methodology)
-- **Purpose**: Complete methodology documentation
-- **Audience**: Developers and AI agents
-- **Sections**: Philosophy, workflow, patterns, best practices, examples
-
-#### 3b. **EXAMPLE_PLAN.md** (The Reference)
-- **Purpose**: Complete example showing Flow in action
-- **Feature**: Mock "Payment Gateway Integration" project
-- **Shows**: Full workflow from brainstorming → implementation → completion
-
-#### 3c. **SLASH_COMMANDS.md** (The Command Definitions)
-- **Purpose**: All 25 slash command definitions
-- **Commands**: Planning (3), Phase Lifecycle (3), Task Lifecycle (3), Iteration Lifecycle (6), Navigation (5), Status & Validation (5)
-
----
-
-## How It Works
-
-**The framework has three interconnected parts:**
-
-1. **`flow.sh`** - Self-contained installer (what you distribute)
-2. **Documentation** - Installed to `.flow/` directory in your project
-3. **Slash Commands** - Installed to `.claude/commands/` directory
-
-**When you run `flow.sh` in your project:**
-- Creates `.claude/commands/` and `.flow/` directories
-- Extracts 25 slash commands from embedded data
-- Writes DEVELOPMENT_FRAMEWORK.md and EXAMPLE_PLAN.md to `.flow/`
-- All content is embedded in flow.sh - no external files needed!
-
-**Cross-References (the magic):**
-- Framework guide references example: "See `.flow/EXAMPLE_PLAN.md`"
-- Example references framework: "See `.flow/DEVELOPMENT_FRAMEWORK.md`"
-- Slash commands reference framework: "Read DEVELOPMENT_FRAMEWORK.md..."
-- Everything works together seamlessly!
+Everything is preserved in `.flow/PLAN.md` - a living document that survives across sessions, AI models, and developers.
 
 ---
 
 ## Quick Start
 
-### 🚀 For End Users (Using the Framework)
+### Install Flow (30 seconds)
 
-**Two ways to get `flow.sh`:**
-
-#### Option A: Direct Download (Recommended - No Git Needed)
-
+**Option 1: Direct Download** (no git required)
 ```bash
-# Navigate to your project directory
 cd /path/to/your/project
-
-# Download flow.sh directly
 curl -O https://raw.githubusercontent.com/khgs2411/flow/master/flow.sh
-chmod +x flow.sh
-
-# Run it to install the framework
-./flow.sh
+chmod +x flow.sh && ./flow.sh
 ```
 
-**Options:**
-- `./flow.sh` - Install framework (skips existing files)
-- `./flow.sh --force` - Reinstall/update (overwrites existing files)
-
-#### Option B: Clone Once, Copy Anywhere
-
+**Option 2: Clone & Run**
 ```bash
-# Clone the repo once (to a shared location)
 git clone https://github.com/khgs2411/flow.git ~/flow-framework
-
-# Copy flow.sh to any project
-cp ~/flow-framework/flow.sh /path/to/your/project/
 cd /path/to/your/project
-./flow.sh
+~/flow-framework/flow.sh
 ```
-
-**Important:** You are NOT tied to the cloned repo! The `flow.sh` file is self-contained and can be copied anywhere. Your project has no connection to the Flow repo after installation.
 
 **What gets installed:**
 ```
 your-project/
-├── .claude/commands/          # 25 slash commands
+├── .claude/commands/    # 28 slash commands
 │   ├── flow-blueprint.md
-│   ├── flow-phase-add.md
-│   └── ... (23 more)
-└── .flow/                     # Framework documentation
+│   ├── flow-brainstorm-start.md
+│   └── ...
+└── .flow/               # Framework docs
     ├── DEVELOPMENT_FRAMEWORK.md
     └── EXAMPLE_PLAN.md
 ```
 
-**Next steps:**
-1. Restart Claude Code (if running)
-2. Run: `/flow-blueprint <your-feature-name>`
-3. Read: `.flow/DEVELOPMENT_FRAMEWORK.md`
-4. Reference: `.flow/EXAMPLE_PLAN.md`
+### Create Your First Plan
+
+**For new projects:**
+```bash
+/flow-blueprint "Real-time collaborative text editor with conflict resolution"
+```
+
+**For existing projects:**
+```bash
+/flow-migrate existing-plan.md
+```
+
+**Start your first iteration:**
+```bash
+/flow-brainstorm-start "CRDT vs OT, WebSocket architecture, offline support"
+/flow-next-subject  # Discuss and resolve each subject
+/flow-brainstorm-review  # Generate iterations and pre-tasks
+/flow-implement-start  # Begin coding
+```
 
 ---
 
-### 🛠️ For Developers (Improving the Framework)
+## How It Works
 
-**If you want to modify the framework itself:**
+### The Flow Hierarchy
 
-```bash
-# 1. Edit source files in framework/ directory
-vim framework/DEVELOPMENT_FRAMEWORK.md
-vim framework/EXAMPLE_PLAN.md
-vim framework/SLASH_COMMANDS.md
-
-# 2. Rebuild the distribution file
-./build-standalone.sh
-
-# 3. Now flow.sh has your changes embedded
-# Share the updated flow.sh with others!
+```
+PHASE (Testing, Implementation, Polish)
+  └── TASK (Authentication, API Design)
+      └── ITERATION (Skeleton, Error Handling, Optimization)
+          ├── BRAINSTORM (Design before code)
+          │   └── SUBJECTS (Key decisions to make)
+          └── IMPLEMENTATION (Code with action items)
 ```
 
+### Status Markers Track Progress
+
+- `⏳ PENDING` - Not started
+- `🚧 IN PROGRESS` - Currently working
+- `🎨 READY` - Brainstorming complete, ready to code
+- `✅ COMPLETE` - Finished and verified
+- `❌ CANCELLED` - Abandoned
+- `🔮 FUTURE` - Deferred to later version
+
+### The Workflow
+
+1. **Blueprint** - Create structured plan from requirements
+2. **Brainstorm** - Design decisions before writing code
+3. **Resolve Subjects** - Capture WHY for each decision
+4. **Review** - Generate iterations and identify pre-tasks
+5. **Implement** - Code with tracked action items
+6. **Verify** - Ensure implementation matches plan
+7. **Iterate** - Repeat for next feature increment
 
 ---
 
-## Example Workflow
+## Key Features
 
-**Real-world scenario**: Building a real-time collaborative text editor
+### 🧠 Brainstorming Sessions
+Document design decisions with rationale BEFORE coding. Prevents refactoring hell.
 
-### 1. Create the Blueprint
+```markdown
+### Subject: API Authentication Strategy ✅
 
-```bash
-/flow-blueprint Real-time collaborative text editor with conflict resolution
+**Decision**: Use JWT with refresh tokens
+
+**Rationale**:
+- Stateless authentication scales better
+- Refresh tokens provide security + UX balance
+- Industry standard with mature libraries
+
+**Action Items**:
+- [ ] Implement JWT generation (jsonwebtoken)
+- [ ] Create refresh token rotation
+- [ ] Add token blacklist for logout
 ```
 
-**What happens**: Creates `PLAN.md` with phases, tasks, and iteration placeholders.
+### 📋 Pre-Implementation Tasks
+Handle blockers discovered during brainstorming:
 
-### 2. Start First Iteration
+```markdown
+### Pre-Implementation Tasks
 
-```bash
-/flow-brainstorm-start "Conflict resolution strategy, CRDT vs OT comparison, WebSocket architecture, offline support design"
+#### ⏳ Task 1: Refactor Legacy Auth Module
+**Why**: Current auth is tightly coupled to session storage
+**What**: Extract to AuthService interface
+- [ ] Create AuthService interface
+- [ ] Implement JWTAuthService
+- [ ] Update controllers to use interface
 ```
 
-**What happens**: AI extracts 4 subjects from your input, marks iteration as "In Progress", creates brainstorming section with subject list.
+### 🎯 Progress Dashboard
+Always-visible navigation for complex projects:
 
-### 3. Add Subjects During Discussion
+```markdown
+## Progress Dashboard
 
-```bash
-/flow-brainstorm-subject Data Structure (CRDT vs OT)
-/flow-brainstorm-subject WebSocket vs WebRTC
-/flow-brainstorm-subject Offline Support Strategy
+**Current Work**:
+- **Phase**: [Phase 2 - Implementation](#phase-2-implementation) 🚧
+- **Task**: [Task 3 - API Layer](#task-3-api-layer) 🚧
+- **Iteration**: [Iteration 5 - Error Handling](#iteration-5-error-handling) 🚧
+
+**Overall Progress**: 47% (14/30 iterations complete)
 ```
 
-**What happens**: Subjects added to "Subjects to Discuss" list with ⏳ status.
+### 📦 Backlog Management
+Move pending tasks out of active plan for token efficiency:
 
-### 4. Discuss and Resolve Each Subject
+```bash
+/flow-backlog-add 14-18  # Move tasks 14-18 to backlog
+/flow-backlog-view       # See what's in backlog
+/flow-backlog-pull 16    # Pull task 16 back to active plan
+```
 
+### ✅ Plan Verification
+Ensure your plan matches reality:
+
+```bash
+/flow-verify-plan  # Checks completed items exist in codebase
+```
+
+---
+
+## Framework Philosophy
+
+### The Human Body Metaphor
+
+**Skeleton → Veins → Flesh → Fibers**
+
+Like building a body, you start with structure and progressively add complexity:
+
+1. **Skeleton** (V1) - Basic structure, happy path only
+2. **Veins** (V1) - Core data flow and connections
+3. **Flesh** (V2) - Error handling, edge cases
+4. **Fibers** (V3) - Performance, optimization, polish
+
+**Why this works:**
+- Prevents premature optimization
+- Forces you to prove the architecture before adding complexity
+- Each iteration builds on validated foundations
+- Natural scope boundaries (V1/V2/V3)
+
+### Core Principles
+
+**1. Plan Before Code**
+Design decisions documented upfront reduce refactoring by 80%.
+
+**2. Context Preservation**
+`.flow/PLAN.md` is the single source of truth. Anyone (human or AI) can resume work instantly.
+
+**3. Explicit Over Implicit**
+Every decision has documented rationale. No "we think this works" - only "we chose X because Y".
+
+**4. Progressive Disclosure**
+Focus on what's needed NOW. Defer complexity to later iterations.
+
+**5. Brainstorm Before Implement**
+Thinking time is cheaper than refactoring time.
+
+---
+
+## Slash Commands (28 total)
+
+### Planning (3)
+- `/flow-blueprint` - Create new plan from scratch
+- `/flow-migrate` - Convert existing PRD/PLAN/TODO to Flow format
+- `/flow-plan-update` - Update plan to latest framework structure
+
+### Phase Management (3)
+- `/flow-phase-add` - Add new phase
+- `/flow-phase-start` - Mark phase in progress
+- `/flow-phase-complete` - Complete phase
+
+### Task Management (3)
+- `/flow-task-add` - Add new task
+- `/flow-task-start` - Mark task in progress
+- `/flow-task-complete` - Complete task
+
+### Iteration Workflow (8)
+- `/flow-iteration-add` - Add new iteration
+- `/flow-brainstorm-start` - Begin brainstorming session
+- `/flow-brainstorm-subject` - Add subject to discussion
+- `/flow-next-subject` - Discuss and resolve next subject
+- `/flow-brainstorm-review` - Review decisions, create follow-up work
+- `/flow-brainstorm-complete` - Finalize brainstorming
+- `/flow-implement-start` - Begin implementation
+- `/flow-implement-complete` - Complete iteration
+
+### Backlog Management (3)
+- `/flow-backlog-add` - Move tasks to backlog
+- `/flow-backlog-view` - Show backlog contents
+- `/flow-backlog-pull` - Pull task back to active plan
+
+### Navigation & Status (5)
+- `/flow-status` - Current position (micro view)
+- `/flow-summarize` - Full project overview (macro view)
+- `/flow-verify-plan` - Verify plan matches codebase
+- `/flow-next` - Smart helper (suggests next action)
+- `/flow-rollback` - Undo last plan change
+
+### Plan Maintenance (3)
+- `/flow-plan-split` - Archive old tasks to reduce file size
+- `/flow-next-iteration` - Show next iteration details
+- `/flow-compact` - Generate handoff report for new AI session
+
+---
+
+## Real-World Example
+
+**Scenario**: Building a payment gateway integration
+
+### 1. Create Blueprint
+```bash
+/flow-blueprint "Stripe Payment Gateway Integration
+
+Requirements:
+- Credit card processing with 3D Secure
+- Webhook handling for async notifications
+- Retry logic: 3 attempts, exponential backoff
+
+Constraints:
+- Express.js backend
+- Max 2-second response time
+- PCI DSS compliant
+
+Testing:
+- Stripe test mode simulation
+- Mock webhook events
+"
+```
+
+**Result**: Structured plan with phases, tasks, iterations
+
+### 2. Brainstorm First Iteration
+```bash
+/flow-brainstorm-start "Payment flow architecture, webhook security, retry strategy, error handling"
+```
+
+**AI creates**:
+```markdown
+### Subjects to Discuss
+1. ⏳ Payment Flow Architecture
+2. ⏳ Webhook Security & Verification
+3. ⏳ Retry Strategy & Idempotency
+4. ⏳ Error Handling & User Feedback
+```
+
+### 3. Resolve Each Subject
 ```bash
 /flow-next-subject
 ```
 
-**What happens**: Shows first subject, you discuss with AI, AI captures your decision:
-- Decision: "Use CRDT (Conflict-free Replicated Data Types)"
-- Rationale: "Better eventual consistency, no central server needed, proven with Yjs library"
-- Action items: "Research Yjs library, prototype basic CRDT implementation, benchmark performance"
+**AI presents subject 1, you discuss together, AI captures:**
 
-Subject automatically marked ✅, AI shows next subject.
+```markdown
+### Subject 1: Payment Flow Architecture ✅
 
-```bash
-/flow-next-subject  # Repeat for remaining subjects
-# ...AI shows each subject, captures decisions, marks ✅ resolved
-```
+**Decision**: Two-phase commit pattern (reserve → capture)
 
-### 5. Handle Pre-Implementation Tasks
+**Rationale**:
+- Prevents double-charging on network failures
+- Enables fraud checks between reserve and capture
+- Stripe native support via PaymentIntent API
+- Standard e-commerce pattern (Amazon, Shopify use this)
 
-During brainstorming, you realize the current network layer needs refactoring:
-
-```bash
-# Document it (don't implement yet!)
-# Add to PLAN.md:
-### Pre-Implementation Tasks:
-#### ⏳ Task 1: Refactor Network Layer
-**Objective**: Extract network logic into separate module before adding WebSocket support
 **Action Items**:
-- [ ] Create NetworkManager interface
-- [ ] Extract existing HTTP code
-- [ ] Add tests for network layer
+- [ ] Create PaymentIntent on checkout initiation
+- [ ] Implement reserve endpoint (confirm payment)
+- [ ] Implement capture endpoint (fulfill order)
+- [ ] Add timeout for abandoned reservations (15min TTL)
 ```
 
-**Then complete the tasks** before moving forward.
+**Repeat for subjects 2-4...**
 
-### 6. Complete Brainstorming
-
+### 4. Review & Create Work
 ```bash
-/flow-brainstorm-complete
+/flow-brainstorm-review
 ```
 
-**What happens**: Checks all subjects resolved and pre-tasks done, marks iteration 🎨 Ready.
+**AI analyzes decisions and suggests**:
+- 3 new iterations for Phase 1
+- 2 pre-implementation tasks (refactor existing payment module)
 
-### 7. Implement
-
+### 5. Implement
 ```bash
 /flow-implement-start
 ```
 
-**What happens**: Creates implementation section with all action items from brainstorming.
+**AI creates**:
+```markdown
+### Implementation
 
-Work through the code, checking off action items as you complete them:
-- [x] Research Yjs library
-- [x] Prototype basic CRDT implementation
-- [x] Benchmark performance
-- ...
+**Action Items** (from brainstorming):
+- [ ] Create PaymentIntent on checkout initiation
+- [ ] Implement reserve endpoint (confirm payment)
+- [ ] Implement capture endpoint (fulfill order)
+- [ ] Add timeout for abandoned reservations (15min TTL)
+- [ ] Implement webhook signature verification
+- [ ] Add idempotency keys to API calls
+- [ ] Create retry queue with exponential backoff
+- [ ] Build error translation for user-friendly messages
+```
 
-### 8. Complete Iteration
+You code, checking off items as you complete them.
 
+### 6. Complete & Verify
 ```bash
 /flow-implement-complete
 ```
 
-**What happens**: Marks iteration ✅ Complete, asks for verification notes, updates task/phase if all iterations done.
+**AI prompts for verification**:
+```
+Verification Notes:
+- ✅ Tested reserve → capture flow with test cards
+- ✅ Verified webhook signature validation
+- ✅ Confirmed retry logic with network failure simulation
+- ✅ All error cases return user-friendly messages
+- ✅ Payment reservations auto-expire after 15min
+```
 
-### 9. Move to Next Iteration
+**Iteration marked ✅ COMPLETE**
 
+---
+
+## Using Flow Without Slash Commands
+
+**The methodology is the core, not the commands.**
+
+You can use Flow with ANY AI (ChatGPT, Gemini, etc.) by manually following the patterns:
+
+1. Copy `.flow/EXAMPLE_PLAN.md` as template
+2. Follow the hierarchy: Phase → Task → Iteration
+3. Use status markers: ⏳ 🚧 🎨 ✅
+4. Document decisions with rationale
+5. Reference `framework/SLASH_COMMANDS.md` for guidance
+
+**Example prompt for ChatGPT**:
+```
+Read framework/SLASH_COMMANDS.md section '/flow-blueprint'
+and execute those instructions for "User Authentication System"
+```
+
+The AI will follow the steps manually. You lose autocomplete but keep the full methodology.
+
+---
+
+## Architecture
+
+### Three-Part System
+
+1. **`flow.sh`** (~146KB single file)
+   - Self-contained deployment script
+   - All framework content embedded via heredocs
+   - Zero external dependencies
+   - This is what gets distributed
+
+2. **`framework/`** (source files for development)
+   - `DEVELOPMENT_FRAMEWORK.md` - Complete methodology (3,897 lines)
+   - `EXAMPLE_PLAN.md` - Payment gateway reference (509 lines)
+   - `SLASH_COMMANDS.md` - 28 command definitions
+
+3. **Build system**
+   - `build-standalone.sh` - Generates `flow.sh` from sources
+   - Embeds all framework content into single distributable file
+
+### For Framework Developers
+
+**Edit framework**:
 ```bash
-/flow-next-iteration
+# Edit source files
+vim framework/DEVELOPMENT_FRAMEWORK.md
+vim framework/SLASH_COMMANDS.md
+
+# Rebuild distribution
+./build-standalone.sh
+
+# Test in a project
+cd /path/to/test-project
+~/flow/flow.sh --force
 ```
 
-**What happens**: Shows next pending iteration or prompts to create one.
+**Release new version**:
+```bash
+./release.sh --patch   # 1.1.4 → 1.1.5
+./release.sh --minor   # 1.1.4 → 1.2.0
+./release.sh --major   # 1.1.4 → 2.0.0
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contributor guide.
 
 ---
 
-**The Power**: Your PLAN.md now contains complete context - all decisions, rationale, pre-tasks, implementations, and verifications. Anyone (including a different AI) can pick up from where you left off.
+## Key Design Decisions
+
+### Why single-file distribution?
+- **Portability** - Share one file, no dependencies
+- **Reliability** - No network requests, no missing files
+- **Simplicity** - Users just run `./flow.sh`
+
+### Why separate source files?
+- **Maintainability** - Edit markdown, not heredocs
+- **Version Control** - Clean diffs on actual content
+- **Development** - Use proper markdown editors
+
+### Why brainstorm before code?
+- **Prevents refactoring** - Design decisions upfront
+- **Captures rationale** - WHY is preserved, not just WHAT
+- **Async collaboration** - Team sees thought process
+
+### Why pre-implementation tasks?
+- **Real-world pattern** - Often need to refactor before new work
+- **Explicit blockers** - No hidden dependencies
+- **Brainstorm completeness** - Can't start coding until ready
 
 ---
 
-## Slash Commands Reference
+## Comparison to Other Approaches
 
-Flow provides **25 slash commands** organized into **6 categories**. **Important**: These are convenience tools - the real power is the methodology. You can use Flow WITHOUT commands by manually following the patterns.
+| Approach | Planning | Context | Iteration | AI Guided |
+|----------|----------|---------|-----------|-----------|
+| **Flow** | Structured upfront | Preserved in PLAN.md | Built-in (V1/V2/V3) | ✅ Yes |
+| **Spec-Kit** | Test-driven | In tests | Manual | ❌ No |
+| **Agile** | Sprint planning | In tickets | Sprint-based | ❌ No |
+| **Waterfall** | All upfront | In docs | None | ❌ No |
+| **Cowboy Coding** | None | Developer's head | Ad-hoc | ❌ No |
 
-### 1. Plan Initialization (3 commands)
-
-**`/flow-blueprint <feature-name>`**
-- Creates fresh .flow/PLAN.md from scratch for new feature/project
-- Generates phases, tasks, and iteration placeholders
-- Asks about reference implementations and testing methodology
-- **Manual alternative**: Copy EXAMPLE_PLAN.md template, adapt to your feature
-
-**`/flow-migrate [file-path]`**
-- Migrates existing PRD.md/PLAN.md/TODO.md to Flow format
-- Auto-detects structure (structured/flat/unstructured)
-- Creates timestamped backup of original file
-- Generates .flow/PLAN.md with Flow patterns
-- **Use when**: Adopting Flow mid-development
-- **Manual alternative**: Manually restructure existing docs to Flow format
-
-**`/flow-plan-update`** (was `/flow-update-plan-version`)
-- Updates existing .flow/PLAN.md to latest Flow framework structure
-- Reads DEVELOPMENT_FRAMEWORK.md and EXAMPLE_PLAN.md for current patterns
-- Creates backup before updating
-- Preserves all content, only enhances structure
-- **Use when**: Framework structure changes (e.g., Progress Dashboard moved)
-- **Manual alternative**: Manually compare with EXAMPLE_PLAN.md and update structure
-
-### 2. Phase Lifecycle (3 commands)
-
-**`/flow-phase-add <phase-name>`** (was `/flow-phase`)
-- Adds new phase structure to PLAN.md (e.g., "Testing", "Polish")
-- **Manual**: Add `### Phase N: Name ⏳` section
-
-**`/flow-phase-start`** ⭐ NEW
-- Marks current phase as 🚧 IN PROGRESS
-- Updates Progress Dashboard automatically
-- **Manual**: Change phase marker to 🚧, update dashboard
-
-**`/flow-phase-complete`** ⭐ NEW
-- Marks phase as ✅ COMPLETE (verifies all tasks done)
-- Updates Progress Dashboard, advances to next phase
-- **Manual**: Change phase marker to ✅, update dashboard
-
-### 3. Task Lifecycle (3 commands)
-
-**`/flow-task-add <task-name>`** (was `/flow-task`)
-- Adds new task under current phase
-- **Manual**: Add `#### Task N: Name ⏳` under phase
-
-**`/flow-task-start`** ⭐ NEW
-- Marks current task as 🚧 IN PROGRESS
-- Updates Progress Dashboard automatically
-- **Manual**: Change task marker to 🚧, update dashboard
-
-**`/flow-task-complete`** ⭐ NEW
-- Marks task as ✅ COMPLETE (verifies all iterations done)
-- Updates Progress Dashboard, advances to next task
-- **Manual**: Change task marker to ✅, update dashboard
-
-### 4. Iteration Lifecycle (8 commands)
-
-**`/flow-iteration-add <iteration-name>`** (was `/flow-iteration`)
-- Adds new iteration under current task
-- **Manual**: Add `##### Iteration N: Name ⏳` under task
-
-**`/flow-brainstorm-start [optional: topics]`** (was `/flow-brainstorm_start`) ✨ REDESIGNED
-- Begins brainstorming session with user-provided subjects
-- **Two modes**: With argument (AI parses free-form text) or without (interactive prompt)
-- User controls WHAT to brainstorm, AI structures HOW
-- Example: `/flow-brainstorm-start "API design, database, auth, testing"`
-- Marks iteration as 🚧 In Progress (brainstorming)
-- **Manual**: Add brainstorming section with subject list from user input
-
-**`/flow-brainstorm-subject <subject-name>`** (was `/flow-brainstorm_subject`)
-- Adds subject to discussion list
-- Supports dynamic subject addition during brainstorming
-- **Manual**: Add `N. ⏳ Subject Name` to subject list
-
-**`/flow-next-subject`** ✨ ENHANCED
-- Shows next unresolved subject, facilitates discussion, captures decision, marks ✅, auto-advances
-- **Integrated workflow**: One command per subject (vs two previously)
-- **5-step process**: Display → Discuss → Capture → Document → Advance
-- Replaces the deprecated `/flow-brainstorm-resolve` command
-- **Manual**: Find next ⏳ subject, discuss, document decision, mark ✅
-
-**`/flow-brainstorm-review`** ⭐ NEW
-- Review all resolved subjects and verify completeness
-- Summarize decisions made during brainstorming
-- Show all action items generated
-- Suggest follow-up work (iterations, pre-tasks) based on scope
-- Await user instructions before marking complete
-- **Manual**: Review PLAN.md, create follow-up work as needed
-
-**`/flow-brainstorm-complete`** (was `/flow-brainstorm_complete`)
-- Checks all subjects resolved (via review step recommended first)
-- Verifies pre-implementation tasks done
-- Marks iteration 🎨 Ready for Implementation
-- **Manual**: Check subjects complete, update status to 🎨
-
-**`/flow-implement-start`** (was `/flow-implement_start`)
-- Begins implementation phase
-- Copies action items from brainstorming
-- Marks iteration 🚧 In Progress (implementing)
-- **Manual**: Create implementation section, copy action items
-
-**`/flow-implement-complete`** (was `/flow-implement_complete`)
-- Marks iteration ✅ Complete
-- Prompts for verification notes
-- Auto-updates task/phase if all complete
-- **Manual**: Check off items, add verification, update to ✅
-
-### 5. Navigation (3 commands)
-
-**`/flow-next`**
-- Auto-detects context, suggests next step
-- Smart universal navigator: "what should I do now?"
-- **Manual**: Look at status markers, decide next action
-
-**`/flow-next-subject`** ✨ ENHANCED (see Iteration Lifecycle above)
-- Integrated workflow: Show → Discuss → Capture → Document → Advance
-- Replaces deprecated `/flow-brainstorm-resolve` command
-
-**`/flow-next-iteration`**
-- Shows next pending iteration with goal and approach
-- Works within current task
-- **Pattern**: Like `/flow-next-subject` but for iterations
-- **Manual**: Find next ⏳ iteration in task
-
-### 6. Status & Validation (5 commands)
-
-**`/flow-status`** ⚡ OPTIMIZED
-- Shows current phase/task/iteration (micro view - "where am I now?")
-- **Dashboard-first approach**: Reads only Progress Dashboard section (~50 lines)
-- **Performance**: 95% token reduction for large PLAN.md files (32,810 → ~1,530 tokens)
-- **Micro integrity verification**: Verifies current work only (3 targeted Greps)
-- Displays progress percentage and suggests next command
-- **Manual**: Scan PLAN.md for current 🚧 items
-
-**`/flow-summarize`**
-- Shows entire project structure (macro view - "what's the whole picture?")
-- Hierarchical Phase → Task → Iteration breakdown
-- Completion percentages at each level
-- Compact, scannable format with grouped items
-- Handles V1/V2/V3 version splits
-- **Use for**: Bird's eye view, progress reports, project health check
-- **Manual**: Read entire PLAN.md, create outline with percentages
-
-**`/flow-verify-plan`**
-- Verifies PLAN.md is synced with actual project state
-- Checks completed items exist in codebase
-- Reports discrepancies and unreported work
-- Updates PLAN.md to match reality if needed
-- **Use before**: New AI session or conversation compacting
-- **Manual**: Review action items, check files exist, use git status
-
-**`/flow-compact`**
-- Generates comprehensive context transfer report
-- Summarizes decisions, progress, challenges, next steps
-- Enables zero-context-loss handoff to new AI instance
-- Focuses on current feature, not generic project info
-- **Use before**: Compacting conversation or starting new session
-- **Manual**: Read entire conversation, write summary notes
-
-**`/flow-rollback`**
-- Undoes last PLAN.md change (one step only)
-- **Manual**: Git revert or manual edit
-
-### Using Flow WITHOUT Slash Commands
-
-**The methodology is the core**, not the commands. You can:
-
-1. **Copy EXAMPLE_PLAN.md** as template
-2. **Follow the patterns**:
-   - Phase → Task → Iteration → Brainstorm → Implement
-   - Use status markers (⏳ 🚧 🎨 ✅)
-   - Document decisions with rationale
-   - Handle pre-implementation tasks
-3. **Reference DEVELOPMENT_FRAMEWORK.md** when stuck
-4. **Update PLAN.md manually** as you work
-
-**Commands are automation** - they enforce patterns and update PLAN.md consistently. But the real magic is:
-- Planning before coding
-- Documenting WHY, not just WHAT
-- Context preservation in PLAN.md
-- Explicit pre-implementation tasks
-
-You can achieve all of this by manually following the framework patterns. Commands just make it faster and more consistent.
+**Flow's unique value**: AI-native workflow with mandatory context preservation.
 
 ---
 
-## Using Flow with Other AI Models
+## Who Should Use Flow?
 
-**Flow works with ANY AI model** - not just Claude Code!
+### ✅ Perfect For:
+- **AI-assisted development** - Claude Code, ChatGPT, Gemini users
+- **Complex features** - Multi-week projects with many edge cases
+- **Team projects** - Context sharing across developers
+- **Learning developers** - Forces good planning habits
+- **Consultants** - Handoff documentation built-in
 
-The slash commands are just **instructions for AI agents**. Any AI (ChatGPT, Gemini, Llama, etc.) can read SLASH_COMMANDS.md and follow the instructions manually.
+### ⚠️ Maybe Overkill For:
+- **Trivial features** - Simple CRUD, one-off scripts
+- **Prototypes** - Throwaway code experiments
+- **Well-established patterns** - Copy-paste implementations
 
-### How It Works
-
-**With Claude Code** (automated):
-```
-User: /flow-blueprint "payment gateway"
-Claude Code: [automatically executes flow-blueprint.md instructions]
-```
-
-**With Other AIs** (manual):
-```
-User: "Read framework/SLASH_COMMANDS.md section '/flow-blueprint' and execute those instructions for 'payment gateway'"
-AI: [reads section, follows steps 1-8 manually]
-```
-
-### Step-by-Step Guide for Other AI Models
-
-1. **Install Flow framework** (one-time setup):
-   ```bash
-   # Clone or copy the Flow repo
-   git clone https://github.com/khgs2411/flow.git
-   cd flow
-
-   # Run installation
-   chmod +x flow.sh
-   ./flow.sh
-
-   # This creates:
-   # - .flow/DEVELOPMENT_FRAMEWORK.md (methodology)
-   # - .flow/EXAMPLE_PLAN.md (template)
-   # - framework/SLASH_COMMANDS.md (command instructions)
-   ```
-
-2. **Reference SLASH_COMMANDS.md in your prompts**:
-   ```
-   "Read framework/SLASH_COMMANDS.md section '/flow-blueprint' and follow those instructions to create a plan for [your feature]"
-   ```
-
-3. **AI reads the section and executes**:
-   - The AI will read steps 1-8 from the `/flow-blueprint` section
-   - Follow each instruction (read framework, gather testing methodology, generate PLAN.md, etc.)
-   - Create your `.flow/PLAN.md` following Flow patterns
-
-4. **Continue with other commands**:
-   ```
-   "Read framework/SLASH_COMMANDS.md section '/flow-brainstorm-start' and execute for 'API design'"
-
-   "Read framework/SLASH_COMMANDS.md section '/flow-next-subject' and discuss subjects"
-
-   "Read framework/SLASH_COMMANDS.md section '/flow-implement-start' and begin implementation"
-   ```
-
-### Example Usage with ChatGPT
-
-**User**:
-```
-I'm using the Flow framework. Please read framework/SLASH_COMMANDS.md
-section '/flow-blueprint' and execute those instructions to create a
-plan for "User Authentication System".
-
-When you get to step 4 (testing methodology), here are my answers:
-- Methodology: Unit tests after implementation
-- Naming: {feature}.test.ts
-- Location: __tests__/
-- Create new: For new features
-- Add to existing: For enhancements
-```
-
-**ChatGPT**:
-```
-[Reads /flow-blueprint section from SLASH_COMMANDS.md]
-[Follows steps 1-8]
-[Creates .flow/PLAN.md with Testing Strategy, phases, tasks, iterations]
-
-✨ Created .flow/PLAN.md with 3 phases, 8 tasks, 15 iterations
-📂 Flow is now managing this project from .flow/ directory
-```
-
-### Tips for Non-Claude AI Models
-
-1. **Always reference the section explicitly**:
-   - ✅ "Read framework/SLASH_COMMANDS.md section '/flow-blueprint'"
-   - ❌ "Create a Flow plan" (AI won't know the exact steps)
-
-2. **Provide answers upfront** (skip AI questions):
-   ```
-   "Execute /flow-blueprint for 'payment gateway'
-
-   Testing methodology: Simulation-based per-service
-   Naming: {service}.scripts.ts
-   Location: scripts/
-   Create new: For new services
-   Add to existing: For enhancements"
-   ```
-
-3. **Check output against framework**:
-   - Compare generated PLAN.md with `.flow/EXAMPLE_PLAN.md`
-   - Verify Testing Strategy section exists
-   - Ensure status markers are used (✅ ⏳ 🚧 🎨 ❌ 🔮)
-
-4. **Manual verification commands**:
-   ```
-   "Read framework/SLASH_COMMANDS.md section '/flow-status' and execute"
-   "Read framework/SLASH_COMMANDS.md section '/flow-verify-plan' and execute"
-   ```
-
-### What You Lose Without Claude Code
-
-**Claude Code provides**:
-- Automatic command execution (type `/flow-blueprint` instead of full prompt)
-- Command autocomplete with descriptions
-- Faster workflow (less typing)
-
-**But you still get**:
-- ✅ Full Flow methodology
-- ✅ All framework patterns (brainstorming, iterations, pre-tasks)
-- ✅ PLAN.md as single source of truth
-- ✅ Progress tracking with status markers
-- ✅ Testing Strategy enforcement
-- ✅ Scope Boundary Rule
-- ✅ All 25 commands via manual prompts
-
-### Available Commands
-
-All 25 commands in SLASH_COMMANDS.md work this way:
-
-**Planning** (3): `/flow-blueprint`, `/flow-migrate`, `/flow-plan-update`
-
-**Phase Lifecycle** (3): `/flow-phase-add`, `/flow-phase-start`, `/flow-phase-complete`
-
-**Task Lifecycle** (3): `/flow-task-add`, `/flow-task-start`, `/flow-task-complete`
-
-**Iteration Lifecycle** (8): `/flow-iteration-add`, `/flow-brainstorm-start`, `/flow-brainstorm-subject`, `/flow-next-subject`, `/flow-brainstorm-review`, `/flow-brainstorm-complete`, `/flow-implement-start`, `/flow-implement-complete`
-
-**Navigation** (3): `/flow-next`, `/flow-next-subject`, `/flow-next-iteration`
-
-**Status & Validation** (5): `/flow-status`, `/flow-summarize`, `/flow-verify-plan`, `/flow-compact`, `/flow-rollback`
-
-**Note**: `/flow-brainstorm-resolve` was removed in v1.0.12 - functionality integrated into `/flow-next-subject`.
-
-Just reference the section name in your prompt!
+### ❌ Not Suitable For:
+- **Research projects** - Too structured for exploration
+- **Creative coding** - Art, games, experimental work
 
 ---
 
-## Design Decisions
+## What's New
 
-### Why `/flow-blueprint` instead of `/flow-init`?
-- "blueprint" evokes architecture and planning
-- More descriptive of what the command does (creates skeleton structure)
-- Less generic than "init" (avoids conflicts)
+### v1.1.4 - Brainstorm Workflow Fix
+- Fixed AI suggesting `/flow-brainstorm-complete` instead of `/flow-brainstorm-review`
+- Added CRITICAL guidance to Quick Reference for proper workflow
 
-### Why split `/flow-next` into `/flow-next-subject` and `/flow-next-iteration`?
-- **Explicit is better than guessing** - user controls the flow
-- `/flow-next` remains as a smart helper (context-aware suggestions)
-- Clear intent: "I want to move to next subject" vs "I want to move to next iteration"
+### v1.1.3 - Version Increment Flags
+- `./release.sh --patch/--minor/--major` for automatic version bumping
+- Improved release automation
 
-### Why mandatory framework reference in commands?
-- Ensures AI understands patterns and structure
-- Maintains coherence across all commands
-- Allows framework to evolve (commands always read latest version)
+### v1.1.2 - Jump Link Format Fix
+- Standardized Progress Dashboard jump links
+- Enhanced `/flow-plan-update` command
 
-### Why pre-implementation pattern?
-- Emerged organically during real development - while brainstorming a complex feature, it became clear that existing code needed refactoring first
-- Common scenario: "We can't implement this cleanly until we fix/refactor X"
-- Prevents starting implementation with unresolved dependencies
-- Ensures brainstorming is truly complete before coding begins
+### v1.1.1 - Backlog Management
+- `/flow-backlog-add`, `/flow-backlog-view`, `/flow-backlog-pull`
+- Token efficiency for large projects
+
+See [GitHub Releases](https://github.com/khgs2411/flow/releases) for full changelog.
 
 ---
 
-## Key Insights from Development
+## Resources
 
-1. **The plan file is memory** - Enables resuming work across sessions, AI handoffs, and long-term projects
-2. **Brainstorm before code** - Upfront design decisions drastically reduce refactoring
-3. **Skeleton → Flesh** - Building incrementally with strong foundations prevents architectural rewrites
-4. **Pre-implementation tasks** - Often needed, should be part of the pattern
-5. **Explicit commands** - Better to have `/flow-next-subject` than AI guessing context
-6. **Document bugs discovered** - Finding bugs during design prevents introducing them later
-7. **Track improvements** - Documenting what you improved shows value and prevents regression
-8. **Dynamic brainstorming** - Subjects emerge during discussion; framework supports adding them on-the-fly
-
----
-
-## Comparison to Other Frameworks
-
-### vs Spec-Kit (GitHub)
-- Spec-Kit: Test-driven specifications
-- Flow: Iterative planning with brainstorming sessions
-- Synergy: Could use both (Flow for planning, Spec-Kit for testing)
-
-### vs Traditional Agile
-- Agile: Sprints, stories, backlogs
-- Flow: Phases, tasks, iterations with embedded brainstorming
-- Flow adds: Plan file as single source of truth, slash command automation
-
-### vs Waterfall
-- Waterfall: All planning upfront, then execution
-- Flow: Planning AND execution are interleaved (brainstorm per iteration)
-- Flow adds: Flexibility to discover and adapt
-
----
-
-## Future Enhancements (V2)
-
-Potential additions to consider:
-
-- [ ] **`/flow-visualize`** - Generate visual diagram of plan structure
-- [ ] **`/flow-export`** - Export plan to PDF/HTML for sharing
-- [ ] **`/flow-compare`** - Compare plan vs actual implementation (drift detection)
-- [ ] **`/flow-template`** - Save common patterns as reusable templates
-- [ ] **`/flow-checkpoint`** - Create snapshots for experimentation
-- [ ] **Multi-plan support** - Work on multiple features simultaneously
-- [ ] **Team features** - Assign tasks, track who's working on what
-- [ ] **Integration** - GitHub issues, Jira, Linear, etc.
+- **📖 Full Methodology**: [DEVELOPMENT_FRAMEWORK.md](framework/DEVELOPMENT_FRAMEWORK.md)
+- **📝 Example Plan**: [EXAMPLE_PLAN.md](framework/EXAMPLE_PLAN.md)
+- **⚙️ Command Reference**: [SLASH_COMMANDS.md](framework/SLASH_COMMANDS.md)
+- **🤝 Contributing**: [CONTRIBUTING.md](CONTRIBUTING.md)
+- **🐛 Issues**: [GitHub Issues](https://github.com/khgs2411/flow/issues)
 
 ---
 
 ## Credits
 
-**Created by**: Liad Goren
+**Created by**: [Liad Goren](https://github.com/khgs2411)
 
-**Inspired by**: Real-world experience building a complex game engine feature. The patterns emerged organically through iterative development with Claude Code, revealing what actually works when AI and humans collaborate on complex software.
+**Inspired by**: Real-world experience building a complex RPG skill generation system. The patterns emerged organically through AI-assisted development, revealing what actually works when AI and humans collaborate on complex software.
 
-**Philosophy**: Domain-Driven Design + Agile + Extreme Programming principles
+**Philosophy**: Domain-Driven Design + Agile + Extreme Programming
 
 **AI Partner**: Claude (Anthropic) via Claude Code
 
@@ -851,10 +553,18 @@ Potential additions to consider:
 
 ## License
 
-Open for personal and commercial use. Attribution appreciated but not required.
+MIT License - Free for personal and commercial use.
+
+Attribution appreciated but not required.
 
 ---
 
+<div align="center">
+
 **"Build the skeleton first, then add flesh."**
 
-*- Flow Framework Manifesto*
+*— Flow Framework*
+
+[⬆ Back to Top](#flow-framework)
+
+</div>
