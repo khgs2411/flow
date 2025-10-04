@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.1.4** - Hotfix: Plan Integrity (2025-10-04)
+**v1.1.5** - Hotfix: Plan Integrity (2025-10-04)
 
 **Changes**:
 
-- - Fixed an issue with thw way iterations were presented in the Progress Dashboard\n
-See the [v1.1.4 release](https://github.com/khgs2411/flow/releases/tag/v1.1.4) for full details.
+- - Fixed an issue where iterations were not displayed properly in the progress dashboard\n
+See the [v1.1.5 release](https://github.com/khgs2411/flow/releases/tag/v1.1.5) for full details.
 
 ---
 
