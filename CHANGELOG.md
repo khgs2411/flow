@@ -17,11 +17,11 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.1.4** - Brainstorm Workflow Guidance Fix (2025-10-04)
+**v1.1.4** - Howfix: Plan integrity (2025-10-04)
 
 **Changes**:
 
-- Added CRITICAL guidance to Quick Reference: suggest /flow-brainstorm-review (NOT /flow-brainstorm-complete) after resolving all subjects\n- Updated workflow to explicitly show review step creates iterations/pre-tasks\n- Prevents AI from incorrectly skipping the review step\n
+- - Fixed an issue where flow-iteration-add did not format iterations properly in the progress dashboard\n- - Fixed an issue where flow-update-plan did not catch that as well\n
 See the [v1.1.4 release](https://github.com/khgs2411/flow/releases/tag/v1.1.4) for full details.
 
 ---
