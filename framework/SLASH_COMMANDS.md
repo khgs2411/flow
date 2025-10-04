@@ -1982,16 +1982,24 @@ User responds → capture decision → document → mark ✅ → auto-advance to
    **Step A: Present subject**
    - Display subject name and description
    - Present relevant context from iteration goal
+   - **DO NOT read codebase files**
+   - **DO NOT analyze existing implementation**
+   - **DO NOT create detailed solutions**
+   - Keep it brief - this is just presenting the topic
 
    **Step B: Present options and STOP** ⚠️ CRITICAL
-   - Analyze the subject and identify 2-4 viable options/approaches
-   - Present each option with brief pros/cons
+   - **DO NOT research code** before presenting options
+   - **DO NOT read files** to understand current implementation
+   - **DO NOT create detailed architecture diagrams**
+   - Suggest 2-4 high-level options/approaches based on GENERAL knowledge
+   - Present each option with brief pros/cons (1-2 sentences each)
    - Format as numbered list for clarity
    - Include option for "Your own approach"
    - Ask user explicitly: "Which option do you prefer? Or provide your own approach."
    - **🛑 STOP HERE - Wait for user response (do NOT proceed to capture decision)**
    - **DO NOT** decide on behalf of user
    - **DO NOT** document any decision yet
+   - **DO NOT** create massive detailed resolutions
    - Command execution ends here - user will respond in next message
 
    **Step C: Capture user's decision** (only execute AFTER user responds)
@@ -2000,25 +2008,31 @@ User responds → capture decision → document → mark ✅ → auto-advance to
    - If unclear: ask clarifying questions
    - If rationale not provided: ask "What's your reasoning for this choice?"
    - Optional: "Any action items to track for this decision?"
+   - **KEEP DOCUMENTATION CONCISE** (1-3 paragraphs, not 336 lines!)
+   - **NO massive architecture diagrams** unless user explicitly provides one
+   - **NO detailed implementation plans** - save for implementation phase
+   - Capture: Decision + Rationale + Action Items (if any)
 
    **Step D: Document resolution**
    - Mark subject ✅ in "Subjects to Discuss" list
-   - Add resolution section under "Resolved Subjects":
+   - Add **CONCISE** resolution section under "Resolved Subjects":
      ```markdown
      ### ✅ **Subject [N]: [Name]**
 
-     **Decision**: [User's decision from their response]
+     **Decision**: [User's decision from their response - 1-2 sentences]
 
      **Rationale**:
      - [Reason 1 from user or follow-up]
      - [Reason 2]
 
      **Action Items** (if any):
-     - [ ] [Item 1]
+     - [ ] [Item 1 - brief, not detailed implementation steps]
      - [ ] [Item 2]
 
      ---
      ```
+   - **Example of TOO MUCH**: 336 line resolution with interfaces, diagrams, detailed architecture
+   - **Example of GOOD**: 10-20 line resolution with decision, rationale, 3-5 action items
 
    **Step E: Auto-advance OR prompt for review**
    - Update PLAN.md with resolution

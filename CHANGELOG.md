@@ -17,11 +17,11 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.1.7** - Hotfix: Command Behavior Fixes (2025-10-04)
+**v1.1.7** - Hotfix: Brainstorm Subjects Autocomplete (2025-10-04)
 
 **Changes**:
 
-- Fixed /flow-iteration-add not listing iterations in Progress Dashboard\n- Fixed /flow-plan-update not catching malformed iteration lists\n- Fixed /flow-brainstorm-start auto-generating subjects without user input\n- Improved release script to handle file staging properly\n
+- - Fixed an issue where the AI did not follow the 'next-subject' command properly\n
 See the [v1.1.7 release](https://github.com/khgs2411/flow/releases/tag/v1.1.7) for full details.
 
 ---
