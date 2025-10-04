@@ -37,7 +37,7 @@ validate_framework_references() {
   local cmd_names=($(grep "^## /" "$commands_file" | sed 's/^## \///'))
 
   for cmd in "${cmd_names[@]}"; do
-    # Check if command has Framework Reference section (inside markdown code block)
+    # Check if command has reading requirement notice (new 🔴/🟢 pattern)
     # Get line number of command header
     local cmd_line=$(grep -n "^## /$cmd\$" "$commands_file" | cut -d: -f1)
 
@@ -47,45 +47,48 @@ validate_framework_references() {
 
     # Extract command section
     local cmd_section=$(sed -n "${cmd_line},${next_cmd_line}p" "$commands_file")
-    local has_reference=$(echo "$cmd_section" | grep -c "^\*\*Framework Reference\*\*:")
 
-    if [ "$has_reference" -eq 0 ]; then
-      echo "❌ /$cmd: Missing Framework Reference section"
+    # Check for new pattern (🔴 REQUIRED or 🟢 NO FRAMEWORK READING REQUIRED)
+    local has_new_pattern=$(echo "$cmd_section" | grep -c "^\*\*🔴 REQUIRED:\|^\*\*🟢 NO FRAMEWORK READING REQUIRED")
+
+    # Check for old pattern (backward compatibility)
+    local has_old_pattern=$(echo "$cmd_section" | grep -c "^\*\*Framework Reference\*\*:")
+
+    if [ "$has_new_pattern" -eq 0 ] && [ "$has_old_pattern" -eq 0 ]; then
+      echo "❌ /$cmd: Missing framework reading requirement notice (🔴/🟢)"
       ((errors++))
       continue
     fi
 
-    # Extract Framework Reference line
-    local ref_line=$(echo "$cmd_section" | grep "^\*\*Framework Reference\*\*:" | head -1)
+    # If using new pattern, validate it
+    if [ "$has_new_pattern" -gt 0 ]; then
+      # Check if it's Category A (🔴 REQUIRED)
+      local is_category_a=$(echo "$cmd_section" | grep -c "^\*\*🔴 REQUIRED:")
 
-    # Extract line numbers using regex (matches patterns like "lines 123-456" or "line 123")
-    local line_ranges=$(echo "$ref_line" | grep -oE '\(lines? [0-9]+-?[0-9]*\)|\(line [0-9]+\)')
-
-    if [ -z "$line_ranges" ]; then
-      echo "⚠️  /$cmd: Framework Reference found but no line numbers detected"
-      ((warnings++))
-      continue
-    fi
-
-    # Extract all line numbers from the reference
-    local line_numbers=$(echo "$line_ranges" | grep -oE '[0-9]+')
-
-    # Get total lines in framework file
-    local framework_lines=$(wc -l < "$framework_file")
-
-    # Verify each line number is valid
-    local invalid_lines=0
-    for line_num in $line_numbers; do
-      if [ "$line_num" -gt "$framework_lines" ]; then
-        echo "❌ /$cmd: Line $line_num exceeds framework file size ($framework_lines lines)"
-        ((errors++))
-        invalid_lines=1
-        break
+      if [ "$is_category_a" -gt 0 ]; then
+        # Verify it has "MUST READ" line with line numbers
+        local must_read_line=$(echo "$cmd_section" | grep "^- \*\*MUST READ\*\*:")
+        if [ -z "$must_read_line" ]; then
+          echo "⚠️  /$cmd: Category A command missing 'MUST READ' section"
+          ((warnings++))
+        else
+          echo "✅ /$cmd: Category A (🔴 REQUIRED - Quick Reference)"
+        fi
+      else
+        # Category B command
+        echo "✅ /$cmd: Category B (🟢 NO FRAMEWORK READING)"
       fi
-    done
+    else
+      # Old pattern - still validate line numbers for backward compatibility
+      local ref_line=$(echo "$cmd_section" | grep "^\*\*Framework Reference\*\*:" | head -1)
+      local line_ranges=$(echo "$ref_line" | grep -oE '\(lines? [0-9]+-?[0-9]*\)|\(line [0-9]+\)')
 
-    if [ "$invalid_lines" -eq 0 ]; then
-      echo "✅ /$cmd: Valid reference ($line_ranges)"
+      if [ -z "$line_ranges" ]; then
+        echo "⚠️  /$cmd: Old pattern - Framework Reference found but no line numbers"
+        ((warnings++))
+      else
+        echo "✅ /$cmd: Old pattern (will migrate to 🔴/🟢 in future)"
+      fi
     fi
   done
 

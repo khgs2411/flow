@@ -50,7 +50,12 @@ You are executing the `/flow-blueprint` command from the Flow framework.
 
 **Purpose**: Create a brand new PLAN.md file from scratch for a new feature/project/bug/issue.
 
-**Framework Reference**: See "Plan File Template" section in DEVELOPMENT_FRAMEWORK.md (lines 2363-2560) for complete template structure, required sections, and examples.
+**🔴 REQUIRED: Read Framework Quick Reference First**
+- **MUST READ**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section)
+- **Focus on**: Plan File Template pattern (lines 134-207), Task Structure Rules (lines 47-107)
+- **Deep dive if needed**: Read lines 2731-2928 for complete Plan File Template using Read(offset=2731, limit=197)
+
+**Framework Reference**: This command requires framework knowledge to generate correct plan structure. See Quick Reference guide above for essential patterns.
 
 **IMPORTANT**: This command ALWAYS creates a fresh `.flow/PLAN.md`, overwriting any existing plan file. Use `/flow-migrate` if you want to convert existing documentation.
 
@@ -203,7 +208,12 @@ You are executing the `/flow-migrate` command from the Flow framework.
 
 **Purpose**: Migrate existing project documentation (PLAN.md, TODO.md, etc.) to Flow-compliant `.flow/PLAN.md` format.
 
-**Framework Reference**: See "Plan File Template" section in DEVELOPMENT_FRAMEWORK.md (lines 2363-2560) for complete template structure, required sections, and examples.
+**🔴 REQUIRED: Read Framework Quick Reference First**
+- **MUST READ**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section)
+- **Focus on**: Plan File Template pattern (lines 134-207), Task Structure Rules (lines 47-107), Status Markers (lines 28-46)
+- **Deep dive if needed**: Read lines 2731-2928 for complete Plan File Template using Read(offset=2731, limit=197)
+
+**Framework Reference**: This command requires framework knowledge to convert existing docs to Flow structure. See Quick Reference guide above for essential patterns.
 
 **IMPORTANT**: This command ALWAYS creates a fresh `.flow/PLAN.md`, overwriting any existing plan file. It reads your current documentation and converts it to Flow format.
 
@@ -358,7 +368,10 @@ You are executing the `/flow-plan-update` command from the Flow framework.
 
 **Purpose**: Update an existing `.flow/PLAN.md` to match the latest Flow framework structure and patterns.
 
-**Framework Reference**: See "Framework Structure" section in DEVELOPMENT_FRAMEWORK.md (lines 105-179) for hierarchy, required sections, and structural patterns.
+**🔴 REQUIRED: Read Framework Quick Reference First**
+- **MUST READ**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section)
+- **Focus on**: Plan File Template (lines 272-353)
+- **Deep dive if needed**: Read lines 105-179 for Framework Structure using Read(offset=105, limit=75)
 
 **IMPORTANT**: This command updates your current plan file to match framework changes (e.g., Progress Dashboard moved, new status markers, structural improvements).
 
@@ -468,7 +481,9 @@ You are executing the `/flow-phase-add` command from the Flow framework.
 
 **Purpose**: Add a new phase to the current PLAN.md file.
 
-**Framework Reference**: See "Development Workflow" section in DEVELOPMENT_FRAMEWORK.md (lines 567-613) for phase management patterns, naming conventions, and lifecycle rules.
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+- Simple structure addition (adds new phase section to PLAN.md)
+- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 567-613 for phase patterns
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
@@ -522,7 +537,9 @@ You are executing the `/flow-phase-start` command from the Flow framework.
 
 **Purpose**: Mark the current phase as 🚧 IN PROGRESS (when first task starts).
 
-**Framework Reference**: See "Development Workflow" section in DEVELOPMENT_FRAMEWORK.md (lines 567-613) for phase lifecycle management and status transition rules.
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+- State transition (⏳ PENDING → 🚧 IN PROGRESS)
+- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 567-613 for lifecycle context
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
@@ -569,7 +586,9 @@ You are executing the `/flow-phase-complete` command from the Flow framework.
 
 **Purpose**: Mark the current phase as ✅ COMPLETE (when all tasks done).
 
-**Framework Reference**: See "Development Workflow" section in DEVELOPMENT_FRAMEWORK.md (lines 567-613) for phase completion criteria and transition rules.
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+- State transition (🚧 IN PROGRESS → ✅ COMPLETE)
+- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 567-613 for completion criteria
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
@@ -617,7 +636,12 @@ You are executing the `/flow-task-add` command from the Flow framework.
 
 **Purpose**: Add a new task to the current phase in PLAN.md.
 
-**Framework Reference**: See "Task Structure Rules" section in DEVELOPMENT_FRAMEWORK.md (lines 238-566) for the Golden Rule (Standalone OR Iterations, Never Both), task patterns, and decision guide.
+**🔴 REQUIRED: Read Framework Quick Reference First**
+- **MUST READ**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section)
+- **Focus on**: Task Structure Rules (lines 47-107) - Golden Rule: Standalone OR Iterations, Never Both
+- **Deep dive if needed**: Read lines 597-920 for complete Task Structure Rules using Read(offset=597, limit=323)
+
+**Framework Reference**: This command requires framework knowledge to create correct task structure. See Quick Reference guide above for essential patterns.
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
@@ -670,7 +694,9 @@ You are executing the `/flow-task-start` command from the Flow framework.
 
 **Purpose**: Mark the current task as 🚧 IN PROGRESS (when first iteration starts).
 
-**Framework Reference**: See "Development Workflow" section in DEVELOPMENT_FRAMEWORK.md (lines 567-613) for task lifecycle management and status transition rules.
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+- State transition (⏳ PENDING → 🚧 IN PROGRESS)
+- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 567-613 for lifecycle context
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
@@ -733,7 +759,9 @@ You are executing the `/flow-task-complete` command from the Flow framework.
 
 **Purpose**: Mark the current task as ✅ COMPLETE (when all iterations done).
 
-**Framework Reference**: See "Development Workflow" section in DEVELOPMENT_FRAMEWORK.md (lines 567-613) for task completion criteria and transition rules.
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+- State transition (🚧 IN PROGRESS → ✅ COMPLETE)
+- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 567-613 for completion criteria
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
@@ -781,7 +809,10 @@ You are executing the `/flow-iteration-add` command from the Flow framework.
 
 **Purpose**: Add a new iteration to the current task in PLAN.md.
 
-**Framework Reference**: See "Development Workflow" section in DEVELOPMENT_FRAMEWORK.md (lines 567-613) for iteration management patterns, scope definition, and action item structure.
+**🔴 REQUIRED: Read Framework Quick Reference First**
+- **MUST READ**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section)
+- **Focus on**: Iteration Patterns (lines in Quick Reference)
+- **Deep dive if needed**: Read lines 567-613 for Development Workflow using Read(offset=567, limit=47)
 
 **🚨 SCOPE BOUNDARY RULE**:
 If you discover NEW issues while working on this iteration that are NOT part of the current work:
@@ -830,7 +861,12 @@ You are executing the `/flow-brainstorm-start` command from the Flow framework.
 
 **Purpose**: Begin a brainstorming session for the current iteration with subjects provided by the user.
 
-**Framework Reference**: See "Brainstorming Session Pattern" section in DEVELOPMENT_FRAMEWORK.md (lines 1167-1797) for complete workflow, subject resolution types (A/B/C/D), and pre-implementation task patterns.
+**🔴 REQUIRED: Read Framework Quick Reference First**
+- **MUST READ**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section)
+- **Focus on**: Subject Resolution Types (lines 108-128), Common Patterns (lines 134-207)
+- **Deep dive if needed**: Read lines 1531-2156 for complete Brainstorming Pattern using Read(offset=1531, limit=625)
+
+**Framework Reference**: This command requires framework knowledge to structure brainstorming session correctly. See Quick Reference guide above for essential patterns.
 
 **Signature**: `/flow-brainstorm-start [optional: free-form text describing topics to discuss]`
 
@@ -921,7 +957,10 @@ You are executing the `/flow-brainstorm-subject` command from the Flow framework
 
 **Purpose**: Add a new subject to the current brainstorming session.
 
-**Framework Reference**: See "Brainstorming Session Pattern > Subject Resolution Types" section in DEVELOPMENT_FRAMEWORK.md (lines 1215-1313) for subject structure and resolution type definitions.
+**🔴 REQUIRED: Read Framework Quick Reference First**
+- **MUST READ**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section)
+- **Focus on**: Subject Creation Patterns (lines in Quick Reference)
+- **Deep dive if needed**: Read lines 1215-1313 for Subject Resolution Types using Read(offset=1215, limit=99)
 
 **Instructions**:
 
@@ -957,7 +996,10 @@ You are executing the `/flow-brainstorm-review` command from the Flow framework.
 
 **Purpose**: Review all resolved brainstorming subjects, verify completeness, summarize decisions, show action items, and suggest follow-up work (iterations/pre-tasks) before marking the brainstorming session complete.
 
-**Framework Reference**: See "Brainstorming Session Pattern" section in DEVELOPMENT_FRAMEWORK.md (lines 1167-1797) for resolution verification, action item extraction, and pre-task identification patterns.
+**🔴 REQUIRED: Read Framework Quick Reference First**
+- **MUST READ**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section)
+- **Focus on**: Subject Resolution Types (A/B/C/D) (lines in Quick Reference)
+- **Deep dive if needed**: Read lines 1167-1797 for Brainstorming Session Pattern using Read(offset=1167, limit=631)
 
 **This is the review gate before `/flow-brainstorm-complete`.**
 
@@ -1039,7 +1081,10 @@ You are executing the `/flow-brainstorm-complete` command from the Flow framewor
 
 **Purpose**: Close the current brainstorming session (only after pre-implementation tasks are done).
 
-**Framework Reference**: See "Brainstorming Session Pattern > Completion Criteria" section in DEVELOPMENT_FRAMEWORK.md (lines 1740-1797) for completion rules and transition to implementation.
+**🔴 REQUIRED: Read Framework Quick Reference First**
+- **MUST READ**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section)
+- **Focus on**: Completion Criteria (lines in Quick Reference)
+- **Deep dive if needed**: Read lines 1740-1797 for Completion Criteria using Read(offset=1740, limit=58)
 
 **IMPORTANT**: Pre-implementation tasks should be documented IN PLAN.md during brainstorming, then completed BEFORE running this command.
 
@@ -1085,7 +1130,9 @@ You are executing the `/flow-implement-start` command from the Flow framework.
 
 **Purpose**: Begin implementation phase for the current iteration.
 
-**Framework Reference**: See "Implementation Pattern" section in DEVELOPMENT_FRAMEWORK.md (lines 1798-1836) for implementation workflow, action item extraction, and verification patterns.
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+- State transition (🎨 READY/⏳ PENDING → 🚧 IMPLEMENTING)
+- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 1798-1836 for implementation workflow
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
@@ -1172,7 +1219,9 @@ You are executing the `/flow-implement-complete` command from the Flow framework
 
 **Purpose**: Mark the current iteration as complete.
 
-**Framework Reference**: See "Implementation Pattern" section in DEVELOPMENT_FRAMEWORK.md (lines 1798-1836) for completion criteria, verification requirements, and status transition rules.
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+- State transition (🚧 IMPLEMENTING → ✅ COMPLETE)
+- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 1798-1836 for completion criteria
 
 **Instructions**:
 
@@ -1228,9 +1277,12 @@ You are executing the `/flow-status` command from the Flow framework.
 
 **Purpose**: Show current position in the plan and verify active work consistency.
 
-**Framework Reference**: See "Progress Dashboard" section (lines 2015-2314) and "Status Markers" section (lines 1872-1968) in DEVELOPMENT_FRAMEWORK.md for dashboard structure and status marker lifecycle.
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+- Dashboard-first approach using grep-based pattern matching
+- Reduces token usage by 95% (from 32,810 → ~1,530 tokens for large files)
+- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 2015-2314 for dashboard structure reference
 
-**PERFORMANCE NOTE**: This command uses Dashboard-first approach for token efficiency. For large PLAN.md files (2000+ lines), this reduces token usage by 95% (from 32,810 → ~1,530 tokens).
+**PERFORMANCE NOTE**: This is the reference model for Category B commands - uses targeted greps instead of reading entire framework.
 
 **Instructions**:
 
@@ -1430,7 +1482,10 @@ You are executing the `/flow-summarize` command from the Flow framework.
 
 **Purpose**: Generate high-level overview of entire project structure and completion state.
 
-**Framework Reference**: See "Framework Structure" section in DEVELOPMENT_FRAMEWORK.md (lines 105-179) for complete hierarchy (PHASE → TASK → ITERATION) and structural patterns.
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+- Uses PLAN.md structure only (no framework knowledge needed)
+- Parses all phases/tasks/iterations with status markers
+- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 105-179 for hierarchy context
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
@@ -1617,7 +1672,12 @@ You are executing the `/flow-next-subject` command from the Flow framework.
 
 **Purpose**: Show next unresolved subject, present options collaboratively, wait for user decision, then mark as ✅ resolved.
 
-**Framework Reference**: See "Brainstorming Session Pattern > Subject Resolution" section in DEVELOPMENT_FRAMEWORK.md (lines 1314-1572) for resolution types (A/B/C/D) and collaborative decision workflow.
+**🔴 REQUIRED: Read Framework Quick Reference First**
+- **MUST READ**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section)
+- **Focus on**: Subject Resolution Types (lines 108-128) - Types A/B/C/D decision matrix
+- **Deep dive if needed**: Read lines 1570-1680 for Subject Resolution details using Read(offset=1570, limit=110)
+
+**Framework Reference**: This command requires framework knowledge to properly categorize resolution types. See Quick Reference guide above for essential patterns.
 
 **New Collaborative Workflow** (two-phase approach):
 ```
@@ -1709,7 +1769,9 @@ You are executing the `/flow-next-iteration` command from the Flow framework.
 
 **Purpose**: Display details about the next pending iteration in the current task.
 
-**Framework Reference**: See "Development Workflow" section in DEVELOPMENT_FRAMEWORK.md (lines 567-613) for iteration sequencing and lifecycle management.
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+- Finds next ⏳ PENDING iteration in current task
+- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 567-613 for iteration context
 
 **Pattern**: Works like `/flow-next-subject` but for iterations - shows what's coming next.
 
@@ -1761,7 +1823,9 @@ You are executing the `/flow-next` command from the Flow framework.
 
 **Purpose**: Auto-detect current context and suggest the next logical step.
 
-**Framework Reference**: See "Quick Reference Guide > Decision Tree 5: What Command Do I Run Next?" section in DEVELOPMENT_FRAMEWORK.md (lines 3277-3356) for complete decision logic and command suggestions.
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+- Smart navigation using Dashboard and current context
+- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 3277-3356 for decision tree reference
 
 **Instructions**:
 
@@ -1838,7 +1902,9 @@ You are executing the `/flow-rollback` command from the Flow framework.
 
 **Purpose**: Undo the last change made to PLAN.md.
 
-**Framework Reference**: See "Status Management Best Practices" section in DEVELOPMENT_FRAMEWORK.md (lines 1969-2014) for rollback patterns, error recovery, and state restoration.
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+- Undoes last change using Changelog section
+- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 1969-2014 for rollback patterns
 
 **Instructions**:
 
@@ -1884,7 +1950,10 @@ You are executing the `/flow-verify-plan` command from the Flow framework.
 
 **Purpose**: Verify that PLAN.md is synchronized with the actual project state.
 
-**Framework Reference**: See "Framework Structure" section in DEVELOPMENT_FRAMEWORK.md (lines 105-179) for structural validation rules, required sections, and integrity checks.
+**🔴 REQUIRED: Read Framework Quick Reference First**
+- **MUST READ**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section)
+- **Focus on**: Framework Structure validation (lines in Quick Reference)
+- **Deep dive if needed**: Read lines 105-179 for Framework Structure using Read(offset=105, limit=75)
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
@@ -1961,7 +2030,9 @@ You are executing the `/flow-compact` command from the Flow framework.
 
 **Purpose**: Generate comprehensive conversation report for context transfer to new AI instance.
 
-**Framework Reference**: See "Progress Tracking" section in DEVELOPMENT_FRAMEWORK.md (lines 2327-2362) for context preservation patterns and session continuity practices.
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+- Generates comprehensive report using PLAN.md content and `/flow-status` logic
+- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 2327-2362 for context preservation patterns
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
@@ -2135,7 +2206,9 @@ You are executing the `/flow-plan-split` command from the Flow framework.
 
 **Purpose**: Archive old completed tasks outside the recent context window to `.flow/ARCHIVE.md`, reducing PLAN.md size while preserving full project history.
 
-**Framework Reference**: See "Plan File Template" section in DEVELOPMENT_FRAMEWORK.md (lines 2363-2560) for archival patterns, file structure maintenance, and context window management.
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+- Archives completed tasks to ARCHIVE.md (keeps recent 3 tasks in PLAN.md)
+- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 2363-2560 for archival patterns
 
 **Context**:
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)

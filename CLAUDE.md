@@ -106,12 +106,60 @@ All commands use `flow-` prefix to avoid conflicts:
 
 ### Command Patterns
 
-Every command MUST:
-1. Read `DEVELOPMENT_FRAMEWORK.md` first (searches `.claude/`, project root, or `~/.claude/flow/`)
-2. Find and parse `PLAN.md` to understand current state
-3. Follow framework patterns exactly (status markers, section structure)
-4. Update `PLAN.md` according to conventions
-5. Provide clear next steps to user
+Commands are categorized into two types based on framework reading requirements:
+
+#### Category A Commands (11 commands) - MUST READ Quick Reference
+These commands require framework knowledge to execute correctly:
+- `/flow-blueprint`, `/flow-migrate`, `/flow-plan-update`
+- `/flow-task-add`, `/flow-iteration-add`
+- `/flow-brainstorm-start`, `/flow-brainstorm-subject`, `/flow-next-subject`, `/flow-brainstorm-review`, `/flow-brainstorm-complete`
+- `/flow-verify-plan`
+
+**Reading pattern for Category A**:
+1. **MUST READ**: Quick Reference section (lines 1-353) first
+2. **Use section index** to find relevant deep-dive section if needed
+3. **Read ONLY that section** using Read(offset, limit) - never read entire 3897-line file
+4. **Example**: For brainstorming, read lines 1167-1797 for Brainstorming Session Pattern
+
+#### Category B Commands (14 commands) - NO FRAMEWORK READING REQUIRED
+These commands work entirely from PLAN.md structure:
+- `/flow-status` ✅ REFERENCE MODEL - Dashboard-first approach
+- `/flow-summarize`, `/flow-phase-add`, `/flow-phase-start`, `/flow-phase-complete`
+- `/flow-task-start`, `/flow-task-complete`
+- `/flow-implement-start`, `/flow-implement-complete`
+- `/flow-next`, `/flow-next-iteration`, `/flow-rollback`, `/flow-compact`, `/flow-plan-split`
+
+**Reading pattern for Category B**:
+1. **NO framework reading required** - work from PLAN.md only
+2. Use Dashboard-first or grep-based approaches
+3. Optional background reading if curious, but NOT required for execution
+
+### Framework Reading Strategy (Three-Layer Approach)
+
+**IMPORTANT**: NEVER read the entire 3897-line DEVELOPMENT_FRAMEWORK.md file. Use this three-layer strategy:
+
+**Layer 1: Quick Reference (ALWAYS START HERE for Category A commands)**
+- Lines 1-353: Quick Reference Guide
+- Contains: Decision trees, command cheat sheet, status markers, common patterns
+- **Read this first** for all Category A commands
+
+**Layer 2: Section Index (FIND RELEVANT SECTION)**
+- Use Quick Reference section index to locate relevant deep-dive section
+- Example sections:
+  - Framework Structure (lines 105-179)
+  - Task Structure Rules (lines 238-566)
+  - Brainstorming Session Pattern (lines 1167-1797)
+  - Implementation Pattern (lines 1798-1836)
+
+**Layer 3: Deep Dive (READ ONLY WHAT'S NEEDED)**
+- Use Read(offset=X, limit=Y) to read ONLY the specific section
+- Example: `Read(offset=1167, limit=631)` for Brainstorming Session Pattern
+- Never read more than 600 lines at once
+
+**Prohibited Pattern**:
+❌ `Read("DEVELOPMENT_FRAMEWORK.md")` - This reads ALL 3897 lines (wasteful!)
+✅ `Read("DEVELOPMENT_FRAMEWORK.md", offset=1, limit=353)` - Quick Reference only
+✅ `Read("DEVELOPMENT_FRAMEWORK.md", offset=1167, limit=631)` - Specific section
 
 ## Flow Framework Integration
 
@@ -144,41 +192,24 @@ IF file_exists('.flow/PLAN.md'):
 
 ### Framework Consultation Requirements
 
-**Before making ANY changes to .flow/PLAN.md, consult these framework sections:**
+**Use the three-layer reading strategy above. Quick lookup table:**
 
-#### For Plan Structure Changes
-- **Section**: "Framework Structure" (DEVELOPMENT_FRAMEWORK.md, ~lines 105-180)
-- **Learn**: PHASE → TASK → ITERATION → BRAINSTORM → IMPLEMENTATION hierarchy
-- **Never**: Create wrong hierarchy (e.g., iterations directly under phases)
+| What You Need | Read This | Lines | How to Read |
+|---------------|-----------|-------|-------------|
+| Plan Structure Changes | Framework Structure | 105-179 | Read(offset=105, limit=75) |
+| Status Markers | Status Markers | 1872-1968 | In Quick Reference (lines 1-353) |
+| Brainstorming | Brainstorming Pattern | 1167-1797 | Read(offset=1167, limit=631) |
+| Task Structure | Task Structure Rules | 238-566 | Read(offset=238, limit=329) |
+| Implementation | Implementation Pattern | 1798-1836 | Read(offset=1798, limit=39) |
+| Complete Workflow | Complete Flow Workflow | 614-940 | Read(offset=614, limit=327) |
+| Quick Decisions | Quick Reference Guide | 1-353 | Read(offset=1, limit=353) |
 
-#### For Status Markers
-- **Section**: "Status Markers" (DEVELOPMENT_FRAMEWORK.md, ~lines 1872-1968)
-- **Learn**: ✅ COMPLETE, ⏳ PENDING, 🚧 IN PROGRESS, 🎨 READY, ❌ CANCELLED, 🔮 FUTURE, 🎯 ACTIVE
-- **Never**: Invent new status markers or use wrong markers
-
-#### For Brainstorming
-- **Section**: "Brainstorming Session Pattern" (DEVELOPMENT_FRAMEWORK.md, ~lines 1167-1797)
-- **Learn**: Subject resolution types (A: Pre-Task, B: Documentation, C: Auto-Resolved, D: Iteration Items)
-- **Learn**: When to use `/flow-brainstorm-start`, `/flow-next-subject`, `/flow-brainstorm-complete`
-- **Never**: Skip brainstorming for complex tasks
-
-#### For Task Structure
-- **Section**: "Task Structure Rules" (DEVELOPMENT_FRAMEWORK.md, ~lines 238-566)
-- **Learn**: Golden Rule - Standalone OR Iterations, Never Both
-- **Learn**: Pattern 1 (Standalone Task with action items) vs Pattern 2 (Task with iterations, NO action items)
-- **Never**: Mix task action items AND iterations in same task
-
-#### For Implementation
-- **Section**: "Implementation Pattern" (DEVELOPMENT_FRAMEWORK.md, ~lines 1798-1836)
-- **Learn**: Pre-implementation tasks vs iteration work
-- **Learn**: When to mark iteration 🎨 READY vs 🚧 IN PROGRESS
-- **Never**: Start implementation before brainstorming is ✅ COMPLETE
-
-#### For Complete Workflow
-- **Section**: "Complete Flow Workflow" (DEVELOPMENT_FRAMEWORK.md, ~lines 614-940)
-- **Learn**: 11-step workflow from blueprint to completion
-- **Learn**: Decision trees for common questions
-- **Learn**: Command reference by workflow phase
+**Key Learning Points (from Quick Reference)**:
+- **Hierarchy**: PHASE → TASK → ITERATION → BRAINSTORM → IMPLEMENTATION
+- **Status Markers**: ✅ COMPLETE, ⏳ PENDING, 🚧 IN PROGRESS, 🎨 READY, ❌ CANCELLED, 🔮 FUTURE, 🎯 ACTIVE
+- **Task Golden Rule**: Standalone OR Iterations, Never Both
+- **Subject Resolution Types**: A (Pre-Task), B (Documentation), C (Auto-Resolved), D (Iteration Items)
+- **Implementation Gate**: Brainstorming must be ✅ COMPLETE before starting implementation
 
 ### Quick Reference Guide
 
@@ -207,21 +238,23 @@ IF file_exists('.flow/PLAN.md'):
 
 ### AI Behavior Expectations
 
-**When you detect Flow usage (`flow/PLAN.md` exists):**
+**When you detect Flow usage (`.flow/PLAN.md` exists):**
 
 ✅ **DO**:
-- Read DEVELOPMENT_FRAMEWORK.md before any PLAN.md edits
+- Use three-layer reading strategy (Quick Reference → Section Index → Deep Dive)
+- Read Quick Reference (lines 1-353) for Category A commands
+- Use Dashboard-first/grep-based approaches for Category B commands
 - Follow exact framework patterns (structure, markers, sections)
 - Use slash commands for Flow operations (don't edit PLAN.md directly for state changes)
-- Consult Quick Reference Guide for common questions
 - Reference specific framework sections when explaining patterns
 
 ❌ **DON'T**:
-- Edit PLAN.md structure without reading framework first
+- Read entire 3897-line DEVELOPMENT_FRAMEWORK.md file (use offset/limit!)
+- Skip Quick Reference for Category A commands
+- Read framework for Category B commands (use PLAN.md only)
 - Invent new status markers or section structures
 - Mix task patterns (standalone + iterations in same task)
 - Skip brainstorming for complex tasks
-- Make assumptions about Flow patterns (read the framework!)
 
 ### Example: Detecting Flow and Consulting Framework
 
