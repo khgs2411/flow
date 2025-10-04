@@ -24,10 +24,11 @@
 - [Slash Commands Reference](#slash-commands-reference)
   - [Planning Commands](#planning-commands-3)
   - [Structure Commands](#structure-commands-3)
-  - [Brainstorming Commands](#brainstorming-commands-4)
+  - [Brainstorming Commands](#brainstorming-commands-5)
   - [Implementation Commands](#implementation-commands-2)
   - [Navigation Commands](#navigation-commands-8)
   - [Using Flow Without Commands](#using-flow-without-slash-commands)
+  - [Using Flow with Other AI Models](#using-flow-with-other-ai-models)
 - [Design Decisions](#design-decisions)
 - [Key Insights](#key-insights-from-development)
 - [Comparison to Other Frameworks](#comparison-to-other-frameworks)
@@ -142,7 +143,7 @@ The Flow framework is a spec-driven iterative development methodology that combi
 
 ## 📦 What's New
 
-**Latest version**: [v1.0.15](https://github.com/khgs2411/flow/releases/tag/v1.0.15) - Plan File Size Management
+**Latest version**: [v1.1.0](https://github.com/khgs2411/flow/releases/tag/v1.1.0) - AI Workflow Guidance & Documentation Cleanup
 
 See [**GitHub Releases**](https://github.com/khgs2411/flow/releases) for detailed changelog and version history.
 
@@ -471,7 +472,7 @@ Flow provides **25 slash commands** organized into **6 categories**. **Important
 - Updates Progress Dashboard, advances to next task
 - **Manual**: Change task marker to ✅, update dashboard
 
-### 4. Iteration Lifecycle (6 commands)
+### 4. Iteration Lifecycle (8 commands)
 
 **`/flow-iteration-add <iteration-name>`** (was `/flow-iteration`)
 - Adds new iteration under current task
@@ -602,7 +603,7 @@ You can achieve all of this by manually following the framework patterns. Comman
 
 ---
 
-## Using Flow Without Slash Commands
+## Using Flow with Other AI Models
 
 **Flow works with ANY AI model** - not just Claude Code!
 
@@ -739,7 +740,7 @@ All 25 commands in SLASH_COMMANDS.md work this way:
 
 **Task Lifecycle** (3): `/flow-task-add`, `/flow-task-start`, `/flow-task-complete`
 
-**Iteration Lifecycle** (6): `/flow-iteration-add`, `/flow-brainstorm-start`, `/flow-brainstorm-subject`, `/flow-brainstorm-review`, `/flow-brainstorm-complete`, `/flow-implement-start`, `/flow-implement-complete`
+**Iteration Lifecycle** (8): `/flow-iteration-add`, `/flow-brainstorm-start`, `/flow-brainstorm-subject`, `/flow-next-subject`, `/flow-brainstorm-review`, `/flow-brainstorm-complete`, `/flow-implement-start`, `/flow-implement-complete`
 
 **Navigation** (3): `/flow-next`, `/flow-next-subject`, `/flow-next-iteration`
 

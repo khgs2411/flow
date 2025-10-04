@@ -132,7 +132,7 @@ Testing:
 
 /flow-blueprint "payment gateway"
 
-````
+```
 
 **Instructions**:
 
@@ -237,7 +237,7 @@ Testing:
    - "Use `/flow-brainstorm-start [topic]` to begin first iteration"
 
 **Output**: Create `.flow/PLAN.md` file and confirm creation to user.
-````
+```
 
 ---
 
@@ -245,7 +245,7 @@ Testing:
 
 **File**: `flow-migrate.md`
 
-````markdown
+```markdown
 ---
 description: Migrate existing PRD/PLAN/TODO to Flow's .flow/PLAN.md format
 ---
@@ -379,7 +379,7 @@ You are executing the `/flow-migrate` command from the Flow framework.
    - Enhance with Flow formatting, don't replace
 
 8. **Confirm to user**:
-````
+```
 
 ✨ Migration complete!
 
@@ -523,7 +523,7 @@ All your content preserved - only structure enhanced.
 
 **File**: `flow-phase-add.md`
 
-````markdown
+```markdown
 ---
 description: Add a new phase to the development plan
 ---
@@ -569,7 +569,7 @@ If you discover NEW issues while working on this phase that are NOT part of the 
 
    ---
    ```
-````
+```
 
 4. **Update .flow/PLAN.md**: Append new phase to Development Plan section
 
@@ -583,7 +583,7 @@ If you discover NEW issues while working on this phase that are NOT part of the 
 
 **Output**: Update .flow/PLAN.md with new phase.
 
-````
+```
 
 ---
 
@@ -632,7 +632,7 @@ If you discover NEW issues while working on this phase that are NOT part of the 
 5. **Confirm to user**: "Started Phase [N]: [Name]. Use `/flow-task-add [description]` to create tasks."
 
 **Output**: Update .flow/PLAN.md with phase status change and Progress Dashboard update.
-````
+```
 
 ---
 
@@ -707,7 +707,7 @@ You are executing the `/flow-phase-complete` command from the Flow framework.
 
 **File**: `flow-task-add.md`
 
-````markdown
+```markdown
 ---
 description: Add a new task under the current phase
 ---
@@ -755,7 +755,7 @@ If you discover NEW issues while working on this task that are NOT part of the c
 
    ---
    ```
-````
+```
 
 5. **Update .flow/PLAN.md**: Append task under current phase
 
@@ -769,7 +769,7 @@ If you discover NEW issues while working on this task that are NOT part of the c
 
 **Output**: Update .flow/PLAN.md with new task.
 
-````
+```
 
 ---
 
@@ -834,7 +834,7 @@ If you discover NEW issues while working on this task that are NOT part of the c
    - Suggest next steps: "Use `/flow-iteration-add [description]` to create iterations, or `/flow-brainstorm-start [topics]` to brainstorm first."
 
 **Output**: Update .flow/PLAN.md with task status change and Progress Dashboard update.
-````
+```
 
 ---
 
@@ -909,7 +909,7 @@ You are executing the `/flow-task-complete` command from the Flow framework.
 
 **File**: `flow-iteration-add.md`
 
-````markdown
+```markdown
 ---
 description: Add a new iteration under the current task
 ---
@@ -950,7 +950,7 @@ If you discover NEW issues while working on this iteration that are NOT part of 
 
    ---
    ```
-````
+```
 
 5. **Update .flow/PLAN.md**: Append iteration under current task
 
@@ -964,7 +964,7 @@ If you discover NEW issues while working on this iteration that are NOT part of 
 
 **Output**: Update .flow/PLAN.md with new iteration.
 
-````
+```
 
 ---
 
@@ -1048,7 +1048,7 @@ If you discover NEW issues during brainstorming that are NOT part of the current
    **Resolved Subjects**:
 
    ---
-````
+```
 
 7. **Update Progress Dashboard**: Update current iteration status to "🚧 BRAINSTORMING"
 
@@ -1061,7 +1061,7 @@ If you discover NEW issues during brainstorming that are NOT part of the current
 
 **Output**: Update .flow/PLAN.md with brainstorming section, subject list, and status change.
 
-````
+```
 
 ---
 
@@ -1100,7 +1100,7 @@ You are executing the `/flow-brainstorm-subject` command from the Flow framework
 6. **Confirm to user**: "Added Subject [N]: [$ARGUMENTS] to brainstorming session."
 
 **Output**: Update .flow/PLAN.md with new subject.
-````
+```
 
 ---
 
@@ -1108,7 +1108,7 @@ You are executing the `/flow-brainstorm-subject` command from the Flow framework
 
 **File**: `flow-brainstorm-review.md`
 
-````markdown
+```markdown
 ---
 description: Review all resolved subjects, suggest follow-up work
 ---
@@ -1201,7 +1201,7 @@ You are executing the `/flow-brainstorm-review` command from the Flow framework.
    ```
 
 **Output**: Comprehensive review summary with actionable suggestions, awaiting user confirmation.
-````
+```
 
 ---
 
@@ -1269,7 +1269,7 @@ You are executing the `/flow-brainstorm-complete` command from the Flow framewor
 
 **File**: `flow-implement-start.md`
 
-````markdown
+```markdown
 ---
 description: Begin implementation of current iteration
 ---
@@ -1351,7 +1351,7 @@ If you discover NEW issues during implementation that are NOT part of the curren
 
    ---
    ```
-````
+```
 
 7. **Update Progress Dashboard** (if it exists):
 
@@ -1365,7 +1365,7 @@ If you discover NEW issues during implementation that are NOT part of the curren
 
 **Output**: Update .flow/PLAN.md with implementation section, status change, and Dashboard update.
 
-````
+```
 
 ---
 
@@ -1414,7 +1414,7 @@ You are executing the `/flow-implement-complete` command from the Flow framework
    **Verification**: [User's verification method]
 
    **Completed**: [Date]
-````
+```
 
 8. **Check if task/phase complete**:
 
@@ -1447,7 +1447,7 @@ You are executing the `/flow-implement-complete` command from the Flow framework
 
 **Output**: Update .flow/PLAN.md with completion status, summary, Dashboard update, and clear next-step guidance.
 
-````
+```
 
 ---
 
@@ -1480,7 +1480,7 @@ You are executing the `/flow-status` command from the Flow framework.
    # Use Grep to read ONLY the Progress Dashboard section (~50 lines)
    Grep pattern: "^## 📋 Progress Dashboard"
    Use -A 20 flag to read ~20 lines after match
-````
+```
 
 Extract from Dashboard text:
 
@@ -1664,7 +1664,7 @@ Extract from Dashboard text:
 
 **Output**: Display current position, micro verification results, next action suggestion.
 
-````
+```
 
 ---
 
@@ -1711,7 +1711,7 @@ You are executing the `/flow-summarize` command from the Flow framework.
 
 3. **Generate structured summary** (compact, scannable format):
 
-````
+```
 
 📊 Flow Summary
 
@@ -1848,7 +1848,7 @@ V2 = Dynamic formulas, character stats integration, full feature set
 - Task 8: Custom HTTP Client (rejected - SDK is better)
 - Subject 3: GraphQL API (rejected - REST is sufficient)
 
-````
+```
 
 7. **Smart verification** (active work only):
 - Skip ✅ COMPLETE items (verified & frozen)
@@ -1879,7 +1879,7 @@ V2 = Dynamic formulas, character stats integration, full feature set
 - Format into hierarchical view
 
 **Output**: Hierarchical summary of entire project structure with completion tracking.
-````
+```
 
 ---
 
@@ -1913,7 +1913,7 @@ Phase 1 (Present):
 Phase 2 (Capture - triggered by user response):
 User responds → capture decision → document → mark ✅ → auto-advance to next
 
-````
+```
 
 **Instructions**:
 
@@ -1995,7 +1995,7 @@ User responds → capture decision → document → mark ✅ → auto-advance to
 **Key Principle**: Moving to next subject implies current is resolved. No separate "resolve" command needed.
 
 **Output**: Update .flow/PLAN.md with subject resolution and show next subject.
-````
+```
 
 ---
 
@@ -2485,7 +2485,7 @@ Repeat for next iteration
 
 **File**: `flow-plan-split.md`
 
-````markdown
+```markdown
 ---
 description: Archive old completed tasks to reduce PLAN.md size
 ---
@@ -2560,7 +2560,7 @@ You are executing the `/flow-plan-split` command from the Flow framework.
 
    [Archived task content here - preserve phase structure]
    ```
-````
+```
 
 **If .flow/ARCHIVE.md ALREADY exists** (subsequent split):
 

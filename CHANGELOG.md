@@ -17,6 +17,53 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
+**v1.1.0** - AI Workflow Guidance & Documentation Cleanup (2025-10-04)
+
+**Breaking Changes**: None - fully backward compatible with v1.0.x
+
+**Major Features**:
+
+1. **"What's Next" Workflow Guidance** ✨
+   - Added prominent "🎯 What's Next" sections to 6 key state transition commands
+   - Commands now show explicit decision trees instead of vague prose
+   - Prevents AI confusion about workflow continuation (e.g., review vs complete)
+   - Pattern: Emoji header + conditional logic + explicit command names
+   - Commands enhanced:
+     - `/flow-next-subject` → Shows `/flow-brainstorm-review` after all subjects resolved
+     - `/flow-brainstorm-review` → Decision tree for pre-tasks/iterations/complete
+     - `/flow-brainstorm-complete` → Directs to `/flow-implement-start`
+     - `/flow-implement-complete` → Decision tree for iteration-add/task-complete/status
+     - `/flow-task-complete` → Decision tree for phase-complete/task-start
+     - `/flow-phase-complete` → Decision tree for phase-start/project completion
+
+2. **Repository Documentation Cleanup** 🧹
+   - Removed 63,693 bytes of redundant meta-work documentation
+   - Deleted: TROUBLESHOOTING.md, TESTING.md, ADVANCED_PATTERNS.md, RELEASE_NOTES_v1.0.16.md
+   - Retained only GitHub Community Standards files + CHANGELOG.md + CLAUDE.md
+   - Rationale: These files made sense for projects USING Flow, not for Flow framework itself
+
+**Improvements**:
+- Consolidated RELEASE_NOTES_v1.0.16.md content into CHANGELOG.md
+- All v1.0.16 improvements fully integrated (Quick Reference, AI_SCAN markers, etc.)
+- Improved command workflow prevents common AI mistakes through prominence
+
+**Bug Fixes**:
+- **Critical**: Fixed 7 slash commands with incorrect markdown fences (4 backticks → 3 backticks)
+  - Affected commands: implement-start, migrate, phase-add, task-add, iteration-add, brainstorm-review, plan-split
+  - Root cause: Build script's awk pattern failed to match 4-backtick fences, silently extracting wrong command content
+  - Impact: Commands showed duplicate content from adjacent commands (e.g., implement-start showed implement-complete)
+  - Fixed in framework/SLASH_COMMANDS.md, rebuilt flow.sh, redeployed all commands
+- Fixed command count errors in README.md (Iteration Lifecycle 6→8, Brainstorming 4→5)
+- Resolved duplicate section title confusion by renaming "Using Flow Without Slash Commands" → "Using Flow with Other AI Models"
+
+**Impact**: Better AI workflow adherence, cleaner repository structure, maintained GitHub Community Standards compliance
+
+See the [v1.1.0 release](https://github.com/khgs2411/flow/releases/tag/v1.1.0) for full details.
+
+---
+
+## Previous Versions
+
 **v1.0.16** - Bidirectional Reference Architecture (2025-10-03)
 
 **Major Feature**:

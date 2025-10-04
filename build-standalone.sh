@@ -12,7 +12,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FRAMEWORK_DIR="$SCRIPT_DIR/framework"
 OUTPUT_FILE="$SCRIPT_DIR/flow.sh"
-FLOW_VERSION="1.0.16"  # Update this with each release
+FLOW_VERSION="1.1.0"  # Update this with each release
 
 echo "🔨 Building standalone Flow framework script v${FLOW_VERSION}..."
 echo ""
