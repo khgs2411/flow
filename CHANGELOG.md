@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.1.7** - Hotfix: Brainstorm Subjects Autocomplete (2025-10-04)
+**v1.1.9** - Hotfix: Brainstorming Command Behavior (2025-10-04)
 
 **Changes**:
 
-- - Fixed an issue where the AI did not follow the 'next-subject' command properly\n
-See the [v1.1.7 release](https://github.com/khgs2411/flow/releases/tag/v1.1.7) for full details.
+- Fixed /flow-next-subject auto-completing subjects without user discussion\n- Fixed /flow-next-subject creating massive 336-line resolutions instead of concise decisions\n- Added explicit DO NOT research/read code instructions to prevent over-engineering\n- Brainstorming now properly facilitates user conversation instead of auto-generating solutions\n
+See the [v1.1.9 release](https://github.com/khgs2411/flow/releases/tag/v1.1.9) for full details.
 
 ---
 
