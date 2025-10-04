@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.1.5** - Hotfix: Plan Integrity (2025-10-04)
+**v1.1.7** - Hotfix: Command Behavior Fixes (2025-10-04)
 
 **Changes**:
 
-- - Fixed an issue where iterations were not displayed properly in the progress dashboard\n
-See the [v1.1.5 release](https://github.com/khgs2411/flow/releases/tag/v1.1.5) for full details.
+- Fixed /flow-iteration-add not listing iterations in Progress Dashboard\n- Fixed /flow-plan-update not catching malformed iteration lists\n- Fixed /flow-brainstorm-start auto-generating subjects without user input\n- Improved release script to handle file staging properly\n
+See the [v1.1.7 release](https://github.com/khgs2411/flow/releases/tag/v1.1.7) for full details.
 
 ---
 
