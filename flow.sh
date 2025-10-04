@@ -23,8 +23,8 @@ CYAN='\033[0;36m'
 NC='\033[0m'
 
 COMMANDS=(
-  # Plan Initialization (3 commands)
-  "flow-blueprint" "flow-migrate" "flow-plan-update"
+  # Plan Initialization (4 commands)
+  "flow-blueprint" "flow-migrate" "flow-plan-update" "flow-plan-split"
   # Phase Lifecycle (3 commands)
   "flow-phase-add" "flow-phase-start" "flow-phase-complete"
   # Task Lifecycle (3 commands)
