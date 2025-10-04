@@ -2,7 +2,7 @@
 
 **AI-in-the-loop iterative development that preserves context and prevents refactoring hell.**
 
-*Domain-Driven Design meets Agile philosophy. You design the architecture and iterations. AI executes within your framework. Context never gets lost.*
+_Domain-Driven Design meets Agile philosophy. You design the architecture and iterations. AI executes within your framework. Context never gets lost._
 
 [![Version](https://img.shields.io/badge/version-1.1.4-blue.svg)](https://github.com/khgs2411/flow/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](#license)
@@ -12,6 +12,7 @@
 ## Why Flow?
 
 Building complex features with AI often leads to:
+
 - **Context loss** across sessions
 - **Refactoring cycles** from poor upfront design
 - **Missed edge cases** discovered too late
@@ -32,13 +33,18 @@ Everything is preserved in `.flow/PLAN.md` - a living document that survives acr
 ### Install Flow (30 seconds)
 
 **Option 1: Direct Download** (no git required)
+
 ```bash
 cd /path/to/your/project
+```
+
+```bash
 curl -O https://raw.githubusercontent.com/khgs2411/flow/master/flow.sh
 chmod +x flow.sh && ./flow.sh
 ```
 
 **Option 2: Clone & Run**
+
 ```bash
 git clone https://github.com/khgs2411/flow.git ~/flow-framework
 cd /path/to/your/project
@@ -46,6 +52,7 @@ cd /path/to/your/project
 ```
 
 **What gets installed:**
+
 ```
 your-project/
 ├── .claude/commands/    # 28 slash commands
@@ -60,16 +67,19 @@ your-project/
 ### Create Your First Plan
 
 **For new projects:**
+
 ```bash
 /flow-blueprint "Real-time collaborative text editor with conflict resolution"
 ```
 
 **For existing projects:**
+
 ```bash
 /flow-migrate existing-plan.md
 ```
 
 **Start your first iteration:**
+
 ```bash
 /flow-brainstorm-start "CRDT vs OT, WebSocket architecture, offline support"
 /flow-next-subject  # Discuss and resolve each subject
@@ -116,6 +126,7 @@ PHASE (Testing, Implementation, Polish)
 ## Key Features
 
 ### 🧠 Brainstorming Sessions
+
 Document design decisions with rationale BEFORE coding. Prevents refactoring hell.
 
 ```markdown
@@ -124,37 +135,44 @@ Document design decisions with rationale BEFORE coding. Prevents refactoring hel
 **Decision**: Use JWT with refresh tokens
 
 **Rationale**:
+
 - Stateless authentication scales better
 - Refresh tokens provide security + UX balance
 - Industry standard with mature libraries
 
 **Action Items**:
+
 - [ ] Implement JWT generation (jsonwebtoken)
 - [ ] Create refresh token rotation
 - [ ] Add token blacklist for logout
 ```
 
 ### 📋 Pre-Implementation Tasks
+
 Handle blockers discovered during brainstorming:
 
 ```markdown
 ### Pre-Implementation Tasks
 
 #### ⏳ Task 1: Refactor Legacy Auth Module
+
 **Why**: Current auth is tightly coupled to session storage
 **What**: Extract to AuthService interface
+
 - [ ] Create AuthService interface
 - [ ] Implement JWTAuthService
 - [ ] Update controllers to use interface
 ```
 
 ### 🎯 Progress Dashboard
+
 Always-visible navigation for complex projects:
 
 ```markdown
 ## Progress Dashboard
 
 **Current Work**:
+
 - **Phase**: [Phase 2 - Implementation](#phase-2-implementation) 🚧
 - **Task**: [Task 3 - API Layer](#task-3-api-layer) 🚧
 - **Iteration**: [Iteration 5 - Error Handling](#iteration-5-error-handling) 🚧
@@ -163,6 +181,7 @@ Always-visible navigation for complex projects:
 ```
 
 ### 📦 Backlog Management
+
 Move pending tasks out of active plan for token efficiency:
 
 ```bash
@@ -172,6 +191,7 @@ Move pending tasks out of active plan for token efficiency:
 ```
 
 ### ✅ Plan Verification
+
 Ensure your plan matches reality:
 
 ```bash
@@ -194,6 +214,7 @@ Like building a body, you start with structure and progressively add complexity:
 4. **Fibers** (V3) - Performance, optimization, polish
 
 **Why this works:**
+
 - Prevents premature optimization
 - Forces you to prove the architecture before adding complexity
 - Each iteration builds on validated foundations
@@ -221,21 +242,25 @@ Thinking time is cheaper than refactoring time.
 ## Slash Commands (28 total)
 
 ### Planning (3)
+
 - `/flow-blueprint` - Create new plan from scratch
 - `/flow-migrate` - Convert existing PRD/PLAN/TODO to Flow format
 - `/flow-plan-update` - Update plan to latest framework structure
 
 ### Phase Management (3)
+
 - `/flow-phase-add` - Add new phase
 - `/flow-phase-start` - Mark phase in progress
 - `/flow-phase-complete` - Complete phase
 
 ### Task Management (3)
+
 - `/flow-task-add` - Add new task
 - `/flow-task-start` - Mark task in progress
 - `/flow-task-complete` - Complete task
 
 ### Iteration Workflow (8)
+
 - `/flow-iteration-add` - Add new iteration
 - `/flow-brainstorm-start` - Begin brainstorming session
 - `/flow-brainstorm-subject` - Add subject to discussion
@@ -246,11 +271,13 @@ Thinking time is cheaper than refactoring time.
 - `/flow-implement-complete` - Complete iteration
 
 ### Backlog Management (3)
+
 - `/flow-backlog-add` - Move tasks to backlog
 - `/flow-backlog-view` - Show backlog contents
 - `/flow-backlog-pull` - Pull task back to active plan
 
 ### Navigation & Status (5)
+
 - `/flow-status` - Current position (micro view)
 - `/flow-summarize` - Full project overview (macro view)
 - `/flow-verify-plan` - Verify plan matches codebase
@@ -258,6 +285,7 @@ Thinking time is cheaper than refactoring time.
 - `/flow-rollback` - Undo last plan change
 
 ### Plan Maintenance (3)
+
 - `/flow-plan-split` - Archive old tasks to reduce file size
 - `/flow-next-iteration` - Show next iteration details
 - `/flow-compact` - Generate handoff report for new AI session
@@ -269,6 +297,7 @@ Thinking time is cheaper than refactoring time.
 **Scenario**: Building a payment gateway integration
 
 ### 1. Create Blueprint
+
 ```bash
 /flow-blueprint "Stripe Payment Gateway Integration
 
@@ -291,13 +320,16 @@ Testing:
 **Result**: Structured plan with phases, tasks, iterations
 
 ### 2. Brainstorm First Iteration
+
 ```bash
 /flow-brainstorm-start "Payment flow architecture, webhook security, retry strategy, error handling"
 ```
 
 **AI creates**:
+
 ```markdown
 ### Subjects to Discuss
+
 1. ⏳ Payment Flow Architecture
 2. ⏳ Webhook Security & Verification
 3. ⏳ Retry Strategy & Idempotency
@@ -305,6 +337,7 @@ Testing:
 ```
 
 ### 3. Resolve Each Subject
+
 ```bash
 /flow-next-subject
 ```
@@ -317,12 +350,14 @@ Testing:
 **Decision**: Two-phase commit pattern (reserve → capture)
 
 **Rationale**:
+
 - Prevents double-charging on network failures
 - Enables fraud checks between reserve and capture
 - Stripe native support via PaymentIntent API
 - Standard e-commerce pattern (Amazon, Shopify use this)
 
 **Action Items**:
+
 - [ ] Create PaymentIntent on checkout initiation
 - [ ] Implement reserve endpoint (confirm payment)
 - [ ] Implement capture endpoint (fulfill order)
@@ -332,24 +367,29 @@ Testing:
 **Repeat for subjects 2-4...**
 
 ### 4. Review & Create Work
+
 ```bash
 /flow-brainstorm-review
 ```
 
 **AI analyzes decisions and suggests**:
+
 - 3 new iterations for Phase 1
 - 2 pre-implementation tasks (refactor existing payment module)
 
 ### 5. Implement
+
 ```bash
 /flow-implement-start
 ```
 
 **AI creates**:
+
 ```markdown
 ### Implementation
 
 **Action Items** (from brainstorming):
+
 - [ ] Create PaymentIntent on checkout initiation
 - [ ] Implement reserve endpoint (confirm payment)
 - [ ] Implement capture endpoint (fulfill order)
@@ -363,11 +403,13 @@ Testing:
 You code, checking off items as you complete them.
 
 ### 6. Complete & Verify
+
 ```bash
 /flow-implement-complete
 ```
 
 **AI prompts for verification**:
+
 ```
 Verification Notes:
 - ✅ Tested reserve → capture flow with test cards
@@ -394,6 +436,7 @@ You can use Flow with ANY AI (ChatGPT, Gemini, etc.) by manually following the p
 5. Reference `framework/SLASH_COMMANDS.md` for guidance
 
 **Example prompt for ChatGPT**:
+
 ```
 Read framework/SLASH_COMMANDS.md section '/flow-blueprint'
 and execute those instructions for "User Authentication System"
@@ -408,12 +451,14 @@ The AI will follow the steps manually. You lose autocomplete but keep the full m
 ### Three-Part System
 
 1. **`flow.sh`** (~146KB single file)
+
    - Self-contained deployment script
    - All framework content embedded via heredocs
    - Zero external dependencies
    - This is what gets distributed
 
 2. **`framework/`** (source files for development)
+
    - `DEVELOPMENT_FRAMEWORK.md` - Complete methodology (3,897 lines)
    - `EXAMPLE_PLAN.md` - Payment gateway reference (509 lines)
    - `SLASH_COMMANDS.md` - 28 command definitions
@@ -425,6 +470,7 @@ The AI will follow the steps manually. You lose autocomplete but keep the full m
 ### For Framework Developers
 
 **Edit framework**:
+
 ```bash
 # Edit source files
 vim framework/DEVELOPMENT_FRAMEWORK.md
@@ -439,6 +485,7 @@ cd /path/to/test-project
 ```
 
 **Release new version**:
+
 ```bash
 ./release.sh --patch   # 1.1.4 → 1.1.5
 ./release.sh --minor   # 1.1.4 → 1.2.0
@@ -452,21 +499,25 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contributor guide.
 ## Key Design Decisions
 
 ### Why single-file distribution?
+
 - **Portability** - Share one file, no dependencies
 - **Reliability** - No network requests, no missing files
 - **Simplicity** - Users just run `./flow.sh`
 
 ### Why separate source files?
+
 - **Maintainability** - Edit markdown, not heredocs
 - **Version Control** - Clean diffs on actual content
 - **Development** - Use proper markdown editors
 
 ### Why brainstorm before code?
+
 - **Prevents refactoring** - Design decisions upfront
 - **Captures rationale** - WHY is preserved, not just WHAT
 - **Async collaboration** - Team sees thought process
 
 ### Why pre-implementation tasks?
+
 - **Real-world pattern** - Often need to refactor before new work
 - **Explicit blockers** - No hidden dependencies
 - **Brainstorm completeness** - Can't start coding until ready
@@ -475,13 +526,13 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contributor guide.
 
 ## Comparison to Other Approaches
 
-| Approach | Planning | Context | Iteration | AI Guided |
-|----------|----------|---------|-----------|-----------|
-| **Flow** | Structured upfront | Preserved in PLAN.md | Built-in (V1/V2/V3) | ✅ Yes |
-| **Spec-Kit** | Test-driven | In tests | Manual | ❌ No |
-| **Agile** | Sprint planning | In tickets | Sprint-based | ❌ No |
-| **Waterfall** | All upfront | In docs | None | ❌ No |
-| **Cowboy Coding** | None | Developer's head | Ad-hoc | ❌ No |
+| Approach          | Planning           | Context              | Iteration           | AI Guided |
+| ----------------- | ------------------ | -------------------- | ------------------- | --------- |
+| **Flow**          | Structured upfront | Preserved in PLAN.md | Built-in (V1/V2/V3) | ✅ Yes    |
+| **Spec-Kit**      | Test-driven        | In tests             | Manual              | ❌ No     |
+| **Agile**         | Sprint planning    | In tickets           | Sprint-based        | ❌ No     |
+| **Waterfall**     | All upfront        | In docs              | None                | ❌ No     |
+| **Cowboy Coding** | None               | Developer's head     | Ad-hoc              | ❌ No     |
 
 **Flow's unique value**: AI-native workflow with mandatory context preservation.
 
@@ -527,7 +578,7 @@ Attribution appreciated but not required.
 
 **"Build the skeleton first, then add flesh."**
 
-*— Flow Framework*
+_— Flow Framework_
 
 [⬆ Back to Top](#flow-framework)
 
