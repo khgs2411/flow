@@ -35,6 +35,37 @@ This file contains all slash command definitions for the Flow framework. Copy th
 - ❌ Cancelled
 - 🔮 Deferred
 
+**Tool Usage for Pattern Matching**:
+
+When commands instruct you to "Find", "Look for", or "Locate" patterns in PLAN.md:
+
+- **Use Grep tool** for:
+  - Simple pattern existence checks (does pattern exist?)
+  - Counting occurrences (`grep -c`)
+  - Reading specific sections with context (`grep -A`, `-B`, `-C`)
+  - Examples: Finding phase markers, checking status, locating sections
+
+- **Use awk** ONLY for:
+  - Extracting content between two patterns (range extraction)
+  - Example: `awk '/start_pattern/,/end_pattern/ {print}'`
+
+- **Prefer Grep over awk** for simple tasks - it's more efficient and clearer
+
+**Examples**:
+```bash
+# ✅ GOOD - Use Grep for pattern checking
+grep "^### Phase 4:" PLAN.md
+grep -c "^#### ⏳ Task" PLAN.md
+grep -A 2 "^## 📋 Progress Dashboard" PLAN.md
+
+# ✅ GOOD - Use awk for range extraction
+awk '/^##### Iteration 5:/,/^#####[^#]|^####[^#]/ {print}' PLAN.md
+awk '/\*\*Subjects to Discuss\*\*:/,/\*\*Resolved Subjects\*\*:/ {print}' PLAN.md
+
+# ❌ BAD - Don't use awk for simple existence checks
+awk '/^### Phase 4:/ {print}' PLAN.md  # Use grep instead
+```
+
 ---
 
 ## /flow-blueprint
@@ -517,7 +548,12 @@ If you discover NEW issues while working on this phase that are NOT part of the 
 
 4. **Update .flow/PLAN.md**: Append new phase to Development Plan section
 
-5. **Confirm to user**: "Added Phase [N]: [$ARGUMENTS] to PLAN.md"
+5. **Update Progress Dashboard** (if it exists):
+   - Update phase count in Progress Overview section
+   - No need to change "Current Work" pointer (new phase is ⏳ PENDING)
+   - Add new phase to completion status if tracking percentages
+
+6. **Confirm to user**: "Added Phase [N]: [$ARGUMENTS] to PLAN.md"
 
 **Output**: Update .flow/PLAN.md with new phase.
 ```
@@ -674,7 +710,12 @@ If you discover NEW issues while working on this task that are NOT part of the c
 
 5. **Update .flow/PLAN.md**: Append task under current phase
 
-6. **Confirm to user**: "Added Task [N]: [$ARGUMENTS] to current phase"
+6. **Update Progress Dashboard** (if it exists):
+   - Update task count in Progress Overview
+   - Add new task to phase's task list
+   - No need to change "Current Work" pointer (new task is ⏳ PENDING)
+
+7. **Confirm to user**: "Added Task [N]: [$ARGUMENTS] to current phase"
 
 **Output**: Update .flow/PLAN.md with new task.
 ```
@@ -841,7 +882,12 @@ If you discover NEW issues while working on this iteration that are NOT part of 
 
 5. **Update .flow/PLAN.md**: Append iteration under current task
 
-6. **Confirm to user**: "Added Iteration [N]: [$ARGUMENTS] to current task. Use `/flow-brainstorm-start [topic]` to begin."
+6. **Update Progress Dashboard** (if it exists):
+   - Update iteration count in Progress Overview (e.g., "3/6 iterations complete" → "3/7 iterations complete")
+   - Add new iteration to task's iteration list
+   - No need to change "Current Work" pointer (new iteration is ⏳ PENDING)
+
+7. **Confirm to user**: "Added Iteration [N]: [$ARGUMENTS] to current task. Use `/flow-brainstorm-start [topic]` to begin."
 
 **Output**: Update .flow/PLAN.md with new iteration.
 ```
@@ -1197,11 +1243,16 @@ If you discover NEW issues during implementation that are NOT part of the curren
    ---
    ```
 
-7. **Confirm to user**:
+7. **Update Progress Dashboard** (if it exists):
+   - Update current iteration status to "🚧 IMPLEMENTING" or "🚧 IN PROGRESS"
+   - Update "Last Updated" timestamp
+   - Current work pointer should already be correct (pointing to this iteration)
+
+8. **Confirm to user**:
    - If brainstorming was done: "Implementation started! Let's begin with the first action item."
    - If brainstorming was skipped: "Implementation started (brainstorming skipped). Let's begin with the first action item."
 
-**Output**: Update .flow/PLAN.md with implementation section and status change.
+**Output**: Update .flow/PLAN.md with implementation section, status change, and Dashboard update.
 ```
 
 ---
@@ -1257,9 +1308,17 @@ You are executing the `/flow-implement-complete` command from the Flow framework
    - If all iterations in task complete → Mark task ✅
    - If all tasks in phase complete → Mark phase ✅
 
-9. **Confirm to user**: "Iteration [N] marked complete! Use `/flow-iteration-add [description]` to start next iteration, or `/flow-status` to see current state."
+9. **Update Progress Dashboard** (if it exists):
+   - Update current iteration status to "✅ COMPLETE"
+   - Update iteration completion count (e.g., "3/6 complete" → "4/6 complete")
+   - If moving to next iteration: Update "Current Work" pointer to next ⏳ PENDING iteration
+   - If task/phase complete: Update those statuses as well
+   - Update "Last Updated" timestamp
+   - Update completion percentages if tracked
 
-**Output**: Update .flow/PLAN.md with completion status and summary.
+10. **Confirm to user**: "Iteration [N] marked complete! Use `/flow-iteration-add [description]` to start next iteration, or `/flow-status` to see current state."
+
+**Output**: Update .flow/PLAN.md with completion status, summary, and Dashboard update.
 ```
 
 ---
@@ -1739,15 +1798,27 @@ User responds → capture decision → document → mark ✅ → auto-advance to
      ---
      ```
 
-   **Step E: Auto-advance**
+   **Step E: Auto-advance OR prompt for review**
    - Update PLAN.md with resolution
    - Show progress: "[N] of [Total] subjects resolved"
-   - Auto-show next unresolved subject (if any)
-   - If all resolved: "All subjects resolved! Use `/flow-brainstorm-review` to review decisions and plan follow-up work."
+   - Check if more ⏳ subjects exist:
+     - **If YES** (more pending): Auto-show next unresolved subject
+     - **If NO** (all resolved): Show workflow prompt below
 
-5. **If all resolved**:
-   - Notify: "All subjects resolved! Use `/flow-brainstorm-review` to review decisions, identify pre-tasks, and plan follow-up work."
-   - Show summary of what was decided
+5. **If all resolved** (this was the last subject):
+   - **IMPORTANT**: Show explicit next-step prompt:
+     ```
+     ✅ All subjects resolved!
+
+     📋 Next step: Run `/flow-brainstorm-review` to:
+     - Analyze all resolved subjects
+     - Categorize by Type A/B/C/D
+     - Identify pre-implementation tasks (Type A)
+     - Plan follow-up work
+
+     After review and completing any pre-tasks, run `/flow-brainstorm-complete` to mark iteration as 🎨 READY FOR IMPLEMENTATION.
+     ```
+   - Show brief summary of decisions made
 
 **Key Principle**: Moving to next subject implies current is resolved. No separate "resolve" command needed.
 
