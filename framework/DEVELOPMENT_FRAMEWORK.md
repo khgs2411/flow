@@ -2409,9 +2409,9 @@ Insert this section **after Overview, before Architecture**:
 **Last Updated**: [Date]
 
 **Current Work**:
-- **Phase**: Phase 2 - Core Implementation → [Jump](#phase-2-core-implementation)
-- **Task**: Task 5 - Error Handling → [Jump](#task-5-error-handling)
-- **Iteration**: Iteration 6 - Circuit Breaker → [Jump](#iteration-6-circuit-breaker)
+- **Phase**: [Phase 2 - Core Implementation](#phase-2-core-implementation-)
+- **Task**: [Task 5 - Error Handling](#task-5-error-handling-)
+- **Iteration**: [Iteration 6 - Circuit Breaker](#iteration-6-circuit-breaker-) 🚧 IN PROGRESS
 
 **Completion Status**:
 - Phase 1: ✅ 100% | Phase 2: 🚧 75% | Phase 3: ⏳ 0%
@@ -2440,8 +2440,8 @@ Insert this section **after Overview, before Architecture**:
 
 ### Key Elements
 
-1. **Jump links** - Navigate to current work in large files (`[Jump](#phase-2-core-implementation)`)
-2. **YOU ARE HERE** - Crystal clear current position
+1. **Jump links** - Navigate to current work in large files using inline markdown links: `[Phase 2 - Core Implementation](#phase-2-core-implementation-)`
+2. **YOU ARE HERE** - Crystal clear current position with arrow marker
 3. **Completion %** - Quick progress view per phase
 4. **Grouped completed items** - Token-efficient (marked "verified & frozen")
 5. **Deferred/Cancelled tracking** - Explicit scope decisions with reasons
@@ -2637,9 +2637,9 @@ From a 3747-line game engine PLAN.md:
 **Last Updated**: 2025-10-03
 
 **Current Work**:
-- **Phase**: Phase 2 - Core Implementation → [Jump](#phase-2-core-implementation)
-- **Task**: Task 5 - Green Service → [Jump](#task-5-green-service)
-- **Iteration**: Iteration 7 - Blue Validation → [Jump](#iteration-7-blue-validation)
+- **Phase**: [Phase 2 - Core Implementation](#phase-2-core-implementation-)
+- **Task**: [Task 5 - Green Service](#task-5-green-service-)
+- **Iteration**: [Iteration 7 - Blue Validation](#iteration-7-blue-validation-) 🚧 IN PROGRESS
 
 **Completion Status**:
 - Phase 1: ✅ 100% | Phase 2: 🚧 95% | Phase 3: ⏳ 0%

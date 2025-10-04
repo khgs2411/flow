@@ -477,7 +477,13 @@ You are executing the `/flow-plan-update` command from the Flow framework.
    - **Clean up redundant framework documentation** (if user has custom brainstorming/workflow docs that duplicate Flow, ask if they want to remove)
    - Add Progress Dashboard if missing and project is complex (10+ iterations)
    - Ensure all status markers are standardized (✅ ⏳ 🚧 🎨 ❌ 🔮)
-   - Add jump links to Progress Dashboard if missing
+   - **Add jump links to "Current Work" section if missing**:
+     - Format: `- **Phase**: [Phase 2 - Core Implementation](#phase-2-core-implementation-)`
+     - Format: `- **Task**: [Task 5 - Error Handling](#task-5-error-handling-)`
+     - Format: `- **Iteration**: [Iteration 6 - Circuit Breaker](#iteration-6-circuit-breaker-) 🚧 IN PROGRESS`
+     - Use inline markdown links (NOT `→ [Jump](#link)` format)
+     - Include status emoji (🚧 IN PROGRESS, 🎨 READY, etc.) on iteration line
+     - See EXAMPLE_PLAN.md lines 34-38 for reference
    - Update any deprecated patterns to new format
    - Preserve all:
      - Decisions and rationale
@@ -501,7 +507,7 @@ You are executing the `/flow-plan-update` command from the Flow framework.
 💾 Backup: .flow/PLAN.md.version-update-backup-[timestamp]
 🎯 Updated: .flow/PLAN.md
 
-Changes made: + Moved Progress Dashboard to correct location (after Overview, before Architecture) + Removed [N] duplicate progress sections (old trackers) + Updated status pointers to use jump links + Added [X] jump links to Progress Dashboard + Standardized [Y] status markers + Cleaned up [Z] redundant framework documentation + [other changes specific to this update]
+Changes made: + Moved Progress Dashboard to correct location (after Overview, before Architecture) + Removed [N] duplicate progress sections (old trackers) + Updated status pointers to use jump links + Added jump links to "Current Work" section (Phase/Task/Iteration) + Standardized [Y] status markers + Cleaned up [Z] redundant framework documentation + [other changes specific to this update]
 
 Next steps: 1. Review changes: diff [backup] .flow/PLAN.md 2. Verify: /flow-status 3. Continue work: /flow-next
 

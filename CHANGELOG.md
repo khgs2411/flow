@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.1.1** - Backlog Management & Release Automation (2025-10-04)
+**v1.1.2** - Progress Dashboard Jump Link Fix (2025-10-04)
 
 **Changes**:
 
-- Added backlog management commands (/flow-backlog-add, /flow-backlog-view, /flow-backlog-pull)\n- Added VERSION file as single source of truth  \n- Automated release process with release.sh script\n- Fixed hardcoded command counts (now dynamic)\n- Removed version from DEVELOPMENT_FRAMEWORK.md\n- Updated CONTRIBUTING.md with release documentation\n
-See the [v1.1.1 release](https://github.com/khgs2411/flow/releases/tag/v1.1.1) for full details.
+- Fixed inconsistent Current Work jump link formats between DEVELOPMENT_FRAMEWORK.md and EXAMPLE_PLAN.md\n- Updated /flow-plan-update command with specific jump link format instructions\n- Standardized to inline markdown link format: [Phase Name](#link)\n- Added explicit examples showing Phase/Task/Iteration link syntax\n
+See the [v1.1.2 release](https://github.com/khgs2411/flow/releases/tag/v1.1.2) for full details.
 
 ---
 
