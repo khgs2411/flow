@@ -33,7 +33,7 @@ This is the **Flow Framework** - a spec-driven iterative development methodology
 2. **`framework/` directory** (source files)
    - `DEVELOPMENT_FRAMEWORK.md` - Complete methodology documentation
    - `EXAMPLE_PLAN.md` - Reference example (payment gateway project)
-   - `SLASH_COMMANDS.md` - All 20 slash command definitions
+   - `SLASH_COMMANDS.md` - All 25 slash command definitions
 
 3. **Build system**
    - `build-standalone.sh` - Generates `flow.sh` from sources
@@ -44,7 +44,7 @@ This is the **Flow Framework** - a spec-driven iterative development methodology
 **Key principle**: `flow.sh` is the ONLY file needed for distribution. All framework content is embedded within it.
 
 When users run `flow.sh` in their project:
-- Extracts 20 slash commands to `.claude/commands/`
+- Extracts 25 slash commands to `.claude/commands/`
 - Extracts framework docs to `.flow/` directory
 - Everything is self-contained - no network requests or external files needed
 
@@ -140,7 +140,7 @@ IF file_exists('.flow/PLAN.md'):
 **Flow-managed projects have**:
 - `.flow/PLAN.md` - Main plan file (Flow manages this)
 - `.flow/DEVELOPMENT_FRAMEWORK.md` - Framework methodology docs
-- `.claude/commands/flow-*.md` - 23 slash commands for Flow operations
+- `.claude/commands/flow-*.md` - 25 slash commands for Flow operations
 
 ### Framework Consultation Requirements
 
@@ -188,7 +188,7 @@ IF file_exists('.flow/PLAN.md'):
 - Decision Tree 4: What subject resolution type is this? (A/B/C/D)
 - Decision Tree 5: What command do I run next?
 - Status Marker Reference (all 7 markers with lifecycle examples)
-- Command Cheat Sheet (23 commands organized by frequency)
+- Command Cheat Sheet (25 commands organized by frequency)
 - Common Pattern Templates (4 copy-paste ready templates)
 
 ### Common Tasks → Framework Sections
@@ -269,7 +269,7 @@ AI Response:
 - **build-standalone.sh** - Build system (edit if changing build process)
 - **framework/DEVELOPMENT_FRAMEWORK.md** - Complete methodology (910 lines)
 - **framework/EXAMPLE_PLAN.md** - Payment gateway reference example (509 lines)
-- **framework/SLASH_COMMANDS.md** - All 15 command definitions (725 lines)
+- **framework/SLASH_COMMANDS.md** - All 25 command definitions
 - **.claude/settings.local.json** - Permissions for build script
 
 ## Testing Changes
@@ -280,7 +280,7 @@ After editing framework sources:
 2. Check output size/lines are reasonable
 3. Create test project directory
 4. Run `./flow.sh` in test project
-5. Verify `.claude/commands/` has 15 files
+5. Verify `.claude/commands/` has 25 files
 6. Verify `.flow/` has 2 documentation files
 7. Test a command like `/flow-status` to ensure content is correct
 
@@ -307,7 +307,7 @@ chmod +x flow.sh
 
 - **V1.0** (2025-10-01) - Initial release
   - Single-file distribution
-  - 20 slash commands
+  - 25 slash commands
   - Pre-implementation tasks pattern
   - Bugs discovered pattern
   - Dynamic subject addition

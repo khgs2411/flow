@@ -69,7 +69,7 @@ chmod +x flow.sh
 ```
 
 **What just happened?**
-- ✅ Created `.claude/commands/` with 23 slash commands
+- ✅ Created `.claude/commands/` with 25 slash commands
 - ✅ Created `.flow/` with framework documentation
 - ✅ Your project is ready to use Flow!
 
@@ -158,7 +158,7 @@ flow/
 └── framework/                   # Source files (for development)
     ├── DEVELOPMENT_FRAMEWORK.md # Complete methodology guide
     ├── EXAMPLE_PLAN.md          # Reference example (payment gateway)
-    └── SLASH_COMMANDS.md        # All 23 slash command definitions
+    └── SLASH_COMMANDS.md        # All 25 slash command definitions
 ```
 
 **For Distribution**: Share `flow.sh` - it's self-contained with everything embedded!
@@ -196,8 +196,8 @@ flow/
 - **Shows**: Full workflow from brainstorming → implementation → completion
 
 #### 3c. **SLASH_COMMANDS.md** (The Command Definitions)
-- **Purpose**: All 23 slash command definitions
-- **Commands**: Planning (3), Phase Lifecycle (3), Task Lifecycle (3), Iteration Lifecycle (6), Navigation (3), Status & Validation (5)
+- **Purpose**: All 25 slash command definitions
+- **Commands**: Planning (3), Phase Lifecycle (3), Task Lifecycle (3), Iteration Lifecycle (6), Navigation (5), Status & Validation (5)
 
 ---
 
@@ -211,7 +211,7 @@ flow/
 
 **When you run `flow.sh` in your project:**
 - Creates `.claude/commands/` and `.flow/` directories
-- Extracts 23 slash commands from embedded data
+- Extracts 25 slash commands from embedded data
 - Writes DEVELOPMENT_FRAMEWORK.md and EXAMPLE_PLAN.md to `.flow/`
 - All content is embedded in flow.sh - no external files needed!
 
@@ -264,10 +264,10 @@ cd /path/to/your/project
 **What gets installed:**
 ```
 your-project/
-├── .claude/commands/          # 23 slash commands
+├── .claude/commands/          # 25 slash commands
 │   ├── flow-blueprint.md
 │   ├── flow-phase-add.md
-│   └── ... (21 more)
+│   └── ... (23 more)
 └── .flow/                     # Framework documentation
     ├── DEVELOPMENT_FRAMEWORK.md
     └── EXAMPLE_PLAN.md
@@ -413,7 +413,7 @@ Work through the code, checking off action items as you complete them:
 
 ## Slash Commands Reference
 
-Flow provides **23 slash commands** organized into **6 categories**. **Important**: These are convenience tools - the real power is the methodology. You can use Flow WITHOUT commands by manually following the patterns.
+Flow provides **25 slash commands** organized into **6 categories**. **Important**: These are convenience tools - the real power is the methodology. You can use Flow WITHOUT commands by manually following the patterns.
 
 ### 1. Plan Initialization (3 commands)
 
@@ -727,11 +727,11 @@ When you get to step 4 (testing methodology), here are my answers:
 - ✅ Progress tracking with status markers
 - ✅ Testing Strategy enforcement
 - ✅ Scope Boundary Rule
-- ✅ All 23 commands via manual prompts
+- ✅ All 25 commands via manual prompts
 
 ### Available Commands
 
-All 23 commands in SLASH_COMMANDS.md work this way:
+All 25 commands in SLASH_COMMANDS.md work this way:
 
 **Planning** (3): `/flow-blueprint`, `/flow-migrate`, `/flow-plan-update`
 
