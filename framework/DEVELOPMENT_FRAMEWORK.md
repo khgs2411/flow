@@ -460,6 +460,74 @@ When working within **any Flow scope** (Phase/Task/Iteration/Brainstorming/Pre-I
 
 **The only exception**: Fixing issues that are **directly blocking** the current task (e.g., syntax error in file you must modify). Even then, document what you fixed and why.
 
+### 7. UX Principles for Flow Commands
+
+**Purpose**: These principles guide all command behavior to ensure consistent, token-efficient, user-friendly interactions.
+
+**The 6 UX Principles**:
+
+**1. Token Efficiency First**
+- Minimize rejection messages (< 80 tokens)
+- Avoid verbose templates/examples unless first-time user
+- Use compact previews, not full explanations
+- Every token counts - reject fast, create efficiently
+- Example: Dry-run preview (200-500 tokens) vs full generation (5000+ tokens) = 90%+ savings
+
+**2. Never Block for Cosmetic Reasons**
+- Phase/task commands accept minimal input
+- Use [TBD] placeholders, don't reject
+- User controls quality (can fill or leave incomplete)
+- Cosmetic sections shouldn't block workflow
+- Example: `/flow-phase-add "Testing"` → Creates phase with [TBD] fields, doesn't reject
+
+**3. Progressive Disclosure**
+- Show complexity only when needed
+- First rejection: educational (with examples)
+- Subsequent rejections: minimal (just example)
+- Advanced features: available but not pushed
+- Don't overwhelm with options upfront
+- Example: First error shows template, next errors show just one-line example
+
+**4. Explicit > Implicit**
+- Honor user's explicit structure (create it)
+- Don't auto-generate from vague input (suggest instead)
+- Confirmations for large operations (blueprint), not small ones (phase/task)
+- User's explicit intent always wins
+- Example: `/flow-blueprint` with "Phase 1:", "Task 2:" → CREATE; without → SUGGEST
+
+**5. Guide, Don't Dictate**
+- Suggest next commands after creation
+- Show what was created (summary)
+- Don't force workflow (user chooses path)
+- Provide options, let user decide
+- Example: After `/flow-brainstorm-complete` → Suggest `/flow-implement-start` but don't auto-run it
+
+**6. Honest Communication**
+- Use [TBD] when info is missing (don't fake it)
+- Show what AI inferred vs what user provided
+- Clear distinction between suggestion and creation
+- Transparency builds trust
+- Example: "Strategy: [Inferred from description]" vs "Strategy: [TBD - fill this in]"
+
+**Application to Commands**:
+
+**For `/flow-blueprint`**:
+- Token efficiency: Dry-run preview is compact (< 500 tokens)
+- Explicit > Implicit: Mode B creates explicit structure, Mode A suggests
+- Guide, don't dictate: Show next commands after creation
+- Honest communication: Show what was extracted vs inferred
+
+**For `/flow-phase-add` & `/flow-task-add`**:
+- Never block: Accept minimal input, use [TBD] placeholders
+- Token efficiency: No verbose rejections, just accept and create
+- Honest communication: Mark [TBD] clearly, extract rich context when provided
+- Guide, don't dictate: Create what's asked, suggest refinement after
+
+**For All Commands**:
+- Progressive disclosure: First error shows examples, subsequent errors are minimal
+- Token efficiency: All responses < 200 tokens unless generating structure
+- Explicit > Implicit: No assumptions, honor user's explicit input
+
 ---
 
 <!-- AI_SCAN:FRAMEWORK_STRUCTURE:464-590 -->
@@ -1147,6 +1215,190 @@ Complete any pre-implementation tasks
 **Output**: Brainstorming complete, iteration marked 🎨 READY
 
 **Next Step**: Optional iterations (Step 6) or direct implementation (Step 8)
+
+---
+
+#### 5a. Action Items Categorization (Critical for Implementation Planning)
+
+**Purpose**: After brainstorming, you have a list of action items from resolved subjects. Understanding which TYPE each action item is determines WHEN and WHERE the work happens.
+
+**The 3 Types of Action Items**:
+
+##### Type 1: Pre-Implementation Tasks (Blockers)
+
+**What**: Work that MUST be done BEFORE starting the main iteration implementation.
+
+**Characteristics**:
+- Blocks the main work (can't proceed without it)
+- Usually refactoring, infrastructure setup, or bug fixes
+- Typically quick wins (< 30 minutes each)
+- Discovered during design discussions
+
+**Examples**:
+- Refactor legacy auth module to use new interface
+- Fix broken test suite that will interfere with new work
+- Setup database migration infrastructure
+- Extract duplicated code into shared utility
+- Rename confusing variable that will be used in iteration
+
+**Where They Go**: Separate "Pre-Implementation Tasks" section in the iteration
+
+**When Completed**: BEFORE running `/flow-implement-start`
+
+**PLAN.md Structure**:
+```markdown
+##### Iteration 1: User Authentication 🚧
+
+**Brainstorming**: ✅ COMPLETE
+
+**Pre-Implementation Tasks**:
+
+###### ⏳ Task 1: Refactor Legacy Auth Module
+- [ ] Extract auth logic to AuthService interface
+- [ ] Update controllers to use interface
+
+###### ⏳ Task 2: Fix Session Store Tests
+- [ ] Update mocked session store
+- [ ] Add missing test cases
+
+**Implementation**: ⏳ PENDING (waiting for pre-tasks)
+```
+
+##### Type 2: Implementation Work (The Iteration Itself)
+
+**What**: The actual work of the current iteration - this IS the main work.
+
+**Characteristics**:
+- The core feature/functionality being built
+- What the iteration is named after
+- The bulk of the work
+- Can't be deferred to later
+
+**Examples**:
+- Implement JWT generation endpoint
+- Add refresh token rotation logic
+- Create password hashing utility
+- Build login form validation
+- Add authentication middleware
+
+**Where They Go**: Action items IN the iteration's Implementation section
+
+**When Completed**: DURING implementation (after running `/flow-implement-start`)
+
+**PLAN.md Structure**:
+```markdown
+##### Iteration 1: User Authentication 🚧
+
+**Implementation**: 🚧 IN PROGRESS
+
+**Action Items** (from brainstorming):
+- [ ] Implement JWT generation endpoint
+- [ ] Add refresh token rotation logic
+- [ ] Create password hashing utility
+- [ ] Build login form validation
+- [ ] Add authentication middleware
+```
+
+##### Type 3: New Iterations (Future Work)
+
+**What**: Follow-up work for future iterations - important but not blocking current work.
+
+**Characteristics**:
+- Discovered during brainstorming but not part of current iteration
+- V2/V3 features, optimizations, edge cases
+- Can be done later without blocking current work
+- Often improvements or enhancements
+
+**Examples**:
+- Add OAuth provider support (V2 feature)
+- Implement rate limiting for login attempts (V3 optimization)
+- Add biometric authentication (future enhancement)
+- Support multi-factor authentication (V2 feature)
+- Add session analytics dashboard (V3 feature)
+
+**Where They Go**: New iterations created with `/flow-iteration-add`
+
+**When Completed**: In future iterations (separate from current work)
+
+**PLAN.md Structure**:
+```markdown
+##### Iteration 1: User Authentication ✅
+[Current iteration work]
+
+##### Iteration 2: OAuth Integration ⏳
+**Goal**: Add OAuth provider support (Google, GitHub)
+**Action Items**:
+- [ ] Implement OAuth callback handler
+- [ ] Add provider configuration
+- [ ] Create OAuth middleware
+```
+
+---
+
+#### Decision Tree for Categorization
+
+When reviewing brainstorming action items, ask these questions in order:
+
+**Question 1**: Does this BLOCK the main work?
+- YES → **Type 1: Pre-Implementation Task**
+  - Example: "Can't implement JWT auth until we refactor the old auth module"
+- NO → Continue to Question 2
+
+**Question 2**: Is this THE main work of this iteration?
+- YES → **Type 2: Implementation Work**
+  - Example: "Implementing JWT generation IS the iteration goal"
+- NO → Continue to Question 3
+
+**Question 3**: Is this future work that can wait?
+- YES → **Type 3: New Iteration**
+  - Example: "OAuth is nice to have but not required for basic auth"
+- NO → You may have misunderstood - review questions again
+
+**If Still Uncertain**: ASK THE USER!
+- Present the action item
+- Explain your reasoning for each type
+- Let the user decide
+
+---
+
+#### Examples of Categorization
+
+**Scenario**: Brainstorming for "Payment Gateway Integration" iteration
+
+**Resolved Subjects Generated These Action Items**:
+1. Extract payment config to environment variables
+2. Implement Stripe payment intent creation
+3. Add webhook signature verification
+4. Fix broken webhook endpoint from previous work
+5. Add retry logic with exponential backoff
+6. Support PayPal integration
+7. Add payment analytics dashboard
+8. Create payment refund endpoint
+
+**Categorization**:
+
+**Type 1 - Pre-Implementation Tasks** (do BEFORE starting):
+- Item 1: Extract payment config to environment variables (blocks main work, uses hardcoded values)
+- Item 4: Fix broken webhook endpoint from previous work (blocks testing)
+
+**Type 2 - Implementation Work** (do DURING iteration):
+- Item 2: Implement Stripe payment intent creation (core iteration work)
+- Item 3: Add webhook signature verification (core iteration work)
+- Item 5: Add retry logic with exponential backoff (core iteration work)
+- Item 8: Create payment refund endpoint (core iteration work)
+
+**Type 3 - New Iterations** (do LATER):
+- Item 6: Support PayPal integration (V2 feature, separate provider)
+- Item 7: Add payment analytics dashboard (V3 feature, not required for MVP)
+
+**Result**:
+- 2 pre-implementation tasks → Complete before `/flow-implement-start`
+- 4 implementation items → Work on after `/flow-implement-start`
+- 2 new iterations → Create with `/flow-iteration-add` for future work
+
+---
+
+**Key Insight**: This categorization happens DURING `/flow-brainstorm-review`. The AI should present suggested categorization and ask the user to confirm before proceeding.
 
 ---
 

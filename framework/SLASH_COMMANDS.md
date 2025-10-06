@@ -136,7 +136,86 @@ Testing:
 
 **Instructions**:
 
-1. **Read the framework guide AND example plan** ⚠️ CRITICAL:
+1. **INPUT VALIDATION** (Token-Efficient - Run BEFORE reading framework) ⚠️ UX PRINCIPLE 1:
+
+   **Goal**: Determine whether to CREATE explicit structure or SUGGEST structure, while minimizing token waste on invalid input.
+
+   **Step 1: Quick Scan for Hard Rules** (< 10 tokens check):
+   ```
+   IF $ARGUMENTS is empty OR just whitespace:
+     REJECT: "❌ Missing project description. Provide at least a project name or brief description."
+     STOP (don't proceed to framework reading)
+   ```
+
+   **Step 2: Detect Blueprint Mode** (< 50 tokens analysis) ⚠️ UX PRINCIPLE 4 (Explicit > Implicit):
+
+   **Mode A: SUGGEST Structure** (User wants AI to design the plan)
+   - Trigger: $ARGUMENTS contains NO explicit structure markers
+   - Examples: "payment gateway", "user auth system", "build a todo app"
+   - Behavior: Read framework, ask questions, generate suggested plan structure
+
+   **Mode B: CREATE Explicit Structure** (User designed the plan already)
+   - Trigger: $ARGUMENTS contains structural markers like:
+     - "Phase 1:", "Phase 2:"
+     - "Task 1:", "Task 2:"
+     - "Iteration 1:", "Iteration 2:"
+     - Or bullet lists suggesting phases/tasks/iterations
+   - Examples:
+     ```
+     "Payment Gateway
+     Phase 1: Foundation
+     - Task 1: Setup Stripe SDK
+     - Task 2: Create payment models
+
+     Phase 2: Implementation
+     - Task 1: Payment processing
+       - Iteration 1: Basic flow
+       - Iteration 2: Error handling"
+     ```
+   - Behavior: Honor user's explicit structure, create it as-is (with [TBD] for missing metadata)
+
+   **Step 3: Semantic Check** (Only if Mode A and input seems vague):
+   - Check if description is too vague to generate meaningful plan
+   - Examples that ARE OK: "payment gateway", "user authentication", "real-time chat"
+   - Examples that ARE TOO VAGUE: "help", "project", "thing"
+   - If too vague:
+     ```
+     "🤔 Need more context. What are you building? Examples:
+     - 'Payment gateway integration with Stripe'
+     - 'Real-time collaborative text editor'
+     - 'User authentication system with JWT'
+
+     Or provide explicit structure:
+     Phase 1: [your phase]
+     - Task 1: [your task]"
+     ```
+   - If OK, proceed to step 4 (framework reading)
+
+   **Step 4: Dry-Run Preview** (Only if Mode B - explicit structure detected):
+   - Parse user's structure and show what will be created
+   - Example output (200-500 tokens vs 5000+ token full generation):
+     ```
+     "📋 Detected explicit structure. I will create:
+
+     **Phase 1: Foundation** ⏳
+     - Task 1: Setup Stripe SDK ⏳
+     - Task 2: Create payment models ⏳
+
+     **Phase 2: Implementation** ⏳
+     - Task 1: Payment processing ⏳
+       - Iteration 1: Basic flow ⏳
+       - Iteration 2: Error handling ⏳
+
+     Missing metadata will use [TBD] placeholders (you can refine later).
+
+     Proceed? (yes/no)"
+     ```
+   - If user says "no", ask what to change
+   - If user says "yes", proceed to framework reading and creation
+
+   **Token Savings**: Validation + preview = 200-500 tokens vs full generation rejection = 5000+ tokens wasted
+
+2. **Read the framework guide AND example plan** ⚠️ CRITICAL (Only after validation passes):
    - **Search for DEVELOPMENT_FRAMEWORK.md** in these locations (in order):
      - `.flow/DEVELOPMENT_FRAMEWORK.md`
      - `.claude/DEVELOPMENT_FRAMEWORK.md`
@@ -152,18 +231,27 @@ Testing:
      - Brainstorming session structure with Resolution Type labels (Type A/B/C/D)
      - Status markers and their lifecycle
 
-2. **Analyze the feature request**: `$ARGUMENTS`
+3. **Analyze the feature request**: `$ARGUMENTS` (Mode-specific behavior) ⚠️ UX PRINCIPLE 4:
+
+   **If Mode A (SUGGEST)**: AI designs the structure
    - Extract all provided information: requirements, constraints, reference paths, testing preferences
    - If user provided rich context (requirements, constraints, references), use it directly
-   - If minimal context provided (just a name), prepare to ask follow-up questions
+   - If minimal context provided (just a name), prepare to ask follow-up questions in steps 4-5
 
-3. **Check for reference implementation** (if not already in $ARGUMENTS):
+   **If Mode B (CREATE)**: Honor user's explicit structure
+   - Parse the provided structure (phases, tasks, iterations)
+   - Extract any metadata provided (goals, purposes, requirements)
+   - Use [TBD] for missing metadata (⚠️ UX PRINCIPLE 2: Never block for cosmetic reasons)
+   - Skip questions in steps 4-5 UNLESS user explicitly asked for them
+   - Example: If user provided structure but no testing strategy, use "[TBD] - Testing strategy to be defined"
+
+4. **Check for reference implementation** (Mode A only, skip if Mode B):
    - If user mentioned reference paths in arguments (e.g., "See src/legacy/billing.ts"), read and analyze them
    - If no reference mentioned, ask: "Do you have a reference implementation I should analyze? (Provide path or say 'no')"
    - If reference provided, read and analyze it to inform the planning
 
-4. **Gather testing methodology** (CRITICAL - if not already in $ARGUMENTS):
-   - If user provided testing details in arguments (e.g., "Testing: Simulation-based per service"), use them directly and skip to step 5
+5. **Gather testing methodology** (Mode A only, skip if Mode B - CRITICAL if asking):
+   - If user provided testing details in arguments (e.g., "Testing: Simulation-based per service"), use them directly and skip to step 6
    - Otherwise, ask: "How do you prefer to verify implementations? Choose or describe:
      - **Simulation-based (per-service)**: Each service has its own test file (e.g., `{service}.scripts.ts`)
      - **Simulation-based (single file)**: All tests in one orchestration file (e.g., `run.scripts.ts`)
@@ -178,13 +266,29 @@ Testing:
      - "When should I create NEW test files vs. add to existing?" (e.g., "Create `{service}.scripts.ts` for new services, add to existing for enhancements")
    - **IMPORTANT**: These answers determine how AI creates/modifies test files in every iteration
 
-5. **Gather any other project-specific patterns** (if not clear from $ARGUMENTS):
+6. **Gather any other project-specific patterns** (Mode A only, skip if Mode B):
    - File naming conventions (if mentioned or user specifies)
    - Directory structure preferences (if relevant)
    - Code style preferences (if mentioned)
    - Skip if not applicable to project type
 
-6. **Generate .flow/PLAN.md** following EXAMPLE_PLAN.md structure exactly ⚠️ CRITICAL (ALWAYS overwrites if exists):
+7. **Generate .flow/PLAN.md** following EXAMPLE_PLAN.md structure exactly ⚠️ CRITICAL (ALWAYS overwrites if exists):
+
+   **Mode-Specific Behavior**:
+
+   **If Mode A (SUGGEST)**: AI-generated comprehensive plan
+   - Use information gathered from steps 4-6
+   - Generate full structure with AI-designed phases/tasks/iterations
+   - Fill in all metadata sections with detailed content
+   - Follow all subsections below
+
+   **If Mode B (CREATE)**: Honor user's explicit structure
+   - Use user's provided structure exactly
+   - Fill in metadata where provided by user
+   - Use [TBD] placeholders for missing metadata (⚠️ UX PRINCIPLE 2 & 6: Honest communication)
+   - Example Testing Strategy if not provided: "[TBD] - Testing strategy to be defined during first iteration brainstorming"
+   - Example Architecture if not provided: "[TBD] - Architecture to be documented during design phase"
+   - Still create ALL required sections (don't skip sections just because metadata is missing)
    - Note: .flow/ directory already exists (created by flow.sh installation)
    - **CRITICAL**: Use EXAMPLE_PLAN.md as your template - follow its structure exactly
 
@@ -240,29 +344,38 @@ Testing:
      - Initial entry with creation date
      - Format: `**YYYY-MM-DD**: - ✅ [Iteration X]: [description] - 🚧 [Iteration Y]: [description] (in progress)`
 
-7. **Depth**: Medium detail
+8. **Depth**: Medium detail
    - Phase names and strategies
    - Task names and purposes
    - Iteration names only (no brainstorming subjects yet)
 
-8. **Verify completeness before saving** ⚠️ CRITICAL SELF-CHECK:
+9. **Verify completeness before saving** ⚠️ CRITICAL SELF-CHECK:
    - [ ] Framework reference header present (with 🎯 Purpose line)?
    - [ ] Overview section present (Purpose, Goals, Scope)?
    - [ ] Progress Dashboard present (NOT optional - REQUIRED)?
-   - [ ] Architecture section present?
-   - [ ] Testing Strategy section present with all fields (Methodology, Location, Naming, When to create, When to add)?
+   - [ ] Architecture section present (can be [TBD] in Mode B)?
+   - [ ] Testing Strategy section present with all fields (can be [TBD] in Mode B)?
    - [ ] Development Plan with phases/tasks/iterations?
    - [ ] Placeholder brainstorming sessions with Resolution Type labels (Type A/B/C/D)?
    - [ ] Changelog section present?
    - [ ] All iteration lists expanded (NOT "(X iterations total)")?
    - **If any checkbox is unchecked, review EXAMPLE_PLAN.md again and add missing section**
 
-9. **Confirm to user**:
-   - "✨ Created .flow/PLAN.md with [X] phases, [Y] tasks, [Z] iterations"
-   - "📂 Flow is now managing this project from .flow/ directory"
-   - "📋 Included: Progress Dashboard, Testing Strategy, Changelog, placeholder brainstorming sessions"
-   - "Use `/flow-status` to see current state"
-   - "Use `/flow-brainstorm-start [topic]` to begin first iteration"
+10. **Confirm to user** (Mode-specific):
+
+    **If Mode A (SUGGEST)**:
+    - "✨ Created .flow/PLAN.md with [X] phases, [Y] tasks, [Z] iterations"
+    - "📂 Flow is now managing this project from .flow/ directory"
+    - "📋 Included: Progress Dashboard, Testing Strategy, Changelog, placeholder brainstorming sessions"
+    - "Use `/flow-status` to see current state"
+    - "Use `/flow-brainstorm-start [topic]` to begin first iteration"
+
+    **If Mode B (CREATE)**:
+    - "✨ Created .flow/PLAN.md from your explicit structure"
+    - "📊 Structure: [X] phases, [Y] tasks, [Z] iterations (as you specified)"
+    - "📝 [TBD] placeholders used for: [list sections with [TBD]]"
+    - "💡 Refine [TBD] sections during brainstorming or use `/flow-plan-update`"
+    - "Use `/flow-status` to see current state"
 
 **Output**: Create `.flow/PLAN.md` file and confirm creation to user.
 ```
@@ -631,34 +744,64 @@ If you discover NEW issues while working on this phase that are NOT part of the 
 
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+1. **INPUT VALIDATION** (Token-Efficient - Run BEFORE reading PLAN.md) ⚠️ UX PRINCIPLE 1 & 2:
 
-2. **Verify framework understanding**: Know that phases are top-level milestones (e.g., "Foundation", "Core Implementation", "Testing")
+   **Goal**: Accept minimal input, use [TBD] for missing metadata - never block for cosmetic reasons.
 
-3. **Parse arguments**: `$ARGUMENTS` = phase description
+   **Step 1: Hard Rule Check** (< 10 tokens):
+   ```
+   IF $ARGUMENTS is empty OR just whitespace:
+     REJECT: "❌ Missing phase name/description. Example: /flow-phase-add 'Testing and QA'"
+     STOP (don't proceed)
+   ```
 
-4. **Add new phase section**:
+   **Step 2: Accept Everything Else** ⚠️ UX PRINCIPLE 2 (Never Block for Cosmetic Reasons):
+   - Even minimal input like "Testing" is OK
+   - Will use [TBD] for Strategy and Goal if not inferable
+   - Proceed to step 2
+
+2. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+
+3. **Verify framework understanding**: Know that phases are top-level milestones (e.g., "Foundation", "Core Implementation", "Testing")
+
+4. **Parse arguments and extract metadata**: `$ARGUMENTS` = phase description
+
+   **Extract Strategy and Goal** (if provided in $ARGUMENTS):
+   - Example: "Testing Phase | Strategy: Comprehensive QA | Goal: Zero critical bugs"
+   - If metadata provided, use it
+   - If NOT provided, try to infer from phase name:
+     - "Testing" → Strategy: "Quality assurance and validation", Goal: "Ensure code quality and stability"
+     - "Foundation" → Strategy: "Setup and architecture", Goal: "Establish project foundation"
+     - "Polish" → Strategy: "UX and optimization", Goal: "Production-ready quality"
+   - If can't infer (unusual phase name or too vague), use [TBD]:
+     - Strategy: "[TBD] - Define strategy during phase start"
+     - Goal: "[TBD] - Define goal during phase start"
+
+5. **Add new phase section** ⚠️ UX PRINCIPLE 6 (Honest Communication):
 
    ```markdown
    ### Phase [N]: [$ARGUMENTS] ⏳
 
-   **Strategy**: [Ask user or infer from description]
+   **Strategy**: [Extracted/Inferred/[TBD]]
 
-   **Goal**: [What this phase achieves]
+   **Goal**: [Extracted/Inferred/[TBD]]
 
    ---
    ```
-```
 
-4. **Update .flow/PLAN.md**: Append new phase to Development Plan section
+6. **Update .flow/PLAN.md**: Append new phase to Development Plan section
 
-5. **Update Progress Dashboard** (if it exists):
+7. **Update Progress Dashboard** (if it exists):
 
    - Update phase count in Progress Overview section
    - No need to change "Current Work" pointer (new phase is ⏳ PENDING)
    - Add new phase to completion status if tracking percentages
 
-6. **Confirm to user**: "Added Phase [N]: [$ARGUMENTS] to PLAN.md"
+8. **Confirm to user** (show what was used):
+   - "✅ Added Phase [N]: [$ARGUMENTS]"
+   - IF used [TBD]: "📝 Used [TBD] placeholders for: [Strategy/Goal]"
+   - IF inferred metadata: "💡 Inferred: Strategy = '[value]', Goal = '[value]'"
+   - "💡 Refine with `/flow-phase-start` when ready to begin"
 
 **Output**: Update .flow/PLAN.md with new phase.
 
@@ -818,33 +961,62 @@ If you discover NEW issues while working on this task that are NOT part of the c
 
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+1. **INPUT VALIDATION** (Token-Efficient - Run BEFORE reading PLAN.md) ⚠️ UX PRINCIPLE 1 & 2:
 
-2. **Parse arguments**: `$ARGUMENTS` = task description
+   **Goal**: Accept minimal input, use [TBD] for missing metadata - never block for cosmetic reasons.
 
-3. **Find current phase**: Look for last phase marked ⏳ or 🚧
+   **Step 1: Hard Rule Check** (< 10 tokens):
+   ```
+   IF $ARGUMENTS is empty OR just whitespace:
+     REJECT: "❌ Missing task name/description. Example: /flow-task-add 'User Authentication'"
+     STOP (don't proceed)
+   ```
 
-4. **Add new task section**:
+   **Step 2: Accept Everything Else** ⚠️ UX PRINCIPLE 2 (Never Block for Cosmetic Reasons):
+   - Even minimal input like "API Design" is OK
+   - Will use [TBD] for Purpose if not inferable
+   - Proceed to step 2
+
+2. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+
+3. **Parse arguments and extract metadata**: `$ARGUMENTS` = task description
+
+   **Extract Purpose** (if provided in $ARGUMENTS):
+   - Example: "User Authentication | Purpose: Implement secure login system"
+   - If metadata provided, use it
+   - If NOT provided, try to infer from task name:
+     - "User Authentication" → Purpose: "Implement user authentication system"
+     - "API Design" → Purpose: "Design and document API endpoints"
+     - "Testing Infrastructure" → Purpose: "Setup testing framework and utilities"
+   - If can't infer (unusual task name or too vague), use [TBD]:
+     - Purpose: "[TBD] - Define purpose during task start or brainstorming"
+
+4. **Find current phase**: Look for last phase marked ⏳ or 🚧
+
+5. **Add new task section** ⚠️ UX PRINCIPLE 6 (Honest Communication):
 
    ```markdown
    #### Task [N]: [$ARGUMENTS] ⏳
 
    **Status**: PENDING
-   **Purpose**: [What this task accomplishes]
+   **Purpose**: [Extracted/Inferred/[TBD]]
 
    ---
    ```
-```
 
-5. **Update .flow/PLAN.md**: Append task under current phase
+6. **Update .flow/PLAN.md**: Append task under current phase
 
-6. **Update Progress Dashboard** (if it exists):
+7. **Update Progress Dashboard** (if it exists):
 
    - Update task count in Progress Overview
    - Add new task to phase's task list
    - No need to change "Current Work" pointer (new task is ⏳ PENDING)
 
-7. **Confirm to user**: "Added Task [N]: [$ARGUMENTS] to current phase"
+8. **Confirm to user** (show what was used):
+   - "✅ Added Task [N]: [$ARGUMENTS] to current phase"
+   - IF used [TBD]: "📝 Used [TBD] placeholder for Purpose"
+   - IF inferred metadata: "💡 Inferred Purpose = '[value]'"
+   - "💡 Refine with `/flow-task-start` or `/flow-brainstorm-start` when ready"
 
 **Output**: Update .flow/PLAN.md with new task.
 
@@ -1274,31 +1446,60 @@ You are executing the `/flow-brainstorm-review` command from the Flow framework.
      - **Other Actions**: Miscellaneous tasks
    - Present in organized format
 
-7. **Suggest follow-up work**:
+7. **Categorize action items** (CRITICAL - Ask user to clarify):
 
-   - Analyze all action items and suggest:
-     - Which items should become pre-implementation tasks (in current iteration)
-     - Which items should become new iterations (under current task)
-     - Which items can be deferred to future tasks/phases
-   - Present suggestions in this format:
+   **The 3 Types of Action Items**:
+
+   **Type 1: Pre-Implementation Tasks (Blockers)**
+   - Work that MUST be done BEFORE starting main implementation
+   - Examples: Refactor legacy code, fix blocking bugs, setup infrastructure
+   - These become separate "Pre-Implementation Tasks" section
+   - Must be ✅ COMPLETE before running `/flow-implement-start`
+
+   **Type 2: Implementation Work (The Iteration Itself)**
+   - The actual work of the current iteration
+   - Examples: Command updates, feature additions, new logic
+   - These stay as action items IN the iteration description
+   - Work on these AFTER running `/flow-implement-start`
+
+   **Type 3: New Iterations (Future Work)**
+   - Follow-up work for future iterations
+   - Examples: V2 features, optimizations, edge cases discovered
+   - Create with `/flow-iteration-add`
+
+   **Decision Tree for AI**:
+   - Extract all action items from resolved subjects
+   - For each action item, ask yourself:
+     - "Does this BLOCK the main work?" → Type 1 (Pre-task)
+     - "Is this THE main work?" → Type 2 (Implementation)
+     - "Is this FUTURE work?" → Type 3 (New iteration)
+   - **If uncertain, ASK THE USER**: "I found these action items. Are they:
+     - A) Blockers that must be done first (pre-tasks)
+     - B) The implementation work itself
+     - C) Future work for new iterations"
+
+   Present categorization in this format:
 
      ```
-     **Suggested Pre-Implementation Tasks** (complete before /flow-implement-start):
-     - [Task description]
-     - [Task description]
+     **Pre-Implementation Tasks** (Type 1 - complete before /flow-implement-start):
+     - [Task description] - Why it blocks: [reason]
 
-     **Suggested New Iterations** (add with /flow-iteration-add):
-     - Iteration N+1: [Name and description]
-     - Iteration N+2: [Name and description]
+     **Implementation Work** (Type 2 - these ARE the iteration):
+     - [Action item 1]
+     - [Action item 2]
+     (These stay in iteration, work on after /flow-implement-start)
 
-     **Can Be Deferred**:
-     - [Task description] - Reason for deferral
+     **New Iterations** (Type 3 - add with /flow-iteration-add):
+     - Iteration N+1: [Name] - [Why it's future work]
      ```
 
-8. **Await user instructions**:
+8. **Await user confirmation**:
    - Do NOT automatically create iterations or pre-tasks
-   - Prompt user: "Would you like me to create these pre-tasks/iterations, or would you prefer to adjust the suggestions?"
-   - Wait for user confirmation before taking action
+   - Show categorization above
+   - Ask: "Does this categorization look correct? Should I adjust anything?"
+   - If user confirms Type 1 (pre-tasks) exist: Ask if they want them created now
+   - If user confirms Type 3 (new iterations): Ask if they want them created now
+   - Type 2 (implementation work) stays in iteration - no creation needed
 
 9. **Show "What's Next" Section**:
    ```markdown
@@ -2104,7 +2305,7 @@ User responds → capture decision → document → mark ✅ → auto-advance to
 
 5. **If all resolved** (this was the last subject):
    - **Show brief summary** of decisions made
-   - **⚠️ CRITICAL - Show "What's Next" Section**:
+   - **⚠️ CRITICAL - Show "What's Next" Section (MANDATORY - AI MUST NOT SKIP THIS)**:
      ```markdown
      ✅ All subjects resolved!
 
@@ -2112,14 +2313,21 @@ User responds → capture decision → document → mark ✅ → auto-advance to
 
      **REQUIRED NEXT STEP**: Run `/flow-brainstorm-review` to:
      - Analyze all resolved subjects
-     - Categorize by Type A/B/C/D
-     - Identify pre-implementation tasks (Type A)
-     - Plan follow-up work
+     - Categorize action items (pre-tasks vs implementation vs new iterations)
+     - Generate follow-up work suggestions
+     - Prepare for implementation
 
-     **DO NOT** run `/flow-brainstorm-complete` yet - review comes first!
+     **DO NOT run `/flow-brainstorm-complete` yet** - review comes first!
 
-     **After review**: Complete any pre-tasks, then run `/flow-brainstorm-complete` to mark iteration as 🎨 READY FOR IMPLEMENTATION.
+     **Workflow Reminder**:
+     1. ✅ NOW: `/flow-brainstorm-review` (analyze & suggest)
+     2. THEN: Create any pre-tasks if needed
+     3. THEN: Complete pre-tasks (if any)
+     4. FINALLY: `/flow-brainstorm-complete` (mark 🎨 READY)
+
+     **Why this order matters**: Review identifies blockers (pre-tasks) that must be done before implementation starts.
      ```
+   - **AI BEHAVIOR**: Do NOT suggest `/flow-brainstorm-complete` or any other command. The "What's Next" section MUST explicitly guide to `/flow-brainstorm-review` first.
 
 **Key Principle**: Moving to next subject implies current is resolved. No separate "resolve" command needed.
 
