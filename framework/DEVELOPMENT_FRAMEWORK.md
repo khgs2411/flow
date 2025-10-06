@@ -1,7 +1,7 @@
-<!-- AI_SCAN:QUICK_REFERENCE:1-349 -->
+<!-- AI_SCAN:QUICK_REFERENCE:1-544 -->
 # Quick Reference for AI (Read This First!)
 
-> **Purpose**: This section provides essential Flow framework knowledge in ~300 lines (~15k tokens) instead of reading the entire 3897-line file (~200k tokens). Read this first, then use the Section Index to jump to specific sections only when needed.
+> **Purpose**: This section provides essential Flow framework knowledge in ~540 lines (~27k tokens) instead of reading the entire 4092-line file (~205k tokens). Read this first, then use the Section Index to jump to specific sections only when needed.
 
 ---
 
@@ -267,24 +267,24 @@ Use this guide to know when to dive deep into specific sections:
 ## AI Reading Strategy (IMPORTANT!)
 
 ### ❌ **DON'T DO THIS**:
-- Reading entire 3897-line file (~200k tokens)
+- Reading entire 4092-line file (~205k tokens)
 - Reading framework when not needed
 - Reading same sections repeatedly
 
 ### ✅ **DO THIS INSTEAD**:
 
-**Step 1**: Read Quick Reference (this section, lines 1-300, ~15k tokens)
+**Step 1**: Read Quick Reference (this section, lines 1-544, ~27k tokens)
 
 **Step 2**: Identify what you need from Section Index
 
 **Step 3**: Read ONLY that section using offset/limit:
 ```
-Read(framework/DEVELOPMENT_FRAMEWORK.md, offset=238, limit=328)  # Task Structure Rules
+Read(framework/DEVELOPMENT_FRAMEWORK.md, offset=597, limit=323)  # Task Structure Rules
 ```
 
 **Step 4**: Skip framework entirely if not needed (e.g., `/flow-status` works from PLAN.md only)
 
-**Token Savings**: 75-90% reduction (15-50k tokens vs 200k)
+**Token Savings**: 75-87% reduction (27-50k tokens vs 205k)
 
 ---
 
@@ -338,20 +338,206 @@ Every PLAN.md MUST have a Testing Strategy section that defines:
 
 ## Scope Boundary Rule (CRITICAL)
 
-🚨 **If you discover NEW issues during implementation that are NOT part of current work:**
+🚨 **STOP → NOTIFY → DISCUSS → AWAIT USER APPROVAL**
 
-1. **STOP** immediately
-2. **NOTIFY** user of the new issue
-3. **DISCUSS** what to do:
-   - Add as new brainstorming subject?
-   - Create new pre-implementation task?
-   - Defer to next iteration?
-   - Handle immediately (only if user explicitly approves)?
-4. **ONLY** proceed with user's explicit approval
+**When to Trigger**: You discover NEW issues during brainstorming or implementation that are NOT part of the current iteration's scope.
 
-**Exception**: Syntax errors or blocking issues in files you must modify (document what you fixed)
+**The 4-Step Response Pattern**:
 
-**Why**: Prevents scope creep, maintains intentional progression, preserves user's ability to prioritize
+1. **STOP** immediately - Don't make assumptions or proceed
+2. **NOTIFY** user - Present the discovered issue(s) clearly
+3. **DISCUSS** - Provide structured options (A/B/C/D format)
+4. **AWAIT USER APPROVAL** - Never proceed without explicit user decision
+
+**Exception**: Syntax errors or blocking bugs in files you must modify (document what you fixed)
+
+---
+
+### Response Template (Use This Format)
+
+When you discover scope boundary violations, use this structured response:
+
+```markdown
+🚨 SCOPE BOUNDARY ALERT
+
+I've discovered NEW issue(s) that are NOT part of the current iteration's scope:
+
+**Issue 1: [Name]**
+- **Problem**: [What's wrong or missing]
+- **Impact**: [How it affects current/future work]
+- **Location**: [File/component if applicable]
+
+[Repeat for additional issues...]
+
+---
+
+## What Should We Do?
+
+According to Scope Boundary Rule, I must:
+
+1. ✅ STOP - Done, I've stopped
+2. ✅ NOTIFY - Done, I've identified the issue(s)
+3. ❓ DISCUSS - Your turn!
+
+**Your Options**:
+
+- **A**: Create pre-implementation task (< 30 min work, blocking current iteration)
+- **B**: Add as new brainstorming subject (design needed before implementation)
+- **C**: Handle immediately as part of this work (if you approve)
+- **D**: Defer to separate iteration (handle after current work complete)
+
+**What's your call?**
+```
+
+---
+
+### Real-World Example (RED Project - Perfect Execution)
+
+**Context**: During `/flow-next-subject` while designing skill generation system, AI discovered 3 NEW issues not part of current iteration.
+
+**AI's Response** (Framework-Aware, CORRECT):
+
+```markdown
+🚨 SCOPE BOUNDARY ALERT
+
+I've discovered NEW issues that are NOT part of the current iteration's scope:
+
+**Issue 1: I_Ability Interface Missing Fields**
+- **Problem**: Interface missing `tier`, `affixes`, and `creator` fields
+- **Impact**: Can't properly filter/validate abilities during generation
+- **Location**: `src/interfaces/I_Ability.ts`
+
+**Issue 2: Array vs Dictionary Performance**
+- **Problem**: Using arrays for ability lookups (O(n) complexity)
+- **Impact**: Performance degrades with large ability counts (1000+)
+- **Location**: Ability collections throughout skill generation
+
+**Issue 3: Definition vs Metadata Separation**
+- **Problem**: Unclear boundary between ability definition and instance metadata
+- **Impact**: Risk of data duplication and inconsistent state
+- **Location**: Skill model design
+
+---
+
+## What Should We Do?
+
+According to Scope Boundary Rule, I must:
+
+1. ✅ STOP - Done, I've stopped
+2. ✅ NOTIFY - Done, I've identified the issues
+3. ❓ DISCUSS - Your turn!
+
+**Your Options**:
+
+- **A**: Create pre-implementation task to fix I_Ability interface (< 30 min work)
+- **B**: Add as new brainstorming subject (#4) to design the solution
+- **C**: Handle immediately as part of this subject (if you approve)
+- **D**: Defer to separate iteration after this one
+
+**What's your call?**
+```
+
+**User's Decision**: Option A (pre-task) for Issue 1, Option D (defer) for Issues 2 & 3
+
+**Why This Was Perfect**:
+- ✅ AI stopped and didn't make assumptions
+- ✅ Clear, structured presentation of issues
+- ✅ Actionable options with implications
+- ✅ User stayed in control of priorities
+- ✅ Fast development with guardrails
+
+---
+
+### Good vs Bad Behavior
+
+#### ❌ BAD: Scope Creep Without Permission
+
+```markdown
+I noticed the I_Ability interface is missing some fields, so I went ahead and added them.
+Also refactored the ability storage to use a Map for better performance.
+Let me know if you want me to change anything.
+```
+
+**Why This Is Bad**:
+- Made decisions without user input
+- Changed scope silently
+- User loses control of priorities
+- May solve wrong problem
+
+#### ✅ GOOD: Stop and Ask
+
+```markdown
+🚨 SCOPE BOUNDARY ALERT
+
+I've discovered the I_Ability interface is missing `tier`, `affixes`, and `creator` fields
+needed for skill generation.
+
+**Your Options**:
+- **A**: Fix interface now as pre-task (< 30 min)
+- **B**: Design in new brainstorming subject
+- **C**: Handle immediately (if you approve)
+- **D**: Defer to later iteration
+
+**What's your call?**
+```
+
+**Why This Is Good**:
+- Stopped immediately
+- Clear problem statement
+- Structured options
+- User makes the decision
+
+---
+
+### When NOT to Trigger (Exceptions)
+
+**1. Syntax Errors in Modified Files**:
+```markdown
+✅ ALLOWED: Fixed TypeScript error in PaymentService.ts (missing return type)
+❌ NOT ALLOWED: Refactored entire PaymentService to use async/await
+```
+
+**2. Import Statements for New Code**:
+```markdown
+✅ ALLOWED: Added `import { Logger } from './logger'` for new logging code
+❌ NOT ALLOWED: Reorganized all imports alphabetically across the file
+```
+
+**3. Trivial Formatting in Lines You're Editing**:
+```markdown
+✅ ALLOWED: Fixed indentation on line you're modifying
+❌ NOT ALLOWED: Reformatted entire file with Prettier
+```
+
+**Rule**: Document any scope exceptions in Implementation Notes.
+
+---
+
+### Why This Pattern Matters
+
+**Vibe-Coding with Guardrails**:
+- **Fast development** - AI finds issues proactively
+- **User control** - User decides priorities
+- **No scope creep** - Clear boundaries
+- **Better decisions** - User has context AI doesn't
+
+**Human Stays in Driver's Seat**:
+- User knows project constraints (deadlines, complexity, tech debt)
+- User has business context (what's actually important)
+- User understands team dynamics (who's working on what)
+- AI provides analysis, user provides judgment
+
+---
+
+### Implementation in Commands
+
+All brainstorming and implementation commands include Scope Boundary Rule reminders:
+
+- `/flow-brainstorm-start`, `/flow-brainstorm-subject`, `/flow-next-subject`
+- `/flow-implement-start`, `/flow-implement-complete`
+- Any command that involves code changes or design decisions
+
+See command definitions in SLASH_COMMANDS.md for specific implementations.
 
 ---
 
@@ -1103,6 +1289,135 @@ graph TD
 **Output**: `.flow/PLAN.md` created with project structure
 
 **Next Step**: Review generated plan, add/modify phases and tasks if needed
+
+---
+
+#### 1a. Blueprint Modes (Understanding /flow-blueprint Behavior)
+
+**Purpose**: `/flow-blueprint` has two modes based on input - understanding these modes helps you provide the right level of detail.
+
+**Mode A: SUGGEST Structure** (AI Designs the Plan)
+
+**Trigger**: You provide a description WITHOUT explicit structure markers
+
+**Examples**:
+```bash
+/flow-blueprint "Payment gateway integration"
+/flow-blueprint "User authentication system"
+/flow-blueprint "Build a real-time chat application"
+```
+
+**What Happens**:
+1. AI reads your description
+2. AI may ask clarifying questions (testing strategy, reference implementations, etc.)
+3. AI generates suggested phases/tasks/iterations based on best practices
+4. You review and modify as needed
+
+**Best For**:
+- New projects where you want AI to suggest structure
+- Features where you're exploring the best approach
+- When you want framework guidance on how to break down work
+
+**Example Output**:
+```markdown
+✨ Created .flow/PLAN.md for "Payment Gateway Integration"
+
+**Generated Structure**:
+- Phase 1: Foundation (API integration, basic flow)
+- Phase 2: Core Implementation (webhooks, retry logic)
+- Phase 3: Testing & Validation
+
+Use `/flow-status` to see current state
+Use `/flow-brainstorm-start [topic]` to begin first iteration
+```
+
+---
+
+**Mode B: CREATE Explicit Structure** (You Design the Plan)
+
+**Trigger**: You provide explicit structure markers in your description
+
+**Structure Markers**:
+- "Phase 1:", "Phase 2:", etc.
+- "Task 1:", "Task 2:", etc.
+- "Iteration 1:", "Iteration 2:", etc.
+- Bullet lists suggesting phases/tasks/iterations
+
+**Examples**:
+```bash
+/flow-blueprint "Payment Gateway
+
+Phase 1: Foundation
+- Task 1: Setup Stripe SDK
+- Task 2: Create payment models
+
+Phase 2: Implementation
+- Task 1: Payment processing
+  - Iteration 1: Basic flow
+  - Iteration 2: Error handling
+- Task 2: Webhook integration"
+```
+
+**What Happens**:
+1. AI detects explicit structure in your input
+2. AI shows dry-run preview of what will be created
+3. You confirm (yes/no)
+4. AI creates your exact structure with [TBD] for missing metadata
+
+**Best For**:
+- You already know the phases/tasks breakdown
+- Migrating from another planning system
+- You have specific work breakdown preferences
+- Quick project setup without AI suggestions
+
+**Example Dry-Run Preview**:
+```markdown
+📋 Detected explicit structure. I will create:
+
+**Phase 1: Foundation** ⏳
+- Task 1: Setup Stripe SDK ⏳
+- Task 2: Create payment models ⏳
+
+**Phase 2: Implementation** ⏳
+- Task 1: Payment processing ⏳
+  - Iteration 1: Basic flow ⏳
+  - Iteration 2: Error handling ⏳
+- Task 2: Webhook integration ⏳
+
+Missing metadata will use [TBD] placeholders (refine later).
+
+Proceed? (yes/no)
+```
+
+**If you say "yes"**:
+```markdown
+✨ Created .flow/PLAN.md from your explicit structure
+
+**Structure**: 2 phases, 3 tasks, 2 iterations (as you specified)
+
+**[TBD] placeholders used for**:
+- Phase strategies
+- Task purposes
+- Testing strategy
+
+💡 Refine [TBD] sections during brainstorming or use `/flow-plan-update`
+
+Use `/flow-status` to see current state
+```
+
+---
+
+**Choosing the Right Mode**:
+
+| Use Mode A (SUGGEST) If... | Use Mode B (CREATE) If... |
+|----------------------------|---------------------------|
+| You want AI to suggest best practices | You already have a work breakdown |
+| You're exploring different approaches | You know exactly what phases/tasks you need |
+| You want framework guidance | You're migrating from another system |
+| You're new to the project domain | You have specific organizational preferences |
+| You want comprehensive Testing Strategy generated | You'll define Testing Strategy later |
+
+**Pro Tip**: Start with Mode A for new projects (get AI suggestions), then use `/flow-phase-add` and `/flow-task-add` to refine the structure. This combines AI guidance with your domain expertise.
 
 ---
 
