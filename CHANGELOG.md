@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.1.12** - y (2025-10-05)
+**v1.2.0** - Test Infrastructure & Bug Fix (2025-10-06)
 
 **Changes**:
 
 - Bug fixes and improvements\n
-See the [v1.1.12 release](https://github.com/khgs2411/flow/releases/tag/v1.1.12) for full details.
+See the [v1.2.0 release](https://github.com/khgs2411/flow/releases/tag/v1.2.0) for full details.
 
 ---
 
