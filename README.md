@@ -40,15 +40,13 @@ cd /path/to/your/project
 
 ```bash
 curl -O https://raw.githubusercontent.com/khgs2411/flow/master/flow.sh
-```
-
-```bash
 chmod +x flow.sh && ./flow.sh
 ```
 
 Or
 
 ```bash
+curl -O https://raw.githubusercontent.com/khgs2411/flow/master/flow.sh
 chmod +x flow.sh && ./flow.sh --force
 ```
 
