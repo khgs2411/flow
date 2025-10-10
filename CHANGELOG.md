@@ -17,11 +17,11 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.2.0** - Test Infrastructure & Bug Fix (2025-10-06)
+**v1.2.0** - Iteration Optimization (2025-10-10)
 
 **Changes**:
 
-- Bug fixes and improvements\n
+- - Optimizing the iteration section, removing duplication on action items\n
 See the [v1.2.0 release](https://github.com/khgs2411/flow/releases/tag/v1.2.0) for full details.
 
 ---
