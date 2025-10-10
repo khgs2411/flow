@@ -262,18 +262,7 @@ Each iteration's "Verification" section will include:
 **Status**: COMPLETE
 **Completed**: 2025-10-01
 
-**Action Items**:
-- [x] Add MOCKPAY_API_KEY and MOCKPAY_SECRET to .env.example
-- [x] Create .env file and add to .gitignore
-- [x] Document credential setup in README.md
-- [x] Add validation on startup to ensure credentials are present
-- [x] Install @mockpay/node-sdk@3.2.1
-- [x] Create MockPayAdapter class implementing PaymentGatewayInterface
-- [x] Add TypeScript types for adapter methods
-- [x] Write unit tests for adapter initialization
-- [x] Create .env.development, .env.staging, .env.production templates
-- [x] Add dotenv-flow package for automatic env file loading
-- [x] Document environment setup in CONTRIBUTING.md
+**Action Items**: See resolved subjects above (Subjects 1, 2, 3 - all Type B/D items completed)
 
 **Implementation Notes**:
 - Discovered MockPay SDK sandbox mode - added `MOCKPAY_SANDBOX=true` for dev
@@ -395,19 +384,7 @@ Need to decide:
 
 **Status**: 🚧 IN PROGRESS
 
-**Action Items**:
-- [x] Define OpenAPI spec for POST /api/payments
-- [x] Create Express router for payment endpoints
-- [x] Add request validation middleware
-- [x] Implement PaymentService.createPaymentIntent() method
-- [x] Create PaymentStatus enum
-- [x] Define state transition validation function
-- [x] Add timestamps to transaction model
-- [x] Create database migration
-- [ ] Resolve error handling strategy
-- [ ] Implement error handling in service layer
-- [ ] Add integration tests for payment creation
-- [ ] Update API documentation
+**Action Items**: See resolved subjects above (Subjects 1, 2 - Type D items; Subject 3 in progress)
 
 **Implementation Notes**:
 - Created basic payment creation flow (happy path working)

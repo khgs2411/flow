@@ -1784,10 +1784,7 @@ If you discover NEW issues during implementation that are NOT part of the curren
 
    **Status**: 🚧 IN PROGRESS
 
-   **Action Items**:
-
-   [If brainstorming was done: Copy all unchecked action items from resolved subjects]
-   [If brainstorming was skipped: Copy action items from iteration definition OR create from iteration goal]
+   **Action Items**: See resolved subjects above (Type 2/D items)
 
    **Implementation Notes**:
 
@@ -1801,6 +1798,8 @@ If you discover NEW issues during implementation that are NOT part of the curren
 
    ---
    ```
+
+   **IMPORTANT**: Do NOT copy/duplicate action items from subjects to implementation section. The implementation section REFERENCES subjects where action items are defined. This prevents token waste and maintains single source of truth.
 ```
 
 7. **Update Progress Dashboard** (if it exists):
@@ -3661,9 +3660,7 @@ When brainstorming, every resolved subject falls into ONE of these types:
 
 **Status**: 🚧 IN PROGRESS
 
-**Action Items**:
-- [x] Completed item
-- [ ] Pending item
+**Action Items**: See resolved subjects above
 
 **Implementation Notes**:
 [Document discoveries during work]
@@ -4490,9 +4487,7 @@ scripts/
 
 ### **Implementation - Iteration 1**
 
-**Action Items**:
-- [ ] Implement basic error types
-- [ ] Add error messages
+**Action Items**: See resolved subjects above (Type 2 items from brainstorming)
 ```
 
 **Why Pre-Tasks Are Allowed**:
@@ -5074,12 +5069,16 @@ Complete any pre-implementation tasks
 
 **Implementation**: 🚧 IN PROGRESS
 
-**Action Items** (from brainstorming):
-- [ ] Implement JWT generation endpoint
-- [ ] Add refresh token rotation logic
-- [ ] Create password hashing utility
-- [ ] Build login form validation
-- [ ] Add authentication middleware
+**Action Items**: See resolved subjects above (Type 2 items)
+
+**Implementation Notes**:
+- Implemented JWT generation using jose library
+- Added refresh token rotation with 7-day expiry
+- [Document progress here as you work]
+
+**Files Modified**:
+- `src/auth/jwt.ts` - JWT generation and validation
+- `src/auth/refresh.ts` - Token rotation logic
 ```
 
 ##### Type 3: New Iterations (Future Work)
@@ -6179,10 +6178,11 @@ AI: "Brainstorming complete! Iteration 5 is 🎨 READY FOR IMPLEMENTATION"
 
 ### **Implementation - Iteration 5: Tier Generation**
 
-**Action Items**:
-- [ ] Implement generateTiers() method
-- [ ] Add weight-based constraint solver
-- [ ] Create selection algorithm
+**Action Items**: See resolved subjects above (Type 2/D items)
+
+**Implementation Notes**:
+- Implementing generateTiers() method...
+- Adding weight-based constraint solver...
 
 [User works through Type D action items - core feature work]
 ```
@@ -6205,11 +6205,7 @@ AI: "Brainstorming complete! Iteration 5 is 🎨 READY FOR IMPLEMENTATION"
 
 **Status**: 🚧 IN PROGRESS / ✅ COMPLETE
 
-**Action Items** (from brainstorming):
-
-- [x] Completed action item
-- [x] Completed action item
-- [ ] Pending action item
+**Action Items**: See resolved subjects above (Type 2/D items from brainstorming)
 
 **Implementation Notes**:
 
@@ -6222,16 +6218,19 @@ AI: "Brainstorming complete! Iteration 5 is 🎨 READY FOR IMPLEMENTATION"
 
 **Verification**: [How you verified it works - tests, manual checks, etc.]
 
+**Completed**: [Date] (when status is ✅ COMPLETE)
+
 ---
 ```
 
 ### Implementation Guidelines
 
-1. **Follow action items** - Don't deviate from brainstorming decisions
-2. **Check boxes as you go** - Maintain accurate state
-3. **Document surprises** - Note anything unexpected
+1. **Reference action items, don't duplicate** - Action items live in subject resolutions; Implementation section references them
+2. **Document progress** - Use Implementation Notes to track what you're doing, challenges, discoveries
+3. **Check boxes in subjects** - Mark action items complete in the subject resolutions where they're defined
 4. **Verify before completing** - Test/validate your work
 5. **Update file list** - Track what changed
+6. **No duplication** - Never copy action items to implementation section; use "See resolved subjects above"
 
 ---
 
@@ -6883,11 +6882,11 @@ Next Task: Task 5 - Implement Blue (Validator)
 
 **Status**: 🚧 IN PROGRESS
 
-**Action Items**:
+**Action Items**: See resolved subjects above
 
-- [ ] Action item 1
-- [ ] Action item 2
-- [ ] Action item 3
+**Implementation Notes**:
+
+[Document your implementation progress, discoveries, and challenges here]
 
 **Files Modified**:
 
@@ -8894,18 +8893,7 @@ Each iteration's "Verification" section will include:
 **Status**: COMPLETE
 **Completed**: 2025-10-01
 
-**Action Items**:
-- [x] Add MOCKPAY_API_KEY and MOCKPAY_SECRET to .env.example
-- [x] Create .env file and add to .gitignore
-- [x] Document credential setup in README.md
-- [x] Add validation on startup to ensure credentials are present
-- [x] Install @mockpay/node-sdk@3.2.1
-- [x] Create MockPayAdapter class implementing PaymentGatewayInterface
-- [x] Add TypeScript types for adapter methods
-- [x] Write unit tests for adapter initialization
-- [x] Create .env.development, .env.staging, .env.production templates
-- [x] Add dotenv-flow package for automatic env file loading
-- [x] Document environment setup in CONTRIBUTING.md
+**Action Items**: See resolved subjects above (Subjects 1, 2, 3 - all Type B/D items completed)
 
 **Implementation Notes**:
 - Discovered MockPay SDK sandbox mode - added `MOCKPAY_SANDBOX=true` for dev
@@ -9027,19 +9015,7 @@ Need to decide:
 
 **Status**: 🚧 IN PROGRESS
 
-**Action Items**:
-- [x] Define OpenAPI spec for POST /api/payments
-- [x] Create Express router for payment endpoints
-- [x] Add request validation middleware
-- [x] Implement PaymentService.createPaymentIntent() method
-- [x] Create PaymentStatus enum
-- [x] Define state transition validation function
-- [x] Add timestamps to transaction model
-- [x] Create database migration
-- [ ] Resolve error handling strategy
-- [ ] Implement error handling in service layer
-- [ ] Add integration tests for payment creation
-- [ ] Update API documentation
+**Action Items**: See resolved subjects above (Subjects 1, 2 - Type D items; Subject 3 in progress)
 
 **Implementation Notes**:
 - Created basic payment creation flow (happy path working)

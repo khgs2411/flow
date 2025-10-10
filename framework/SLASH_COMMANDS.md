@@ -1683,10 +1683,7 @@ If you discover NEW issues during implementation that are NOT part of the curren
 
    **Status**: 🚧 IN PROGRESS
 
-   **Action Items**:
-
-   [If brainstorming was done: Copy all unchecked action items from resolved subjects]
-   [If brainstorming was skipped: Copy action items from iteration definition OR create from iteration goal]
+   **Action Items**: See resolved subjects above (Type 2/D items)
 
    **Implementation Notes**:
 
@@ -1700,6 +1697,8 @@ If you discover NEW issues during implementation that are NOT part of the curren
 
    ---
    ```
+
+   **IMPORTANT**: Do NOT copy/duplicate action items from subjects to implementation section. The implementation section REFERENCES subjects where action items are defined. This prevents token waste and maintains single source of truth.
 ```
 
 7. **Update Progress Dashboard** (if it exists):
