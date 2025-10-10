@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.2.1** - Iteration Optimization (2025-10-10)
+**v1.2.2** - Adjusted the flow-update-plan command (2025-10-10)
 
 **Changes**:
 
-- - Improved token usage by removing duplicated sections\n
-See the [v1.2.1 release](https://github.com/khgs2411/flow/releases/tag/v1.2.1) for full details.
+- - The command is now inline with 1.2.1\n
+See the [v1.2.2 release](https://github.com/khgs2411/flow/releases/tag/v1.2.2) for full details.
 
 ---
 

@@ -636,56 +636,159 @@ You are executing the `/flow-plan-update` command from the Flow framework.
    - Copy current plan: `.flow/PLAN.md.version-update-backup-$(date +%Y-%m-%d-%H%M%S)`
    - Confirm: "✅ Backed up .flow/PLAN.md to [backup]"
 
-5. **Update plan structure** (preserve ALL content):
+5. **Analyze current plan against framework checklist**:
 
-   - **NEVER discard any user content** - only reformat and enhance
-   - Update section order to match framework:
-     1. Title + Framework Reference
-     2. Overview (Purpose, Goals, Scope)
-     3. **Progress Dashboard** (if complex project, OR create if missing)
-     4. Architecture
-     5. Development Plan (Phases → Tasks → Iterations)
-   - Move Progress Dashboard if in wrong location (should be after Overview, before Architecture)
-   - **Remove duplicate progress sections** (search for old "Implementation Tasks", "Current Phase" headers, redundant trackers)
-   - **Update status pointers** (change old references like "Search for 'Current Phase' below" to jump link: `[Progress Dashboard](#-progress-dashboard)`)
-   - **Clean up redundant framework documentation** (if user has custom brainstorming/workflow docs that duplicate Flow, ask if they want to remove)
-   - Add Progress Dashboard if missing and project is complex (10+ iterations)
-   - Ensure all status markers are standardized (✅ ⏳ 🚧 🎨 ❌ 🔮)
-   - **Add jump links to "Current Work" section if missing**:
-     - Format: `- **Phase**: [Phase 2 - Core Implementation](#phase-2-core-implementation-)`
-     - Format: `- **Task**: [Task 5 - Error Handling](#task-5-error-handling-)`
-     - Format: `- **Iteration**: [Iteration 6 - Circuit Breaker](#iteration-6-circuit-breaker-) 🚧 IN PROGRESS`
-     - Use inline markdown links (NOT `→ [Jump](#link)` format)
-     - Include status emoji (🚧 IN PROGRESS, 🎨 READY, etc.) on iteration line
-     - See EXAMPLE_PLAN.md lines 34-38 for reference
-   - **CRITICAL - Validate Progress Dashboard Iteration Lists**:
-     - Read DEVELOPMENT_FRAMEWORK.md lines 2555-2567 for iteration list format requirements
-     - Check if tasks with multiple iterations show them as indented sub-bullets
-     - **Invalid**: `- 🚧 **Task 23**: Refactor RED Service Architecture - Pre-tasks complete, Iteration 1 ready (3 iterations total)` ← NO iteration list!
-     - **Valid**: Task expanded with ALL iterations listed:
-       ```markdown
-       - 🚧 **Task 23**: Refactor RED Service Architecture (3/3 iterations)
-         - ✅ **Iteration 1**: Separate Concerns - COMPLETE
-         - ⏳ **Iteration 2**: Extract Core Logic - PENDING
-         - ⏳ **Iteration 3**: Optimize Performance - PENDING
-       ```
-     - Fix any tasks that say "(X iterations total)" without actually listing them
-   - Update any deprecated patterns to new format
-   - Preserve all:
-     - Decisions and rationale
-     - Brainstorming subjects and resolutions
-     - Implementation notes
-     - Completion dates
-     - Bug discoveries
-     - Code examples
+   **CRITICAL FRAMEWORK VERSION PATTERNS** (v1.2.1+):
 
-6. **Verify consistency**:
+   Compare user's PLAN.md against these patterns and identify what needs updating:
+
+   **✅ CORRECT PATTERNS (v1.2.1+)**:
+
+   **A. Section Order**:
+   1. Title + Framework Reference header
+   2. Overview (Purpose, Goals, Scope)
+   3. Progress Dashboard (after Overview, before Architecture)
+   4. Architecture
+   5. Testing Strategy
+   6. Development Plan (Phases → Tasks → Iterations)
+   7. Changelog
+
+   **B. Implementation Section Pattern** (NO ACTION ITEM DUPLICATION):
+   ```markdown
+   ### **Implementation - Iteration [N]: [Name]**
+
+   **Status**: 🚧 IN PROGRESS
+
+   **Action Items**: See resolved subjects above (Type 2/D items)
+
+   **Implementation Notes**:
+   [Document progress, discoveries, challenges]
+
+   **Files Modified**:
+   - `path/to/file.ts` - Description
+
+   **Verification**: [How verified]
+   ```
+
+   **C. Progress Dashboard Jump Links**:
+   ```markdown
+   **Current Work**:
+   - **Phase**: [Phase 2 - Core Implementation](#phase-2-core-implementation-)
+   - **Task**: [Task 5 - Error Handling](#task-5-error-handling-)
+   - **Iteration**: [Iteration 6 - Circuit Breaker](#iteration-6-circuit-breaker-) 🚧 IN PROGRESS
+   ```
+
+   **D. Iteration Lists** (EXPANDED, not collapsed):
+   ```markdown
+   - 🚧 **Task 23**: Refactor Architecture (3/3 iterations)
+     - ✅ **Iteration 1**: Separate Concerns - COMPLETE
+     - ⏳ **Iteration 2**: Extract Logic - PENDING
+     - ⏳ **Iteration 3**: Optimize - PENDING
+   ```
+
+   **E. Status Markers**: ✅ ⏳ 🚧 🎨 ❌ 🔮 (standardized)
+
+   ---
+
+   **❌ DEPRECATED PATTERNS (pre-v1.2.1)**:
+
+   **A. Duplicated Action Items** (REMOVE):
+   ```markdown
+   ### ✅ Subject 1: Feature X
+   **Action Items**:
+   - [ ] Item 1
+   - [ ] Item 2
+
+   ### **Implementation - Iteration 1**
+   **Action Items** (from brainstorming):  ← DUPLICATE! REMOVE THIS
+   - [ ] Item 1
+   - [ ] Item 2
+   ```
+   **FIX**: Replace Implementation action items with "See resolved subjects above"
+
+   **B. Collapsed Iteration Lists** (EXPAND):
+   ```markdown
+   - 🚧 Task 23: Architecture (3 iterations total)  ← WRONG!
+   ```
+   **FIX**: Expand to show all iterations as sub-bullets
+
+   **C. Duplicate Progress Sections** (REMOVE):
+   - Old "Current Phase" headers scattered throughout
+   - Multiple "Implementation Tasks" trackers
+   - Redundant status summaries
+   **FIX**: Single Progress Dashboard after Overview
+
+   **D. Text-based Status Pointers** (REPLACE):
+   ```markdown
+   Current work: Search for "Current Phase" below  ← WRONG!
+   ```
+   **FIX**: Use jump links: `[Progress Dashboard](#-progress-dashboard)`
+
+   **E. Missing Testing Strategy Section** (ADD):
+   **FIX**: Add Testing Strategy section (see EXAMPLE_PLAN.md lines 87-129)
+
+6. **Present analysis to user**:
+
+   **DO NOT automatically make changes**. Instead, present findings:
+
+   ```markdown
+   ## 📋 Plan Structure Analysis
+
+   I've compared your PLAN.md against the latest Flow framework (v1.2.1).
+
+   **✅ Already Correct**:
+   - [List patterns that match current framework]
+
+   **❌ Needs Updates**:
+
+   1. **Action Item Duplication** (Found in X iterations)
+      - Problem: Implementation sections duplicate action items from subjects
+      - Fix: Replace with "See resolved subjects above"
+      - Saves: ~600-1000 tokens per iteration
+
+   2. **Progress Dashboard Location** (if applicable)
+      - Problem: Dashboard is [location]
+      - Fix: Move to after Overview, before Architecture
+
+   3. **[Other issues found]**
+      - Problem: [description]
+      - Fix: [what needs to change]
+
+   **Recommendation**: Should I update your PLAN.md to fix these issues?
+   - I'll create a backup first
+   - All content will be preserved
+   - Only structure/formatting changes
+   ```
+
+7. **If user approves, update plan structure** (preserve ALL content):
+
+   **Create backup first**:
+   - Copy: `.flow/PLAN.md.version-update-backup-$(date +%Y-%m-%d-%H%M%S)`
+
+   **Apply fixes** based on analysis from step 5:
+   - Fix action item duplication (replace with references)
+   - Move Progress Dashboard to correct location
+   - Remove duplicate progress sections
+   - Update status pointers to jump links
+   - Add missing sections (Testing Strategy, Changelog)
+   - Expand collapsed iteration lists
+   - Standardize status markers
+
+   **Preserve ALL**:
+   - Decisions and rationale
+   - Brainstorming subjects and resolutions
+   - Implementation notes
+   - Completion dates
+   - Bug discoveries
+   - Code examples
+
+8. **Verify consistency**:
 
    - Check Progress Dashboard matches status markers
    - Verify all sections follow framework structure
    - Ensure no content was lost
 
-7. **Confirm to user**:
+9. **Confirm to user**:
 ```
 
 ✨ Plan structure updated to match latest Flow framework!
@@ -693,7 +796,7 @@ You are executing the `/flow-plan-update` command from the Flow framework.
 💾 Backup: .flow/PLAN.md.version-update-backup-[timestamp]
 🎯 Updated: .flow/PLAN.md
 
-Changes made: + Moved Progress Dashboard to correct location (after Overview, before Architecture) + Removed [N] duplicate progress sections (old trackers) + Updated status pointers to use jump links + Added jump links to "Current Work" section (Phase/Task/Iteration) + Standardized [Y] status markers + Cleaned up [Z] redundant framework documentation + [other changes specific to this update]
+Changes made: + Fixed [N] iterations with duplicated action items (replaced with references) + Moved Progress Dashboard to correct location (if needed) + Removed duplicate progress sections (if found) + Updated status pointers to use jump links (if needed) + Added jump links to "Current Work" section (if missing) + Expanded [Y] collapsed iteration lists + Standardized status markers + [other changes specific to this update]
 
 Next steps: 1. Review changes: diff [backup] .flow/PLAN.md 2. Verify: /flow-status 3. Continue work: /flow-next
 
@@ -701,7 +804,7 @@ All your content preserved - only structure enhanced.
 
 ```
 
-8. **Handle edge cases**:
+10. **Handle edge cases**:
 - If `.flow/PLAN.md` doesn't exist: Suggest `/flow-blueprint` or `/flow-migrate`
 - If plan already matches latest structure: Report "Already up to date!"
 - If can't determine what to update: Ask user what framework version they're coming from
