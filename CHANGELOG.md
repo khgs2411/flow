@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.2.9** - Hotfix (2025-10-20)
+**v1.2.10** - MCP server hotfix (2025-10-20)
 
 **Changes**:
 
-- - mcp tools hotfix\n
-See the [v1.2.9 release](https://github.com/khgs2411/flow/releases/tag/v1.2.9) for full details.
+- - fixed mcp tools\n
+See the [v1.2.10 release](https://github.com/khgs2411/flow/releases/tag/v1.2.10) for full details.
 
 ---
 
