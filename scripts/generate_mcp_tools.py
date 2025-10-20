@@ -74,21 +74,30 @@ def generate_function_body(cmd: dict) -> str:
     """Generate function body that reads and returns slash command instructions"""
     command_name = cmd['command_name']
 
+    # Build metadata dict from command metadata
+    metadata_dict = {
+        'category': cmd.get('category', 'unknown'),
+        'framework_reading_required': cmd.get('framework_reading_required', False),
+        'framework_sections': cmd.get('framework_sections', []),
+        'plan_operations': cmd.get('plan_operations', []),
+        'parameters': {p['name']: p.get('description', '') for p in cmd.get('parameters', [])}
+    }
+
     lines = []
     lines.append('    try:')
-    lines.append('        # Read slash command instructions from bundled SLASH_COMMANDS.md')
-    lines.append('        package_dir = Path(__file__).parent')
-    lines.append('        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"')
-    lines.append('')
-    lines.append('        if not slash_commands_file.exists():')
+    lines.append('        # Read slash command instructions from cached SLASH_COMMANDS.md')
+    lines.append('        try:')
+    lines.append('            content = get_slash_commands_content()')
+    lines.append('        except FileNotFoundError as e:')
     lines.append('            return format_error_response(')
     lines.append(f'                "{command_name}",')
-    lines.append('                "SLASH_COMMANDS.md not found",')
-    lines.append('                f"Expected at: {slash_commands_file}"')
+    lines.append('                "SLASH_COMMANDS.md not found in package",')
+    lines.append('                f"This is a package installation issue. Try:\\\\n"')
+    lines.append('                f"1. Reinstall: uvx --force mcp-server-flow\\\\n"')
+    lines.append('                f"2. Report issue: https://github.com/khgs2411/flow/issues"')
     lines.append('            )')
     lines.append('')
     lines.append('        # Extract command instructions')
-    lines.append('        content = slash_commands_file.read_text()')
     lines.append('        import re')
     lines.append(f'        pattern = r"## {command_name}\\s*\\n.*?```markdown\\n(.*?)```"')
     lines.append('        match = re.search(pattern, content, re.DOTALL)')
@@ -101,12 +110,21 @@ def generate_function_body(cmd: dict) -> str:
     lines.append('            )')
     lines.append('')
     lines.append('        instructions = match.group(1).strip()')
+    lines.append('        instruction_lines = len(instructions.split("\\\\n"))')
+    lines.append('')
+    lines.append('        # Build metadata for LLM context')
+    lines.append(f'        metadata = {repr(metadata_dict)}')
+    lines.append('        metadata["instruction_lines"] = instruction_lines')
     lines.append('')
     lines.append('        # Return instructions as structured guidance for LLM to execute')
+    lines.append('        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"')
     lines.append('        return format_success_response(')
     lines.append(f'            "{command_name}",')
-    lines.append(f'            "Instructions retrieved - LLM will execute",')
-    lines.append('            instructions')
+    lines.append('            operation,')
+    lines.append('            instructions,')
+    lines.append('            "",')
+    lines.append('            None,')
+    lines.append('            metadata')
     lines.append('        )')
     lines.append('')
     lines.append('    except Exception as e:')
@@ -150,7 +168,7 @@ Generated from framework/SLASH_COMMANDS.md metadata
 import os
 import shutil
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, cast, Optional
 from fastmcp import FastMCP
 
 from flow_core import (
@@ -167,6 +185,36 @@ from flow_core import (
     PlanNotFoundError,
     FlowError,
 )
+
+# ============== CACHING ==============
+
+_SLASH_COMMANDS_CACHE: Optional[str] = None
+
+def get_slash_commands_content() -> str:
+    """
+    Get cached SLASH_COMMANDS.md content.
+
+    This function caches the SLASH_COMMANDS.md file in memory on first access
+    to avoid repeated disk I/O. The file is bundled with the package and never
+    changes at runtime, so caching is safe.
+
+    Returns:
+        Content of SLASH_COMMANDS.md
+
+    Raises:
+        FileNotFoundError: If SLASH_COMMANDS.md is not found in package
+    """
+    global _SLASH_COMMANDS_CACHE
+    if _SLASH_COMMANDS_CACHE is None:
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
+        if not slash_commands_file.exists():
+            raise FileNotFoundError(
+                f"SLASH_COMMANDS.md not found at {slash_commands_file}. "
+                f"This indicates a corrupted package installation."
+            )
+        _SLASH_COMMANDS_CACHE = slash_commands_file.read_text()
+    return _SLASH_COMMANDS_CACHE
 
 # ============== INITIALIZATION ==============
 
@@ -360,6 +408,39 @@ def main():
     commands = extract_all_commands(slash_commands_file)
 
     print(f"✅ Found {len(commands)} commands with metadata")
+
+    # Validate commands (build-time validation)
+    print(f"\n🔍 Validating {len(commands)} commands...")
+    slash_content = slash_commands_file.read_text()
+
+    validation_errors = []
+    for cmd in commands:
+        command_name = cmd['command_name']
+        # Escape regex special characters in command name
+        import re
+        escaped_name = re.escape(command_name)
+        pattern = rf"## {escaped_name}\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, slash_content, re.DOTALL)
+
+        if not match:
+            validation_errors.append(
+                f"   ❌ {command_name}: Has metadata but missing/malformed markdown content"
+            )
+        elif len(match.group(1).strip()) < 50:
+            validation_errors.append(
+                f"   ⚠️  {command_name}: Instructions are suspiciously short ({len(match.group(1))} chars)"
+            )
+        else:
+            print(f"   ✅ {command_name}")
+
+    if validation_errors:
+        print("\n🚨 VALIDATION FAILED:\n")
+        for error in validation_errors:
+            print(error)
+        print("\nFix these issues in framework/SLASH_COMMANDS.md before building.\n")
+        return 1
+
+    print(f"✅ All {len(commands)} commands validated successfully")
 
     # Generate MCP server
     output_file = Path(__file__).parent.parent / "mcp-server-flow" / "mcp_server.py"

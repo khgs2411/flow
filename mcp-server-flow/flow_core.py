@@ -287,7 +287,8 @@ def format_success_response(
     operation: str,
     output: str,
     next_steps: str = "",
-    dashboard: Optional[dict[str, Any]] = None
+    dashboard: Optional[dict[str, Any]] = None,
+    metadata: Optional[dict[str, Any]] = None
 ) -> dict[str, Any]:
     """
     Format a successful MCP tool response.
@@ -298,6 +299,7 @@ def format_success_response(
         output: Markdown-formatted output for AI
         next_steps: Suggested next actions
         dashboard: Updated dashboard state
+        metadata: Additional context (category, framework sections, etc.)
 
     Returns:
         Formatted response dictionary
@@ -309,6 +311,7 @@ def format_success_response(
         "output": output,
         "next_steps": next_steps or "Run flow_status() to see current position.",
         "dashboard": dashboard,
+        "metadata": metadata,
         "error": None
     }
 

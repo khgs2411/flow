@@ -11,7 +11,7 @@ Generated from framework/SLASH_COMMANDS.md metadata
 import os
 import shutil
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, cast, Optional
 from fastmcp import FastMCP
 
 from flow_core import (
@@ -28,6 +28,36 @@ from flow_core import (
     PlanNotFoundError,
     FlowError,
 )
+
+# ============== CACHING ==============
+
+_SLASH_COMMANDS_CACHE: Optional[str] = None
+
+def get_slash_commands_content() -> str:
+    """
+    Get cached SLASH_COMMANDS.md content.
+
+    This function caches the SLASH_COMMANDS.md file in memory on first access
+    to avoid repeated disk I/O. The file is bundled with the package and never
+    changes at runtime, so caching is safe.
+
+    Returns:
+        Content of SLASH_COMMANDS.md
+
+    Raises:
+        FileNotFoundError: If SLASH_COMMANDS.md is not found in package
+    """
+    global _SLASH_COMMANDS_CACHE
+    if _SLASH_COMMANDS_CACHE is None:
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
+        if not slash_commands_file.exists():
+            raise FileNotFoundError(
+                f"SLASH_COMMANDS.md not found at {slash_commands_file}. "
+                f"This indicates a corrupted package installation."
+            )
+        _SLASH_COMMANDS_CACHE = slash_commands_file.read_text()
+    return _SLASH_COMMANDS_CACHE
 
 # ============== INITIALIZATION ==============
 
@@ -175,19 +205,19 @@ def flow_blueprint(project_description: str) -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-blueprint",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-blueprint\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -200,12 +230,21 @@ def flow_blueprint(project_description: str) -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'planning_creation', 'framework_reading_required': True, 'framework_sections': ['Quick Reference (lines 1-544)', 'Plan File Template (lines 2731-2928)'], 'plan_operations': ['WRITE'], 'parameters': {'project_description': 'Rich description of the feature/project including requirements, constraints, references, and testing methodology'}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-blueprint",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -228,19 +267,19 @@ def flow_migrate(existing_file_path: str = "") -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-migrate",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-migrate\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -253,12 +292,21 @@ def flow_migrate(existing_file_path: str = "") -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'planning_creation', 'framework_reading_required': True, 'framework_sections': ['Quick Reference (lines 1-544)', 'Plan File Template (lines 2731-2928)'], 'plan_operations': ['READ', 'WRITE'], 'parameters': {'existing_file_path': 'Path to existing plan file (auto-discovers if not provided)'}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-migrate",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -278,19 +326,19 @@ def flow_plan_update() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-plan-update",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-plan-update\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -303,12 +351,21 @@ def flow_plan_update() -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'maintenance', 'framework_reading_required': True, 'framework_sections': ['Quick Reference (lines 1-544)', 'Plan File Template (lines 2731-2928)'], 'plan_operations': ['READ', 'WRITE'], 'parameters': {}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-plan-update",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -332,19 +389,19 @@ def flow_phase_add(phase_name: str, phase_description: str = "") -> dict[str, An
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-phase-add",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-phase-add\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -357,12 +414,21 @@ def flow_phase_add(phase_name: str, phase_description: str = "") -> dict[str, An
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'structure_addition', 'framework_reading_required': False, 'framework_sections': [], 'plan_operations': ['READ', 'WRITE'], 'parameters': {'phase_name': 'Name of the phase to add', 'phase_description': 'Optional description of the phase'}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-phase-add",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -382,19 +448,19 @@ def flow_phase_start() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-phase-start",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-phase-start\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -407,12 +473,21 @@ def flow_phase_start() -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'state_management', 'framework_reading_required': False, 'framework_sections': [], 'plan_operations': ['READ', 'WRITE'], 'parameters': {}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-phase-start",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -432,19 +507,19 @@ def flow_phase_complete() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-phase-complete",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-phase-complete\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -457,12 +532,21 @@ def flow_phase_complete() -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'state_management', 'framework_reading_required': False, 'framework_sections': [], 'plan_operations': ['READ', 'WRITE'], 'parameters': {}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-phase-complete",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -487,19 +571,19 @@ def flow_task_add(task_name: str, task_description: str = "", task_purpose: str 
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-task-add",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-task-add\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -512,12 +596,21 @@ def flow_task_add(task_name: str, task_description: str = "", task_purpose: str 
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'structure_addition', 'framework_reading_required': True, 'framework_sections': ['Task Structure Rules (lines 238-566)'], 'plan_operations': ['READ', 'WRITE'], 'parameters': {'task_name': 'Name of the task to add', 'task_description': 'Optional description of the task', 'task_purpose': 'Optional purpose statement for the task'}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-task-add",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -537,19 +630,19 @@ def flow_task_start() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-task-start",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-task-start\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -562,12 +655,21 @@ def flow_task_start() -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'state_management', 'framework_reading_required': False, 'framework_sections': [], 'plan_operations': ['READ', 'WRITE'], 'parameters': {}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-task-start",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -587,19 +689,19 @@ def flow_task_complete() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-task-complete",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-task-complete\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -612,12 +714,21 @@ def flow_task_complete() -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'state_management', 'framework_reading_required': False, 'framework_sections': [], 'plan_operations': ['READ', 'WRITE'], 'parameters': {}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-task-complete",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -641,19 +752,19 @@ def flow_iteration_add(iteration_name: str, iteration_description: str = "") -> 
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-iteration-add",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-iteration-add\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -666,12 +777,21 @@ def flow_iteration_add(iteration_name: str, iteration_description: str = "") -> 
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'structure_addition', 'framework_reading_required': True, 'framework_sections': ['Quick Reference (lines 1-544)', 'Task Structure Rules (lines 606-934)'], 'plan_operations': ['READ', 'WRITE'], 'parameters': {'iteration_name': 'Name/goal of the iteration to add', 'iteration_description': 'Optional description of the iteration'}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-iteration-add",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -694,19 +814,19 @@ def flow_brainstorm_start(topics: str = "") -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-brainstorm-start",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-brainstorm-start\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -719,12 +839,21 @@ def flow_brainstorm_start(topics: str = "") -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'brainstorming', 'framework_reading_required': True, 'framework_sections': ['Quick Reference (lines 1-544)', 'Brainstorming Session Pattern (lines 1535-2165)'], 'plan_operations': ['READ', 'WRITE'], 'parameters': {'topics': 'Topics to discuss (prompts if not provided)'}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-brainstorm-start",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -747,19 +876,19 @@ def flow_brainstorm_subject(subject_text: str) -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-brainstorm-subject",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-brainstorm-subject\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -772,12 +901,21 @@ def flow_brainstorm_subject(subject_text: str) -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'brainstorming', 'framework_reading_required': True, 'framework_sections': ['Quick Reference (lines 1-544)', 'Brainstorming Session Pattern (lines 1535-2165)'], 'plan_operations': ['READ', 'WRITE'], 'parameters': {'subject_text': 'Subject to add to discussion'}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-brainstorm-subject",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -797,19 +935,19 @@ def flow_brainstorm_review() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-brainstorm-review",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-brainstorm-review\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -822,12 +960,21 @@ def flow_brainstorm_review() -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'brainstorming', 'framework_reading_required': True, 'framework_sections': ['Quick Reference (lines 1-544)', 'Brainstorming Session Pattern (lines 1535-2165)'], 'plan_operations': ['READ'], 'parameters': {}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-brainstorm-review",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -847,19 +994,19 @@ def flow_brainstorm_complete() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-brainstorm-complete",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-brainstorm-complete\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -872,12 +1019,21 @@ def flow_brainstorm_complete() -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'brainstorming', 'framework_reading_required': True, 'framework_sections': ['Quick Reference (lines 1-544)', 'Brainstorming Session Pattern (lines 1535-2165)'], 'plan_operations': ['READ', 'WRITE'], 'parameters': {}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-brainstorm-complete",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -897,19 +1053,19 @@ def flow_implement_start() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-implement-start",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-implement-start\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -922,12 +1078,21 @@ def flow_implement_start() -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'state_management', 'framework_reading_required': False, 'framework_sections': [], 'plan_operations': ['READ', 'WRITE'], 'parameters': {}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-implement-start",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -947,19 +1112,19 @@ def flow_implement_complete() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-implement-complete",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-implement-complete\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -972,12 +1137,21 @@ def flow_implement_complete() -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'state_management', 'framework_reading_required': False, 'framework_sections': [], 'plan_operations': ['READ', 'WRITE'], 'parameters': {}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-implement-complete",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -997,19 +1171,19 @@ def flow_status() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-status",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-status\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -1022,12 +1196,21 @@ def flow_status() -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'navigation_query', 'framework_reading_required': False, 'framework_sections': [], 'plan_operations': ['READ'], 'parameters': {}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-status",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -1047,19 +1230,19 @@ def flow_summarize() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-summarize",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-summarize\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -1072,12 +1255,21 @@ def flow_summarize() -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'navigation_query', 'framework_reading_required': False, 'framework_sections': [], 'plan_operations': ['READ'], 'parameters': {}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-summarize",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -1097,19 +1289,19 @@ def flow_next_subject() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-next-subject",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-next-subject\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -1122,12 +1314,21 @@ def flow_next_subject() -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'navigation_query', 'framework_reading_required': False, 'framework_sections': [], 'plan_operations': ['READ', 'WRITE'], 'parameters': {}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-next-subject",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -1147,19 +1348,19 @@ def flow_next_iteration() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-next-iteration",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-next-iteration\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -1172,12 +1373,21 @@ def flow_next_iteration() -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'navigation_query', 'framework_reading_required': False, 'framework_sections': [], 'plan_operations': ['READ'], 'parameters': {}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-next-iteration",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -1197,19 +1407,19 @@ def flow_next() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-next",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-next\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -1222,12 +1432,21 @@ def flow_next() -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'navigation_query', 'framework_reading_required': False, 'framework_sections': [], 'plan_operations': ['READ'], 'parameters': {}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-next",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -1247,19 +1466,19 @@ def flow_rollback() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-rollback",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-rollback\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -1272,12 +1491,21 @@ def flow_rollback() -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'maintenance', 'framework_reading_required': False, 'framework_sections': [], 'plan_operations': ['READ', 'WRITE'], 'parameters': {}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-rollback",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -1297,19 +1525,19 @@ def flow_verify_plan() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-verify-plan",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-verify-plan\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -1322,12 +1550,21 @@ def flow_verify_plan() -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'maintenance', 'framework_reading_required': True, 'framework_sections': ['Quick Reference (lines 1-544)', 'Plan File Template (lines 2731-2928)'], 'plan_operations': ['READ'], 'parameters': {}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-verify-plan",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -1347,19 +1584,19 @@ def flow_compact() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-compact",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-compact\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -1372,12 +1609,21 @@ def flow_compact() -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'maintenance', 'framework_reading_required': False, 'framework_sections': [], 'plan_operations': ['READ'], 'parameters': {}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-compact",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -1397,19 +1643,19 @@ def flow_plan_split() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-plan-split",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-plan-split\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -1422,12 +1668,21 @@ def flow_plan_split() -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'maintenance', 'framework_reading_required': False, 'framework_sections': [], 'plan_operations': ['READ', 'WRITE'], 'parameters': {}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-plan-split",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -1450,19 +1705,19 @@ def flow_backlog_add(task_numbers: str) -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-backlog-add",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-backlog-add\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -1475,12 +1730,21 @@ def flow_backlog_add(task_numbers: str) -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'backlog', 'framework_reading_required': False, 'framework_sections': [], 'plan_operations': ['READ', 'WRITE'], 'parameters': {'task_numbers': "Task number(s) to move to backlog (e.g. '14' or '14-22')"}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-backlog-add",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -1500,19 +1764,19 @@ def flow_backlog_view() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-backlog-view",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-backlog-view\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -1525,12 +1789,21 @@ def flow_backlog_view() -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'backlog', 'framework_reading_required': False, 'framework_sections': [], 'plan_operations': ['READ'], 'parameters': {}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-backlog-view",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
@@ -1554,19 +1827,19 @@ def flow_backlog_pull(task_number: str, position: str = "") -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Read slash command instructions from bundled SLASH_COMMANDS.md
-        package_dir = Path(__file__).parent
-        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
-
-        if not slash_commands_file.exists():
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
             return format_error_response(
                 "/flow-backlog-pull",
-                "SLASH_COMMANDS.md not found",
-                f"Expected at: {slash_commands_file}"
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
             )
 
         # Extract command instructions
-        content = slash_commands_file.read_text()
         import re
         pattern = r"## /flow-backlog-pull\s*\n.*?```markdown\n(.*?)```"
         match = re.search(pattern, content, re.DOTALL)
@@ -1579,12 +1852,21 @@ def flow_backlog_pull(task_number: str, position: str = "") -> dict[str, Any]:
             )
 
         instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'backlog', 'framework_reading_required': False, 'framework_sections': [], 'plan_operations': ['READ', 'WRITE'], 'parameters': {'task_number': 'Task number to pull from backlog', 'position': 'Optional positioning instruction'}}
+        metadata["instruction_lines"] = instruction_lines
 
         # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
         return format_success_response(
             "/flow-backlog-pull",
-            "Instructions retrieved - LLM will execute",
-            instructions
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
         )
 
     except Exception as e:
