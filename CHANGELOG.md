@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.2.2** - Adjusted the flow-update-plan command (2025-10-10)
+**v1.2.3** - MCP Server (2025-10-20)
 
 **Changes**:
 
-- - The command is now inline with 1.2.1\n
-See the [v1.2.2 release](https://github.com/khgs2411/flow/releases/tag/v1.2.2) for full details.
+- - Added MCP server support\n
+See the [v1.2.3 release](https://github.com/khgs2411/flow/releases/tag/v1.2.3) for full details.
 
 ---
 

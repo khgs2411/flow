@@ -1,0 +1,23 @@
+[project]
+name = "mcp-server-flow"
+version = "0.1.0"
+description = "MCP server for Flow Framework - Spec-driven iterative development methodology"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "Liad Goren", email = "liadgoren@example.com" }
+]
+dependencies = [
+    "fastmcp>=2.0.0",
+]
+
+[project.scripts]
+mcp-server-flow = "mcp_server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+include = ["framework/**/*.md"]
