@@ -71,51 +71,78 @@ def generate_docstring(cmd: dict) -> str:
 
 
 def generate_function_body(cmd: dict) -> str:
-    """Generate function body (stub implementation)"""
+    """Generate function body that reads and returns slash command instructions"""
     func_name = cmd['function_name']
     command_name = cmd['command_name']
-    category = cmd.get('category', 'unknown')
     plan_ops = cmd.get('plan_operations', [])
 
     lines = []
     lines.append('    try:')
-
-    # Add plan file finding if needed
-    if 'READ' in plan_ops or 'WRITE' in plan_ops:
-        lines.append('        # Find and read PLAN.md')
-        lines.append('        plan_path = find_plan_file()')
-        if 'READ' in plan_ops:
-            lines.append('        plan_content = read_plan(plan_path)')
-
+    lines.append('        # Read slash command instructions from bundled SLASH_COMMANDS.md')
+    lines.append('        package_dir = Path(__file__).parent')
+    lines.append('        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"')
     lines.append('')
-    lines.append(f'        # TODO: Implement {command_name} logic')
-    lines.append(f'        # Category: {category}')
-    lines.append(f'        # Operations: {", ".join(plan_ops) if plan_ops else "None"}')
+    lines.append('        if not slash_commands_file.exists():')
+    lines.append('            return format_error_response(')
+    lines.append(f'                "{command_name}",')
+    lines.append('                "SLASH_COMMANDS.md not found",')
+    lines.append('                f"Expected at: {slash_commands_file}"')
+    lines.append('            )')
+    lines.append('')
+    lines.append('        # Extract command instructions')
+    lines.append('        content = slash_commands_file.read_text()')
+    lines.append('        import re')
+    lines.append(f'        pattern = r"## {command_name}\\s*\\n.*?```markdown\\n(.*?)```"')
+    lines.append('        match = re.search(pattern, content, re.DOTALL)')
+    lines.append('')
+    lines.append('        if not match:')
+    lines.append('            return format_error_response(')
+    lines.append(f'                "{command_name}",')
+    lines.append(f'                "Command instructions not found",')
+    lines.append(f'                f"Could not find {command_name} in SLASH_COMMANDS.md"')
+    lines.append('            )')
+    lines.append('')
+    lines.append('        instructions = match.group(1).strip()')
     lines.append('')
 
-    # Return stub response
-    lines.append('        output = f"""# {command_name} Result')
+    # Add dashboard extraction for commands that need it
+    if 'READ' in plan_ops:
+        lines.append('        # Extract dashboard if plan exists')
+        lines.append('        dashboard = None')
+        lines.append('        try:')
+        lines.append('            plan_path = find_plan_file()')
+        lines.append('            plan_content = read_plan(plan_path)')
+        lines.append('            dashboard = extract_dashboard(plan_content)')
+        lines.append('        except PlanNotFoundError:')
+        lines.append('            pass  # Dashboard optional for instruction-only commands')
+        lines.append('')
+
+    # Return instructions as structured guidance
+    lines.append('        # Return instructions as structured guidance for LLM to execute')
+    lines.append(f'        output = f"""# {command_name}')
     lines.append('')
-    lines.append('        TODO: Implement command logic')
+    lines.append('## Instructions')
+    lines.append('')
+    lines.append('{instructions}')
     lines.append('        """')
     lines.append('')
     lines.append('        return format_success_response(')
     lines.append(f'            "{command_name}",')
-    lines.append(f'            "{func_name} executed",')
+    lines.append(f'            "Instructions retrieved",')
     lines.append('            output,')
-    lines.append(f'            "Next steps for {command_name}"')
+
+    if 'READ' in plan_ops:
+        lines.append('            "",')
+        lines.append('            dashboard')
+    else:
+        lines.append('            ""')
+
     lines.append('        )')
     lines.append('')
-    lines.append('    except PlanNotFoundError:')
-    lines.append('        return format_error_response(')
-    lines.append(f'            "{command_name}",')
-    lines.append('            "PLAN.md not found",')
-    lines.append('            "Run flow_init() first, then flow_blueprint() to create a plan"')
-    lines.append('        )')
     lines.append('    except Exception as e:')
     lines.append('        return format_error_response(')
     lines.append(f'            "{command_name}",')
-    lines.append(f'            "Failed to execute {command_name}",')
+    lines.append(f'            "Failed to retrieve command instructions",')
     lines.append('            str(e)')
     lines.append('        )')
 

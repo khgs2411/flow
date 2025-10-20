@@ -175,35 +175,51 @@ def flow_blueprint(project_description: str) -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-blueprint logic
-        # Category: planning_creation
-        # Operations: WRITE
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-blueprint",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-blueprint\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-blueprint",
+                "Command instructions not found",
+                f"Could not find /flow-blueprint in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-blueprint
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-blueprint",
-            "flow_blueprint executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-blueprint"
+            ""
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-blueprint",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-blueprint",
-            "Failed to execute /flow-blueprint",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -220,36 +236,61 @@ def flow_migrate(existing_file_path: str = "") -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-migrate logic
-        # Category: planning_creation
-        # Operations: READ, WRITE
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-migrate",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-migrate\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-migrate",
+                "Command instructions not found",
+                f"Could not find /flow-migrate in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-migrate
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-migrate",
-            "flow_migrate executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-migrate"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-migrate",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-migrate",
-            "Failed to execute /flow-migrate",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -263,36 +304,61 @@ def flow_plan_update() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-plan-update logic
-        # Category: maintenance
-        # Operations: READ, WRITE
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-plan-update",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-plan-update\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-plan-update",
+                "Command instructions not found",
+                f"Could not find /flow-plan-update in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-plan-update
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-plan-update",
-            "flow_plan_update executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-plan-update"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-plan-update",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-plan-update",
-            "Failed to execute /flow-plan-update",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -310,36 +376,61 @@ def flow_phase_add(phase_name: str, phase_description: str = "") -> dict[str, An
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-phase-add logic
-        # Category: structure_addition
-        # Operations: READ, WRITE
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-phase-add",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-phase-add\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-phase-add",
+                "Command instructions not found",
+                f"Could not find /flow-phase-add in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-phase-add
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-phase-add",
-            "flow_phase_add executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-phase-add"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-phase-add",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-phase-add",
-            "Failed to execute /flow-phase-add",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -353,36 +444,61 @@ def flow_phase_start() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-phase-start logic
-        # Category: state_management
-        # Operations: READ, WRITE
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-phase-start",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-phase-start\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-phase-start",
+                "Command instructions not found",
+                f"Could not find /flow-phase-start in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-phase-start
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-phase-start",
-            "flow_phase_start executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-phase-start"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-phase-start",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-phase-start",
-            "Failed to execute /flow-phase-start",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -396,36 +512,61 @@ def flow_phase_complete() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-phase-complete logic
-        # Category: state_management
-        # Operations: READ, WRITE
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-phase-complete",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-phase-complete\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-phase-complete",
+                "Command instructions not found",
+                f"Could not find /flow-phase-complete in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-phase-complete
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-phase-complete",
-            "flow_phase_complete executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-phase-complete"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-phase-complete",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-phase-complete",
-            "Failed to execute /flow-phase-complete",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -444,36 +585,61 @@ def flow_task_add(task_name: str, task_description: str = "", task_purpose: str 
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-task-add logic
-        # Category: structure_addition
-        # Operations: READ, WRITE
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-task-add",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-task-add\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-task-add",
+                "Command instructions not found",
+                f"Could not find /flow-task-add in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-task-add
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-task-add",
-            "flow_task_add executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-task-add"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-task-add",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-task-add",
-            "Failed to execute /flow-task-add",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -487,36 +653,61 @@ def flow_task_start() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-task-start logic
-        # Category: state_management
-        # Operations: READ, WRITE
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-task-start",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-task-start\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-task-start",
+                "Command instructions not found",
+                f"Could not find /flow-task-start in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-task-start
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-task-start",
-            "flow_task_start executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-task-start"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-task-start",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-task-start",
-            "Failed to execute /flow-task-start",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -530,36 +721,61 @@ def flow_task_complete() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-task-complete logic
-        # Category: state_management
-        # Operations: READ, WRITE
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-task-complete",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-task-complete\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-task-complete",
+                "Command instructions not found",
+                f"Could not find /flow-task-complete in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-task-complete
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-task-complete",
-            "flow_task_complete executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-task-complete"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-task-complete",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-task-complete",
-            "Failed to execute /flow-task-complete",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -577,36 +793,61 @@ def flow_iteration_add(iteration_name: str, iteration_description: str = "") -> 
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-iteration-add logic
-        # Category: structure_addition
-        # Operations: READ, WRITE
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-iteration-add",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-iteration-add\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-iteration-add",
+                "Command instructions not found",
+                f"Could not find /flow-iteration-add in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-iteration-add
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-iteration-add",
-            "flow_iteration_add executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-iteration-add"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-iteration-add",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-iteration-add",
-            "Failed to execute /flow-iteration-add",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -623,36 +864,61 @@ def flow_brainstorm_start(topics: str = "") -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-brainstorm-start logic
-        # Category: brainstorming
-        # Operations: READ, WRITE
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-brainstorm-start",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-brainstorm-start\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-brainstorm-start",
+                "Command instructions not found",
+                f"Could not find /flow-brainstorm-start in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-brainstorm-start
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-brainstorm-start",
-            "flow_brainstorm_start executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-brainstorm-start"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-brainstorm-start",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-brainstorm-start",
-            "Failed to execute /flow-brainstorm-start",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -669,36 +935,61 @@ def flow_brainstorm_subject(subject_text: str) -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-brainstorm-subject logic
-        # Category: brainstorming
-        # Operations: READ, WRITE
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-brainstorm-subject",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-brainstorm-subject\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-brainstorm-subject",
+                "Command instructions not found",
+                f"Could not find /flow-brainstorm-subject in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-brainstorm-subject
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-brainstorm-subject",
-            "flow_brainstorm_subject executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-brainstorm-subject"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-brainstorm-subject",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-brainstorm-subject",
-            "Failed to execute /flow-brainstorm-subject",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -712,36 +1003,61 @@ def flow_brainstorm_review() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-brainstorm-review logic
-        # Category: brainstorming
-        # Operations: READ
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-brainstorm-review",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-brainstorm-review\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-brainstorm-review",
+                "Command instructions not found",
+                f"Could not find /flow-brainstorm-review in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-brainstorm-review
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-brainstorm-review",
-            "flow_brainstorm_review executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-brainstorm-review"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-brainstorm-review",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-brainstorm-review",
-            "Failed to execute /flow-brainstorm-review",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -755,36 +1071,61 @@ def flow_brainstorm_complete() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-brainstorm-complete logic
-        # Category: brainstorming
-        # Operations: READ, WRITE
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-brainstorm-complete",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-brainstorm-complete\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-brainstorm-complete",
+                "Command instructions not found",
+                f"Could not find /flow-brainstorm-complete in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-brainstorm-complete
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-brainstorm-complete",
-            "flow_brainstorm_complete executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-brainstorm-complete"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-brainstorm-complete",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-brainstorm-complete",
-            "Failed to execute /flow-brainstorm-complete",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -798,36 +1139,61 @@ def flow_implement_start() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-implement-start logic
-        # Category: state_management
-        # Operations: READ, WRITE
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-implement-start",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-implement-start\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-implement-start",
+                "Command instructions not found",
+                f"Could not find /flow-implement-start in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-implement-start
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-implement-start",
-            "flow_implement_start executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-implement-start"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-implement-start",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-implement-start",
-            "Failed to execute /flow-implement-start",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -841,36 +1207,61 @@ def flow_implement_complete() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-implement-complete logic
-        # Category: state_management
-        # Operations: READ, WRITE
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-implement-complete",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-implement-complete\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-implement-complete",
+                "Command instructions not found",
+                f"Could not find /flow-implement-complete in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-implement-complete
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-implement-complete",
-            "flow_implement_complete executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-implement-complete"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-implement-complete",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-implement-complete",
-            "Failed to execute /flow-implement-complete",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -884,36 +1275,61 @@ def flow_status() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-status logic
-        # Category: navigation_query
-        # Operations: READ
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-status",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-status\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-status",
+                "Command instructions not found",
+                f"Could not find /flow-status in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-status
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-status",
-            "flow_status executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-status"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-status",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-status",
-            "Failed to execute /flow-status",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -927,36 +1343,61 @@ def flow_summarize() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-summarize logic
-        # Category: navigation_query
-        # Operations: READ
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-summarize",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-summarize\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-summarize",
+                "Command instructions not found",
+                f"Could not find /flow-summarize in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-summarize
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-summarize",
-            "flow_summarize executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-summarize"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-summarize",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-summarize",
-            "Failed to execute /flow-summarize",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -970,36 +1411,61 @@ def flow_next_subject() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-next-subject logic
-        # Category: navigation_query
-        # Operations: READ, WRITE
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-next-subject",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-next-subject\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-next-subject",
+                "Command instructions not found",
+                f"Could not find /flow-next-subject in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-next-subject
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-next-subject",
-            "flow_next_subject executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-next-subject"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-next-subject",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-next-subject",
-            "Failed to execute /flow-next-subject",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -1013,36 +1479,61 @@ def flow_next_iteration() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-next-iteration logic
-        # Category: navigation_query
-        # Operations: READ
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-next-iteration",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-next-iteration\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-next-iteration",
+                "Command instructions not found",
+                f"Could not find /flow-next-iteration in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-next-iteration
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-next-iteration",
-            "flow_next_iteration executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-next-iteration"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-next-iteration",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-next-iteration",
-            "Failed to execute /flow-next-iteration",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -1056,36 +1547,61 @@ def flow_next() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-next logic
-        # Category: navigation_query
-        # Operations: READ
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-next",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-next\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-next",
+                "Command instructions not found",
+                f"Could not find /flow-next in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-next
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-next",
-            "flow_next executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-next"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-next",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-next",
-            "Failed to execute /flow-next",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -1099,36 +1615,61 @@ def flow_rollback() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-rollback logic
-        # Category: maintenance
-        # Operations: READ, WRITE
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-rollback",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-rollback\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-rollback",
+                "Command instructions not found",
+                f"Could not find /flow-rollback in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-rollback
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-rollback",
-            "flow_rollback executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-rollback"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-rollback",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-rollback",
-            "Failed to execute /flow-rollback",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -1142,36 +1683,61 @@ def flow_verify_plan() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-verify-plan logic
-        # Category: maintenance
-        # Operations: READ
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-verify-plan",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-verify-plan\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-verify-plan",
+                "Command instructions not found",
+                f"Could not find /flow-verify-plan in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-verify-plan
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-verify-plan",
-            "flow_verify_plan executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-verify-plan"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-verify-plan",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-verify-plan",
-            "Failed to execute /flow-verify-plan",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -1185,36 +1751,61 @@ def flow_compact() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-compact logic
-        # Category: maintenance
-        # Operations: READ
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-compact",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-compact\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-compact",
+                "Command instructions not found",
+                f"Could not find /flow-compact in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-compact
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-compact",
-            "flow_compact executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-compact"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-compact",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-compact",
-            "Failed to execute /flow-compact",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -1228,36 +1819,61 @@ def flow_plan_split() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-plan-split logic
-        # Category: maintenance
-        # Operations: READ, WRITE
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-plan-split",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-plan-split\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-plan-split",
+                "Command instructions not found",
+                f"Could not find /flow-plan-split in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-plan-split
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-plan-split",
-            "flow_plan_split executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-plan-split"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-plan-split",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-plan-split",
-            "Failed to execute /flow-plan-split",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -1274,36 +1890,61 @@ def flow_backlog_add(task_numbers: str) -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-backlog-add logic
-        # Category: backlog
-        # Operations: READ, WRITE
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-backlog-add",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-backlog-add\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-backlog-add",
+                "Command instructions not found",
+                f"Could not find /flow-backlog-add in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-backlog-add
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-backlog-add",
-            "flow_backlog_add executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-backlog-add"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-backlog-add",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-backlog-add",
-            "Failed to execute /flow-backlog-add",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -1317,36 +1958,61 @@ def flow_backlog_view() -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-backlog-view logic
-        # Category: backlog
-        # Operations: READ
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-backlog-view",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-backlog-view\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-backlog-view",
+                "Command instructions not found",
+                f"Could not find /flow-backlog-view in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-backlog-view
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-backlog-view",
-            "flow_backlog_view executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-backlog-view"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-backlog-view",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-backlog-view",
-            "Failed to execute /flow-backlog-view",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
@@ -1364,36 +2030,61 @@ def flow_backlog_pull(task_number: str, position: str = "") -> dict[str, Any]:
         Status response with operation result
     """
     try:
-        # Find and read PLAN.md
-        plan_path = find_plan_file()
-        plan_content = read_plan(plan_path)
+        # Read slash command instructions from bundled SLASH_COMMANDS.md
+        package_dir = Path(__file__).parent
+        slash_commands_file = package_dir / "framework" / "SLASH_COMMANDS.md"
 
-        # TODO: Implement /flow-backlog-pull logic
-        # Category: backlog
-        # Operations: READ, WRITE
+        if not slash_commands_file.exists():
+            return format_error_response(
+                "/flow-backlog-pull",
+                "SLASH_COMMANDS.md not found",
+                f"Expected at: {slash_commands_file}"
+            )
 
-        output = f"""# {command_name} Result
+        # Extract command instructions
+        content = slash_commands_file.read_text()
+        import re
+        pattern = r"## /flow-backlog-pull\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
 
-        TODO: Implement command logic
+        if not match:
+            return format_error_response(
+                "/flow-backlog-pull",
+                "Command instructions not found",
+                f"Could not find /flow-backlog-pull in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+
+        # Extract dashboard if plan exists
+        dashboard = None
+        try:
+            plan_path = find_plan_file()
+            plan_content = read_plan(plan_path)
+            dashboard = extract_dashboard(plan_content)
+        except PlanNotFoundError:
+            pass  # Dashboard optional for instruction-only commands
+
+        # Return instructions as structured guidance for LLM to execute
+        output = f"""# /flow-backlog-pull
+
+## Instructions
+
+{instructions}
         """
 
         return format_success_response(
             "/flow-backlog-pull",
-            "flow_backlog_pull executed",
+            "Instructions retrieved",
             output,
-            "Next steps for /flow-backlog-pull"
+            "",
+            dashboard
         )
 
-    except PlanNotFoundError:
-        return format_error_response(
-            "/flow-backlog-pull",
-            "PLAN.md not found",
-            "Run flow_init() first, then flow_blueprint() to create a plan"
-        )
     except Exception as e:
         return format_error_response(
             "/flow-backlog-pull",
-            "Failed to execute /flow-backlog-pull",
+            "Failed to retrieve command instructions",
             str(e)
         )
 
