@@ -355,6 +355,12 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo -e "${GREEN}✅ Updated pyproject.toml${NC}"
     echo ""
 
+    # Clean old builds
+    echo -e "${CYAN}🧹 Cleaning old builds...${NC}"
+    rm -rf "$MCP_DIR/dist"/*.whl "$MCP_DIR/dist"/*.tar.gz 2>/dev/null || true
+    echo -e "${GREEN}✅ Cleaned dist directory${NC}"
+    echo ""
+
     # Build the package
     echo -e "${CYAN}🔨 Building MCP package...${NC}"
     cd "$MCP_DIR"

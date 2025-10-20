@@ -72,9 +72,7 @@ def generate_docstring(cmd: dict) -> str:
 
 def generate_function_body(cmd: dict) -> str:
     """Generate function body that reads and returns slash command instructions"""
-    func_name = cmd['function_name']
     command_name = cmd['command_name']
-    plan_ops = cmd.get('plan_operations', [])
 
     lines = []
     lines.append('    try:')
@@ -104,39 +102,11 @@ def generate_function_body(cmd: dict) -> str:
     lines.append('')
     lines.append('        instructions = match.group(1).strip()')
     lines.append('')
-
-    # Add dashboard extraction for commands that need it
-    if 'READ' in plan_ops:
-        lines.append('        # Extract dashboard if plan exists')
-        lines.append('        dashboard = None')
-        lines.append('        try:')
-        lines.append('            plan_path = find_plan_file()')
-        lines.append('            plan_content = read_plan(plan_path)')
-        lines.append('            dashboard = extract_dashboard(plan_content)')
-        lines.append('        except PlanNotFoundError:')
-        lines.append('            pass  # Dashboard optional for instruction-only commands')
-        lines.append('')
-
-    # Return instructions as structured guidance
     lines.append('        # Return instructions as structured guidance for LLM to execute')
-    lines.append(f'        output = f"""# {command_name}')
-    lines.append('')
-    lines.append('## Instructions')
-    lines.append('')
-    lines.append('{instructions}')
-    lines.append('        """')
-    lines.append('')
     lines.append('        return format_success_response(')
     lines.append(f'            "{command_name}",')
-    lines.append(f'            "Instructions retrieved",')
-    lines.append('            output,')
-
-    if 'READ' in plan_ops:
-        lines.append('            "",')
-        lines.append('            dashboard')
-    else:
-        lines.append('            ""')
-
+    lines.append(f'            "Instructions retrieved - LLM will execute",')
+    lines.append('            instructions')
     lines.append('        )')
     lines.append('')
     lines.append('    except Exception as e:')

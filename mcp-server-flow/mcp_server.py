@@ -202,18 +202,10 @@ def flow_blueprint(project_description: str) -> dict[str, Any]:
         instructions = match.group(1).strip()
 
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-blueprint
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-blueprint",
-            "Instructions retrieved",
-            output,
-            ""
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -262,29 +254,11 @@ def flow_migrate(existing_file_path: str = "") -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-migrate
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-migrate",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -330,29 +304,11 @@ def flow_plan_update() -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-plan-update
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-plan-update",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -402,29 +358,11 @@ def flow_phase_add(phase_name: str, phase_description: str = "") -> dict[str, An
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-phase-add
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-phase-add",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -470,29 +408,11 @@ def flow_phase_start() -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-phase-start
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-phase-start",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -538,29 +458,11 @@ def flow_phase_complete() -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-phase-complete
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-phase-complete",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -611,29 +513,11 @@ def flow_task_add(task_name: str, task_description: str = "", task_purpose: str 
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-task-add
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-task-add",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -679,29 +563,11 @@ def flow_task_start() -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-task-start
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-task-start",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -747,29 +613,11 @@ def flow_task_complete() -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-task-complete
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-task-complete",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -819,29 +667,11 @@ def flow_iteration_add(iteration_name: str, iteration_description: str = "") -> 
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-iteration-add
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-iteration-add",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -890,29 +720,11 @@ def flow_brainstorm_start(topics: str = "") -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-brainstorm-start
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-brainstorm-start",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -961,29 +773,11 @@ def flow_brainstorm_subject(subject_text: str) -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-brainstorm-subject
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-brainstorm-subject",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -1029,29 +823,11 @@ def flow_brainstorm_review() -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-brainstorm-review
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-brainstorm-review",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -1097,29 +873,11 @@ def flow_brainstorm_complete() -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-brainstorm-complete
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-brainstorm-complete",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -1165,29 +923,11 @@ def flow_implement_start() -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-implement-start
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-implement-start",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -1233,29 +973,11 @@ def flow_implement_complete() -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-implement-complete
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-implement-complete",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -1301,29 +1023,11 @@ def flow_status() -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-status
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-status",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -1369,29 +1073,11 @@ def flow_summarize() -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-summarize
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-summarize",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -1437,29 +1123,11 @@ def flow_next_subject() -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-next-subject
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-next-subject",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -1505,29 +1173,11 @@ def flow_next_iteration() -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-next-iteration
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-next-iteration",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -1573,29 +1223,11 @@ def flow_next() -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-next
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-next",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -1641,29 +1273,11 @@ def flow_rollback() -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-rollback
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-rollback",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -1709,29 +1323,11 @@ def flow_verify_plan() -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-verify-plan
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-verify-plan",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -1777,29 +1373,11 @@ def flow_compact() -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-compact
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-compact",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -1845,29 +1423,11 @@ def flow_plan_split() -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-plan-split
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-plan-split",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -1916,29 +1476,11 @@ def flow_backlog_add(task_numbers: str) -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-backlog-add
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-backlog-add",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -1984,29 +1526,11 @@ def flow_backlog_view() -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-backlog-view
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-backlog-view",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
@@ -2056,29 +1580,11 @@ def flow_backlog_pull(task_number: str, position: str = "") -> dict[str, Any]:
 
         instructions = match.group(1).strip()
 
-        # Extract dashboard if plan exists
-        dashboard = None
-        try:
-            plan_path = find_plan_file()
-            plan_content = read_plan(plan_path)
-            dashboard = extract_dashboard(plan_content)
-        except PlanNotFoundError:
-            pass  # Dashboard optional for instruction-only commands
-
         # Return instructions as structured guidance for LLM to execute
-        output = f"""# /flow-backlog-pull
-
-## Instructions
-
-{instructions}
-        """
-
         return format_success_response(
             "/flow-backlog-pull",
-            "Instructions retrieved",
-            output,
-            "",
-            dashboard
+            "Instructions retrieved - LLM will execute",
+            instructions
         )
 
     except Exception as e:
