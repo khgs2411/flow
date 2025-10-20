@@ -17,3 +17,6 @@
 .prettierrc
 .prettierignore
 .mcp.json
+
+__pycache__/
+*__pyc
