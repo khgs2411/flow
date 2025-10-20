@@ -1,4 +1,4 @@
-# Flow Framework - Slash Commands
+# Flow Framework - Slash Commands File
 
 This file contains all slash command definitions for the Flow framework. Copy these to `.claude/commands/` when ready to use.
 
