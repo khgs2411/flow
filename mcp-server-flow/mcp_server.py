@@ -1877,6 +1877,65 @@ def flow_backlog_pull(task_number: str, position: str = "") -> dict[str, Any]:
         )
 
 
+@mcp.tool()
+def flow_reinstall() -> dict[str, Any]:
+    """
+    Force reinstall of Flow MCP server to latest version by clearing cache and restarting
+
+    Returns:
+        Status response with operation result
+    """
+    try:
+        # Read slash command instructions from cached SLASH_COMMANDS.md
+        try:
+            content = get_slash_commands_content()
+        except FileNotFoundError as e:
+            return format_error_response(
+                "/flow-reinstall",
+                "SLASH_COMMANDS.md not found in package",
+                f"This is a package installation issue. Try:\\n"
+                f"1. Reinstall: uvx --force mcp-server-flow\\n"
+                f"2. Report issue: https://github.com/khgs2411/flow/issues"
+            )
+
+        # Extract command instructions
+        import re
+        pattern = r"## /flow-reinstall\s*\n.*?```markdown\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL)
+
+        if not match:
+            return format_error_response(
+                "/flow-reinstall",
+                "Command instructions not found",
+                f"Could not find /flow-reinstall in SLASH_COMMANDS.md"
+            )
+
+        instructions = match.group(1).strip()
+        instruction_lines = len(instructions.split("\\n"))
+
+        # Build metadata for LLM context
+        metadata = {'category': 'maintenance', 'framework_reading_required': False, 'framework_sections': [], 'plan_operations': [], 'parameters': {}}
+        metadata["instruction_lines"] = instruction_lines
+
+        # Return instructions as structured guidance for LLM to execute
+        operation = f"Instructions retrieved ({instruction_lines} lines) - LLM will execute"
+        return format_success_response(
+            "/flow-reinstall",
+            operation,
+            instructions,
+            "",
+            None,
+            metadata
+        )
+
+    except Exception as e:
+        return format_error_response(
+            "/flow-reinstall",
+            "Failed to retrieve command instructions",
+            str(e)
+        )
+
+
 # ============== ENTRY POINT ==============
 
 def main():
