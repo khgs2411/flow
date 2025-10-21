@@ -66,7 +66,7 @@ mcp = FastMCP("Flow")
 # ============== SPECIAL MCP TOOL: flow_init ==============
 
 @mcp.tool()
-def flow_init(create_slash_commands: bool = True) -> dict[str, Any]:
+def flow_init(create_slash_commands: bool = False) -> dict[str, Any]:
     """
     Initialize Flow framework in current project.
 
@@ -74,8 +74,8 @@ def flow_init(create_slash_commands: bool = True) -> dict[str, Any]:
     .claude/commands/ with slash commands for Claude Code users.
 
     Args:
-        create_slash_commands: Create .claude/commands/ slash commands (default: True).
-                              Set to False if not using Claude Code.
+        create_slash_commands: Create .claude/commands/ slash commands (default: False).
+                              Set to True if using Claude Code.
 
     Returns:
         Initialization status and next steps
