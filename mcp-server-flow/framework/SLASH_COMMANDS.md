@@ -3815,7 +3815,7 @@ framework_reading_required: false
 framework_sections: []
 MCP_METADATA_END -->
 
-**File**: N/A (MCP-only command, no slash command file)
+**File**: `flow-reinstall.md`
 
 ```markdown
 ---

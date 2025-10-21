@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.2.14** - Version (2025-10-20)
+**v1.2.15** - flow reinstall slash command (2025-10-21)
 
 **Changes**:
 
-- - version\n
-See the [v1.2.14 release](https://github.com/khgs2411/flow/releases/tag/v1.2.14) for full details.
+- - added flow reinstall as slash command against caching \n
+See the [v1.2.15 release](https://github.com/khgs2411/flow/releases/tag/v1.2.15) for full details.
 
 ---
 

@@ -171,6 +171,8 @@ COMMANDS=(
   "flow-status" "flow-summarize" "flow-verify-plan" "flow-compact" "flow-rollback"
   # Backlog Management (3 commands)
   "flow-backlog-add" "flow-backlog-view" "flow-backlog-pull"
+  # Maintenance (1 command)
+  "flow-reinstall"
 )
 
 # Deprecated commands (renamed/removed in v1.0.11+) - cleaned up during --force
