@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.2.16** - flow init default to mcp only (2025-10-21)
+**v1.2.17** - Brainstorming adjustments (2025-10-25)
 
 **Changes**:
 
-- - made sure flow init defaults to mcp only\n
-See the [v1.2.16 release](https://github.com/khgs2411/flow/releases/tag/v1.2.16) for full details.
+- - adjustments\n
+See the [v1.2.17 release](https://github.com/khgs2411/flow/releases/tag/v1.2.17) for full details.
 
 ---
 
