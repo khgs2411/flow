@@ -1914,15 +1914,41 @@ You are executing the `/flow-brainstorm-review` command from the Flow framework.
      - Iteration N+1: [Name] - [Why it's future work]
      ```
 
-8. **Await user confirmation**:
+8. **Consolidate action items into iteration** (if Type 2 items exist):
+
+   After user confirms categorization:
+
+   - **If Type 2 items exist** (Implementation Work):
+     - Ask user: "The brainstorming session produced detailed action items. Should I update Iteration [N]'s action items to reference the brainstorming subjects?"
+     - **If YES**:
+       - Replace iteration's **Action Items** section with consolidated summary:
+         ```markdown
+         **Action Items**: See brainstorming session above - all action items documented in resolved subjects.
+
+         **Implementation Summary** (from brainstorming):
+         - [ ] [High-level category 1]: [Brief summary] (Subject N)
+         - [ ] [High-level category 2]: [Brief summary] (Subject N)
+
+         **📋 Detailed Action Items**: See each subject's "Action Items Added" section above for granular tasks.
+         ```
+       - Keep detailed action items in "Resolved Subjects" → "Action Items Added" sections
+       - Avoid duplication (don't copy all items twice)
+       - Group related items by system/component for clarity
+     - **If NO**: Leave old action items (user will update manually)
+
+   - **If NO Type 2 items** (everything is Type 1 or Type 3):
+     - Iteration should reference pre-tasks or state "See pre-implementation tasks below"
+     - No action items consolidation needed
+
+9. **Await user confirmation**:
    - Do NOT automatically create iterations or pre-tasks
    - Show categorization above
    - Ask: "Does this categorization look correct? Should I adjust anything?"
    - If user confirms Type 1 (pre-tasks) exist: Ask if they want them created now
    - If user confirms Type 3 (new iterations): Ask if they want them created now
-   - Type 2 (implementation work) stays in iteration - no creation needed
+   - After confirmation: Ask about action items consolidation (step 8)
 
-9. **Show "What's Next" Section**:
+10. **Show "What's Next" Section**:
    ```markdown
    ## 🎯 What's Next
 
@@ -1994,11 +2020,31 @@ You are executing the `/flow-brainstorm-complete` command from the Flow framewor
      - If yes: "Please document pre-implementation tasks in PLAN.md first (see framework guide), complete them, then run this command again."
      - If no: Proceed to step 4
 
-4. **Update iteration status**: Change from 🚧 to 🎨 READY FOR IMPLEMENTATION
+4. **Verify iteration has up-to-date action items**:
 
-5. **Add note**: "**Status**: All brainstorming complete, pre-implementation tasks done, ready for implementation"
+   - Read the current iteration's **Action Items** section
+   - Check if action items reference the brainstorming session:
+     - ✅ **Good patterns**:
+       - "**Action Items**: See brainstorming session above - all action items documented in resolved subjects."
+       - "**Action Items**: See resolved subjects above (Type 2 items)"
+       - Has **Implementation Summary** with high-level checkboxes referencing subjects
+     - ❌ **Outdated patterns**:
+       - Old action items from before brainstorming session
+       - No reference to brainstorming subjects
+       - Detailed action items duplicated (not in subjects)
 
-6. **Show "What's Next" Section**:
+   - **If action items are outdated**:
+     - Warn user: "The iteration's action items don't reference the brainstorming session. Should I update them to match the brainstorming subjects? (This will replace old action items with a summary + reference to resolved subjects)"
+     - **If YES**: Update iteration's action items using pattern from `/flow-brainstorm-review` step 8
+     - **If NO**: Ask user to manually update before proceeding, or confirm they want to proceed anyway
+
+   - **If action items are up-to-date**: Proceed to step 5
+
+5. **Update iteration status**: Change from 🚧 to 🎨 READY FOR IMPLEMENTATION
+
+6. **Add note**: "**Status**: All brainstorming complete, pre-implementation tasks done, ready for implementation"
+
+7. **Show "What's Next" Section**:
    ```markdown
    ## 🎯 What's Next
 
