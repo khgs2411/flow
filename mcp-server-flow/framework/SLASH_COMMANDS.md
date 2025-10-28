@@ -1291,13 +1291,20 @@ If you discover NEW issues while working on this task that are NOT part of the c
 
 3. **Update task status**: Change marker from ⏳ to 🚧 IN PROGRESS
 
-4. **Update Progress Dashboard**:
+4. **Update parent phase status** (if needed):
+   - Find the phase containing this task
+   - Check if phase status is ⏳ PENDING
+   - If yes: Change phase marker from ⏳ to 🚧 IN PROGRESS
+   - If phase already 🚧 IN PROGRESS: Skip this step
+   - Update phase status in both the phase header AND Progress Dashboard
+
+5. **Update Progress Dashboard**:
    - Find "## 📋 Progress Dashboard" section
    - Update current task information
    - Update last updated timestamp
    - Add action description: "Task [N] started"
 
-5. **Confirm to user**:
+6. **Confirm to user**:
    - If argument provided: "✅ Started Task [N]: [Name]"
    - If auto-detected: "✅ Started Task [N]: [Name] (auto-detected next task)"
    - Suggest next steps: "Use `/flow-iteration-add [description]` to create iterations, or `/flow-brainstorm-start [topics]` to brainstorm first."
@@ -2036,7 +2043,14 @@ If you discover NEW issues during implementation that are NOT part of the curren
 
 5. **Update iteration status**: Change from 🎨 (or ⏳ if skipping brainstorm) to 🚧 IN PROGRESS
 
-6. **Create implementation section**:
+6. **Update parent task status** (if needed):
+   - Find the task containing this iteration
+   - Check if task status is ⏳ PENDING
+   - If yes: Change task marker from ⏳ to 🚧 IN PROGRESS
+   - If task already 🚧 IN PROGRESS: Skip this step
+   - Update task status in both the task header AND Progress Dashboard
+
+7. **Create implementation section**:
 
    ```markdown
    ### **Implementation - Iteration [N]: [Name]**
@@ -2061,13 +2075,13 @@ If you discover NEW issues during implementation that are NOT part of the curren
    **IMPORTANT**: Do NOT copy/duplicate action items from subjects to implementation section. The implementation section REFERENCES subjects where action items are defined. This prevents token waste and maintains single source of truth.
 ```
 
-7. **Update Progress Dashboard** (if it exists):
+8. **Update Progress Dashboard** (if it exists):
 
    - Update current iteration status to "🚧 IMPLEMENTING" or "🚧 IN PROGRESS"
    - Update "Last Updated" timestamp
    - Current work pointer should already be correct (pointing to this iteration)
 
-8. **Confirm to user**:
+9. **Confirm to user**:
    - If brainstorming was done: "Implementation started! Let's begin with the first action item."
    - If brainstorming was skipped: "Implementation started (brainstorming skipped). Let's begin with the first action item."
 
@@ -2113,16 +2127,22 @@ You are executing the `/flow-implement-complete` command from the Flow framework
    - Check all action items are ✅ checked
    - If unchecked items remain: Ask user "There are unchecked action items. Are you sure you want to mark complete? (yes/no)"
 
-4. **Prompt for verification notes**:
+4. **Check for existing verification information**:
+   - Read Implementation Notes section - check if verification details already documented
+   - Review recent conversation context (last 5-10 messages) - look for testing/verification discussion
+   - If verification info found in EITHER location: Skip to step 6 (don't ask redundant questions)
+   - If NO verification info found: Proceed to step 5
+
+5. **Prompt for verification notes** (ONLY if not already available):
    - "How did you verify this iteration works? (tests, manual checks, etc.)"
 
-5. **Update iteration status**: Change from 🚧 to ✅ COMPLETE
+6. **Update iteration status**: Change from 🚧 to ✅ COMPLETE
 
-6. **Update implementation section**:
-   - Add verification notes
+7. **Update implementation section**:
+   - Add verification notes (from user response OR extracted from context/notes)
    - Add timestamp
 
-7. **Add completion summary**:
+8. **Add completion summary**:
    ```markdown
    **Implementation Results**:
    - [Summarize what was built]
@@ -2133,12 +2153,12 @@ You are executing the `/flow-implement-complete` command from the Flow framework
    **Completed**: [Date]
 ```
 
-8. **Check if task/phase complete**:
+9. **Check if task/phase complete**:
 
    - If all iterations in task complete → Mark task ✅
    - If all tasks in phase complete → Mark phase ✅
 
-9. **Update Progress Dashboard** (if it exists):
+10. **Update Progress Dashboard** (if it exists):
 
    - Update current iteration status to "✅ COMPLETE"
    - Update iteration completion count (e.g., "3/6 complete" → "4/6 complete")
@@ -2147,7 +2167,7 @@ You are executing the `/flow-implement-complete` command from the Flow framework
    - Update "Last Updated" timestamp
    - Update completion percentages if tracked
 
-10. **Show "What's Next" Section**:
+11. **Show "What's Next" Section**:
     ```markdown
     ## 🎯 What's Next
 
