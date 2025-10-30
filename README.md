@@ -43,6 +43,7 @@ Everything lives in `.flow/PLAN.md` - your design, your decisions, your rational
 ### Human vs AI Responsibilities
 
 **👤 You (Human)**:
+
 - Design the architecture
 - Make technical decisions
 - Define iterations
@@ -50,6 +51,7 @@ Everything lives in `.flow/PLAN.md` - your design, your decisions, your rational
 - Verify implementations
 
 **🤖 AI**:
+
 - Reads your framework
 - Follows your patterns
 - Implements your decisions
@@ -90,10 +92,18 @@ your-project/
 
 ```bash
 cd /path/to/your/project
+```
 
+```bash
 # Download and run
 curl -O https://raw.githubusercontent.com/khgs2411/flow/master/flow.sh
 chmod +x flow.sh && ./flow.sh
+```
+
+```bash
+# Rerun to update
+curl -O https://raw.githubusercontent.com/khgs2411/flow/master/flow.sh
+chmod +x flow.sh && ./flow.sh --force
 ```
 
 ### 2. Create Your First Plan
@@ -152,11 +162,13 @@ AI presents options, **you choose**:
 **Decision**: Two-phase commit (reserve → capture)
 
 **Rationale** (YOUR reasoning):
+
 - Prevents double-charging on network failures
 - Enables fraud checks between reserve and capture
 - Industry standard (Amazon, Shopify)
 
 **Action Items** (for AI to implement):
+
 - [ ] Create PaymentIntent on checkout
 - [ ] Implement reserve endpoint
 - [ ] Implement capture endpoint
@@ -232,6 +244,7 @@ PHASE (Testing, Implementation, Deployment)
 **Decision**: Use PostgreSQL, not MongoDB
 
 **Rationale**:
+
 - Strong ACID guarantees for financial data
 - Better complex query support for reporting
 - Team has 5 years PostgreSQL experience
@@ -285,11 +298,13 @@ See [SLASH_COMMANDS.md](framework/SLASH_COMMANDS.md) for full reference.
 First, get the framework reference files:
 
 **Option 1: Clone the repository** (recommended)
+
 ```bash
 git clone https://github.com/khgs2411/flow.git ~/flow-framework
 ```
 
 **Option 2: Download framework folder only**
+
 ```bash
 # Download the framework directory
 curl -L https://github.com/khgs2411/flow/archive/refs/heads/master.zip -o flow.zip
@@ -332,6 +347,7 @@ The AI will follow Flow patterns manually without slash command integration.
 ## Phase 1: Core Payment Flow
 
 ### Task 1: Stripe Integration
+
 - Iteration 1: Basic charge flow (skeleton)
 - Iteration 2: Error handling (veins)
 - Iteration 3: Webhooks (flesh)
@@ -345,11 +361,13 @@ The AI will follow Flow patterns manually without slash command integration.
 **Decision**: Two-phase commit (reserve → capture)
 
 **Rationale** (you decide):
+
 - Prevents double-charging
 - Enables fraud checks
 - Industry standard
 
 **Action Items** (AI implements):
+
 - [ ] PaymentIntent API integration
 - [ ] Reserve endpoint
 - [ ] Capture endpoint
@@ -375,12 +393,12 @@ Confirm implementation matches your design.
 
 ## Why Flow Over Alternatives?
 
-| Approach       | Who Decides | Context Preserved | Iteration Structure | AI Leveraged |
-|----------------|-------------|-------------------|---------------------|--------------|
-| **Flow**       | Human       | Yes (PLAN.md)     | Built-in (V1/V2/V3) | ✅ Execution |
-| **Spec-Kit**   | Human       | In tests          | Manual              | ❌ No        |
-| **Agile**      | Team        | In tickets        | Sprint-based        | ❌ No        |
-| **Cowboy AI**  | AI          | Lost per session  | None                | ❌ Decides   |
+| Approach      | Who Decides | Context Preserved | Iteration Structure | AI Leveraged |
+| ------------- | ----------- | ----------------- | ------------------- | ------------ |
+| **Flow**      | Human       | Yes (PLAN.md)     | Built-in (V1/V2/V3) | ✅ Execution |
+| **Spec-Kit**  | Human       | In tests          | Manual              | ❌ No        |
+| **Agile**     | Team        | In tickets        | Sprint-based        | ❌ No        |
+| **Cowboy AI** | AI          | Lost per session  | None                | ❌ Decides   |
 
 **Flow's unique value**: Human-driven design + AI-powered execution + mandatory context preservation.
 
@@ -391,11 +409,13 @@ Confirm implementation matches your design.
 ### Three-Part System
 
 1. **`flow.sh`** (~150KB)
+
    - Self-contained deployment script
    - All framework content embedded (no external dependencies)
    - This is what users download
 
 2. **`framework/`** (source files)
+
    - `DEVELOPMENT_FRAMEWORK.md` - Complete methodology (3,900 lines)
    - `SLASH_COMMANDS.md` - All command definitions
    - `examples/` - Reference examples
