@@ -192,8 +192,8 @@ You are executing the `/flow-blueprint` command from the Flow framework.
 
 **🔴 REQUIRED: Read Framework Quick Reference & Templates First**
 
-- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-600 (Quick Reference section) - if not already in context
-- **Read file templates**: DEVELOPMENT_FRAMEWORK.md lines 2101-2600 (DASHBOARD.md, PLAN.md, task-N.md templates)
+- **Read once per session**: .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 1-600 (Quick Reference section) - if not already in context
+- **Read file templates**: .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 2101-2600 (DASHBOARD.md, PLAN.md, task-N.md templates)
 - **Read examples**: `.flow/framework/examples/` directory for real-world examples
 
 **Multi-File Architecture**: This command creates:
@@ -280,7 +280,7 @@ Testing: Simulation-based per service"
      ```
 
 2. **Read framework guide AND examples** (after validation):
-   - Search for DEVELOPMENT_FRAMEWORK.md (`.flow/`, `.claude/`, `./`, `~/.claude/flow/`)
+   - Search for .flow/framework/DEVELOPMENT_FRAMEWORK.md (`.flow/`, `.claude/`, `./`, `~/.claude/flow/`)
    - Search for examples in `.flow/framework/examples/` (DASHBOARD.md, PLAN.md, task files)
    - Read to understand:
      - Multi-file structure (DASHBOARD vs PLAN vs task files)
@@ -375,7 +375,7 @@ Testing: Simulation-based per service"
    - Minimal task file content needed
 
    a. **Create PLAN.md FIRST** (turn 1 if using turn-based approach):
-      - Use template from DEVELOPMENT_FRAMEWORK.md lines 2232-2321
+      - Use template from .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 2232-2321
       - Include (MINIMAL - no assumptions):
         - Header with purpose
         - Overview (Purpose, Goals - text format NO checklists, Scope V1 only)
@@ -390,7 +390,7 @@ Testing: Simulation-based per service"
       - **If turn-based**: Stop here, confirm with user, ask if ready for DASHBOARD
 
    b. **Create DASHBOARD.md SECOND** (turn 2 if using turn-based approach):
-      - Use template from DEVELOPMENT_FRAMEWORK.md lines 2102-2200
+      - Use template from .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 2102-2200
       - Fill in project name, purpose
       - Current Work: Set to Phase 1, Task 1, Iteration 1 (if phases created) OR "No phases yet" (if not)
       - Progress Overview: List all phases/tasks structure (with iteration counts)
@@ -404,7 +404,7 @@ Testing: Simulation-based per service"
       - Naming: `phase-1/`, `phase-2/`, etc.
 
    d. **Create phase-N/task-M.md files** (turn 3+ if using turn-based approach):
-      - Use template from DEVELOPMENT_FRAMEWORK.md lines 2383-2472 (task with iterations)
+      - Use template from .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 2383-2472 (task with iterations)
       - **ALL tasks have iterations** (no standalone tasks)
       - **CRITICAL: Create task files for EVERY task listed in DASHBOARD.md**
         - If DASHBOARD.md shows "Task 1: Name" under Phase 2, then `phase-2/task-1.md` MUST exist
@@ -511,7 +511,7 @@ You are executing the `/flow-migrate` command from the Flow framework.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
 
-- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
+- **Read once per session**: .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Multi-File Architecture, File Templates, Task Structure Rules, Status Markers
 - **Deep dive if needed**: Read lines 2101-2600 for File Templates using Read(offset=2101, limit=500)
 
@@ -530,8 +530,8 @@ You are executing the `/flow-migrate` command from the Flow framework.
 
 1. **Read the framework guide AND examples** ⚠️ CRITICAL:
 
-   - **Read DEVELOPMENT_FRAMEWORK.md lines 1-353** (Quick Reference)
-   - **Read DEVELOPMENT_FRAMEWORK.md lines 2101-2600** (File Templates)
+   - **Read .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 1-353** (Quick Reference)
+   - **Read .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 2101-2600** (File Templates)
    - **Read framework/examples/** directory to see multi-file structure:
      - `framework/examples/DASHBOARD.md` - Dashboard format
      - `framework/examples/PLAN.md` - Static plan format
@@ -606,7 +606,7 @@ You are executing the `/flow-migrate` command from the Flow framework.
      - Pre-implementation tasks (if applicable)
      - Implementation sections
      ```markdown
-     > **📖 Framework Guide**: See DEVELOPMENT_FRAMEWORK.md for complete methodology and patterns used in this plan
+     > **📖 Framework Guide**: See .flow/framework/DEVELOPMENT_FRAMEWORK.md for complete methodology and patterns used in this plan
      >
      > **🎯 Purpose**: [Brief description of what this plan covers - extract from existing docs]
 
@@ -617,7 +617,7 @@ You are executing the `/flow-migrate` command from the Flow framework.
    - **Add/enhance Progress Dashboard section** (after Overview, before Architecture):
      - Follow EXAMPLE_PLAN.md lines 29-62 format exactly
      - Include: Last Updated, Current Work (with jump links), Completion Status, Progress Overview
-     - **Ensure iteration lists are expanded** (read DEVELOPMENT_FRAMEWORK.md lines 2555-2567 for format)
+     - **Ensure iteration lists are expanded** (read .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 2555-2567 for format)
      - **Remove duplicate progress sections** (search for patterns like "Current Phase:", "Implementation Tasks", old progress trackers)
      - **Update status pointers** (change "Search for 'Current Phase' below" to jump link to Progress Dashboard)
    - **Add Testing Strategy section** if missing (see EXAMPLE_PLAN.md lines 87-129):
@@ -747,7 +747,7 @@ You are executing the `/flow-plan-update` command from the Flow framework.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
 
-- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
+- **Read once per session**: .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Multi-File Architecture, File Templates
 - **Deep dive if needed**: Read lines 2101-2600 for File Templates using Read(offset=2101, limit=500)
 
@@ -762,8 +762,8 @@ You are executing the `/flow-plan-update` command from the Flow framework.
 **Instructions**:
 
 1. **Read the framework guide**:
-   - Read DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference)
-   - Read DEVELOPMENT_FRAMEWORK.md lines 2101-2600 (File Templates)
+   - Read .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference)
+   - Read .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 2101-2600 (File Templates)
    - Read framework/examples/ directory for current format
 
 2. **Read current structure**:
@@ -1131,7 +1131,7 @@ You are executing the `/flow-phase-start` command from the Flow framework.
 
 **🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from DASHBOARD.md**
 - State transition (⏳ PENDING → 🚧 IN PROGRESS)
-- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 567-613 for lifecycle context
+- Optional background reading (NOT required): .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 567-613 for lifecycle context
 
 **Multi-File Architecture**: This command:
 - Updates `DASHBOARD.md` phase status
@@ -1204,7 +1204,7 @@ You are executing the `/flow-phase-complete` command from the Flow framework.
 **🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from DASHBOARD.md**
 
 - State transition (🚧 IN PROGRESS → ✅ COMPLETE)
-- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 567-613 for completion criteria
+- Optional background reading (NOT required): .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 567-613 for completion criteria
 
 **Multi-File Architecture**: This command:
 - Updates `DASHBOARD.md` phase status
@@ -1290,7 +1290,7 @@ You are executing the `/flow-task-add` command from the Flow framework.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
 
-- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-600 (Quick Reference) - if not already in context
+- **Read once per session**: .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 1-600 (Quick Reference) - if not already in context
 - **Focus on**: Task Structure Rules (lines 164-223) - ALL tasks have iterations
 - **Read task template**: Lines 2383-2472 for task file template (with iterations)
 
@@ -1333,7 +1333,7 @@ You are executing the `/flow-task-add` command from the Flow framework.
 
 4. **Create task file**:
 
-   Create `phase-N/task-M.md` using template from DEVELOPMENT_FRAMEWORK.md:
+   Create `phase-N/task-M.md` using template from .flow/framework/DEVELOPMENT_FRAMEWORK.md:
 
    ```markdown
    # Task [M]: [Task Name]
@@ -1439,7 +1439,7 @@ You are executing the `/flow-task-start` command from the Flow framework.
 
 **🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from DASHBOARD.md and task file**
 - State transition (⏳ PENDING → 🚧 IN PROGRESS)
-- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 567-613 for lifecycle context
+- Optional background reading (NOT required): .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 567-613 for lifecycle context
 
 **Multi-File Architecture**: This command:
 - Updates task status in `phase-N/task-M.md`
@@ -1535,7 +1535,7 @@ You are executing the `/flow-task-complete` command from the Flow framework.
 **🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from DASHBOARD.md and task file**
 
 - State transition (🚧 IN PROGRESS → ✅ COMPLETE)
-- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 567-613 for completion criteria
+- Optional background reading (NOT required): .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 567-613 for completion criteria
 
 **Multi-File Architecture**: This command:
 - Updates task status in `phase-N/task-M.md`
@@ -1642,7 +1642,7 @@ You are executing the `/flow-iteration-add` command from the Flow framework.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
 
-- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
+- **Read once per session**: .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Iteration Patterns, Task Structure Rules
 - **Deep dive if needed**: Read lines 238-566 for Task Structure Rules using Read(offset=238, limit=329)
 
@@ -1744,7 +1744,7 @@ You are executing the `/flow-brainstorm-start` command from the Flow framework.
 **Purpose**: Begin a brainstorming session for the current iteration with subjects provided by the user.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
-- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
+- **Read once per session**: .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Subject Resolution Types, Common Patterns
 - **Deep dive if needed**: Read lines 1167-1797 for complete Brainstorming Pattern using Read(offset=1167, limit=631)
 
@@ -1757,7 +1757,7 @@ You are executing the `/flow-brainstorm-start` command from the Flow framework.
 - Updates brainstorming section in `phase-N/task-M.md`
 - Updates `DASHBOARD.md` with "🚧 BRAINSTORMING" status
 
-**🚨 SCOPE BOUNDARY RULE** (CRITICAL - see DEVELOPMENT_FRAMEWORK.md lines 339-540):
+**🚨 SCOPE BOUNDARY RULE** (CRITICAL - see .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 339-540):
 
 If you discover NEW issues during brainstorming that are NOT part of the current iteration:
 
@@ -1770,7 +1770,7 @@ If you discover NEW issues during brainstorming that are NOT part of the current
    - **D**: Defer to separate iteration (after current work)
 4. **AWAIT USER APPROVAL** - Never proceed without explicit user decision
 
-**Use the Scope Boundary Alert Template** (see DEVELOPMENT_FRAMEWORK.md lines 356-390)
+**Use the Scope Boundary Alert Template** (see .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 356-390)
 
 **Why This Matters**: User stays in control of priorities, AI finds issues proactively but doesn't make scope decisions
 
@@ -1921,7 +1921,7 @@ You are executing the `/flow-brainstorm-subject` command from the Flow framework
 **Purpose**: Add a new subject to the current brainstorming session.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
-- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
+- **Read once per session**: .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Subject Creation Patterns (lines in Quick Reference)
 - **Deep dive if needed**: Read lines 1167-1797 for Brainstorming Pattern using Read(offset=1167, limit=631)
 
@@ -1992,7 +1992,7 @@ You are executing the `/flow-brainstorm-review` command from the Flow framework.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
 
-- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
+- **Read once per session**: .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Subject Resolution Types (A/B/C/D) (lines in Quick Reference)
 - **Deep dive if needed**: Read lines 1167-1797 for Brainstorming Session Pattern using Read(offset=1167, limit=631)
 
@@ -2167,7 +2167,7 @@ You are executing the `/flow-brainstorm-complete` command from the Flow framewor
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
 
-- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
+- **Read once per session**: .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Completion Criteria (lines in Quick Reference)
 - **Deep dive if needed**: Read lines 1167-1797 for Brainstorming Pattern using Read(offset=1167, limit=631)
 
@@ -2289,7 +2289,7 @@ You are executing the `/flow-implement-start` command from the Flow framework.
 **🟢 NO FRAMEWORK READING REQUIRED - This command works from DASHBOARD.md and task file**
 
 - State transition (🎨 READY/⏳ PENDING → 🚧 IMPLEMENTING)
-- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 1798-1836 for implementation workflow
+- Optional background reading (NOT required): .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 1798-1836 for implementation workflow
 
 **Multi-File Architecture**: This command:
 - Reads `DASHBOARD.md` to find current work
@@ -2297,7 +2297,7 @@ You are executing the `/flow-implement-start` command from the Flow framework.
 - Updates `DASHBOARD.md` current work section
 - **Prerequisite**: Brainstorming must be ✅ COMPLETE and all pre-implementation tasks done
 
-**🚨 SCOPE BOUNDARY RULE** (CRITICAL - see DEVELOPMENT_FRAMEWORK.md lines 339-540):
+**🚨 SCOPE BOUNDARY RULE** (CRITICAL - see .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 339-540):
 
 If you discover NEW issues during implementation that are NOT part of the current iteration's action items:
 
@@ -2310,7 +2310,7 @@ If you discover NEW issues during implementation that are NOT part of the curren
    - **D**: Defer to separate iteration (after current work)
 4. **AWAIT USER APPROVAL** - Never proceed without explicit user decision
 
-**Use the Scope Boundary Alert Template** (see DEVELOPMENT_FRAMEWORK.md lines 356-390)
+**Use the Scope Boundary Alert Template** (see .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 356-390)
 
 **Exception**: Syntax errors or blocking bugs in files you must modify (document what you fixed in Implementation Notes)
 
@@ -2429,7 +2429,7 @@ You are executing the `/flow-implement-complete` command from the Flow framework
 
 **🟢 NO FRAMEWORK READING REQUIRED - This command works from DASHBOARD.md and task file**
 - State transition (🚧 IMPLEMENTING → ✅ COMPLETE)
-- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 1798-1836 for completion criteria
+- Optional background reading (NOT required): .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 1798-1836 for completion criteria
 
 **Multi-File Architecture**: This command:
 - Updates iteration status in `phase-N/task-M.md`
@@ -2738,7 +2738,7 @@ You are executing the `/flow-summarize` command from the Flow framework.
 **🟢 NO FRAMEWORK READING REQUIRED - This command works from DASHBOARD.md and task files**
 - Uses DASHBOARD.md for high-level view
 - Reads task files for detailed iteration status
-- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 105-179 for hierarchy context
+- Optional background reading (NOT required): .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 105-179 for hierarchy context
 
 **Multi-File Architecture**: This command:
 - Reads `DASHBOARD.md` for overall structure
@@ -2958,7 +2958,7 @@ You are executing the `/flow-next-subject` command from the Flow framework.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
 
-- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
+- **Read once per session**: .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Subject Resolution Types (lines in Quick Reference) - Types A/B/C/D decision matrix
 - **Deep dive if needed**: Read lines 1167-1797 for Brainstorming Pattern using Read(offset=1167, limit=631)
 
@@ -2969,7 +2969,7 @@ You are executing the `/flow-next-subject` command from the Flow framework.
 
 **Framework Reference**: This command requires framework knowledge to properly categorize resolution types. See Quick Reference guide above for essential patterns.
 
-**🚨 SCOPE BOUNDARY RULE** (CRITICAL - see DEVELOPMENT_FRAMEWORK.md lines 339-540):
+**🚨 SCOPE BOUNDARY RULE** (CRITICAL - see .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 339-540):
 
 If you discover NEW issues while discussing subjects that are NOT part of the current iteration:
 
@@ -2982,7 +2982,7 @@ If you discover NEW issues while discussing subjects that are NOT part of the cu
    - **D**: Defer to separate iteration (after current work)
 4. **AWAIT USER APPROVAL** - Never proceed without explicit user decision
 
-**Use the Scope Boundary Alert Template** (see DEVELOPMENT_FRAMEWORK.md lines 356-390)
+**Use the Scope Boundary Alert Template** (see .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 356-390)
 
 **Why This Matters**: User stays in control of priorities. AI finds issues proactively but doesn't make scope decisions.
 
@@ -3124,7 +3124,7 @@ You are executing the `/flow-next-iteration` command from the Flow framework.
 **🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from DASHBOARD.md and task file**
 
 - Finds next ⏳ PENDING iteration in current task
-- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 567-613 for iteration context
+- Optional background reading (NOT required): .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 567-613 for iteration context
 
 **Multi-File Architecture**: This command:
 - Reads `DASHBOARD.md` to find current task
@@ -3192,7 +3192,7 @@ You are executing the `/flow-next` command from the Flow framework.
 **🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from DASHBOARD.md and task file**
 
 - Smart navigation using Dashboard and current context
-- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 3277-3356 for decision tree reference
+- Optional background reading (NOT required): .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 3277-3356 for decision tree reference
 
 **Multi-File Architecture**: This command:
 - Reads `DASHBOARD.md` to find current work
@@ -3285,7 +3285,7 @@ You are executing the `/flow-rollback` command from the Flow framework.
 **🟢 NO FRAMEWORK READING REQUIRED - This command works from plan files**
 
 - Undoes last change using CHANGELOG.md
-- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 1969-2014 for rollback patterns
+- Optional background reading (NOT required): .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 1969-2014 for rollback patterns
 
 **Multi-File Architecture**: This command can rollback:
 - DASHBOARD.md status updates (phase/task/iteration status changes)
@@ -3386,7 +3386,7 @@ You are executing the `/flow-verify-plan` command from the Flow framework.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
 
-- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
+- **Read once per session**: .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Framework Structure validation, Status Markers (in Quick Reference)
 - **Deep dive if needed**: Read lines 105-179 for Framework Structure using Read(offset=105, limit=75)
 
@@ -3398,7 +3398,7 @@ You are executing the `/flow-verify-plan` command from the Flow framework.
 
 **Context**:
 
-- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
+- **Framework Guide**: .flow/framework/DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
 - **Working Files**: .flow/DASHBOARD.md, .flow/PLAN.md, .flow/phase-N/task-M.md
 - **Use case**: Run before starting new AI session or compacting conversation to ensure context is accurate
 
@@ -3498,7 +3498,7 @@ You are executing the `/flow-compact` command from the Flow framework.
 
 - Generates comprehensive report using DASHBOARD.md, PLAN.md, and task file content
 - Uses `/flow-status` dashboard-first logic for current position
-- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 2327-2362 for context preservation patterns
+- Optional background reading (NOT required): .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 2327-2362 for context preservation patterns
 
 **Multi-File Architecture**: This command reads:
 - `DASHBOARD.md` - Current work location and progress overview
@@ -3507,7 +3507,7 @@ You are executing the `/flow-compact` command from the Flow framework.
 
 **Context**:
 
-- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
+- **Framework Guide**: .flow/framework/DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
 - **Working Files**: .flow/DASHBOARD.md, .flow/PLAN.md, .flow/phase-N/task-M.md
 - **Use case**: Before compacting conversation or starting new AI session - ensures zero context loss
 
@@ -3721,7 +3721,7 @@ You are executing the `/flow-plan-split` command from the Flow framework.
 
 - Moves completed task FILES to archive/ directory (keeps recent 3 tasks visible)
 - Updates DASHBOARD.md and CHANGELOG.md to reflect archived tasks
-- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 2363-2560 for archival patterns
+- Optional background reading (NOT required): .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 2363-2560 for archival patterns
 
 **Multi-File Architecture**: This command:
 - Moves `phase-N/task-M.md` files to `archive/phase-N/task-M.md`
@@ -3730,7 +3730,7 @@ You are executing the `/flow-plan-split` command from the Flow framework.
 
 **Context**:
 
-- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
+- **Framework Guide**: .flow/framework/DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
 - **Working Files**: .flow/DASHBOARD.md, .flow/phase-N/task-M.md
 - **Archive Directory**: .flow/archive/ (task files moved here)
 - **Changelog**: .flow/CHANGELOG.md (updated with archive references)
@@ -3869,7 +3869,7 @@ You are executing the `/flow-backlog-add` command from the Flow framework.
 **🟢 NO FRAMEWORK READING REQUIRED - This command works from DASHBOARD.md and task files**
 
 - Moves task files to backlog directory (token efficiency feature)
-- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 3407-3682 for backlog management patterns
+- Optional background reading (NOT required): .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 3407-3682 for backlog management patterns
 
 **Multi-File Architecture**: This command:
 - Moves `phase-N/task-M.md` files to `backlog/` directory
@@ -3994,7 +3994,7 @@ You are executing the `/flow-backlog-view` command from the Flow framework.
 **🟢 NO FRAMEWORK READING REQUIRED - This command works from BACKLOG.md and backlog/ directory**
 
 - Simple read operation (shows backlog list)
-- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 3407-3682 for backlog context
+- Optional background reading (NOT required): .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 3407-3682 for backlog context
 
 **Multi-File Architecture**: This command:
 - Reads `BACKLOG.md` for task list
@@ -4062,7 +4062,7 @@ You are executing the `/flow-backlog-pull` command from the Flow framework.
 **🟢 NO FRAMEWORK READING REQUIRED - This command works from DASHBOARD.md, BACKLOG.md, and task files**
 
 - Moves task file back from backlog/ to phase directory
-- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 3407-3682 for backlog patterns
+- Optional background reading (NOT required): .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 3407-3682 for backlog patterns
 
 **Multi-File Architecture**: This command:
 - Moves `backlog/phase-N-task-M.md` back to `phase-N/task-M.md`
