@@ -1,561 +1,409 @@
 # Flow Framework
 
-**AI-in-the-loop iterative development that preserves context and prevents refactoring hell.**
+**Iterative Design-Driven Development where humans drive, AI executes.**
 
-_Domain-Driven Design meets Agile philosophy. You design the architecture and iterations. AI executes within your framework. Context never gets lost._
+_You make the decisions. AI implements within your framework. Context is never lost._
 
-[![Version](https://img.shields.io/badge/version-1.1.4-blue.svg)](https://github.com/khgs2411/flow/releases)
+[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](https://github.com/khgs2411/flow/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](#license)
 
 ---
 
-## Why Flow?
+## Philosophy
 
-Building complex features with AI often leads to:
+Flow is **not** AI autopilot. It's **human-in-loop development** that leverages AI as an execution engine, not a decision maker.
 
-- **Context loss** across sessions
-- **Refactoring cycles** from poor upfront design
-- **Missed edge cases** discovered too late
-- **Disconnected implementations** that don't fit together
+**The human drives. The AI executes.**
 
-Flow solves this by enforcing **structured planning before coding**:
+Traditional AI development: You prompt → Wait → Hope it works → Refactor when it doesn't.
 
-```
-Brainstorm → Design → Iterate → Implement → Verify
-```
+Flow development: You design → AI implements → You verify → Iterate with preserved context.
 
-Everything is preserved in `.flow/PLAN.md` - a living document that survives across sessions, AI models, and developers.
+### Why This Matters
 
----
+Building with AI often fails because:
 
-## Quick Start
+- **AI decides** architecture (leads to refactoring hell)
+- **Context disappears** between sessions (AI forgets your design)
+- **No iteration structure** (everything is a rewrite)
+- **Decisions lack rationale** (why did we choose this?)
 
-### Install Flow (30 seconds)
-
-**Option 1: Direct Download** (no git required)
-
-```bash
-cd /path/to/your/project
-```
-
-```bash
-curl -O https://raw.githubusercontent.com/khgs2411/flow/master/flow.sh
-chmod +x flow.sh && ./flow.sh
-```
-
-Or
-
-```bash
-curl -O https://raw.githubusercontent.com/khgs2411/flow/master/flow.sh
-chmod +x flow.sh && ./flow.sh --force
-```
-
-**Option 2: Clone & Run**
-
-```bash
-git clone https://github.com/khgs2411/flow.git ~/flow-framework
-cd /path/to/your/project
-~/flow-framework/flow.sh
-```
-
-**What gets installed:**
+Flow fixes this by **putting you in control**:
 
 ```
-your-project/
-├── .claude/commands/    # 28 slash commands
-│   ├── flow-blueprint.md
-│   ├── flow-brainstorm-start.md
-│   └── ...
-└── .flow/               # Framework docs
-    ├── DEVELOPMENT_FRAMEWORK.md
-    └── EXAMPLE_PLAN.md
+You Brainstorm → Document Decisions → AI Implements → You Verify → Next Iteration
 ```
 
-### Create Your First Plan
-
-**For new projects:**
-
-```bash
-/flow-blueprint "Real-time collaborative text editor with conflict resolution"
-```
-
-**For existing projects:**
-
-```bash
-/flow-migrate existing-plan.md
-```
-
-**Start your first iteration:**
-
-```bash
-/flow-brainstorm-start "CRDT vs OT, WebSocket architecture, offline support"
-/flow-next-subject  # Discuss and resolve each subject
-/flow-brainstorm-review  # Generate iterations and pre-tasks
-/flow-implement-start  # Begin coding
-```
+Everything lives in `.flow/PLAN.md` - your design, your decisions, your rationale. The AI reads it, follows it, and never loses context.
 
 ---
 
 ## How It Works
 
-### The Flow Hierarchy
+### Human vs AI Responsibilities
+
+**👤 You (Human)**:
+- Design the architecture
+- Make technical decisions
+- Define iterations
+- Document rationale
+- Verify implementations
+
+**🤖 AI**:
+- Reads your framework
+- Follows your patterns
+- Implements your decisions
+- Asks when unclear
+- Never decides architecture
+
+### The File Structure
+
+Flow separates your workspace from AI reference files:
 
 ```
-PHASE (Testing, Implementation, Polish)
-  └── TASK (Authentication, API Design)
-      └── ITERATION (Skeleton, Error Handling, Optimization)
-          ├── BRAINSTORM (Design before code)
-          │   └── SUBJECTS (Key decisions to make)
-          └── IMPLEMENTATION (Code with action items)
+your-project/
+├── .claude/commands/        # 25 slash commands (AI helpers)
+│   ├── flow-blueprint.md
+│   ├── flow-brainstorm-start.md
+│   └── ...
+│
+└── .flow/
+    ├── 👤 YOUR WORKSPACE (you own these)
+    │   ├── PLAN.md          # Your design document
+    │   ├── DASHBOARD.md     # Your progress tracker
+    │   └── phase-*/task-*.md # Your detailed iterations
+    │
+    └── 🤖 AI REFERENCE (read-only templates)
+        └── framework/
+            ├── DEVELOPMENT_FRAMEWORK.md  # Complete methodology
+            ├── SLASH_COMMANDS.md         # Command definitions
+            └── examples/                 # Reference examples
 ```
 
-### Status Markers Track Progress
-
-- `⏳ PENDING` - Not started
-- `🚧 IN PROGRESS` - Currently working
-- `🎨 READY` - Brainstorming complete, ready to code
-- `✅ COMPLETE` - Finished and verified
-- `❌ CANCELLED` - Abandoned
-- `🔮 FUTURE` - Deferred to later version
-
-### The Workflow
-
-1. **Blueprint** - Create structured plan from requirements
-2. **Brainstorm** - Design decisions before writing code
-3. **Resolve Subjects** - Capture WHY for each decision
-4. **Review** - Generate iterations and identify pre-tasks
-5. **Implement** - Code with tracked action items
-6. **Verify** - Ensure implementation matches plan
-7. **Iterate** - Repeat for next feature increment
+**Key principle**: You control `.flow/PLAN.md` and task files. AI reads `framework/` for patterns but never decides your architecture.
 
 ---
 
-## Key Features
+## Quick Start
 
-### 🧠 Brainstorming Sessions
-
-Document design decisions with rationale BEFORE coding. Prevents refactoring hell.
-
-```markdown
-### Subject: API Authentication Strategy ✅
-
-**Decision**: Use JWT with refresh tokens
-
-**Rationale**:
-
-- Stateless authentication scales better
-- Refresh tokens provide security + UX balance
-- Industry standard with mature libraries
-
-**Action Items**:
-
-- [ ] Implement JWT generation (jsonwebtoken)
-- [ ] Create refresh token rotation
-- [ ] Add token blacklist for logout
-```
-
-### 📋 Pre-Implementation Tasks
-
-Handle blockers discovered during brainstorming:
-
-```markdown
-### Pre-Implementation Tasks
-
-#### ⏳ Task 1: Refactor Legacy Auth Module
-
-**Why**: Current auth is tightly coupled to session storage
-**What**: Extract to AuthService interface
-
-- [ ] Create AuthService interface
-- [ ] Implement JWTAuthService
-- [ ] Update controllers to use interface
-```
-
-### 🎯 Progress Dashboard
-
-Always-visible navigation for complex projects:
-
-```markdown
-## Progress Dashboard
-
-**Current Work**:
-
-- **Phase**: [Phase 2 - Implementation](#phase-2-implementation) 🚧
-- **Task**: [Task 3 - API Layer](#task-3-api-layer) 🚧
-- **Iteration**: [Iteration 5 - Error Handling](#iteration-5-error-handling) 🚧
-
-**Overall Progress**: 47% (14/30 iterations complete)
-```
-
-### 📦 Backlog Management
-
-Move pending tasks out of active plan for token efficiency:
+### 1. Install Flow (30 seconds)
 
 ```bash
-/flow-backlog-add 14-18  # Move tasks 14-18 to backlog
-/flow-backlog-view       # See what's in backlog
-/flow-backlog-pull 16    # Pull task 16 back to active plan
+cd /path/to/your/project
+
+# Download and run
+curl -O https://raw.githubusercontent.com/khgs2411/flow/master/flow.sh
+chmod +x flow.sh && ./flow.sh
 ```
 
-### ✅ Plan Verification
+### 2. Create Your First Plan
 
-Ensure your plan matches reality:
+**For new features:**
 
 ```bash
-/flow-verify-plan  # Checks completed items exist in codebase
+/flow-blueprint "Real-time chat with WebSocket, Redis pub/sub, and message history"
 ```
 
----
+AI generates structured plan. **You review and adjust the architecture.**
 
-## Framework Philosophy
-
-### The Human Body Metaphor
-
-**Skeleton → Veins → Flesh → Fibers**
-
-Like building a body, you start with structure and progressively add complexity:
-
-1. **Skeleton** (V1) - Basic structure, happy path only
-2. **Veins** (V1) - Core data flow and connections
-3. **Flesh** (V2) - Error handling, edge cases
-4. **Fibers** (V3) - Performance, optimization, polish
-
-**Why this works:**
-
-- Prevents premature optimization
-- Forces you to prove the architecture before adding complexity
-- Each iteration builds on validated foundations
-- Natural scope boundaries (V1/V2/V3)
-
-### Core Principles
-
-**1. Plan Before Code**
-Design decisions documented upfront reduce refactoring by 80%.
-
-**2. Context Preservation**
-`.flow/PLAN.md` is the single source of truth. Anyone (human or AI) can resume work instantly.
-
-**3. Explicit Over Implicit**
-Every decision has documented rationale. No "we think this works" - only "we chose X because Y".
-
-**4. Progressive Disclosure**
-Focus on what's needed NOW. Defer complexity to later iterations.
-
-**5. Brainstorm Before Implement**
-Thinking time is cheaper than refactoring time.
-
----
-
-## Slash Commands (28 total)
-
-### Planning (3)
-
-- `/flow-blueprint` - Create new plan from scratch
-- `/flow-migrate` - Convert existing PRD/PLAN/TODO to Flow format
-- `/flow-plan-update` - Update plan to latest framework structure
-
-### Phase Management (3)
-
-- `/flow-phase-add` - Add new phase
-- `/flow-phase-start` - Mark phase in progress
-- `/flow-phase-complete` - Complete phase
-
-### Task Management (3)
-
-- `/flow-task-add` - Add new task
-- `/flow-task-start` - Mark task in progress
-- `/flow-task-complete` - Complete task
-
-### Iteration Workflow (8)
-
-- `/flow-iteration-add` - Add new iteration
-- `/flow-brainstorm-start` - Begin brainstorming session
-- `/flow-brainstorm-subject` - Add subject to discussion
-- `/flow-next-subject` - Discuss and resolve next subject
-- `/flow-brainstorm-review` - Review decisions, create follow-up work
-- `/flow-brainstorm-complete` - Finalize brainstorming
-- `/flow-implement-start` - Begin implementation
-- `/flow-implement-complete` - Complete iteration
-
-### Backlog Management (3)
-
-- `/flow-backlog-add` - Move tasks to backlog
-- `/flow-backlog-view` - Show backlog contents
-- `/flow-backlog-pull` - Pull task back to active plan
-
-### Navigation & Status (5)
-
-- `/flow-status` - Current position (micro view)
-- `/flow-summarize` - Full project overview (macro view)
-- `/flow-verify-plan` - Verify plan matches codebase
-- `/flow-next` - Smart helper (suggests next action)
-- `/flow-rollback` - Undo last plan change
-
-### Plan Maintenance (3)
-
-- `/flow-plan-split` - Archive old tasks to reduce file size
-- `/flow-next-iteration` - Show next iteration details
-- `/flow-compact` - Generate handoff report for new AI session
-
----
-
-## Real-World Example
-
-**Scenario**: Building a payment gateway integration
-
-### 1. Create Blueprint
+### 3. Brainstorm Before Code
 
 ```bash
-/flow-blueprint "Stripe Payment Gateway Integration
-
-Requirements:
-- Credit card processing with 3D Secure
-- Webhook handling for async notifications
-- Retry logic: 3 attempts, exponential backoff
-
-Constraints:
-- Express.js backend
-- Max 2-second response time
-- PCI DSS compliant
-
-Testing:
-- Stripe test mode simulation
-- Mock webhook events
-"
+/flow-brainstorm-start "WebSocket vs SSE, Redis pub/sub architecture, message persistence strategy"
 ```
 
-**Result**: Structured plan with phases, tasks, iterations
+AI presents decision points. **You discuss and decide together.**
 
-### 2. Brainstorm First Iteration
-
-```bash
-/flow-brainstorm-start "Payment flow architecture, webhook security, retry strategy, error handling"
-```
-
-**AI creates**:
-
-```markdown
-### Subjects to Discuss
-
-1. ⏳ Payment Flow Architecture
-2. ⏳ Webhook Security & Verification
-3. ⏳ Retry Strategy & Idempotency
-4. ⏳ Error Handling & User Feedback
-```
-
-### 3. Resolve Each Subject
-
-```bash
-/flow-next-subject
-```
-
-**AI presents subject 1, you discuss together, AI captures:**
-
-```markdown
-### Subject 1: Payment Flow Architecture ✅
-
-**Decision**: Two-phase commit pattern (reserve → capture)
-
-**Rationale**:
-
-- Prevents double-charging on network failures
-- Enables fraud checks between reserve and capture
-- Stripe native support via PaymentIntent API
-- Standard e-commerce pattern (Amazon, Shopify use this)
-
-**Action Items**:
-
-- [ ] Create PaymentIntent on checkout initiation
-- [ ] Implement reserve endpoint (confirm payment)
-- [ ] Implement capture endpoint (fulfill order)
-- [ ] Add timeout for abandoned reservations (15min TTL)
-```
-
-**Repeat for subjects 2-4...**
-
-### 4. Review & Create Work
-
-```bash
-/flow-brainstorm-review
-```
-
-**AI analyzes decisions and suggests**:
-
-- 3 new iterations for Phase 1
-- 2 pre-implementation tasks (refactor existing payment module)
-
-### 5. Implement
+### 4. AI Implements Your Design
 
 ```bash
 /flow-implement-start
 ```
 
-**AI creates**:
+AI codes based on **your documented decisions**, not its assumptions.
 
-```markdown
-### Implementation
+---
 
-**Action Items** (from brainstorming):
+## Core Workflow
 
-- [ ] Create PaymentIntent on checkout initiation
-- [ ] Implement reserve endpoint (confirm payment)
-- [ ] Implement capture endpoint (fulfill order)
-- [ ] Add timeout for abandoned reservations (15min TTL)
-- [ ] Implement webhook signature verification
-- [ ] Add idempotency keys to API calls
-- [ ] Create retry queue with exponential backoff
-- [ ] Build error translation for user-friendly messages
+### 1. Design Phase (You Lead)
+
+```bash
+/flow-blueprint "Payment Gateway Integration"
 ```
 
-You code, checking off items as you complete them.
+- You define requirements
+- You set constraints
+- You outline phases
+- AI structures the plan
 
-### 6. Complete & Verify
+### 2. Brainstorming (Collaborative)
+
+```bash
+/flow-brainstorm-start "Payment flow, webhook security, retry strategy"
+/flow-next-subject  # Discuss each decision point
+```
+
+AI presents options, **you choose**:
+
+```markdown
+### Subject: Payment Flow Architecture ✅
+
+**Decision**: Two-phase commit (reserve → capture)
+
+**Rationale** (YOUR reasoning):
+- Prevents double-charging on network failures
+- Enables fraud checks between reserve and capture
+- Industry standard (Amazon, Shopify)
+
+**Action Items** (for AI to implement):
+- [ ] Create PaymentIntent on checkout
+- [ ] Implement reserve endpoint
+- [ ] Implement capture endpoint
+```
+
+### 3. Implementation (AI Executes)
+
+```bash
+/flow-implement-start
+```
+
+AI implements **your design decisions**, following action items from brainstorming.
+
+### 4. Verification (You Confirm)
 
 ```bash
 /flow-implement-complete
 ```
 
-**AI prompts for verification**:
-
-```
-Verification Notes:
-- ✅ Tested reserve → capture flow with test cards
-- ✅ Verified webhook signature validation
-- ✅ Confirmed retry logic with network failure simulation
-- ✅ All error cases return user-friendly messages
-- ✅ Payment reservations auto-expire after 15min
-```
-
-**Iteration marked ✅ COMPLETE**
+You verify the implementation matches your design.
 
 ---
 
-## Using Flow Without Slash Commands
+## The Iteration Structure
 
-**The methodology is the core, not the commands.**
+**"Build the skeleton first, then add flesh."** — Flow Framework
 
-You can use Flow with ANY AI (ChatGPT, Gemini, etc.) by manually following the patterns:
+### Progressive Refinement
 
-1. Copy `.flow/EXAMPLE_PLAN.md` as template
-2. Follow the hierarchy: Phase → Task → Iteration
-3. Use status markers: ⏳ 🚧 🎨 ✅
+Flow uses a body-building metaphor for iterations:
+
+- **V1 - Skeleton**: Basic structure, happy path only
+- **V2 - Veins**: Core data flow, error handling
+- **V3 - Flesh**: Edge cases, optimization
+- **V4 - Fibers**: Polish, performance tuning
+
+**Why this works**: You validate the architecture before adding complexity. No big-bang rewrites.
+
+### Hierarchy
+
+```
+PHASE (Testing, Implementation, Deployment)
+  └── TASK (User Auth, API Layer)
+      └── ITERATION (Skeleton, Error Handling)
+          ├── BRAINSTORM (Design decisions)
+          └── IMPLEMENTATION (Coding)
+```
+
+### Status Tracking
+
+- `⏳ PENDING` - Not started
+- `🚧 IN PROGRESS` - Working now
+- `🎨 READY` - Design complete, ready to code
+- `✅ COMPLETE` - Done and verified
+
+---
+
+## Key Features
+
+### Context Preservation
+
+**Problem**: AI forgets your design between sessions.
+
+**Solution**: Everything in `.flow/PLAN.md`. Any AI (or human) can resume instantly.
+
+### Rationale Documentation
+
+**Problem**: Code shows WHAT, not WHY.
+
+**Solution**: Every decision documented with reasoning during brainstorming.
+
+```markdown
+**Decision**: Use PostgreSQL, not MongoDB
+
+**Rationale**:
+- Strong ACID guarantees for financial data
+- Better complex query support for reporting
+- Team has 5 years PostgreSQL experience
+```
+
+### Pre-Implementation Tasks
+
+**Problem**: Refactoring discovered mid-implementation derails work.
+
+**Solution**: Identify blockers during brainstorming, handle BEFORE coding.
+
+```markdown
+### Pre-Implementation Tasks
+
+#### Task 1: Refactor Legacy Payment Module
+
+**Why**: Current code tightly coupled to Stripe
+**What**: Extract PaymentProvider interface
+
+- [ ] Create interface
+- [ ] Implement StripeProvider
+- [ ] Update controllers
+```
+
+---
+
+## Slash Commands
+
+Flow provides 25 slash commands for AI-assisted workflow:
+
+**Planning** (3): `/flow-blueprint`, `/flow-migrate`, `/flow-plan-update`
+
+**Structure** (9): `/flow-phase-*`, `/flow-task-*`, `/flow-iteration-*`
+
+**Brainstorming** (5): `/flow-brainstorm-start`, `/flow-next-subject`, `/flow-brainstorm-complete`, etc.
+
+**Implementation** (2): `/flow-implement-start`, `/flow-implement-complete`
+
+**Navigation** (6): `/flow-status`, `/flow-next`, `/flow-summarize`, `/flow-verify-plan`, etc.
+
+See [SLASH_COMMANDS.md](framework/SLASH_COMMANDS.md) for full reference.
+
+---
+
+## Using Without Slash Commands
+
+**The methodology is framework-agnostic.** You can use Flow principles with any AI:
+
+1. Copy `.flow/framework/examples/PLAN.md` as template
+2. Follow Phase → Task → Iteration hierarchy
+3. Use status markers (`⏳ 🚧 ✅`)
 4. Document decisions with rationale
-5. Reference `framework/SLASH_COMMANDS.md` for guidance
+5. Reference `framework/SLASH_COMMANDS.md` for patterns
 
-**Example prompt for ChatGPT**:
+**Example ChatGPT prompt**:
 
 ```
-Read framework/SLASH_COMMANDS.md section '/flow-blueprint'
-and execute those instructions for "User Authentication System"
+Read my PLAN.md file. Follow the brainstorming pattern
+from framework/SLASH_COMMANDS.md to discuss
+"WebSocket architecture decisions" with me.
 ```
 
-The AI will follow the steps manually. You lose autocomplete but keep the full methodology.
+The AI will follow Flow patterns manually.
 
 ---
 
-## Architecture
+## Real-World Example
+
+**Building a payment gateway:**
+
+**1. You design** (via `/flow-blueprint`):
+
+```markdown
+## Phase 1: Core Payment Flow
+
+### Task 1: Stripe Integration
+- Iteration 1: Basic charge flow (skeleton)
+- Iteration 2: Error handling (veins)
+- Iteration 3: Webhooks (flesh)
+```
+
+**2. You brainstorm** (via `/flow-brainstorm-start`):
+
+```markdown
+### Subject: Charge Flow Architecture ✅
+
+**Decision**: Two-phase commit (reserve → capture)
+
+**Rationale** (you decide):
+- Prevents double-charging
+- Enables fraud checks
+- Industry standard
+
+**Action Items** (AI implements):
+- [ ] PaymentIntent API integration
+- [ ] Reserve endpoint
+- [ ] Capture endpoint
+```
+
+**3. AI implements** your design:
+
+```bash
+/flow-implement-start
+```
+
+AI creates the code following YOUR documented decisions.
+
+**4. You verify**:
+
+```bash
+/flow-implement-complete
+```
+
+Confirm implementation matches your design.
+
+---
+
+## Why Flow Over Alternatives?
+
+| Approach       | Who Decides | Context Preserved | Iteration Structure | AI Leveraged |
+|----------------|-------------|-------------------|---------------------|--------------|
+| **Flow**       | Human       | Yes (PLAN.md)     | Built-in (V1/V2/V3) | ✅ Execution |
+| **Spec-Kit**   | Human       | In tests          | Manual              | ❌ No        |
+| **Agile**      | Team        | In tickets        | Sprint-based        | ❌ No        |
+| **Cowboy AI**  | AI          | Lost per session  | None                | ❌ Decides   |
+
+**Flow's unique value**: Human-driven design + AI-powered execution + mandatory context preservation.
+
+---
+
+## Architecture (For Framework Developers)
 
 ### Three-Part System
 
-1. **`flow.sh`** (~146KB single file)
-
+1. **`flow.sh`** (~150KB)
    - Self-contained deployment script
-   - All framework content embedded via heredocs
-   - Zero external dependencies
-   - This is what gets distributed
+   - All framework content embedded (no external dependencies)
+   - This is what users download
 
-2. **`framework/`** (source files for development)
-
-   - `DEVELOPMENT_FRAMEWORK.md` - Complete methodology (3,897 lines)
-   - `EXAMPLE_PLAN.md` - Payment gateway reference (509 lines)
-   - `SLASH_COMMANDS.md` - 28 command definitions
+2. **`framework/`** (source files)
+   - `DEVELOPMENT_FRAMEWORK.md` - Complete methodology (3,900 lines)
+   - `SLASH_COMMANDS.md` - All command definitions
+   - `examples/` - Reference examples
 
 3. **Build system**
    - `build-standalone.sh` - Generates `flow.sh` from sources
-   - Embeds all framework content into single distributable file
+   - Embeds framework docs via heredocs
 
-### For Framework Developers
+### Contributing
 
-**Edit framework**:
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guide.
+
+**Quick start**:
 
 ```bash
-# Edit source files
+# Edit framework source
 vim framework/DEVELOPMENT_FRAMEWORK.md
-vim framework/SLASH_COMMANDS.md
 
 # Rebuild distribution
 ./build-standalone.sh
 
-# Test in a project
-cd /path/to/test-project
-~/flow/flow.sh --force
+# Test
+cd /test-project && ~/flow/flow.sh --force
 ```
-
-**Release new version**:
-
-```bash
-./release.sh --patch   # 1.1.4 → 1.1.5
-./release.sh --minor   # 1.1.4 → 1.2.0
-./release.sh --major   # 1.1.4 → 2.0.0
-```
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contributor guide.
-
----
-
-## Key Design Decisions
-
-### Why single-file distribution?
-
-- **Portability** - Share one file, no dependencies
-- **Reliability** - No network requests, no missing files
-- **Simplicity** - Users just run `./flow.sh`
-
-### Why separate source files?
-
-- **Maintainability** - Edit markdown, not heredocs
-- **Version Control** - Clean diffs on actual content
-- **Development** - Use proper markdown editors
-
-### Why brainstorm before code?
-
-- **Prevents refactoring** - Design decisions upfront
-- **Captures rationale** - WHY is preserved, not just WHAT
-- **Async collaboration** - Team sees thought process
-
-### Why pre-implementation tasks?
-
-- **Real-world pattern** - Often need to refactor before new work
-- **Explicit blockers** - No hidden dependencies
-- **Brainstorm completeness** - Can't start coding until ready
-
----
-
-## Comparison to Other Approaches
-
-| Approach          | Planning           | Context              | Iteration           | AI Guided |
-| ----------------- | ------------------ | -------------------- | ------------------- | --------- |
-| **Flow**          | Structured upfront | Preserved in PLAN.md | Built-in (V1/V2/V3) | ✅ Yes    |
-| **Spec-Kit**      | Test-driven        | In tests             | Manual              | ❌ No     |
-| **Agile**         | Sprint planning    | In tickets           | Sprint-based        | ❌ No     |
-| **Waterfall**     | All upfront        | In docs              | None                | ❌ No     |
-| **Cowboy Coding** | None               | Developer's head     | Ad-hoc              | ❌ No     |
-
-**Flow's unique value**: AI-native workflow with mandatory context preservation.
-
----
-
-## What's New
-
-**Latest**: v1.1.4 - See [GitHub Releases](https://github.com/khgs2411/flow/releases) for full changelog.
 
 ---
 
 ## Resources
 
-- **📖 Full Methodology**: [DEVELOPMENT_FRAMEWORK.md](framework/DEVELOPMENT_FRAMEWORK.md)
-- **📝 Example Plan**: [EXAMPLE_PLAN.md](framework/EXAMPLE_PLAN.md)
-- **⚙️ Command Reference**: [SLASH_COMMANDS.md](framework/SLASH_COMMANDS.md)
+- **📖 Methodology**: [DEVELOPMENT_FRAMEWORK.md](framework/DEVELOPMENT_FRAMEWORK.md)
+- **📝 Examples**: [framework/examples/](framework/examples/)
+- **⚙️ Commands**: [SLASH_COMMANDS.md](framework/SLASH_COMMANDS.md)
 - **🤝 Contributing**: [CONTRIBUTING.md](CONTRIBUTING.md)
 - **🐛 Issues**: [GitHub Issues](https://github.com/khgs2411/flow/issues)
 
@@ -565,19 +413,17 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contributor guide.
 
 **Created by**: [Liad Goren](https://github.com/khgs2411)
 
-**Inspired by**: Real-world experience building a complex RPG skill generation system. The patterns emerged organically through AI-assisted development, revealing what actually works when AI and humans collaborate on complex software.
-
 **Philosophy**: Domain-Driven Design + Agile + Extreme Programming
 
-**AI Partner**: Claude (Anthropic) via Claude Code
+**AI Partner**: Claude (Anthropic)
+
+**Inspired by**: Real-world AI-assisted development on complex RPG systems, revealing what actually works when humans and AI collaborate.
 
 ---
 
 ## License
 
 MIT License - Free for personal and commercial use.
-
-Attribution appreciated but not required.
 
 ---
 
