@@ -231,7 +231,7 @@ echo -e "${BLUE}📝 Step 4/7: Creating git commit...${NC}"
 echo ""
 
 # Stage the release files
-git add VERSION CHANGELOG.md flow.sh build-standalone.sh framework/DEVELOPMENT_FRAMEWORK.md framework/SLASH_COMMANDS.md framework/EXAMPLE_PLAN.md README.md 2>/dev/null || true
+git add VERSION CHANGELOG.md flow.sh build-standalone.sh framework/DEVELOPMENT_FRAMEWORK.md framework/SLASH_COMMANDS.md framework/examples/ README.md 2>/dev/null || true
 
 # Check if there are changes to commit
 if git diff --cached --quiet; then
