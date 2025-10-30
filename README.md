@@ -278,23 +278,47 @@ See [SLASH_COMMANDS.md](framework/SLASH_COMMANDS.md) for full reference.
 
 ## Using Without Slash Commands
 
-**The methodology is framework-agnostic.** You can use Flow principles with any AI:
+**The methodology is framework-agnostic.** You can use Flow principles with any AI (ChatGPT, Gemini, etc.).
 
-1. Copy `.flow/framework/examples/PLAN.md` as template
+### Setup
+
+First, get the framework reference files:
+
+**Option 1: Clone the repository** (recommended)
+```bash
+git clone https://github.com/khgs2411/flow.git ~/flow-framework
+```
+
+**Option 2: Download framework folder only**
+```bash
+# Download the framework directory
+curl -L https://github.com/khgs2411/flow/archive/refs/heads/master.zip -o flow.zip
+unzip flow.zip "flow-master/framework/*"
+mv flow-master/framework ~/flow-framework
+rm -rf flow-master flow.zip
+```
+
+### Using the Framework
+
+1. Use `~/flow-framework/examples/PLAN.md` as a template
 2. Follow Phase → Task → Iteration hierarchy
 3. Use status markers (`⏳ 🚧 ✅`)
 4. Document decisions with rationale
-5. Reference `framework/SLASH_COMMANDS.md` for patterns
+5. Reference `~/flow-framework/SLASH_COMMANDS.md` for command patterns
 
 **Example ChatGPT prompt**:
 
 ```
-Read my PLAN.md file. Follow the brainstorming pattern
-from framework/SLASH_COMMANDS.md to discuss
-"WebSocket architecture decisions" with me.
+I'm using the Flow Framework for iterative development.
+
+Please read ~/flow-framework/SLASH_COMMANDS.md and find
+the /flow-brainstorm-start command instructions.
+
+Follow those instructions to help me brainstorm
+"WebSocket architecture decisions" for my project.
 ```
 
-The AI will follow Flow patterns manually.
+The AI will follow Flow patterns manually without slash command integration.
 
 ---
 
