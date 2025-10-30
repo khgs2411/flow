@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.3.1** - Fixed a small issue with slash commands (2025-10-30)
+**v1.3.2** - Fixed slash commands development framework file location (2025-10-30)
 
 **Changes**:
 
-- - makde it easier to extract slash commands\n
-See the [v1.3.1 release](https://github.com/khgs2411/flow/releases/tag/v1.3.1) for full details.
+- - Fixed every slash command with a better file location text\n
+See the [v1.3.2 release](https://github.com/khgs2411/flow/releases/tag/v1.3.2) for full details.
 
 ---
 
