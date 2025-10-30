@@ -254,16 +254,25 @@ Testing: Simulation-based per service"
 
 6. **Generate files**:
 
-   a. **Create DASHBOARD.md**:
-      - Use template from DEVELOPMENT_FRAMEWORK.md lines 2102-2200
-      - Fill in project name, purpose
-      - Current Work: Set to Phase 1, Task 1, Iteration 1 (if phases created) OR "No phases yet" (if not)
-      - Progress Overview: List all phases/tasks created (or empty if none)
-      - Completion Status: 0% initially
-      - Next Actions: "Use /flow-phase-add to add first phase" OR "Use /flow-phase-start to begin"
-      - Last Updated: Current timestamp
+   **💡 BEST PRACTICE - Turn-Based Approach**:
+   For large projects with many phases/tasks, use a turn-based approach to manage context:
+   1. **First turn**: Create PLAN.md only (architecture, scope, overview)
+   2. **Second turn**: Create DASHBOARD.md (list all phases/tasks structure)
+   3. **Third+ turns**: Create task files incrementally (Phase 1, then Phase 2, etc.)
 
-   b. **Create PLAN.md**:
+   This prevents context overflow and allows human review between steps.
+
+   **When to use turn-based**:
+   - 3+ phases with multiple tasks each
+   - Complex projects requiring detailed task descriptions
+   - When human wants to review structure before task file creation
+
+   **When to use single-turn**:
+   - Small projects (1-2 phases, few tasks)
+   - Clear structure from user's description
+   - Minimal task file content needed
+
+   a. **Create PLAN.md FIRST** (turn 1 if using turn-based approach):
       - Use template from DEVELOPMENT_FRAMEWORK.md lines 2232-2321
       - Include (MINIMAL - no assumptions):
         - Header with purpose
@@ -276,14 +285,30 @@ Testing: Simulation-based per service"
         - Testing Strategy section (user decides during brainstorming)
         - Development Phases section
         - Future Enhancements section
+      - **If turn-based**: Stop here, confirm with user, ask if ready for DASHBOARD
 
-   c. **Create phase-N/ directories** (if applicable):
+   b. **Create DASHBOARD.md SECOND** (turn 2 if using turn-based approach):
+      - Use template from DEVELOPMENT_FRAMEWORK.md lines 2102-2200
+      - Fill in project name, purpose
+      - Current Work: Set to Phase 1, Task 1, Iteration 1 (if phases created) OR "No phases yet" (if not)
+      - Progress Overview: List all phases/tasks structure (with iteration counts)
+      - Completion Status: 0% initially
+      - Next Actions: "Use /flow-phase-add to add first phase" OR "Use /flow-phase-start to begin"
+      - Last Updated: Current timestamp
+      - **If turn-based**: Stop here, ask user which phase to create task files for first
+
+   c. **Create phase-N/ directories** (turn 3+ if using turn-based approach):
       - Create one directory per phase
       - Naming: `phase-1/`, `phase-2/`, etc.
 
-   d. **Create phase-N/task-M.md files** (if applicable):
+   d. **Create phase-N/task-M.md files** (turn 3+ if using turn-based approach):
       - Use template from DEVELOPMENT_FRAMEWORK.md lines 2383-2472 (task with iterations)
       - **ALL tasks have iterations** (no standalone tasks)
+      - **CRITICAL: Create task files for EVERY task listed in DASHBOARD.md**
+        - If DASHBOARD.md shows "Task 1: Name" under Phase 2, then `phase-2/task-1.md` MUST exist
+        - NEVER create incomplete structures where DASHBOARD promises tasks that don't exist
+        - If uncertain about task details, use [TBD] placeholders - but file must exist
+      - **If turn-based**: Create one phase at a time (e.g., all Phase 1 tasks, then ask before Phase 2)
       - Fill in:
         - Task name and purpose
         - Phase link back to DASHBOARD.md
@@ -292,17 +317,27 @@ Testing: Simulation-based per service"
         - Dependencies (if known)
         - At least 1 iteration per task (with placeholder goal)
         - Task Notes section (empty initially)
+      - **Context management**: For large projects, ask user after each phase if ready to continue
 
 7. **Verify completeness** (self-check):
    - [ ] DASHBOARD.md created with all required sections?
    - [ ] PLAN.md created with minimal required sections (no assumptions)?
    - [ ] phase-N/ directories created (if applicable)?
    - [ ] phase-N/task-M.md files created with iterations (if applicable)?
+   - [ ] **CRITICAL: Every task listed in DASHBOARD.md has a corresponding task file?**
+     - Parse DASHBOARD.md "Progress Overview" section
+     - For each task entry (e.g., "Task 1: Name"), verify phase-N/task-M.md exists
+     - **NEVER create "phantom tasks"** - if DASHBOARD lists it, file MUST exist
    - [ ] DASHBOARD.md Current Work points to correct location?
 
 8. **Confirm to user**:
 
-   **If Mode A (SUGGEST) with phases created**:
+   **If using turn-based approach**:
+   - After PLAN.md: "✨ Created PLAN.md. Review the architecture and scope. Ready to create DASHBOARD.md?"
+   - After DASHBOARD.md: "✨ Created DASHBOARD.md with [X] phases, [Y] tasks. Which phase should I create task files for first? (Suggest: Phase 1)"
+   - After each phase's tasks: "✅ Created [N] task files for Phase [X]. Ready to create Phase [X+1] task files?"
+
+   **If Mode A (SUGGEST) with phases created** (single-turn approach):
    ```
    "✨ Created multi-file Flow project structure:
 
