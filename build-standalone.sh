@@ -227,8 +227,8 @@ extract_command() {
   local marker="## /${cmd}$"
   awk -v marker="$marker" '
     $0 ~ marker {found=1; next}
-    found && /^```markdown$/ {inside=1; next}
-    found && inside && /^```$/ {exit}
+    found && /<!-- COMMAND_START -->/ {inside=1; next}
+    found && inside && /<!-- COMMAND_END -->/ {exit}
     found && inside {print}
   ' <<'COMMANDS_DATA_EOF'
 HEADER_EOF

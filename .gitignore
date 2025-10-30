@@ -1,7 +1,7 @@
 # Testing artifacts
 .claude/
 .flow*
-
+backup/
 # Temporary files
 *.tmp
 *.swp

@@ -80,6 +80,7 @@ awk '/^### Phase 4:/ {print}' PLAN.md  # Use grep instead
 **File**: `flow-blueprint.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Create new multi-file Flow project structure from scratch
 ---
@@ -391,12 +392,14 @@ Testing: Simulation-based per service"
    - Use `/flow-phase-start` to begin work"
    ```
 
+<!-- COMMAND_END -->
 **Output**: Create multi-file Flow project structure and confirm to user.
 ## /flow-migrate
 
 **File**: `flow-migrate.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Migrate existing PRD/PLAN/TODO to Flow's .flow/PLAN.md format
 ---
@@ -621,6 +624,7 @@ Next steps:
  - If can't determine structure: Default to Path C (unstructured)
  - If migration fails: Keep backup safe, report error, suggest manual approach
 
+<!-- COMMAND_END -->
 **Output**: Create multi-file Flow structure (DASHBOARD.md, PLAN.md, phase-N/task-M.md files) from existing documentation, create backup, confirm migration to user.
 ```
 
@@ -631,6 +635,7 @@ Next steps:
 **File**: `flow-plan-update.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Update existing plan to match latest Flow framework structure
 ---
@@ -881,6 +886,7 @@ All your content preserved - only structure enhanced.
 - If structure already matches latest: Report "Already up to date!"
 - If can't determine what to update: Ask user for clarification
 
+<!-- COMMAND_END -->
 **Output**: Update all Flow files to latest framework structure, create backup, confirm changes to user.
 ```
 
@@ -891,6 +897,7 @@ All your content preserved - only structure enhanced.
 **File**: `flow-phase-add.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Add a new phase directory and update dashboard
 ---
@@ -1000,6 +1007,7 @@ You are executing the `/flow-phase-add` command from the Flow framework.
    - Use `/flow-phase-start` when ready to begin work"
    ```
 
+<!-- COMMAND_END -->
 **Output**: Create phase-N/ directory and update DASHBOARD.md + PLAN.md with new phase.
 
 ```
@@ -1011,6 +1019,7 @@ You are executing the `/flow-phase-add` command from the Flow framework.
 **File**: `flow-phase-start.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Mark current phase as in progress
 ---
@@ -1071,6 +1080,7 @@ If you discover NEW issues while working on this phase that are NOT part of the 
    - Or use `/flow-blueprint` if you want to regenerate the plan structure
    ```
 
+<!-- COMMAND_END -->
 **Output**: Updated `DASHBOARD.md` with phase status change.
 ```
 
@@ -1081,6 +1091,7 @@ If you discover NEW issues while working on this phase that are NOT part of the 
 **File**: `flow-phase-complete.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Mark current phase as complete
 ---
@@ -1156,6 +1167,7 @@ You are executing the `/flow-phase-complete` command from the Flow framework.
    - **All phases complete?** → Project finished! 🎉 Use `/flow-summarize` to review
    ```
 
+<!-- COMMAND_END -->
 **Output**: Updated `DASHBOARD.md` with phase completion and next steps.
 ```
 
@@ -1166,6 +1178,7 @@ You are executing the `/flow-phase-complete` command from the Flow framework.
 **File**: `flow-task-add.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Create a new task file in current phase directory
 ---
@@ -1302,6 +1315,7 @@ You are executing the `/flow-task-add` command from the Flow framework.
    - Use `/flow-brainstorm-start` when ready to design"
    ```
 
+<!-- COMMAND_END -->
 **Output**: Create phase-N/task-M.md file and update DASHBOARD.md.
 
 ```
@@ -1313,6 +1327,7 @@ You are executing the `/flow-task-add` command from the Flow framework.
 **File**: `flow-task-start.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Mark current task as in progress
 ---
@@ -1394,6 +1409,7 @@ If you discover NEW issues while working on this task that are NOT part of the c
    - Or use `/flow-brainstorm-start [topics]` to plan this task
    ```
 
+<!-- COMMAND_END -->
 **Output**:
 - Updated `phase-N/task-M.md` status
 - Updated `DASHBOARD.md` current work and task status
@@ -1406,6 +1422,7 @@ If you discover NEW issues while working on this task that are NOT part of the c
 **File**: `flow-task-complete.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Mark current task as complete
 ---
@@ -1496,6 +1513,7 @@ You are executing the `/flow-task-complete` command from the Flow framework.
    - **All tasks complete?** → Use `/flow-phase-complete` to mark phase as done
    ```
 
+<!-- COMMAND_END -->
 **Output**:
 - Updated `phase-N/task-M.md` status
 - Updated `DASHBOARD.md` with completion and next work
@@ -1508,6 +1526,7 @@ You are executing the `/flow-task-complete` command from the Flow framework.
 **File**: `flow-iteration-add.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Add a new iteration under the current task
 ---
@@ -1600,6 +1619,7 @@ If you discover NEW issues while working on this iteration that are NOT part of 
    - Or add more iterations with `/flow-iteration-add [name]`
    ```
 
+<!-- COMMAND_END -->
 **Output**:
 - Updated `phase-N/task-M.md` with new iteration section
 - Updated `DASHBOARD.md` with iteration count and percentages
@@ -1613,6 +1633,7 @@ If you discover NEW issues while working on this iteration that are NOT part of 
 **File**: `flow-brainstorm-start.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Start brainstorming session with user-provided topics
 ---
@@ -1775,6 +1796,7 @@ If you discover NEW issues during brainstorming that are NOT part of the current
 - ✅ **If no argument**: STOP, suggest topics, WAIT for user response
 - ✅ **After user provides topics**: THEN create brainstorming section
 
+<!-- COMMAND_END -->
 **Output**:
 - Updated `phase-N/task-M.md` with brainstorming section
 - Updated `DASHBOARD.md` with "🚧 BRAINSTORMING" status
@@ -1788,6 +1810,7 @@ If you discover NEW issues during brainstorming that are NOT part of the current
 **File**: `flow-brainstorm-subject.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Add a subject to discuss in brainstorming
 ---
@@ -1846,6 +1869,7 @@ Adding subjects dynamically is a KEY feature of Flow. When you discover NEW issu
    Use `/flow-next-subject` to discuss subjects in order.
    ```
 
+<!-- COMMAND_END -->
 **Output**: Updated `phase-N/task-M.md` with new subject in "Subjects to Discuss" list.
 ```
 
@@ -1856,6 +1880,7 @@ Adding subjects dynamically is a KEY feature of Flow. When you discover NEW issu
 **File**: `flow-brainstorm-review.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Review all resolved subjects, suggest follow-up work
 ---
@@ -2016,6 +2041,7 @@ You are executing the `/flow-brainstorm-review` command from the Flow framework.
    - Need more iterations? → Use `/flow-iteration-add [description]` first
    ```
 
+<!-- COMMAND_END -->
 **Output**:
 - **READ-ONLY** - No files modified
 - Comprehensive review summary with actionable suggestions, awaiting user confirmation
@@ -2029,6 +2055,7 @@ You are executing the `/flow-brainstorm-review` command from the Flow framework.
 **File**: `flow-brainstorm-complete.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Complete brainstorming and generate action items
 ---
@@ -2136,6 +2163,7 @@ You are executing the `/flow-brainstorm-complete` command from the Flow framewor
    **Reminder**: If you discover new issues during implementation (scope violations), STOP and discuss with the user before proceeding.
    ```
 
+<!-- COMMAND_END -->
 **Output**:
 - Updated `phase-N/task-M.md` with 🎨 READY status
 - Updated `DASHBOARD.md` with "🎨 READY FOR IMPLEMENTATION"
@@ -2148,6 +2176,7 @@ You are executing the `/flow-brainstorm-complete` command from the Flow framewor
 **File**: `flow-implement-start.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Begin implementation of current iteration
 ---
@@ -2274,6 +2303,7 @@ If you discover NEW issues during implementation that are NOT part of the curren
    Follow Testing Strategy in PLAN.md for verification.
    ```
 
+<!-- COMMAND_END -->
 **Output**:
 - Updated `phase-N/task-M.md` with implementation section
 - Updated `DASHBOARD.md` current work
@@ -2287,6 +2317,7 @@ If you discover NEW issues during implementation that are NOT part of the curren
 **File**: `flow-implement-complete.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Mark current iteration as complete
 ---
@@ -2411,6 +2442,7 @@ You are executing the `/flow-implement-complete` command from the Flow framework
    **Current state**: [X]/[Y] iterations complete
    ```
 
+<!-- COMMAND_END -->
 **Output**:
 - Updated `phase-N/task-M.md` with completion status
 - Updated `DASHBOARD.md` with progress and next work
@@ -2424,6 +2456,7 @@ You are executing the `/flow-implement-complete` command from the Flow framework
 **File**: `flow-status.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Show current position and project progress
 ---
@@ -2580,6 +2613,7 @@ You are executing the `/flow-status` command from the Flow framework.
 
 **Key Principle**: DASHBOARD.md is the source of truth for current state. This command simply displays what's in the dashboard - it doesn't validate against task files (that's what `/flow-verify-plan` does).
 
+<!-- COMMAND_END -->
 **Output**: Formatted status display with current position, progress overview, completion stats, and next action suggestion.
 
 ```
@@ -2591,6 +2625,7 @@ You are executing the `/flow-status` command from the Flow framework.
 **File**: `flow-summarize.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Generate summary of all phases/tasks/iterations
 ---
@@ -2800,6 +2835,7 @@ V2 = Dynamic formulas, character stats integration, full feature set
 - Count completions and calculate percentages
 - Format into hierarchical view
 
+<!-- COMMAND_END -->
 **Output**: Hierarchical summary of entire project structure with completion tracking.
 ```
 
@@ -2810,6 +2846,7 @@ V2 = Dynamic formulas, character stats integration, full feature set
 **File**: `flow-next-subject.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Discuss next subject, capture decision, and mark resolved
 ---
@@ -2963,6 +3000,7 @@ User responds → capture decision → document → mark ✅ → auto-advance to
 
 **Key Principle**: Moving to next subject implies current is resolved. No separate "resolve" command needed.
 
+<!-- COMMAND_END -->
 **Output**: Updated `phase-N/task-M.md` with subject resolution and show next subject.
 ```
 
@@ -2973,6 +3011,7 @@ User responds → capture decision → document → mark ✅ → auto-advance to
 **File**: `flow-next-iteration.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Show next iteration details
 ---
@@ -3029,6 +3068,7 @@ Ready to start? Use `/flow-brainstorm-start [topic]` to begin.
 
 6. **Show progress**: "Iteration [current] of [total] in current task"
 
+<!-- COMMAND_END -->
 **Output**: Display next iteration details and suggest appropriate next action.
 ```
 
@@ -3039,6 +3079,7 @@ Ready to start? Use `/flow-brainstorm-start [topic]` to begin.
 **File**: `flow-next.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Smart helper - suggests next action based on current context
 ---
@@ -3120,6 +3161,7 @@ You are executing the `/flow-next` command from the Flow framework.
 
 4. **Show current status summary**: Brief summary of where you are
 
+<!-- COMMAND_END -->
 **Output**: Suggest appropriate next command based on context.
 ```
 
@@ -3130,6 +3172,7 @@ You are executing the `/flow-next` command from the Flow framework.
 **File**: `flow-rollback.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Undo last plan change
 ---
@@ -3220,6 +3263,7 @@ You are executing the `/flow-rollback` command from the Flow framework.
 
 **Limitation**: Can only rollback one step at a time. For major reverts, manually edit files or use git to revert commits.
 
+<!-- COMMAND_END -->
 **Output**: Revert last change in plan files, update CHANGELOG.md.
 ```
 
@@ -3230,6 +3274,7 @@ You are executing the `/flow-rollback` command from the Flow framework.
 **File**: `flow-verify-plan.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Verify plan file matches actual codebase state
 ---
@@ -3332,6 +3377,7 @@ Status: [SYNCHRONIZED / NEEDS UPDATE]
 - Use `git status` and `git diff` to verify changes
 - Update task file and DASHBOARD.md to match reality
 
+<!-- COMMAND_END -->
 **Output**: Verification report and optional plan file updates.
 ```
 
@@ -3342,6 +3388,7 @@ Status: [SYNCHRONIZED / NEEDS UPDATE]
 **File**: `flow-compact.md`
 
 ```markdown
+<!-- COMMAND_START -->
 You are executing the `/flow-compact` command from the Flow framework.
 
 **Purpose**: Generate comprehensive conversation report for context transfer to new AI instance.
@@ -3491,6 +3538,7 @@ You are executing the `/flow-compact` command from the Flow framework.
 - Summarize key points, decisions, and progress
 - Document in separate notes file
 
+<!-- COMMAND_END -->
 **Output**: Comprehensive context transfer report.
 ```
 
@@ -3559,6 +3607,7 @@ Repeat for next iteration
 **File**: `flow-plan-split.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Archive old completed tasks to reduce PLAN.md size
 ---
@@ -3695,6 +3744,7 @@ You are executing the `/flow-plan-split` command from the Flow framework.
 - **Current task < 4**: "Current task is Task [N]. Need at least Task 4 to enable archiving (keeps current + 3 previous)."
 - **Non-complete old tasks**: Keep visible in DASHBOARD.md: "Task [N] kept visible (not complete - status: [status])"
 
+<!-- COMMAND_END -->
 **Output**: Move task files to archive/, update DASHBOARD.md and CHANGELOG.md (full history preserved).
 
 ```
@@ -3706,6 +3756,7 @@ You are executing the `/flow-plan-split` command from the Flow framework.
 **File**: `flow-backlog-add.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Move task(s) to backlog to reduce active plan clutter
 ---
@@ -3818,6 +3869,7 @@ You are executing the `/flow-backlog-add` command from the Flow framework.
 - **Empty range**: "No tasks found in range 14-22"
 - **Already in backlog**: Check backlog/ directory first, warn if task already there
 
+<!-- COMMAND_END -->
 **Output**: Move task files to backlog/ directory, update DASHBOARD.md and BACKLOG.md.
 
 ```
@@ -3829,6 +3881,7 @@ You are executing the `/flow-backlog-add` command from the Flow framework.
 **File**: `flow-backlog-view.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Show backlog contents (tasks waiting)
 ---
@@ -3884,6 +3937,7 @@ You are executing the `/flow-backlog-view` command from the Flow framework.
    - Can read full task file from backlog/ on request
    - Default view is just list (lightweight)
 
+<!-- COMMAND_END -->
 **Output**: Display backlog list with task files and guidance.
 
 ```
@@ -3895,6 +3949,7 @@ You are executing the `/flow-backlog-view` command from the Flow framework.
 **File**: `flow-backlog-pull.md`
 
 ```markdown
+<!-- COMMAND_START -->
 ---
 description: Pull task from backlog back into active plan
 ---
@@ -3985,6 +4040,7 @@ You are executing the `/flow-backlog-pull` command from the Flow framework.
 - **Target phase doesn't exist**: Create phase directory
 - **No active phase**: Ask user which phase to add task to
 
+<!-- COMMAND_END -->
 **Output**: Move task file from backlog/ to phase directory, update DASHBOARD.md and BACKLOG.md.
 
 ```
