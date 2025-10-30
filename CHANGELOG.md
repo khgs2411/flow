@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.3.2** - Fixed slash commands development framework file location (2025-10-30)
+**v1.3.3** - Updated the DEVELOPMENT_FRAMEWORK.md file (2025-10-30)
 
 **Changes**:
 
-- - Fixed every slash command with a better file location text\n
-See the [v1.3.2 release](https://github.com/khgs2411/flow/releases/tag/v1.3.2) for full details.
+- - Aligned the dashboard file structure to suit the desired ouput\n
+See the [v1.3.3 release](https://github.com/khgs2411/flow/releases/tag/v1.3.3) for full details.
 
 ---
 

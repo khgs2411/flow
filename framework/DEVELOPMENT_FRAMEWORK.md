@@ -359,8 +359,6 @@ When brainstorming (inside task file), every resolved subject falls into ONE of 
 **Result**: Reads DASHBOARD.md, shows formatted current state
 - Current work pointer
 - Progress overview
-- Completion percentages
-- Next actions
 
 **This is the REFERENCE MODEL command** - simple dashboard read, no complex logic needed.
 
@@ -738,8 +736,9 @@ Flow is a **specification-driven iterative development methodology** that combin
 **Sections**:
 1. **Current Work** - Pointer to active Phase/Task/Iteration
 2. **Progress Overview** - All phases with task completion status
-3. **Completion Status** - Percentages and statistics
-4. **Next Actions** - What to do next
+3. **Key Decisions** - Outstanding decisions needing user input
+4. **Success Criteria** - Definition of done for phases
+5. **Related Resources** - Links to docs, examples
 
 **Update Frequency**: Every command that changes state
 
@@ -769,15 +768,54 @@ Flow is a **specification-driven iterative development methodology** that combin
 - ⏳ Task 4: Authentication
 - ⏳ Task 5: Caching Layer
 
-## 📈 Completion Status
-- Phase 1: 100% (5/5 iterations)
-- Phase 2: 40% (6/15 iterations)
-- Overall: 55% (11/20 iterations)
 
-## 🎯 Next Actions
-- [ ] Complete Iteration 2 error handling patterns
-- [ ] Review error taxonomy with team
-- [ ] Start Iteration 3 retry logic design
+## 💡 Key Decisions
+
+**Decision Needed**: Should Skills be included in flow.sh or distributed separately?
+- Option A: Include in flow.sh (150KB → 180KB) - Users get Skills automatically, easier onboarding
+- Option B: Separate distribution (skills.zip) - Keeps flow.sh lean, users opt-in to Skills
+- **Recommendation**: Option A - Skills are lightweight (~30KB total), automatic deployment enhances AI experience
+
+**Decision Needed**: Which Skills to create first?
+- Option A: Start with 3 core Skills (navigator, planner, implementer) - MVP approach, faster testing
+- Option B: Create all 6 Skills upfront - Complete experience from day 1, but longer Phase 2
+- **Recommendation**: Option A - Iterate on core 3, add remaining 3 based on real usage feedback
+
+**Resolved**:
+- **2025-10-30**: Skills Complement Commands - Skills = model-invoked (AI decides when), Commands = user-invoked (human triggers explicitly). This maintains human-in-loop philosophy.
+- **2025-10-30**: Human Still Drives - Skills give AI *awareness* of Flow patterns, not *authority* to make architectural decisions. Descriptions emphasize "when user wants..." patterns.
+
+---
+
+## 🎯 Success Criteria
+
+**Phase 1 Complete When**:
+- `.claude/skills/` directory structure exists
+- Skill templates documented in framework/
+- build-standalone.sh embeds Skills in flow.sh
+- Skills deploy correctly to test project
+
+**Phase 2 Complete When**:
+- 6 Core Skills created with SKILL.md files
+- Each Skill has clear description triggering appropriate context
+- Skills reference framework patterns correctly
+- Skills tested individually
+
+**Phase 3 Complete When**:
+- Skills activate based on user requests (not manual invocation)
+- Real-world workflow test completed (plan → implement → complete)
+- Documentation updated (README, new SKILLS.md guide)
+- Example Skills added to framework/examples/
+
+---
+
+## 📚 Related Resources
+
+- **Agent Skills Documentation**: https://docs.claude.com/en/docs/claude-code/skills
+- **Flow Framework**: framework/DEVELOPMENT_FRAMEWORK.md
+- **Slash Commands**: framework/SLASH_COMMANDS.md
+- **Build System**: build-standalone.sh (deployment logic)
+
 ```
 
 ### PLAN.md (Static Context)

@@ -295,7 +295,18 @@ cat >> "$OUTPUT_FILE" <<'MIDDLE6_EOF'
 EXAMPLE_TASK_ITERATIONS_EOF
 }
 
+get_skills_guide() {
+  cat <<'SKILLS_GUIDE_EOF'
 MIDDLE6_EOF
+
+# Embed SKILLS_GUIDE.md content
+cat "$FRAMEWORK_DIR/skills/SKILLS_GUIDE.md" >> "$OUTPUT_FILE"
+
+cat >> "$OUTPUT_FILE" <<'MIDDLE7_EOF'
+SKILLS_GUIDE_EOF
+}
+
+MIDDLE7_EOF
 
 # Write the main deployment logic
 cat >> "$OUTPUT_FILE" <<'FOOTER_EOF'
@@ -373,6 +384,31 @@ deploy_framework() {
     get_example_task_standalone > "$examples_dir/phase-1/task-1.md" && echo -e "${GREEN}✅ framework/examples/phase-1/task-1.md${NC}" || { echo -e "${RED}❌ framework/examples/phase-1/task-1.md${NC}"; return 1; }
     get_example_task_iterations > "$examples_dir/phase-2/task-3.md" && echo -e "${GREEN}✅ framework/examples/phase-2/task-3.md${NC}" || { echo -e "${RED}❌ framework/examples/phase-2/task-3.md${NC}"; return 1; }
   fi
+
+  # Deploy Skills Guide
+  local skills_guide="$framework_dir/skills/SKILLS_GUIDE.md"
+  mkdir -p "$framework_dir/skills" || { echo -e "${RED}❌ mkdir framework/skills${NC}"; return 1; }
+
+  if [ -f "$skills_guide" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip framework/skills/SKILLS_GUIDE.md${NC}"
+  else
+    get_skills_guide > "$skills_guide" && echo -e "${GREEN}✅ framework/skills/SKILLS_GUIDE.md${NC}" || { echo -e "${RED}❌ Skills Guide${NC}"; return 1; }
+  fi
+
+  return 0
+}
+
+deploy_skills() {
+  local target_dir="$1"
+  local force="$2"
+  local skills_dir="$target_dir/skills"
+  local success_count=0
+
+  # For now, Skills are templates only (no actual Skills to deploy yet)
+  # This function will be expanded in Phase 2 when actual Skills are created
+
+  # Note: Skills will deploy to .claude/skills/flow-*/SKILL.md once created
+  # Template Skills (_TEMPLATE, _TEMPLATE-MULTI) are NOT deployed to user projects
 
   return 0
 }
