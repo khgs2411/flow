@@ -171,8 +171,6 @@ COMMANDS=(
   "flow-status" "flow-summarize" "flow-verify-plan" "flow-compact" "flow-rollback"
   # Backlog Management (3 commands)
   "flow-backlog-add" "flow-backlog-view" "flow-backlog-pull"
-  # Maintenance (1 command)
-  "flow-reinstall"
 )
 
 # Deprecated commands (renamed/removed in v1.0.11+) - cleaned up during --force
@@ -202,8 +200,7 @@ OPTIONS:
 DEPLOYMENT STRUCTURE:
   .claude/commands/          Slash commands (\${#COMMANDS[@]} files)
   .flow/                     Framework documentation
-    ├── DEVELOPMENT_FRAMEWORK.md
-    └── EXAMPLE_PLAN.md
+    └── DEVELOPMENT_FRAMEWORK.md
 
 This script is SELF-CONTAINED - no external files needed!
 
@@ -253,17 +250,54 @@ cat >> "$OUTPUT_FILE" <<'MIDDLE2_EOF'
 FRAMEWORK_DATA_EOF
 }
 
-get_example_content() {
-  cat <<'EXAMPLE_DATA_EOF'
+get_example_dashboard() {
+  cat <<'EXAMPLE_DASHBOARD_EOF'
 MIDDLE2_EOF
 
-# Embed EXAMPLE_PLAN.md content
-cat "$FRAMEWORK_DIR/EXAMPLE_PLAN.md" >> "$OUTPUT_FILE"
+# Embed examples/DASHBOARD.md content
+cat "$FRAMEWORK_DIR/examples/DASHBOARD.md" >> "$OUTPUT_FILE"
 
-cat >> "$OUTPUT_FILE" <<'FOOTER_EOF'
-EXAMPLE_DATA_EOF
+cat >> "$OUTPUT_FILE" <<'MIDDLE3_EOF'
+EXAMPLE_DASHBOARD_EOF
 }
 
+get_example_plan() {
+  cat <<'EXAMPLE_PLAN_EOF'
+MIDDLE3_EOF
+
+# Embed examples/PLAN.md content
+cat "$FRAMEWORK_DIR/examples/PLAN.md" >> "$OUTPUT_FILE"
+
+cat >> "$OUTPUT_FILE" <<'MIDDLE4_EOF'
+EXAMPLE_PLAN_EOF
+}
+
+get_example_task_standalone() {
+  cat <<'EXAMPLE_TASK_STANDALONE_EOF'
+MIDDLE4_EOF
+
+# Embed examples/phase-1/task-1.md content
+cat "$FRAMEWORK_DIR/examples/phase-1/task-1.md" >> "$OUTPUT_FILE"
+
+cat >> "$OUTPUT_FILE" <<'MIDDLE5_EOF'
+EXAMPLE_TASK_STANDALONE_EOF
+}
+
+get_example_task_iterations() {
+  cat <<'EXAMPLE_TASK_ITERATIONS_EOF'
+MIDDLE5_EOF
+
+# Embed examples/phase-2/task-3.md content
+cat "$FRAMEWORK_DIR/examples/phase-2/task-3.md" >> "$OUTPUT_FILE"
+
+cat >> "$OUTPUT_FILE" <<'MIDDLE6_EOF'
+EXAMPLE_TASK_ITERATIONS_EOF
+}
+
+MIDDLE6_EOF
+
+# Write the main deployment logic
+cat >> "$OUTPUT_FILE" <<'FOOTER_EOF'
 deploy_commands() {
   local target_dir="$1"
   local force="$2"
@@ -305,12 +339,12 @@ deploy_framework() {
   local target_dir="$1"
   local force="$2"
   local framework_file="$target_dir/DEVELOPMENT_FRAMEWORK.md"
-  local example_file="$target_dir/EXAMPLE_PLAN.md"
+  local examples_dir="$target_dir/examples"
 
   # If force mode, delete existing files first to ensure clean write
   if [ "$force" = true ]; then
     [ -f "$framework_file" ] && rm -f "$framework_file"
-    [ -f "$example_file" ] && rm -f "$example_file"
+    [ -d "$examples_dir" ] && rm -rf "$examples_dir"
   fi
 
   # Deploy framework guide
@@ -320,11 +354,19 @@ deploy_framework() {
     get_framework_content > "$framework_file" && echo -e "${GREEN}✅ DEVELOPMENT_FRAMEWORK.md${NC}" || { echo -e "${RED}❌ Framework${NC}"; return 1; }
   fi
 
-  # Deploy example plan
-  if [ -f "$example_file" ] && [ "$force" = false ]; then
-    echo -e "${YELLOW}⏭️  Skip EXAMPLE_PLAN.md${NC}"
+  # Deploy examples
+  if [ -d "$examples_dir" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip examples/${NC}"
   else
-    get_example_content > "$example_file" && echo -e "${GREEN}✅ EXAMPLE_PLAN.md${NC}" || { echo -e "${RED}❌ Example${NC}"; return 1; }
+    # Create examples directory structure
+    mkdir -p "$examples_dir/phase-1" || { echo -e "${RED}❌ examples/phase-1${NC}"; return 1; }
+    mkdir -p "$examples_dir/phase-2" || { echo -e "${RED}❌ examples/phase-2${NC}"; return 1; }
+
+    # Deploy example files
+    get_example_dashboard > "$examples_dir/DASHBOARD.md" && echo -e "${GREEN}✅ examples/DASHBOARD.md${NC}" || { echo -e "${RED}❌ examples/DASHBOARD.md${NC}"; return 1; }
+    get_example_plan > "$examples_dir/PLAN.md" && echo -e "${GREEN}✅ examples/PLAN.md${NC}" || { echo -e "${RED}❌ examples/PLAN.md${NC}"; return 1; }
+    get_example_task_standalone > "$examples_dir/phase-1/task-1.md" && echo -e "${GREEN}✅ examples/phase-1/task-1.md${NC}" || { echo -e "${RED}❌ examples/phase-1/task-1.md${NC}"; return 1; }
+    get_example_task_iterations > "$examples_dir/phase-2/task-3.md" && echo -e "${GREEN}✅ examples/phase-2/task-3.md${NC}" || { echo -e "${RED}❌ examples/phase-2/task-3.md${NC}"; return 1; }
   fi
 
   return 0
@@ -340,8 +382,8 @@ validate() {
   # Check framework
   [ ! -f "$flow_dir/DEVELOPMENT_FRAMEWORK.md" ] && { echo -e "${RED}❌ Framework missing${NC}"; valid=false; } || echo -e "${GREEN}✅ Framework${NC}"
 
-  # Check example
-  [ ! -f "$flow_dir/EXAMPLE_PLAN.md" ] && { echo -e "${RED}❌ Example missing${NC}"; valid=false; } || echo -e "${GREEN}✅ Example${NC}"
+  # Check examples
+  [ ! -d "$flow_dir/examples" ] && { echo -e "${RED}❌ Examples missing${NC}"; valid=false; } || echo -e "${GREEN}✅ Examples (4 files)${NC}"
 
   # Check commands
   local count=0
@@ -393,15 +435,19 @@ main() {
     echo -e "${GREEN}✅ Flow Framework Installed!${NC}\n"
     echo -e "${CYAN}📂 Structure:${NC}"
     echo "   .claude/commands/       (${#COMMANDS[@]} slash commands)"
-    echo "   .flow/                  (framework docs)"
+    echo "   .flow/                  (framework docs + examples)"
     echo "     ├── DEVELOPMENT_FRAMEWORK.md"
-    echo "     └── EXAMPLE_PLAN.md"
+    echo "     └── examples/"
+    echo "         ├── DASHBOARD.md"
+    echo "         ├── PLAN.md"
+    echo "         ├── phase-1/task-1.md"
+    echo "         └── phase-2/task-3.md"
     echo ""
     echo -e "${CYAN}🚀 Next Steps:${NC}"
     echo "   1. Restart Claude Code (if running)"
     echo "   2. Run: /flow-blueprint <your-feature-name>"
     echo "   3. Read: .flow/DEVELOPMENT_FRAMEWORK.md"
-    echo "   4. Reference: .flow/EXAMPLE_PLAN.md"
+    echo "   4. Examples: .flow/examples/ (now installed locally!)"
     echo ""
     echo "💡 Share this script - it's self-contained!"
     echo "=================================================="
@@ -430,4 +476,4 @@ echo "📝 Lines: $(wc -l < "$OUTPUT_FILE") lines"
 echo ""
 
 echo "✨ The standalone script is ready to distribute!"
-echo "   Includes: Commands + Framework + Example (complete package)"
+echo "   Includes: Commands + Framework (complete package)"

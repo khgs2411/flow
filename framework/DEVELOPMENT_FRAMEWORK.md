@@ -14,10 +14,9 @@ Flow uses a **multi-file architecture** where work is split across focused files
 
 ```
 .flow/
-├── DASHBOARD.md              # ⭐ USER'S MAIN WORKSPACE (progress tracking)
-├── PLAN.md                   # 📖 Static context (overview, architecture, testing)
+├── DASHBOARD.md              # ⭐ USER'S MAIN WORKSPACE (single source of truth for progress)
+├── PLAN.md                   # 📖 Static context (overview, architecture, scope)
 ├── BACKLOG.md                # 📦 Deferred/future tasks
-├── CHANGELOG.md              # 📜 Historical record
 ├── ARCHIVE.md                # 🗄️ Completed work (created by /flow-plan-split)
 ├── phase-1/
 │   ├── task-1.md            # 📝 Task with iterations, brainstorming, implementation
@@ -36,38 +35,31 @@ Flow uses a **multi-file architecture** where work is split across focused files
 
 ### File Purposes
 
-**DASHBOARD.md** (⭐ Most Important):
+**DASHBOARD.md** (⭐ Most Important - Single Source of Truth):
 - User spends most time here
-- Shows current work (Phase/Task/Iteration)
-- Displays progress overview for all phases
-- Completion percentages
-- Next actions
-- Source of truth for project state
+- Shows current work pointer (Phase/Task/Iteration)
+- Displays progress overview with ALL phases/tasks/iterations
+- Key decisions needing user input
+- **This is the ONLY place progress is tracked** - no duplication
 
-**PLAN.md** (Static Context):
+**PLAN.md** (Static Context - Rarely Changes):
 - Like CLAUDE.md but for this specific feature/project
-- Purpose, Goals, Scope (V1/V2)
+- Purpose, Goals (text only, no checklists), Scope (V1 only)
 - Architecture overview
-- Testing strategy
-- Rarely changes during implementation
+- DO/DON'T guidelines
+- Minimal and focused - no assumptions about future work
 
-**phase-N/task-N.md** (Work Files):
-- Contains task details
-- All iterations for that task
-- Brainstorming sessions
-- Implementation notes
-- Pre-implementation tasks
-- Everything related to that specific task
+**phase-N/task-N.md** (Work Files - All Tasks Have Iterations):
+- Contains task overview and dependencies
+- **All tasks have iterations** (no standalone tasks)
+- Each iteration has: Pre-tasks (optional) → Brainstorming (optional) → Action Items
+- One Action Items section per iteration
+- Brainstorming subjects produce "Resolution Items" → consolidated into Action Items
 
 **BACKLOG.md** (Future Work):
 - Tasks moved out of active plan
 - Deferred features
-- V2/V3 items
-
-**CHANGELOG.md** (History):
-- Completed milestones
-- Major decisions
-- Release notes
+- V2/V3 items (if user explicitly wants to track them)
 
 **ARCHIVE.md** (Completed Work):
 - Created by `/flow-plan-split`
@@ -171,43 +163,9 @@ PHASE → TASK → ITERATION → BRAINSTORM → IMPLEMENTATION → COMPLETE
 <!-- AI_SCAN:TASK_STRUCTURE_QUICK:198-270 -->
 ## Task Structure Rules
 
-**The Golden Rule**: Tasks must be **EITHER** Standalone **OR** have Iterations - **NEVER BOTH**
+**The Golden Rule**: **ALL tasks have iterations** - this provides consistent structure and enables iterative development.
 
-### Pattern 1: Standalone Task (Direct Action Items)
-
-**File**: `phase-N/task-N.md`
-```markdown
-# Task 5: Update Documentation
-
-**Status**: ⏳ PENDING
-**Phase**: [Phase 3 - Polish](../DASHBOARD.md#phase-3-polish)
-**Purpose**: Update project documentation
-
----
-
-## Task Overview
-
-Update documentation to reflect new multi-file architecture.
-
-**Action Items**:
-- [ ] Update README.md
-- [ ] Fix typos in guide
-- [ ] Add examples
-
----
-
-## Task Notes
-
-**Discoveries**: None yet
-```
-
-**When to Use**:
-- Straightforward work (5-10 simple steps)
-- No design decisions needed
-- Can complete in one session
-- Single focus
-
-### Pattern 2: Task with Iterations (NO Direct Action Items)
+### Task with Iterations (The Only Pattern)
 
 **File**: `phase-N/task-N.md`
 ```markdown
@@ -236,31 +194,32 @@ Build production-ready payment gateway integration.
 ### ✅ Iteration 1: API Setup
 
 **Goal**: Configure Stripe SDK and credentials
+**Status**: ✅ COMPLETE
 
-[Brainstorming → Implementation sections below]
+[Brainstorming → Action Items → Implementation sections below]
 
 ---
 
 ### 🚧 Iteration 2: Payment Processing
 
 **Goal**: Implement charge creation and webhooks
+**Status**: 🚧 IN PROGRESS
 
 [Currently brainstorming...]
 ```
 
-**When to Use**:
-- Large/complex task
-- Needs design decisions (brainstorming required)
-- Multiple stages (V1 → V2 → V3)
-- Want incremental shipping
+**Why iterations-only**:
+- Consistent structure across all tasks
+- Enables human-in-loop iteration (plan → brainstorm → implement → complete)
+- Clear progress tracking (iteration status)
+- Simple tasks just have 1-2 iterations with action items
+- Complex tasks have multiple iterations with brainstorming
 
-**NEVER**:
-- ❌ Task with BOTH action items AND iterations (creates confusion about completion criteria)
-
-**Exception**:
-- ✅ Pre-implementation tasks (from brainstorming) are allowed
-- Pre-tasks completed BEFORE iterations start
-- Structure: Task → Iteration → Brainstorming → Pre-tasks → Implementation
+**Structure per iteration**:
+1. **Pre-Implementation Tasks** (optional) - Quick fixes before starting
+2. **Brainstorming Session** (optional) - Design decisions → Resolution Items
+3. **Action Items** (required) - ONE list per iteration, consolidated from brainstorming or direct
+4. **Implementation** - Track work, files modified, discoveries
 
 ---
 
@@ -274,7 +233,7 @@ When brainstorming (inside task file), every resolved subject falls into ONE of 
 | **A** | Pre-Implementation Task | Small code changes needed BEFORE iteration | Create pre-task (< 30 min work) | Fix interface, rename file, update enum |
 | **B** | Immediate Documentation | Architectural decision, no code yet | Update PLAN.md Architecture section NOW | Design pattern choice, API contract |
 | **C** | Auto-Resolved | Answered by another subject's decision | Mark as resolved by Subject N | Cascade decisions |
-| **D** | Iteration Action Items | Substantial feature work that IS the iteration | Action items become iteration implementation | Build API endpoint, implement validator |
+| **D** | Iteration Action Items | Substantial feature work that IS the iteration | Create "Resolution Items" list in subject | Build API endpoint, implement validator |
 
 **Decision Flow**:
 1. Does subject require code changes?
@@ -282,11 +241,14 @@ When brainstorming (inside task file), every resolved subject falls into ONE of 
    - **YES** → Continue to #2
 2. Is it small quick task (< 30 min)?
    - **YES** → Type A (Pre-task)
-   - **NO** → Type D (Iteration work)
+   - **NO** → Type D (Resolution Items → Action Items)
 
 **Where They Live**:
-- Type B decisions → Update `PLAN.md` Architecture section
-- Type A/D action items → Stay in task file (`phase-N/task-M.md`)
+- Type B decisions → Update `PLAN.md` Architecture section immediately
+- Type A pre-tasks → Pre-Implementation Tasks section (before brainstorming complete)
+- Type D Resolution Items → Listed in subject, then `/flow-brainstorm-review` consolidates them into iteration's Action Items section
+
+**Key Insight**: Brainstorming creates "Resolution Items" per subject. The `/flow-brainstorm-review` command consolidates all Resolution Items → single Action Items list per iteration.
 
 ---
 
@@ -560,7 +522,7 @@ These tasks MUST be completed BEFORE starting main implementation of this iterat
   - File naming conventions
 
 - Lines 1101-1400: **Task Structure Rules (Complete Guide)**
-  - Standalone vs Iterations decision tree
+  - Iterations-only architecture
   - When to split tasks
   - Task size guidelines
   - Nested iteration patterns
@@ -888,7 +850,7 @@ Comprehensive testing and edge cases
 **Sections**:
 1. **Task Header** - Status, Phase link, Purpose
 2. **Task Overview** - Description, dependencies, why this task
-3. **Iterations** (if task has iterations) OR **Action Items** (if standalone)
+3. **Iterations** - All tasks have iterations (1+ iterations per task)
 4. **Task Notes** - Discoveries, decisions, references
 
 **Update Frequency**: Constantly during work on this task
@@ -1103,100 +1065,19 @@ phase-1/
 
 ## The Golden Rule
 
-**Tasks must be EITHER Standalone OR have Iterations - NEVER BOTH**
+**ALL Tasks Have Iterations**
 
-This is the most important rule in Flow. Breaking this rule creates confusion about:
-- What defines "task complete"?
-- Are we tracking iterations or action items?
-- Where do implementation notes go?
+This provides consistent structure and enables human-in-loop iterative development.
 
-## Pattern Decision Tree
+## Why Iterations-Only?
 
-```
-Does this task require design decisions or multiple stages?
-├─ NO → Standalone Task (direct action items)
-└─ YES → Task with Iterations (no direct action items)
-```
+- **Consistent structure** - Every task follows same pattern, easier to navigate
+- **Human-in-loop** - Enables plan → brainstorm → implement → complete cycle
+- **Progress tracking** - Clear iteration status shows where you are
+- **Flexibility** - Simple tasks have 1-2 iterations, complex tasks have many
+- **No special cases** - One pattern to learn and follow
 
-### Decision Factors
-
-**Use Standalone Task when**:
-- Work is straightforward (clear what to do)
-- 5-10 simple steps
-- No brainstorming needed
-- Can complete in one session
-- Examples: Update docs, fix typos, add logging, simple refactors
-
-**Use Task with Iterations when**:
-- Needs design decisions
-- Multiple stages (V1 → V2 → V3)
-- Complex feature requiring planning
-- Want to ship incrementally
-- Examples: New API endpoint, payment integration, auth system
-
-## Standalone Task Pattern
-
-**File**: `phase-N/task-N.md`
-
-### Complete Example
-
-```markdown
-# Task 5: Update Documentation
-
-**Status**: ⏳ PENDING
-**Phase**: [Phase 3 - Polish](../DASHBOARD.md#phase-3-polish)
-**Purpose**: Update docs to reflect multi-file architecture
-
----
-
-## Task Overview
-
-Update all documentation files to show new multi-file Flow structure.
-
-**Why This Task**: Users need current documentation for new architecture.
-
-**Scope**:
-- Update README.md
-- Update framework docs
-- Add migration guide
-- Update examples
-
----
-
-## Action Items
-
-- [ ] Update README.md with new structure diagram
-- [ ] Revise framework docs (DEVELOPMENT_FRAMEWORK.md)
-- [ ] Create migration guide for old users
-- [ ] Update all code examples
-- [ ] Run doc linter
-- [ ] Get team review
-
----
-
-## Task Notes
-
-**Discoveries**:
-- Old examples still referenced single PLAN.md
-- Need to add troubleshooting section for migration
-
-**Decisions**:
-- Using mermaid for diagrams
-- Adding before/after examples for clarity
-
-**References**:
-- Old docs: docs/old/README.md
-- Style guide: docs/STYLE.md
-```
-
-### Completion Criteria
-
-Task is ✅ COMPLETE when:
-- All action items checked off
-- Work verified (tests pass, docs render correctly, etc.)
-- Task Notes updated with any discoveries
-
-## Task with Iterations Pattern
+## Task Pattern (The Only Pattern)
 
 **File**: `phase-N/task-N.md`
 
@@ -1258,10 +1139,10 @@ Build robust Stripe API client with error handling, retry logic, and webhooks.
 - Multiple instances would create redundant connections
 - Lazy init delays credential validation until first use
 
-**Action Items**:
-- [x] Create `StripeClient` singleton class
-- [x] Implement lazy initialization in constructor
-- [x] Add credential validation on first API call
+**Resolution Items**:
+- Create `StripeClient` singleton class
+- Implement lazy initialization in constructor
+- Add credential validation on first API call
 
 ---
 
@@ -1276,7 +1157,20 @@ Build robust Stripe API client with error handling, retry logic, and webhooks.
 - Supports different keys per environment
 - Fails fast if key missing or invalid
 
-**Action Items**:
+**Resolution Items**:
+- Load `STRIPE_API_KEY` from env
+- Validate key format at startup
+- Throw clear error if key missing
+
+---
+
+#### Action Items
+
+(Consolidated from Resolution Items above by `/flow-brainstorm-review`)
+
+- [x] Create `StripeClient` singleton class
+- [x] Implement lazy initialization in constructor
+- [x] Add credential validation on first API call
 - [x] Load `STRIPE_API_KEY` from env
 - [x] Validate key format at startup
 - [x] Throw clear error if key missing
@@ -1286,8 +1180,6 @@ Build robust Stripe API client with error handling, retry logic, and webhooks.
 #### Implementation - Iteration 1: REST Client Setup
 
 **Status**: ✅ COMPLETE (2025-01-12)
-
-**Action Items**: See resolved subjects above
 
 **Implementation Notes**:
 - Created `src/payment/StripeClient.ts` with singleton pattern
@@ -1433,15 +1325,16 @@ After:
 - No brainstorming needed
 - Can complete in < 1 hour
 
-**Solution**: Convert to Standalone Task
+**Solution**: Use Single Iteration with Direct Action Items
 
 **Example**:
 ```
-Before:
-- Task: Add Logging (with 1 iteration)
-
-After:
-- Task: Add Logging (standalone with 3 action items)
+Task: Add Logging
+- Iteration 1: Logging Implementation
+  - Action Items (no brainstorming):
+    - Add logger configuration
+    - Update main entry points
+    - Add log rotation
 ```
 
 ## Nested Iteration Pattern
@@ -2033,20 +1926,6 @@ Before marking iteration complete, verify:
 ✅ COMPLETE
 ```
 
-### Task Lifecycle (Standalone)
-
-```
-⏳ PENDING (created)
-    ↓
-    /flow-task-start
-    ↓
-🚧 IN PROGRESS (working on action items)
-    ↓
-    /flow-task-complete (all action items done)
-    ↓
-✅ COMPLETE
-```
-
 ### Iteration Lifecycle
 
 ```
@@ -2220,9 +2099,9 @@ Before marking iteration complete, verify:
 
 ## 📍 Current Work
 
-- **Phase**: [Phase N - Name]([phase-N/](phase-N/))
-- **Task**: [Task M - Name]([phase-N/task-M.md](phase-N/task-M.md))
-- **Iteration**: [Iteration K - Name]([phase-N/task-M.md#iteration-K](phase-N/task-M.md#iteration-K)) [Status Emoji]
+- **Phase**: [Phase N - Name](phase-N/)
+- **Task**: [Task M - Name](phase-N/task-M.md)
+- **Iteration**: [Iteration K - Name](phase-N/task-M.md#iteration-K) [Status Emoji]
 - **Focus**: [One sentence describing current work]
 
 ---
@@ -2234,78 +2113,35 @@ Before marking iteration complete, verify:
 **Goal**: [One sentence phase goal]
 **Status**: [Completion summary, e.g., "3/3 tasks complete"]
 
-- [Status Emoji] **Task 1**: [Name] [([X/Y iterations])]
-- [Status Emoji] **Task 2**: [Name] [([X/Y iterations])]
-- [Status Emoji] **Task 3**: [Name] [(standalone)]
+**Tasks**:
+- [Status Emoji] **Task 1**: [Name] ([X/Y iterations])
+  - [Status Emoji] Iteration 1: [Name]
+  - [Status Emoji] Iteration 2: [Name]
+- [Status Emoji] **Task 2**: [Name] ([X/Y iterations])
+  - [Status Emoji] Iteration 1: [Name]
 
 ### Phase 2: [Name] [Status Emoji]
 
 **Goal**: [One sentence phase goal]
 **Status**: [Completion summary]
 
-- [Status Emoji] **Task 1**: [Name] [([X/Y iterations])]
-- [Status Emoji] **Task 2**: [Name] [([X/Y iterations])] ← CURRENT
+**Tasks**:
+- [Status Emoji] **Task 1**: [Name] ([X/Y iterations])
+  - [Status Emoji] Iteration 1: [Name]
+  - 🚧 Iteration 2: [Name] ← **CURRENT**
+  - ⏳ Iteration 3: [Name]
 
 ---
 
-## 📈 Completion Status
+## 💡 Key Decisions
 
-**Phases**: [X/Y complete]
-**Tasks**: [X/Y complete]
-**Iterations**: [X/Y complete]
+**Decision Needed**: [Question for user]
+- Option A: [Choice] - [Rationale]
+- Option B: [Choice] - [Rationale]
+- **Recommendation**: [If AI has suggestion]
 
-### Phase Breakdown
-- **Phase 1**: 100% (5/5 iterations complete)
-- **Phase 2**: 40% (6/15 iterations complete)
-- **Overall**: 55% (11/20 iterations complete)
-
----
-
-## 🎯 Next Actions
-
-**Immediate** (today):
-- [ ] [Specific action item]
-- [ ] [Specific action item]
-
-**Short-term** (this week):
-- [ ] [Task-level goal]
-- [ ] [Task-level goal]
-
-**Upcoming** (next):
-- [ ] [Phase-level milestone]
-
----
-
-## 📝 Recent Activity
-
-### [Date]
-- ✅ Completed Iteration 1 of Task 3
-- 🚧 Started Iteration 2 brainstorming
-- 📝 Updated architecture docs with retry strategy
-
-### [Date]
-- ✅ Completed Task 2 (all 3 iterations)
-- 🎯 Moved to Task 3
-
----
-
-## 🔗 Quick Links
-
-- [Development Plan](PLAN.md) - Overview, architecture, testing strategy
-- [Backlog](BACKLOG.md) - Deferred tasks and V2/V3 features
-- [Changelog](CHANGELOG.md) - Historical record
-- [Framework Guide](DEVELOPMENT_FRAMEWORK.md) - How to use Flow
-
----
-
-## 📊 Backlog Summary
-
-**Total Items**: [N]
-- [N] V2 features
-- [N] V3 features
-- [N] Technical debt items
-
-[See full backlog →](BACKLOG.md)
+**Resolved**:
+- **[Date]**: [Decision made] - [Brief rationale]
 ```
 
 ---
@@ -2333,10 +2169,12 @@ Before marking iteration complete, verify:
 
 ### Goals
 
+[Describe what success looks like - text format, NOT checklists]
+
 **Primary Goals**:
-- [ ] [Measurable goal 1]
-- [ ] [Measurable goal 2]
-- [ ] [Measurable goal 3]
+- [Measurable goal 1]
+- [Measurable goal 2]
+- [Measurable goal 3]
 
 **Success Criteria**:
 - [How we know this is successful]
@@ -2345,165 +2183,47 @@ Before marking iteration complete, verify:
 
 ### Scope
 
-**V1 Scope** (Current - Included):
+**V1 Scope** (Current Session):
 - [Feature 1]
 - [Feature 2]
 - [Feature 3]
 - [Constraint/limitation]
 
-**V2 Scope** (Future - Deferred):
-- [Enhancement 1]
-- [Enhancement 2]
-- [Advanced feature]
-
-**V3+ Scope** (Long-term):
-- [Major enhancement]
-- [Complex feature requiring V1/V2 foundation]
-
-**Explicitly Out of Scope**:
-- [Thing we're NOT doing]
-- [Thing we're NOT doing]
+**Note**: V2/V3/Out-of-Scope sections only included if user explicitly requests them. Default to V1-only scope for minimal planning overhead.
 
 ---
 
 ## Architecture
 
-### System Design
+### System Context
 
-[High-level description of how this feature fits into the system]
+[High-level description of how this feature fits into the system - describe WHAT exists, NOT prescriptive current-vs-desired with line numbers]
 
 **Components**:
 - **[ComponentName]**: [Responsibility]
 - **[ComponentName]**: [Responsibility]
-- **[ComponentName]**: [Responsibility]
 
-**Interactions**:
-[How components interact, data flow, etc.]
+**Key Dependencies**:
+- [Internal service/module]: [What we need from it]
+- [External library/API]: [Why we need it, version if relevant]
 
-### Key Dependencies
-
-**Internal Dependencies**:
-- [Existing service/module]: [What we need from it]
-- [Existing service/module]: [What we need from it]
-
-**External Dependencies**:
-- [Third-party service]: [Why we need it]
-- [Third-party library]: [Version, purpose]
-
-**Reference Implementations**:
-- [Existing code to learn from]: [File path]
+**Reference Implementations** (if relevant):
+- [Existing code to learn from]: [File path or description]
 - [Similar feature]: [What to reuse/avoid]
 
-### Data Flow
-
-[Diagram or description of how data moves through the system]
-
-Example:
-```
-User Request → API Endpoint → Service Layer → Repository → Database
-                    ↓
-            Validation Layer
-                    ↓
-            Business Logic
-                    ↓
-            External API Call → Third Party
-                    ↓
-            Response Transformation
-```
-
-### Data Model
-
-**Core Entities**:
-- **[EntityName]**: [Purpose, key fields]
-- **[EntityName]**: [Purpose, key fields]
-
-**Relationships**:
-[How entities relate to each other]
-
 ---
 
-## Testing Strategy
-
-**Methodology**: [Simulation-based / Integration tests / Unit tests / etc.]
-
-**Approach**: [Describe testing philosophy for this project]
-
-**Test Location**: `[directory]/`
-
-**Naming Convention**: `[pattern]` (e.g., `{service}.scripts.ts`, `{feature}.test.ts`)
-
-**Coverage Goals**:
-- Unit tests: [target %]
-- Integration tests: [coverage description]
-- E2E tests: [coverage description]
-
-**Test Scenarios**:
-
-**Happy Path**:
-- [ ] [Primary user flow]
-- [ ] [Common use case]
-
-**Edge Cases**:
-- [ ] [Boundary condition]
-- [ ] [Error scenario]
-- [ ] [Concurrent usage]
-
-**Error Conditions**:
-- [ ] [API failure]
-- [ ] [Invalid input]
-- [ ] [Timeout scenario]
+## DO / DON'T Guidelines
 
 **✅ DO**:
-- [Testing best practice for this project]
-- [Testing best practice for this project]
+- [Best practice for this project]
+- [Quality standard to maintain]
+- [Pattern to follow]
 
 **❌ DO NOT**:
-- [Testing anti-pattern to avoid]
-- [Testing anti-pattern to avoid]
-
----
-
-## Development Phases
-
-**Note**: Detailed tasks and iterations are in phase directories. This section provides high-level phase summaries.
-
-### Phase 1: [Name] ⏳
-
-**Strategy**: [One sentence phase approach]
-**Goal**: [What this phase achieves]
-**Duration**: [Estimate if known]
-
-**Key Deliverables**:
-- [Deliverable 1]
-- [Deliverable 2]
-
-**Tasks**: See [phase-1/](phase-1/) directory for detailed task files
-
----
-
-### Phase 2: [Name] ⏳
-
-**Strategy**: [One sentence phase approach]
-**Goal**: [What this phase achieves]
-
-**Key Deliverables**:
-- [Deliverable 1]
-- [Deliverable 2]
-
-**Tasks**: See [phase-2/](phase-2/) directory for detailed task files
-
----
-
-### Phase 3: [Name] ⏳
-
-**Strategy**: [One sentence phase approach]
-**Goal**: [What this phase achieves]
-
-**Key Deliverables**:
-- [Deliverable 1]
-- [Deliverable 2]
-
-**Tasks**: See [phase-3/](phase-3/) directory for detailed task files
+- [Anti-pattern to avoid]
+- [Common mistake to prevent]
+- [Constraint to respect]
 
 ---
 
@@ -2511,35 +2231,10 @@ User Request → API Endpoint → Service Layer → Repository → Database
 
 **Design Decisions**:
 - [Date]: [Decision made and rationale]
-- [Date]: [Decision made and rationale]
-
-**Technical Discoveries**:
-- [Discovery that affects architecture]
-- [Performance insight]
 
 **References**:
 - [External doc]: [URL]
 - [Internal doc]: [Path]
-- [Similar implementation]: [Path]
-
----
-
-## Future Enhancements (V2+)
-
-**V2 Features** (Next iteration):
-- [Feature name]: [Brief description]
-  - **Why deferred**: [Reason]
-  - **Dependencies**: [What needs to be done first]
-  - **Estimated effort**: [Rough estimate]
-
-**V3 Features** (Long-term):
-- [Feature name]: [Brief description]
-
-**Technical Debt**:
-- [Item to revisit]
-- [Refactoring opportunity]
-
-See [BACKLOG.md](BACKLOG.md) for complete backlog details.
 ```
 
 ---
@@ -2602,54 +2297,6 @@ See [BACKLOG.md](BACKLOG.md) for complete backlog details.
 
 ---
 
-## task-N.md Template (Standalone)
-
-```markdown
-# Task [N]: [Task Name]
-
-**Status**: ⏳ PENDING
-**Phase**: [Phase M - Name](../DASHBOARD.md#phase-M-name)
-**Purpose**: [One sentence - what this task accomplishes]
-
----
-
-## Task Overview
-
-[2-3 paragraphs describing this task]
-
-**Why This Task**: [Explanation of why this task is necessary]
-
-**Scope**:
-- [What's included]
-- [What's included]
-- [What's explicitly excluded]
-
----
-
-## Action Items
-
-- [ ] [Specific action 1]
-- [ ] [Specific action 2]
-- [ ] [Specific action 3]
-- [ ] [Specific action 4]
-- [ ] [Specific action 5]
-
----
-
-## Task Notes
-
-**Discoveries**:
-- [Things learned during this task]
-
-**Decisions**:
-- [Task-specific decisions]
-
-**Verification**:
-- ✅ [How we verified this is complete]
-```
-
----
-
 ## Iteration Section Template (Full)
 
 ```markdown
@@ -2657,11 +2304,31 @@ See [BACKLOG.md](BACKLOG.md) for complete backlog details.
 
 **Goal**: [One sentence]
 
-**Status**: [Status] ([Optional substatus like "Brainstorming" or "Implementing"])
+**Status**: [Status]
+
+---
+
+#### Pre-Implementation Tasks
+
+(Optional - only if Type A subjects identified during brainstorming)
+
+##### ⏳ Pre-Task 1: [Name]
+
+**Why Blocking**: [Explanation]
+
+**Scope** (< 30 min):
+- [What to do]
+
+**Files**:
+- [file1]
+
+**Test**: [How to verify]
 
 ---
 
 #### Brainstorming Session - [Topic]
+
+(Optional - only for complex iterations requiring design decisions)
 
 **Focus**: [What we're designing]
 
@@ -2681,33 +2348,32 @@ See [BACKLOG.md](BACKLOG.md) for complete backlog details.
 
 **Rationale**: [Why this decision]
 
-**Action Items** (if Type A or D):
-- [ ] [Item]
-- [ ] [Item]
+**Resolution Items** (if Type D):
+- [Item to do]
+- [Item to do]
+
+**Note**: Type A creates Pre-Tasks. Type B updates PLAN.md immediately. Type C references other subjects. Type D creates Resolution Items.
 
 ---
 
-#### Pre-Implementation Tasks
+#### Action Items
 
-(If any Type A subjects)
+(Required - ONE list per iteration)
 
-##### ⏳ Pre-Task 1: [Name]
+**If brainstorming**: `/flow-brainstorm-review` consolidates all Resolution Items into this list
+**If no brainstorming**: List action items directly
 
-**Why Blocking**: [Explanation]
-
-**Scope** (< 30 min):
-- [What to do]
-
-**Files**:
-- [file1]
+- [ ] [Action item 1]
+- [ ] [Action item 2]
+- [ ] [Action item 3]
 
 ---
 
 #### Implementation - Iteration [N]: [Name]
 
-**Status**: 🚧 IN PROGRESS
+(Added by `/flow-implement-start`, updated during work, completed by `/flow-implement-complete`)
 
-**Action Items**: See resolved subjects above
+**Status**: 🚧 IN PROGRESS
 
 **Implementation Notes**:
 - [Discovery during implementation]
@@ -3107,39 +2773,53 @@ AI: Phase 1 complete! ✅
 
 ---
 
-## Example 2: Standalone Task (Simple Documentation Update)
+## Example 2: Simple Task with Single Iteration
 
 ```bash
 # Add simple task
 /flow-task-add "Update Documentation"
 
 AI: Created phase-2/task-4.md
-    This looks like a simple task. Should it be:
-    A) Standalone task (direct action items)
-    B) Task with iterations (complex work)
+    Task created with iterations structure.
 
-User: A
+    Since this is simple documentation work, you can:
+    - Add one iteration with direct action items (skip brainstorming)
+    - Start, implement, and complete quickly
 
-AI: Great! Added as standalone task. What are the action items?
+# Add single iteration
+/flow-iteration-add "Documentation Updates"
 
-User: Update README, Fix typos, Add examples
+AI: Added Iteration 1 to Task 4.
+    For simple work, you can skip brainstorming and add action items directly.
 
-AI: Added 3 action items. Use /flow-task-start to begin.
+User: Add these action items:
+      - Update README
+      - Fix typos
+      - Add examples
 
-# Start task
-/flow-task-start
+AI: Added 3 action items to Iteration 1.
+    Use /flow-implement-start to begin.
+
+# Start implementation
+/flow-implement-start
 
 # Do the work
 [Update docs]
 
-# Complete task
+# Complete implementation
+/flow-implement-complete
+
+AI: Iteration 1 complete! ✅
+    Task 4 has 1/1 iterations complete.
+    Use /flow-task-complete to mark task done.
+
 /flow-task-complete
 
 AI: Task 4 complete! ✅
     Moving to next task...
 ```
 
-**Note**: Standalone tasks skip brainstorming entirely - just action items.
+**Note**: Simple tasks use one iteration with direct action items - no brainstorming required.
 
 ---
 
@@ -3617,29 +3297,7 @@ Phase 2: Core Implementation
 
 ## Common Pitfalls
 
-### Pitfall 1: Mixing Standalone and Iterations
-
-**Problem**:
-```markdown
-# Task 3: API Integration
-
-**Action Items**:
-- [ ] Setup client
-- [ ] Add error handling
-
-## Iterations
-
-### Iteration 1: Setup
-...
-```
-
-**Why Bad**: Unclear what defines "task complete" - action items or iterations?
-
-**Fix**: Choose ONE pattern - either standalone OR iterations, never both.
-
----
-
-### Pitfall 2: Skipping /flow-brainstorm-review
+### Pitfall 1: Skipping /flow-brainstorm-review
 
 **Problem**:
 ```bash
@@ -3653,7 +3311,7 @@ Phase 2: Core Implementation
 
 ---
 
-### Pitfall 3: Marking Complete Too Early
+### Pitfall 2: Marking Complete Too Early
 
 **Problem**:
 ```markdown
@@ -3670,7 +3328,7 @@ Phase 2: Core Implementation
 
 ---
 
-### Pitfall 4: Not Reading DASHBOARD.md First
+### Pitfall 3: Not Reading DASHBOARD.md First
 
 **Problem**:
 ```
@@ -3685,7 +3343,7 @@ Phase 2: Core Implementation
 
 ---
 
-### Pitfall 5: Creating Too Many Small Tasks
+### Pitfall 4: Creating Too Many Small Tasks
 
 **Problem**:
 ```
@@ -3702,7 +3360,7 @@ Phase 2: Core Implementation
 
 ---
 
-### Pitfall 6: Not Linking Files
+### Pitfall 5: Not Linking Files
 
 **Problem**:
 ```markdown
@@ -3720,7 +3378,7 @@ Phase 2: Core Implementation
 
 ---
 
-### Pitfall 7: Forgetting to Update Examples
+### Pitfall 6: Forgetting to Update Examples
 
 **Problem**: Make changes to framework, forget to update example files.
 
@@ -3792,7 +3450,7 @@ Phase 2: Core Implementation
 ## Summary of Key Rules
 
 1. **Dashboard-First**: Always read DASHBOARD.md first
-2. **Golden Rule**: Tasks are EITHER standalone OR have iterations, never both
+2. **Iterations-Only**: All tasks have iterations (simple tasks use single iteration)
 3. **Brainstorm Complex Work**: Don't skip brainstorming for complex iterations
 4. **Pre-Tasks Before Implementation**: Complete all pre-tasks before `/flow-brainstorm-complete`
 5. **Review Before Complete**: Always `/flow-brainstorm-review` before `/flow-brainstorm-complete`

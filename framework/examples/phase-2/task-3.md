@@ -57,11 +57,11 @@ Build a robust Stripe API client with error handling, retry logic for transient 
 - Lazy initialization delays credential validation until first use (fast app startup)
 - Singleton ensures consistent configuration across the application
 
-**Action Items**:
-- [x] Create `StripeClient` singleton class in src/integrations/stripe/
-- [x] Implement lazy initialization in constructor (init on first API call)
-- [x] Add credential validation on first API call (fail fast if misconfigured)
-- [x] Export singleton instance for import across codebase
+**Resolution Items**:
+- Create `StripeClient` singleton class in src/integrations/stripe/
+- Implement lazy initialization in constructor (init on first API call)
+- Add credential validation on first API call (fail fast if misconfigured)
+- Export singleton instance for import across codebase
 
 ---
 
@@ -77,11 +77,11 @@ Build a robust Stripe API client with error handling, retry logic for transient 
 - Validation at startup prevents runtime errors from missing/invalid keys
 - Fails fast with clear error message if key is missing or malformed
 
-**Action Items**:
-- [x] Load `STRIPE_API_KEY` from environment variables
-- [x] Validate key format at startup (must start with `sk_test_` or `sk_live_`)
-- [x] Throw descriptive error if key is missing or invalid
-- [x] Log masked key on startup for debugging (sk_***...last4chars)
+**Resolution Items**:
+- Load `STRIPE_API_KEY` from environment variables
+- Validate key format at startup (must start with `sk_test_` or `sk_live_`)
+- Throw descriptive error if key is missing or invalid
+- Log masked key on startup for debugging (sk_***...last4chars)
 
 ---
 
@@ -97,7 +97,26 @@ Build a robust Stripe API client with error handling, retry logic for transient 
 - Configurable via environment for different deployment scenarios
 - Balance between reliability (long enough for legit slow requests) and responsiveness (not too long)
 
-**Action Items**:
+**Resolution Items**:
+- Configure default timeout of 30 seconds
+- Make timeout configurable via `STRIPE_API_TIMEOUT_MS` env var
+- Add timeout handling in API call wrapper
+- Log timeout events for monitoring
+
+---
+
+#### Action Items
+
+(Consolidated from Resolution Items above by `/flow-brainstorming-review`)
+
+- [x] Create `StripeClient` singleton class in src/integrations/stripe/
+- [x] Implement lazy initialization in constructor (init on first API call)
+- [x] Add credential validation on first API call (fail fast if misconfigured)
+- [x] Export singleton instance for import across codebase
+- [x] Load `STRIPE_API_KEY` from environment variables
+- [x] Validate key format at startup (must start with `sk_test_` or `sk_live_`)
+- [x] Throw descriptive error if key is missing or invalid
+- [x] Log masked key on startup for debugging (sk_***...last4chars)
 - [x] Configure default timeout of 30 seconds
 - [x] Make timeout configurable via `STRIPE_API_TIMEOUT_MS` env var
 - [x] Add timeout handling in API call wrapper
@@ -108,8 +127,6 @@ Build a robust Stripe API client with error handling, retry logic for transient 
 #### Implementation - Iteration 1: REST Client Setup
 
 **Status**: ✅ COMPLETE (2025-01-12)
-
-**Action Items**: See resolved subjects above (all completed)
 
 **Implementation Notes**:
 - Created `src/integrations/stripe/StripeClient.ts` with singleton pattern
@@ -210,11 +227,11 @@ These tasks MUST be completed BEFORE starting main implementation of this iterat
 - `PaymentConfigurationError` - API key or configuration issue (not retryable)
 - `PaymentValidationError` - Invalid request parameters (not retryable)
 
-**Action Items**:
-- [x] Create `ErrorMapper` class in src/integrations/stripe/
-- [x] Define domain error types in src/errors/
-- [x] Map all Stripe error codes to domain errors
-- [x] Add tests for error mapping (all Stripe error codes covered)
+**Resolution Items**:
+- Create `ErrorMapper` class in src/integrations/stripe/
+- Define domain error types in src/errors/
+- Map all Stripe error codes to domain errors
+- Add tests for error mapping (all Stripe error codes covered)
 
 ---
 
@@ -234,13 +251,13 @@ These tasks MUST be completed BEFORE starting main implementation of this iterat
 - Retry: Network timeout, Stripe 500/502/503/504, rate limit (429)
 - Don't retry: Card declined (402), invalid request (400), authentication errors (401)
 
-**Action Items**:
-- [x] Create `RetryPolicy` class with exponential backoff algorithm
-- [x] Implement retry logic in StripeClient wrapper
-- [x] Add configuration for max retries (default 3, configurable via env)
-- [x] Add configuration for base delay (default 1000ms, configurable via env)
-- [x] Log retry attempts with attempt number and delay
-- [x] Add tests for retry scenarios (success after N retries, exhausted retries)
+**Resolution Items**:
+- Create `RetryPolicy` class with exponential backoff algorithm
+- Implement retry logic in StripeClient wrapper
+- Add configuration for max retries (default 3, configurable via env)
+- Add configuration for base delay (default 1000ms, configurable via env)
+- Log retry attempts with attempt number and delay
+- Add tests for retry scenarios (success after N retries, exhausted retries)
 
 ---
 
@@ -269,12 +286,12 @@ These tasks MUST be completed BEFORE starting main implementation of this iterat
 }
 ```
 
-**Action Items**:
-- [x] Add structured logging to StripeClient
-- [x] Log all API errors with full context
-- [x] Redact sensitive data before logging
-- [x] Add retry attempt number to logs
-- [x] Integrate with existing logging infrastructure
+**Resolution Items**:
+- Add structured logging to StripeClient
+- Log all API errors with full context
+- Redact sensitive data before logging
+- Add retry attempt number to logs
+- Integrate with existing logging infrastructure
 
 ---
 
@@ -296,11 +313,31 @@ Added circuit breaker to PLAN.md V2 scope with reasoning and implementation note
 
 ---
 
+#### Action Items
+
+(Consolidated from Resolution Items above by `/flow-brainstorming-review`)
+
+- [x] Create `ErrorMapper` class in src/integrations/stripe/
+- [x] Define domain error types in src/errors/
+- [x] Map all Stripe error codes to domain errors
+- [x] Add tests for error mapping (all Stripe error codes covered)
+- [x] Create `RetryPolicy` class with exponential backoff algorithm
+- [x] Implement retry logic in StripeClient wrapper
+- [x] Add configuration for max retries (default 3, configurable via env)
+- [x] Add configuration for base delay (default 1000ms, configurable via env)
+- [x] Log retry attempts with attempt number and delay
+- [x] Add tests for retry scenarios (success after N retries, exhausted retries)
+- [x] Add structured logging to StripeClient
+- [x] Log all API errors with full context
+- [x] Redact sensitive data before logging
+- [x] Add retry attempt number to logs
+- [x] Integrate with existing logging infrastructure
+
+---
+
 #### Implementation - Iteration 2: Error Handling
 
 **Status**: 🚧 IN PROGRESS (2025-01-15)
-
-**Action Items**: See resolved subjects above
 
 **Implementation Notes**:
 - Created `src/integrations/stripe/ErrorMapper.ts` (98 lines)

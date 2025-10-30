@@ -94,11 +94,10 @@ You are executing the `/flow-blueprint` command from the Flow framework.
 - **Read examples**: `.flow/examples/` directory for real-world examples
 
 **Multi-File Architecture**: This command creates:
-- `DASHBOARD.md` - Progress tracking (user's main workspace)
-- `PLAN.md` - Static context (overview, architecture, testing)
+- `DASHBOARD.md` - Progress tracking (single source of truth, user's main workspace)
+- `PLAN.md` - Static context (overview, architecture, scope)
 - `phase-N/` directories (if enough info provided)
 - `phase-N/task-M.md` files (if enough info provided)
-- `CHANGELOG.md` - Historical record
 
 **IMPORTANT**: This command ALWAYS creates fresh files, overwriting any existing. Use `/flow-migrate` to convert existing docs or `/flow-plan-update` to migrate old single-file plans.
 
@@ -172,7 +171,7 @@ Testing: Simulation-based per service"
      Phase 3: Frontend App ⏳
        - phase-3/task-1.md (Build WebSocket client)
      
-     Also creating: DASHBOARD.md, PLAN.md, CHANGELOG.md
+     Also creating: DASHBOARD.md, PLAN.md
      
      Proceed? (yes/no)"
      ```
@@ -227,9 +226,8 @@ Testing: Simulation-based per service"
 5. **Determine what files to create**:
 
    **ALWAYS CREATE**:
-   - `DASHBOARD.md` (required)
-   - `PLAN.md` (required)
-   - `CHANGELOG.md` (required)
+   - `DASHBOARD.md` (required - single source of truth for progress)
+   - `PLAN.md` (required - static context)
 
    **CREATE phase-N/ directories + task files IF**:
    - Mode B (explicit structure) → Always create
@@ -248,62 +246,53 @@ Testing: Simulation-based per service"
       - Last Updated: Current timestamp
 
    b. **Create PLAN.md**:
-      - Use template from DEVELOPMENT_FRAMEWORK.md lines 2202-2400
-      - Include:
+      - Use template from DEVELOPMENT_FRAMEWORK.md lines 2232-2321
+      - Include (MINIMAL - no assumptions):
         - Header with purpose
-        - Overview (Purpose, Goals, Scope V1/V2/V3)
-        - Architecture (fill in if info provided, [TBD] if Mode B without info)
-        - Testing Strategy (from step 4b, [TBD] if not gathered)
-        - Development Phases (high-level phase summaries, point to phase-N/ directories)
+        - Overview (Purpose, Goals - text format NO checklists, Scope V1 only)
+        - Architecture (high-level system context if info provided)
+        - DO/DON'T Guidelines
         - Notes & Learnings (empty initially)
-        - Future Enhancements (V2/V3 items if mentioned)
+      - **DO NOT INCLUDE** (unless user explicitly requests):
+        - V2/V3 Scope sections
+        - Testing Strategy section (user decides during brainstorming)
+        - Development Phases section
+        - Future Enhancements section
 
    c. **Create phase-N/ directories** (if applicable):
       - Create one directory per phase
       - Naming: `phase-1/`, `phase-2/`, etc.
 
    d. **Create phase-N/task-M.md files** (if applicable):
-      - Use template from DEVELOPMENT_FRAMEWORK.md lines 2402-2500 (task with iterations) or 2502-2550 (standalone)
+      - Use template from DEVELOPMENT_FRAMEWORK.md lines 2383-2472 (task with iterations)
+      - **ALL tasks have iterations** (no standalone tasks)
       - Fill in:
         - Task name and purpose
         - Phase link back to DASHBOARD.md
         - Status: ⏳ PENDING initially
         - Task Overview with "Why This Task"
         - Dependencies (if known)
-        - Iterations section (with placeholder iteration names if Mode A, exact names if Mode B)
+        - At least 1 iteration per task (with placeholder goal)
         - Task Notes section (empty initially)
-
-   e. **Create CHANGELOG.md**:
-      ```markdown
-      # Changelog
-      
-      ## [Initial] - [Date]
-      ### Created
-      - Project structure initialized
-      - [X] phases, [Y] tasks planned
-      ```
 
 7. **Verify completeness** (self-check):
    - [ ] DASHBOARD.md created with all required sections?
-   - [ ] PLAN.md created with all required sections?
-   - [ ] CHANGELOG.md created?
+   - [ ] PLAN.md created with minimal required sections (no assumptions)?
    - [ ] phase-N/ directories created (if applicable)?
-   - [ ] phase-N/task-M.md files created (if applicable)?
+   - [ ] phase-N/task-M.md files created with iterations (if applicable)?
    - [ ] DASHBOARD.md Current Work points to correct location?
-   - [ ] PLAN.md Development Phases section points to phase directories?
 
 8. **Confirm to user**:
 
    **If Mode A (SUGGEST) with phases created**:
    ```
    "✨ Created multi-file Flow project structure:
-   
+
    📂 Files Created:
-   - DASHBOARD.md (your main workspace)
-   - PLAN.md (static overview & architecture)
-   - CHANGELOG.md
-   - phase-1/ with [X] task files
-   - phase-2/ with [Y] task files
+   - DASHBOARD.md (your main workspace - single source of truth)
+   - PLAN.md (static context - minimal assumptions)
+   - phase-1/ with [X] task files (all with iterations)
+   - phase-2/ with [Y] task files (all with iterations)
    
    📊 Structure: [X] phases, [Y] tasks, [Z] iterations
    
@@ -316,11 +305,10 @@ Testing: Simulation-based per service"
    **If Mode A (SUGGEST) without phases** (minimal context):
    ```
    "✨ Created initial Flow project structure:
-   
+
    📂 Files Created:
    - DASHBOARD.md (your main workspace)
-   - PLAN.md (overview & architecture)
-   - CHANGELOG.md
+   - PLAN.md (static context - V1 scope only)
    
    📝 Note: No phases created yet (need more context)
    
@@ -333,14 +321,13 @@ Testing: Simulation-based per service"
    **If Mode B (CREATE)**:
    ```
    "✨ Created multi-file Flow project from your explicit structure:
-   
+
    📂 Files Created:
-   - DASHBOARD.md
-   - PLAN.md  
-   - CHANGELOG.md
-   - phase-1/ → [X] tasks
-   - phase-2/ → [Y] tasks
-   - phase-3/ → [Z] tasks
+   - DASHBOARD.md (single source of truth)
+   - PLAN.md (minimal assumptions)
+   - phase-1/ → [X] tasks (all with iterations)
+   - phase-2/ → [Y] tasks (all with iterations)
+   - phase-3/ → [Z] tasks (all with iterations)
    
    📊 Structure: [X] phases, [Y] tasks (as you specified)
    📝 [TBD] placeholders: [list sections with [TBD]]
@@ -372,11 +359,10 @@ You are executing the `/flow-migrate` command from the Flow framework.
 - **Deep dive if needed**: Read lines 2101-2600 for File Templates using Read(offset=2101, limit=500)
 
 **Multi-File Architecture**: This command creates:
-- `DASHBOARD.md` - Progress tracking dashboard
-- `PLAN.md` - Static overview, architecture, testing
+- `DASHBOARD.md` - Progress tracking (single source of truth)
+- `PLAN.md` - Static context (overview, architecture, scope)
 - `phase-N/` directories
-- `phase-N/task-M.md` files for each task
-- `CHANGELOG.md` - Historical record
+- `phase-N/task-M.md` files for each task (all with iterations)
 - `BACKLOG.md` - Deferred tasks (if applicable)
 
 **Framework Reference**: This command requires framework knowledge to convert existing docs to Flow's multi-file structure. See Quick Reference guide above for essential patterns.
@@ -437,11 +423,10 @@ You are executing the `/flow-migrate` command from the Flow framework.
 5. **Generate multi-file Flow structure** based on detected structure (ALWAYS overwrites if exists):
 
    **Multi-File Generation Process**:
-   - Create `DASHBOARD.md` with progress tracking
-   - Create `PLAN.md` with overview, architecture, testing
+   - Create `DASHBOARD.md` with progress tracking (single source of truth)
+   - Create `PLAN.md` with overview, architecture, scope (minimal assumptions)
    - Create `phase-N/` directories for each phase
-   - Create `phase-N/task-M.md` files for each task
-   - Create `CHANGELOG.md` with historical entries
+   - Create `phase-N/task-M.md` files for each task (all with iterations)
    - Create `BACKLOG.md` if deferred items exist
 
    **Path A - STRUCTURED** (already has phases/tasks):
@@ -453,10 +438,10 @@ You are executing the `/flow-migrate` command from the Flow framework.
      - "📊 Progress Overview" with all phases and tasks
      - "📈 Completion Status" with percentages
    - **Create PLAN.md** (use examples/PLAN.md as template):
-     - Overview section with Purpose, Scope (V1/V2 split)
-     - Architecture section with system design
-     - Testing Strategy section
-     - Development Phases (high-level summary only, NOT detailed tasks)
+     - Overview section with Purpose, Goals (text only, no checklists), Scope (V1 only unless user specifies V2)
+     - Architecture section with system context (high-level, not prescriptive)
+     - DO/DON'T Guidelines section
+     - Notes & Learnings section
    - **Create phase-N/ directories** for each phase
    - **Create task files** (use examples/phase-2/task-3.md as template):
      - Task overview
@@ -1139,8 +1124,8 @@ You are executing the `/flow-task-add` command from the Flow framework.
 **🔴 REQUIRED: Read Framework Quick Reference First**
 
 - **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-600 (Quick Reference) - if not already in context
-- **Focus on**: Task Structure Rules (lines 198-270) - Golden Rule: Standalone OR Iterations, Never Both
-- **Read task template**: Lines 2402-2550 for task file template
+- **Focus on**: Task Structure Rules (lines 164-223) - ALL tasks have iterations
+- **Read task template**: Lines 2383-2472 for task file template (with iterations)
 
 **Multi-File Architecture**: This command:
 - Creates `phase-N/task-M.md` file
@@ -1174,10 +1159,10 @@ You are executing the `/flow-task-add` command from the Flow framework.
      - "Database Schema" → "Design and implement database schema"
      - "Testing" → "Implement testing infrastructure"
      - Can't infer → "[TBD] - Define during task start"
-   - **Task type**: Guess if standalone or with iterations:
-     - Simple/small tasks → Standalone (direct action items)
-     - Complex/large tasks → With iterations (needs brainstorming)
-     - Default to "With iterations" if uncertain
+   - **Task structure**: ALL tasks have iterations (no standalone tasks)
+     - Simple tasks → 1-2 iterations with direct action items
+     - Complex tasks → Multiple iterations with brainstorming
+     - Always create with at least 1 iteration
 
 4. **Create task file**:
 
@@ -1205,19 +1190,19 @@ You are executing the `/flow-task-add` command from the Flow framework.
 
    ---
 
-   [If standalone task:]
-   ## Action Items
-
-   - [ ] [TBD] - Define action items during task start
-
-   [If task with iterations:]
    ## Iterations
 
    ### ⏳ Iteration 1: [TBD]
 
-   **Goal**: [TBD] - Define during brainstorming
+   **Goal**: [TBD] - Define during brainstorming or task start
 
    **Status**: ⏳ PENDING
+
+   ---
+
+   #### Action Items
+
+   - [ ] [TBD] - Define during brainstorming or add directly
 
    ---
 
@@ -1923,31 +1908,37 @@ You are executing the `/flow-brainstorm-review` command from the Flow framework.
      - Iteration N+1: [Name] - [Why it's future work]
      ```
 
-7. **Consolidate action items into iteration** (if Type 2 items exist):
+7. **Consolidate Resolution Items into Action Items section** (CRITICAL - NEW PATTERN):
 
    After user confirms categorization:
 
-   - **If Type 2 items exist** (Implementation Work):
-     - Ask user: "The brainstorming session produced detailed action items. Should I update Iteration [N]'s action items to reference the brainstorming subjects?"
-     - **If YES**:
-       - Replace iteration's **Action Items** section with consolidated summary:
-         ```markdown
-         **Action Items**: See brainstorming session above - all action items documented in resolved subjects.
+   - **Extract all "Resolution Items" from Type D subjects**:
+     - Read all resolved subjects with "Resolution Type: D"
+     - Each Type D subject has a "Resolution Items" list
+     - Collect all Resolution Items into a single consolidated list
 
-         **Implementation Summary** (from brainstorming):
-         - [ ] [High-level category 1]: [Brief summary] (Subject N)
-         - [ ] [High-level category 2]: [Brief summary] (Subject N)
+   - **Replace iteration's Action Items section**:
+     ```markdown
+     #### Action Items
 
-         **📋 Detailed Action Items**: See each subject's "Action Items Added" section above for granular tasks.
-         ```
-       - Keep detailed action items in "Resolved Subjects" → "Action Items Added" sections
-       - Avoid duplication (don't copy all items twice)
-       - Group related items by system/component for clarity
-     - **If NO**: Leave old action items (user will update manually)
+     (Consolidated from Resolution Items above by `/flow-brainstorm-review`)
 
-   - **If NO Type 2 items** (everything is Type 1 or Type 3):
-     - Iteration should reference pre-tasks or state "See pre-implementation tasks below"
-     - No action items consolidation needed
+     - [ ] [Resolution Item 1 from Subject 1]
+     - [ ] [Resolution Item 2 from Subject 1]
+     - [ ] [Resolution Item 1 from Subject 2]
+     - [ ] [Resolution Item 2 from Subject 2]
+     - [ ] [Resolution Item 1 from Subject 3]
+     ```
+
+   - **Key Points**:
+     - ONE Action Items section per iteration (single source of truth)
+     - Preserves all Resolution Items from all Type D subjects
+     - Add header comment: "(Consolidated from Resolution Items above by `/flow-brainstorm-review`)"
+     - All checkboxes start as unchecked `- [ ]`
+     - Resolution Items in subjects remain unchanged (for context)
+
+   - **If NO Type D items** (all subjects are Type A/B/C):
+     - Create minimal Action Items section referencing pre-tasks or other work
 
 8. **Await user confirmation**:
    - Do NOT automatically create iterations or pre-tasks
