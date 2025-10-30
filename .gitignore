@@ -1,6 +1,6 @@
 # Testing artifacts
 .claude/
-.flow/
+.flow*
 
 # Temporary files
 *.tmp
