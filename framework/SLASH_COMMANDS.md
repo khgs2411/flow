@@ -2026,6 +2026,8 @@ You are executing the `/flow-brainstorm-review` command from the Flow framework.
    - If user confirms Type 3 (new iterations): Ask if they want them created now
    - After confirmation: Ask about action items consolidation (step 7)
 
+8b. **Reminder**: If you discover new issues during implementation (scope violations), STOP and discuss with the user before proceeding.
+
 9. **Show "What's Next" Section**:
    ```markdown
    ## 🎯 What's Next
@@ -2154,13 +2156,15 @@ You are executing the `/flow-brainstorm-complete` command from the Flow framewor
 
    c. **Update "Last Updated" timestamp** at top
 
+   d. **Reminder**: If you discover new issues during implementation (scope violations), STOP and discuss with the user before proceeding.
+
 7. **Confirm to user**:
    ```
    ✅ Brainstorming session complete! Iteration [K]: [Name] marked 🎨 READY FOR IMPLEMENTATION
 
    **Next Step**: Use `/flow-implement-start` to begin implementation
 
-   **Reminder**: If you discover new issues during implementation (scope violations), STOP and discuss with the user before proceeding.
+  
    ```
 
 <!-- COMMAND_END -->
