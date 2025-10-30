@@ -76,346 +76,283 @@ awk '/^### Phase 4:/ {print}' PLAN.md  # Use grep instead
 
 ## /flow-blueprint
 
-<!-- MCP_METADATA
-function_name: flow_blueprint
-category: planning_creation
-parameters:
-  - name: project_description
-    type: str
-    required: true
-    description: Rich description of the feature/project including requirements, constraints, references, and testing methodology
-returns: dict[str, Any]
-plan_operations: [WRITE]
-framework_reading_required: true
-framework_sections:
-  - Quick Reference (lines 1-544)
-  - Plan File Template (lines 2731-2928)
-MCP_METADATA_END -->
-
 **File**: `flow-blueprint.md`
 
 ```markdown
 ---
-description: Create new .flow/PLAN.md for a feature/project from scratch
+description: Create new multi-file Flow project structure from scratch
 ---
 
 You are executing the `/flow-blueprint` command from the Flow framework.
 
-**Purpose**: Create a brand new PLAN.md file from scratch for a new feature/project/bug/issue.
+**Purpose**: Create a brand new multi-file Flow project structure from scratch.
 
-**🔴 REQUIRED: Read Framework Quick Reference First**
+**🔴 REQUIRED: Read Framework Quick Reference & Templates First**
 
-- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-544 (Quick Reference section) - if not already in context from earlier in session, read it now
-- **Focus on**: Plan File Template pattern (lines 134-207), Task Structure Rules (lines 47-107)
-- **Deep dive if needed**: Read lines 2731-2928 for complete Plan File Template using Read(offset=2731, limit=197)
+- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-600 (Quick Reference section) - if not already in context
+- **Read file templates**: DEVELOPMENT_FRAMEWORK.md lines 2101-2600 (DASHBOARD.md, PLAN.md, task-N.md templates)
+- **Read examples**: `.flow/examples/` directory for real-world examples
 
-**Framework Reference**: This command requires framework knowledge to generate correct plan structure. See Quick Reference guide above for essential patterns.
+**Multi-File Architecture**: This command creates:
+- `DASHBOARD.md` - Progress tracking (user's main workspace)
+- `PLAN.md` - Static context (overview, architecture, testing)
+- `phase-N/` directories (if enough info provided)
+- `phase-N/task-M.md` files (if enough info provided)
+- `CHANGELOG.md` - Historical record
 
-**IMPORTANT**: This command ALWAYS creates a fresh `.flow/PLAN.md`, overwriting any existing plan file. Use `/flow-migrate` if you want to convert existing documentation.
+**IMPORTANT**: This command ALWAYS creates fresh files, overwriting any existing. Use `/flow-migrate` to convert existing docs or `/flow-plan-update` to migrate old single-file plans.
 
-**💡 TIP FOR USERS**: Provide rich context in $ARGUMENTS! You are the domain expert - the more details you provide upfront, the better the plan.
+**💡 TIP FOR USERS**: Provide rich context! The more details you provide upfront, the better the plan.
 
-**Good example**:
+**Good example** (explicit tasks = creates phase directories + task files):
+```
+/flow-blueprint "WebSocket Chat App
+
+1. Create Bun.js web server with Express
+2. Implement Socket.IO for real-time messaging  
+3. Build frontend app to communicate with WebSocket server
+
+Testing: Simulation-based per service"
 ```
 
-/flow-blueprint "Payment Gateway Integration
-
-Requirements:
-
-- Integrate with Stripe API for credit card processing
-- Support webhooks for async payment notifications
-- Handle failed payments with retry logic (3 attempts, exponential backoff)
-
-Constraints:
-
-- Must work with existing Express.js backend
-- Maximum 2-second response time
-
-Reference:
-
-- See src/legacy/billing.ts for old PayPal integration
-- Similar webhook pattern in src/webhooks/shipment.ts
-
-Testing:
-
-- Simulation-based per service (scripts/{service}.scripts.ts)
-  "
-
+**Minimal example** (AI will ask follow-up questions, may only create DASHBOARD + PLAN):
 ```
-
-**Minimal example** (AI will ask follow-up questions):
-```
-
-/flow-blueprint "payment gateway"
-
+/flow-blueprint "websocket server"
 ```
 
 **Instructions**:
 
-1. **INPUT VALIDATION** (Token-Efficient - Run BEFORE reading framework) ⚠️ UX PRINCIPLE 1:
+1. **INPUT VALIDATION** (Run BEFORE reading framework):
 
-   **Goal**: Determine whether to CREATE explicit structure or SUGGEST structure, while minimizing token waste on invalid input.
-
-   **Step 1: Quick Scan for Hard Rules** (< 10 tokens check):
+   **Step 1: Quick Scan**:
    ```
    IF $ARGUMENTS is empty OR just whitespace:
      REJECT: "❌ Missing project description. Provide at least a project name or brief description."
-     STOP (don't proceed to framework reading)
+     STOP
    ```
 
-   **Step 2: Detect Blueprint Mode** (< 50 tokens analysis) ⚠️ UX PRINCIPLE 4 (Explicit > Implicit):
+   **Step 2: Detect Blueprint Mode**:
 
-   **Mode A: SUGGEST Structure** (User wants AI to design the plan)
-   - Trigger: $ARGUMENTS contains NO explicit structure markers
-   - Examples: "payment gateway", "user auth system", "build a todo app"
-   - Behavior: Read framework, ask questions, generate suggested plan structure
+   **Mode A: SUGGEST Structure** (User wants AI to design)
+   - Trigger: NO explicit structure markers in $ARGUMENTS
+   - Examples: "websocket server", "user auth system"
+   - Behavior: Ask questions, generate suggested structure
 
-   **Mode B: CREATE Explicit Structure** (User designed the plan already)
-   - Trigger: $ARGUMENTS contains structural markers like:
-     - "Phase 1:", "Phase 2:"
-     - "Task 1:", "Task 2:"
-     - "Iteration 1:", "Iteration 2:"
-     - Or bullet lists suggesting phases/tasks/iterations
-   - Examples:
-     ```
-     "Payment Gateway
-     Phase 1: Foundation
-     - Task 1: Setup Stripe SDK
-     - Task 2: Create payment models
+   **Mode B: CREATE Explicit Structure** (User designed it)
+   - Trigger: Contains numbered lists, "Phase N:", "Task N:", or bullet structure
+   - Examples: 
+     - "1. server, 2. socket.io, 3. frontend"  
+     - "Phase 1: Foundation\n- Task 1: Setup\nPhase 2: Implementation"
+   - Behavior: Honor user's structure exactly (with [TBD] for missing metadata)
 
-     Phase 2: Implementation
-     - Task 1: Payment processing
-       - Iteration 1: Basic flow
-       - Iteration 2: Error handling"
-     ```
-   - Behavior: Honor user's explicit structure, create it as-is (with [TBD] for missing metadata)
-
-   **Step 3: Semantic Check** (Only if Mode A and input seems vague):
-   - Check if description is too vague to generate meaningful plan
-   - Examples that ARE OK: "payment gateway", "user authentication", "real-time chat"
-   - Examples that ARE TOO VAGUE: "help", "project", "thing"
-   - If too vague:
+   **Step 3: Semantic Check** (Mode A only):
+   - If too vague ("help", "project", "thing"):
      ```
      "🤔 Need more context. What are you building? Examples:
-     - 'Payment gateway integration with Stripe'
-     - 'Real-time collaborative text editor'
+     - 'WebSocket chat server with Socket.IO'
      - 'User authentication system with JWT'
-
+     
      Or provide explicit structure:
-     Phase 1: [your phase]
-     - Task 1: [your task]"
+     1. [First step]
+     2. [Second step]
+     3. [Third step]"
      ```
-   - If OK, proceed to step 4 (framework reading)
 
-   **Step 4: Dry-Run Preview** (Only if Mode B - explicit structure detected):
-   - Parse user's structure and show what will be created
-   - Example output (200-500 tokens vs 5000+ token full generation):
+   **Step 4: Dry-Run Preview** (Mode B only):
+   - Parse structure and show what will be created:
      ```
      "📋 Detected explicit structure. I will create:
-
-     **Phase 1: Foundation** ⏳
-     - Task 1: Setup Stripe SDK ⏳
-     - Task 2: Create payment models ⏳
-
-     **Phase 2: Implementation** ⏳
-     - Task 1: Payment processing ⏳
-       - Iteration 1: Basic flow ⏳
-       - Iteration 2: Error handling ⏳
-
-     Missing metadata will use [TBD] placeholders (you can refine later).
-
+     
+     Phase 1: Bun.js Web Server ⏳
+       - phase-1/task-1.md (Create Express server)
+     
+     Phase 2: Socket.IO Implementation ⏳  
+       - phase-2/task-1.md (Implement real-time messaging)
+     
+     Phase 3: Frontend App ⏳
+       - phase-3/task-1.md (Build WebSocket client)
+     
+     Also creating: DASHBOARD.md, PLAN.md, CHANGELOG.md
+     
      Proceed? (yes/no)"
      ```
-   - If user says "no", ask what to change
-   - If user says "yes", proceed to framework reading and creation
 
-   **Token Savings**: Validation + preview = 200-500 tokens vs full generation rejection = 5000+ tokens wasted
+2. **Read framework guide AND examples** (after validation):
+   - Search for DEVELOPMENT_FRAMEWORK.md (`.flow/`, `.claude/`, `./`, `~/.claude/flow/`)
+   - Search for examples in `.flow/examples/` (DASHBOARD.md, PLAN.md, task files)
+   - Read to understand:
+     - Multi-file structure (DASHBOARD vs PLAN vs task files)
+     - File templates
+     - Required sections
+     - Status markers
 
-2. **Read the framework guide AND example plan** ⚠️ CRITICAL (Only after validation passes):
-   - **Search for DEVELOPMENT_FRAMEWORK.md** in these locations (in order):
-     - `.flow/DEVELOPMENT_FRAMEWORK.md`
-     - `.claude/DEVELOPMENT_FRAMEWORK.md`
-     - `./DEVELOPMENT_FRAMEWORK.md` (project root)
-     - `~/.claude/flow/DEVELOPMENT_FRAMEWORK.md` (global)
-   - **Search for EXAMPLE_PLAN.md** in same locations
-   - **Read BOTH files completely** to understand:
-     - Hierarchy: PHASE → TASK → ITERATION → BRAINSTORM → IMPLEMENTATION
-     - Plan file template structure (DEVELOPMENT_FRAMEWORK.md lines 2731-2928)
-     - Real-world example structure (EXAMPLE_PLAN.md - all 509 lines)
-     - Required sections: Framework Guide header, Overview, Progress Dashboard, Architecture, Testing Strategy, Development Plan, Changelog
-     - Progress Dashboard format with iteration lists
-     - Brainstorming session structure with Resolution Type labels (Type A/B/C/D)
-     - Status markers and their lifecycle
+3. **Analyze feature request** (Mode-specific):
 
-3. **Analyze the feature request**: `$ARGUMENTS` (Mode-specific behavior) ⚠️ UX PRINCIPLE 4:
+   **If Mode A (SUGGEST)**:
+   - Extract: requirements, constraints, references, testing
+   - If minimal context, prepare to ask questions
 
-   **If Mode A (SUGGEST)**: AI designs the structure
-   - Extract all provided information: requirements, constraints, reference paths, testing preferences
-   - If user provided rich context (requirements, constraints, references), use it directly
-   - If minimal context provided (just a name), prepare to ask follow-up questions in steps 4-5
+   **If Mode B (CREATE)**:
+   - Parse structure (phases/tasks from numbered lists or explicit markers)
+   - Extract metadata if provided
+   - Use [TBD] for missing metadata
 
-   **If Mode B (CREATE)**: Honor user's explicit structure
-   - Parse the provided structure (phases, tasks, iterations)
-   - Extract any metadata provided (goals, purposes, requirements)
-   - Use [TBD] for missing metadata (⚠️ UX PRINCIPLE 2: Never block for cosmetic reasons)
-   - Skip questions in steps 4-5 UNLESS user explicitly asked for them
-   - Example: If user provided structure but no testing strategy, use "[TBD] - Testing strategy to be defined"
+4. **Gather information** (Mode A only):
 
-4. **Check for reference implementation** (Mode A only, skip if Mode B):
-   - If user mentioned reference paths in arguments (e.g., "See src/legacy/billing.ts"), read and analyze them
-   - If no reference mentioned, ask: "Do you have a reference implementation I should analyze? (Provide path or say 'no')"
-   - If reference provided, read and analyze it to inform the planning
+   a. **Reference implementations**:
+      - If mentioned in args, read and analyze
+      - Otherwise ask: "Reference implementation to analyze? (path or 'no')"
 
-5. **Gather testing methodology** (Mode A only, skip if Mode B - CRITICAL if asking):
-   - If user provided testing details in arguments (e.g., "Testing: Simulation-based per service"), use them directly and skip to step 6
-   - Otherwise, ask: "How do you prefer to verify implementations? Choose or describe:
-     - **Simulation-based (per-service)**: Each service has its own test file (e.g., `{service}.scripts.ts`)
-     - **Simulation-based (single file)**: All tests in one orchestration file (e.g., `run.scripts.ts`)
-     - **Unit tests**: Test individual functions/classes after implementation (Jest/Vitest/etc.)
-     - **TDD**: Write tests before implementation, then make them pass
-     - **Integration/E2E**: Focus on end-to-end workflows, minimal unit tests
-     - **Manual QA**: No automated tests, manual verification only
-     - **Custom**: Describe your approach"
-   - **CRITICAL follow-up questions**:
-     - "What's your test file naming convention?" (e.g., `{service}.scripts.ts`, `{feature}.test.ts`, `{feature}.spec.ts`)
-     - "Where do test files live?" (e.g., `scripts/`, `__tests__/`, `tests/`, `e2e/`)
-     - "When should I create NEW test files vs. add to existing?" (e.g., "Create `{service}.scripts.ts` for new services, add to existing for enhancements")
-   - **IMPORTANT**: These answers determine how AI creates/modifies test files in every iteration
+   b. **Testing methodology**:
+      - If provided in args, use directly
+      - Otherwise ask:
+        ```
+        "How do you prefer to verify implementations?
+        - Simulation-based (per-service): scripts/{service}.scripts.ts
+        - Unit tests: Jest/Vitest after implementation
+        - TDD: Tests before implementation
+        - Manual QA: No automated tests
+        - Custom: Describe your approach
+        
+        Also tell me:
+        - Test file naming? (e.g., {service}.scripts.ts, {feature}.test.ts)
+        - Test file location? (e.g., scripts/, __tests__/, tests/)
+        - When to create NEW vs add to existing?"
+        ```
 
-6. **Gather any other project-specific patterns** (Mode A only, skip if Mode B):
-   - File naming conventions (if mentioned or user specifies)
-   - Directory structure preferences (if relevant)
-   - Code style preferences (if mentioned)
-   - Skip if not applicable to project type
+   c. **Estimate phase/task structure** (Mode A only):
+      - Based on requirements, estimate phases needed
+      - Ask: "I'm thinking X phases: [list]. Does this structure make sense? Any changes?"
 
-7. **Generate .flow/PLAN.md** following EXAMPLE_PLAN.md structure exactly ⚠️ CRITICAL (ALWAYS overwrites if exists):
+5. **Determine what files to create**:
 
-   **Mode-Specific Behavior**:
+   **ALWAYS CREATE**:
+   - `DASHBOARD.md` (required)
+   - `PLAN.md` (required)
+   - `CHANGELOG.md` (required)
 
-   **If Mode A (SUGGEST)**: AI-generated comprehensive plan
-   - Use information gathered from steps 4-6
-   - Generate full structure with AI-designed phases/tasks/iterations
-   - Fill in all metadata sections with detailed content
-   - Follow all subsections below
+   **CREATE phase-N/ directories + task files IF**:
+   - Mode B (explicit structure) → Always create
+   - Mode A with rich context (clear tasks identified) → Create
+   - Mode A with minimal context → Don't create yet (user adds with /flow-phase-add later)
 
-   **If Mode B (CREATE)**: Honor user's explicit structure
-   - Use user's provided structure exactly
-   - Fill in metadata where provided by user
-   - Use [TBD] placeholders for missing metadata (⚠️ UX PRINCIPLE 2 & 6: Honest communication)
-   - Example Testing Strategy if not provided: "[TBD] - Testing strategy to be defined during first iteration brainstorming"
-   - Example Architecture if not provided: "[TBD] - Architecture to be documented during design phase"
-   - Still create ALL required sections (don't skip sections just because metadata is missing)
-   - Note: .flow/ directory already exists (created by flow.sh installation)
-   - **CRITICAL**: Use EXAMPLE_PLAN.md as your template - follow its structure exactly
+6. **Generate files**:
 
-   - **Framework reference header** (REQUIRED - copy format from EXAMPLE_PLAN.md lines 1-11):
-     ```markdown
-     # [Project Name] - Development Plan
+   a. **Create DASHBOARD.md**:
+      - Use template from DEVELOPMENT_FRAMEWORK.md lines 2102-2200
+      - Fill in project name, purpose
+      - Current Work: Set to Phase 1, Task 1, Iteration 1 (if phases created) OR "No phases yet" (if not)
+      - Progress Overview: List all phases/tasks created (or empty if none)
+      - Completion Status: 0% initially
+      - Next Actions: "Use /flow-phase-add to add first phase" OR "Use /flow-phase-start to begin"
+      - Last Updated: Current timestamp
 
-     > **📖 Framework Guide**: See DEVELOPMENT_FRAMEWORK.md for complete methodology and patterns used in this plan
-     >
-     > **🎯 Purpose**: [Brief description of what this plan covers]
+   b. **Create PLAN.md**:
+      - Use template from DEVELOPMENT_FRAMEWORK.md lines 2202-2400
+      - Include:
+        - Header with purpose
+        - Overview (Purpose, Goals, Scope V1/V2/V3)
+        - Architecture (fill in if info provided, [TBD] if Mode B without info)
+        - Testing Strategy (from step 4b, [TBD] if not gathered)
+        - Development Phases (high-level phase summaries, point to phase-N/ directories)
+        - Notes & Learnings (empty initially)
+        - Future Enhancements (V2/V3 items if mentioned)
 
-     **Created**: [Date]
-     **Version**: V1
-     **Plan Location**: `.flow/PLAN.md` (managed by Flow)
-     ```
+   c. **Create phase-N/ directories** (if applicable):
+      - Create one directory per phase
+      - Naming: `phase-1/`, `phase-2/`, etc.
 
-   - **Overview section** (see EXAMPLE_PLAN.md lines 13-27):
-     - Purpose, Goals, Scope (Included/Excluded with version markers)
+   d. **Create phase-N/task-M.md files** (if applicable):
+      - Use template from DEVELOPMENT_FRAMEWORK.md lines 2402-2500 (task with iterations) or 2502-2550 (standalone)
+      - Fill in:
+        - Task name and purpose
+        - Phase link back to DASHBOARD.md
+        - Status: ⏳ PENDING initially
+        - Task Overview with "Why This Task"
+        - Dependencies (if known)
+        - Iterations section (with placeholder iteration names if Mode A, exact names if Mode B)
+        - Task Notes section (empty initially)
 
-   - **Progress Dashboard section** ⚠️ REQUIRED (see EXAMPLE_PLAN.md lines 29-62):
-     - **Last Updated** timestamp
-     - **Current Work** with jump links to Phase/Task/Iteration
-     - **Completion Status** percentage per phase
-     - **Progress Overview** with full iteration lists (NOT "(X iterations total)")
-     - Format: Follow EXAMPLE_PLAN.md lines 44-61 exactly for iteration list structure
-     - Read DEVELOPMENT_FRAMEWORK.md lines 2555-2567 for iteration list format rules
+   e. **Create CHANGELOG.md**:
+      ```markdown
+      # Changelog
+      
+      ## [Initial] - [Date]
+      ### Created
+      - Project structure initialized
+      - [X] phases, [Y] tasks planned
+      ```
 
-   - **Architecture section** (see EXAMPLE_PLAN.md lines 65-85):
-     - High-level design, key components, dependencies
+7. **Verify completeness** (self-check):
+   - [ ] DASHBOARD.md created with all required sections?
+   - [ ] PLAN.md created with all required sections?
+   - [ ] CHANGELOG.md created?
+   - [ ] phase-N/ directories created (if applicable)?
+   - [ ] phase-N/task-M.md files created (if applicable)?
+   - [ ] DASHBOARD.md Current Work points to correct location?
+   - [ ] PLAN.md Development Phases section points to phase directories?
 
-   - **Testing Strategy section** ⚠️ REQUIRED (see EXAMPLE_PLAN.md lines 87-129):
-     - **Methodology**: Document testing methodology from step 4
-     - **Approach**: Integration/Unit/E2E/Manual QA details
-     - **Location**: Where test files live
-     - **Naming Convention**: Test file naming pattern
-     - **When to create**: Conditions for new test files
-     - **When to add**: When to add to existing files
-     - **Coverage**: What to test
-     - **IMPORTANT** section with ✅ DO and ❌ DO NOT examples
-     - Include file structure visualization if helpful
+8. **Confirm to user**:
 
-   - **Development Plan section** (see EXAMPLE_PLAN.md lines 134+):
-     - Estimate 2-4 phases (Foundation, Core Implementation, Testing, Enhancement/Polish)
-     - For each phase: Status, Started/Completed dates, Strategy, Goal
-     - For each task: 1-5 tasks with Status, Purpose
-     - For each task: 2-10 iterations with Goal (high-level names only)
-     - Mark everything as ⏳ PENDING initially
-     - Add placeholder brainstorming sessions (see EXAMPLE_PLAN.md lines 164-259 for structure)
-     - Include Resolution Type labels (Type A/B/C/D) in subject resolutions
-     - Include placeholder Implementation sections (see EXAMPLE_PLAN.md lines 260-283)
+   **If Mode A (SUGGEST) with phases created**:
+   ```
+   "✨ Created multi-file Flow project structure:
+   
+   📂 Files Created:
+   - DASHBOARD.md (your main workspace)
+   - PLAN.md (static overview & architecture)
+   - CHANGELOG.md
+   - phase-1/ with [X] task files
+   - phase-2/ with [Y] task files
+   
+   📊 Structure: [X] phases, [Y] tasks, [Z] iterations
+   
+   🎯 Next Steps:
+   - Use `/flow-status` to see current state
+   - Use `/flow-phase-start` to begin Phase 1
+   - Use `/flow-brainstorm-start` when ready to design first iteration"
+   ```
 
-   - **Changelog section** ⚠️ REQUIRED (see EXAMPLE_PLAN.md lines 544-549):
-     - Initial entry with creation date
-     - Format: `**YYYY-MM-DD**: - ✅ [Iteration X]: [description] - 🚧 [Iteration Y]: [description] (in progress)`
+   **If Mode A (SUGGEST) without phases** (minimal context):
+   ```
+   "✨ Created initial Flow project structure:
+   
+   📂 Files Created:
+   - DASHBOARD.md (your main workspace)
+   - PLAN.md (overview & architecture)
+   - CHANGELOG.md
+   
+   📝 Note: No phases created yet (need more context)
+   
+   🎯 Next Steps:
+   - Use `/flow-phase-add "Phase Name"` to add your first phase
+   - Then use `/flow-task-add "Task Name"` to add tasks
+   - Or re-run `/flow-blueprint` with more detailed requirements"
+   ```
 
-8. **Depth**: Medium detail
-   - Phase names and strategies
-   - Task names and purposes
-   - Iteration names only (no brainstorming subjects yet)
+   **If Mode B (CREATE)**:
+   ```
+   "✨ Created multi-file Flow project from your explicit structure:
+   
+   📂 Files Created:
+   - DASHBOARD.md
+   - PLAN.md  
+   - CHANGELOG.md
+   - phase-1/ → [X] tasks
+   - phase-2/ → [Y] tasks
+   - phase-3/ → [Z] tasks
+   
+   📊 Structure: [X] phases, [Y] tasks (as you specified)
+   📝 [TBD] placeholders: [list sections with [TBD]]
+   
+   🎯 Next Steps:
+   - Use `/flow-status` to see current state
+   - Refine [TBD] sections during brainstorming
+   - Use `/flow-phase-start` to begin work"
+   ```
 
-9. **Verify completeness before saving** ⚠️ CRITICAL SELF-CHECK:
-   - [ ] Framework reference header present (with 🎯 Purpose line)?
-   - [ ] Overview section present (Purpose, Goals, Scope)?
-   - [ ] Progress Dashboard present (NOT optional - REQUIRED)?
-   - [ ] Architecture section present (can be [TBD] in Mode B)?
-   - [ ] Testing Strategy section present with all fields (can be [TBD] in Mode B)?
-   - [ ] Development Plan with phases/tasks/iterations?
-   - [ ] Placeholder brainstorming sessions with Resolution Type labels (Type A/B/C/D)?
-   - [ ] Changelog section present?
-   - [ ] All iteration lists expanded (NOT "(X iterations total)")?
-   - **If any checkbox is unchecked, review EXAMPLE_PLAN.md again and add missing section**
-
-10. **Confirm to user** (Mode-specific):
-
-    **If Mode A (SUGGEST)**:
-    - "✨ Created .flow/PLAN.md with [X] phases, [Y] tasks, [Z] iterations"
-    - "📂 Flow is now managing this project from .flow/ directory"
-    - "📋 Included: Progress Dashboard, Testing Strategy, Changelog, placeholder brainstorming sessions"
-    - "Use `/flow-status` to see current state"
-    - "Use `/flow-brainstorm-start [topic]` to begin first iteration"
-
-    **If Mode B (CREATE)**:
-    - "✨ Created .flow/PLAN.md from your explicit structure"
-    - "📊 Structure: [X] phases, [Y] tasks, [Z] iterations (as you specified)"
-    - "📝 [TBD] placeholders used for: [list sections with [TBD]]"
-    - "💡 Refine [TBD] sections during brainstorming or use `/flow-plan-update`"
-    - "Use `/flow-status` to see current state"
-
-**Output**: Create `.flow/PLAN.md` file and confirm creation to user.
-```
-
----
-
+**Output**: Create multi-file Flow project structure and confirm to user.
 ## /flow-migrate
-
-<!-- MCP_METADATA
-function_name: flow_migrate
-category: planning_creation
-parameters:
-  - name: existing_file_path
-    type: str
-    required: false
-    default: ""
-    description: Path to existing plan file (auto-discovers if not provided)
-returns: dict[str, Any]
-plan_operations: [READ, WRITE]
-framework_reading_required: true
-framework_sections:
-  - Quick Reference (lines 1-544)
-  - Plan File Template (lines 2731-2928)
-MCP_METADATA_END -->
 
 **File**: `flow-migrate.md`
 
@@ -426,35 +363,41 @@ description: Migrate existing PRD/PLAN/TODO to Flow's .flow/PLAN.md format
 
 You are executing the `/flow-migrate` command from the Flow framework.
 
-**Purpose**: Migrate existing project documentation (PLAN.md, TODO.md, etc.) to Flow-compliant `.flow/PLAN.md` format.
+**Purpose**: Migrate existing project documentation (PLAN.md, TODO.md, etc.) to Flow's multi-file format (DASHBOARD.md, PLAN.md, phase-N/task-M.md files).
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
 
-- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-544 (Quick Reference section) - if not already in context from earlier in session, read it now
-- **Focus on**: Plan File Template pattern (lines 134-207), Task Structure Rules (lines 47-107), Status Markers (lines 28-46)
-- **Deep dive if needed**: Read lines 2731-2928 for complete Plan File Template using Read(offset=2731, limit=197)
+- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
+- **Focus on**: Multi-File Architecture, File Templates, Task Structure Rules, Status Markers
+- **Deep dive if needed**: Read lines 2101-2600 for File Templates using Read(offset=2101, limit=500)
 
-**Framework Reference**: This command requires framework knowledge to convert existing docs to Flow structure. See Quick Reference guide above for essential patterns.
+**Multi-File Architecture**: This command creates:
+- `DASHBOARD.md` - Progress tracking dashboard
+- `PLAN.md` - Static overview, architecture, testing
+- `phase-N/` directories
+- `phase-N/task-M.md` files for each task
+- `CHANGELOG.md` - Historical record
+- `BACKLOG.md` - Deferred tasks (if applicable)
 
-**IMPORTANT**: This command ALWAYS creates a fresh `.flow/PLAN.md`, overwriting any existing plan file. It reads your current documentation and converts it to Flow format.
+**Framework Reference**: This command requires framework knowledge to convert existing docs to Flow's multi-file structure. See Quick Reference guide above for essential patterns.
+
+**IMPORTANT**: This command ALWAYS creates fresh Flow files, overwriting any existing multi-file structure. It reads your current documentation and converts it to multi-file Flow format.
 
 **Instructions**:
 
-1. **Read the framework guide AND example plan** ⚠️ CRITICAL:
+1. **Read the framework guide AND examples** ⚠️ CRITICAL:
 
-   - **Search for DEVELOPMENT_FRAMEWORK.md** in these locations (in order):
-     - `.flow/DEVELOPMENT_FRAMEWORK.md`
-     - `.claude/DEVELOPMENT_FRAMEWORK.md`
-     - `./DEVELOPMENT_FRAMEWORK.md` (project root)
-     - `~/.claude/flow/DEVELOPMENT_FRAMEWORK.md` (global)
-   - **Search for EXAMPLE_PLAN.md** in same locations
-   - **Read BOTH files completely** to understand:
+   - **Read DEVELOPMENT_FRAMEWORK.md lines 1-353** (Quick Reference)
+   - **Read DEVELOPMENT_FRAMEWORK.md lines 2101-2600** (File Templates)
+   - **Read examples/** directory to see multi-file structure:
+     - `examples/DASHBOARD.md` - Dashboard format
+     - `examples/PLAN.md` - Static plan format
+     - `examples/phase-1/task-1.md` - Standalone task example
+     - `examples/phase-2/task-3.md` - Task with iterations example
+   - **Understand**:
+     - Multi-file hierarchy: DASHBOARD.md + PLAN.md + phase-N/task-M.md
      - Flow's hierarchy: PHASE → TASK → ITERATION → BRAINSTORM → IMPLEMENTATION
-     - Plan file template structure (DEVELOPMENT_FRAMEWORK.md lines 2731-2928)
-     - Real-world example structure (EXAMPLE_PLAN.md - all 509 lines)
-     - Required sections: Framework Guide header, Overview, Progress Dashboard, Architecture, Testing Strategy, Development Plan, Changelog
-     - Progress Dashboard format with iteration lists
-     - All status markers (✅ ⏳ 🚧 🎨 ❌ 🔮)
+     - All status markers (✅ ⏳ 🚧 🎨 ❌ 🔮 🎯)
 
 2. **Discover existing documentation**:
 
@@ -491,15 +434,35 @@ You are executing the `/flow-migrate` command from the Flow framework.
    - Copy source file: `[original].pre-flow-backup-$(date +%Y-%m-%d-%H%M%S)`
    - Confirm: "✅ Backed up [original] to [backup]"
 
-5. **Generate .flow/PLAN.md** based on detected structure (ALWAYS overwrites if exists):
+5. **Generate multi-file Flow structure** based on detected structure (ALWAYS overwrites if exists):
 
-   - Note: .flow/ directory already exists (created by flow.sh installation)
+   **Multi-File Generation Process**:
+   - Create `DASHBOARD.md` with progress tracking
+   - Create `PLAN.md` with overview, architecture, testing
+   - Create `phase-N/` directories for each phase
+   - Create `phase-N/task-M.md` files for each task
+   - Create `CHANGELOG.md` with historical entries
+   - Create `BACKLOG.md` if deferred items exist
 
    **Path A - STRUCTURED** (already has phases/tasks):
 
    - Keep existing hierarchy
-   - **CRITICAL**: Use EXAMPLE_PLAN.md as reference for all sections
-   - **Add framework reference header at top** (copy format from EXAMPLE_PLAN.md lines 1-11):
+   - **CRITICAL**: Use examples/ directory as reference for all files
+   - **Create DASHBOARD.md** (use examples/DASHBOARD.md as template):
+     - "📍 Current Work" section with current phase/task/iteration
+     - "📊 Progress Overview" with all phases and tasks
+     - "📈 Completion Status" with percentages
+   - **Create PLAN.md** (use examples/PLAN.md as template):
+     - Overview section with Purpose, Scope (V1/V2 split)
+     - Architecture section with system design
+     - Testing Strategy section
+     - Development Phases (high-level summary only, NOT detailed tasks)
+   - **Create phase-N/ directories** for each phase
+   - **Create task files** (use examples/phase-2/task-3.md as template):
+     - Task overview
+     - Iterations with brainstorming sessions
+     - Pre-implementation tasks (if applicable)
+     - Implementation sections
      ```markdown
      > **📖 Framework Guide**: See DEVELOPMENT_FRAMEWORK.md for complete methodology and patterns used in this plan
      >
@@ -592,14 +555,25 @@ You are executing the `/flow-migrate` command from the Flow framework.
 
 📂 Source: [original file path]
 💾 Backup: [backup file path]
-🎯 Output: .flow/PLAN.md
+🎯 Output: Multi-file Flow structure created
+
+**Files Created**:
+- DASHBOARD.md - Progress tracking dashboard
+- PLAN.md - Static overview and architecture
+- phase-1/ → phase-N/ - Phase directories
+- phase-N/task-M.md - Individual task files
+- CHANGELOG.md - Historical record
+- BACKLOG.md - Deferred tasks (if applicable)
 
 Migration type: [STRUCTURED/FLAT_LIST/UNSTRUCTURED]
-Changes: + Added Progress Dashboard with jump links + Enhanced [X] status markers + Preserved [Y] completed items + Preserved [Z] pending items + [other changes specific to migration type]
+Changes: + Created [X] phase directories + Created [Y] task files + Migrated [Z] iterations + Preserved all decisions and context
 
-Next steps: 1. Review: diff [backup] .flow/PLAN.md 2. Verify: /flow-status 3. Start using Flow: /flow-brainstorm_start [topic]
+Next steps:
+1. Review: /flow-status
+2. Verify structure: ls .flow/
+3. Start using Flow: /flow-brainstorm-start [topic]
 
-📂 Flow is now managing this project from .flow/ directory
+📂 Flow is now managing this project from .flow/ multi-file structure
 
 ```
 
@@ -609,24 +583,12 @@ Next steps: 1. Review: diff [backup] .flow/PLAN.md 2. Verify: /flow-status 3. St
  - If can't determine structure: Default to Path C (unstructured)
  - If migration fails: Keep backup safe, report error, suggest manual approach
 
-**Output**: Create `.flow/PLAN.md` from existing documentation, create backup, confirm migration to user.
+**Output**: Create multi-file Flow structure (DASHBOARD.md, PLAN.md, phase-N/task-M.md files) from existing documentation, create backup, confirm migration to user.
 ```
 
 ---
 
 ## /flow-plan-update
-
-<!-- MCP_METADATA
-function_name: flow_plan_update
-category: maintenance
-parameters: []
-returns: dict[str, Any]
-plan_operations: [READ, WRITE]
-framework_reading_required: true
-framework_sections:
-  - Quick Reference (lines 1-544)
-  - Plan File Template (lines 2731-2928)
-MCP_METADATA_END -->
 
 **File**: `flow-plan-update.md`
 
@@ -637,53 +599,66 @@ description: Update existing plan to match latest Flow framework structure
 
 You are executing the `/flow-plan-update` command from the Flow framework.
 
-**Purpose**: Update an existing `.flow/PLAN.md` to match the latest Flow framework structure and patterns.
+**Purpose**: Update an existing multi-file Flow structure to match the latest framework patterns.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
 
-- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-544 (Quick Reference section) - if not already in context from earlier in session, read it now
-- **Focus on**: Plan File Template (lines 272-353)
-- **Deep dive if needed**: Read lines 105-179 for Framework Structure using Read(offset=105, limit=75)
+- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
+- **Focus on**: Multi-File Architecture, File Templates
+- **Deep dive if needed**: Read lines 2101-2600 for File Templates using Read(offset=2101, limit=500)
 
-**IMPORTANT**: This command updates your current plan file to match framework changes (e.g., Progress Dashboard moved, new status markers, structural improvements).
+**Multi-File Architecture**: This command updates:
+- `DASHBOARD.md` - Ensures correct format and sections
+- `PLAN.md` - Ensures correct format and sections
+- `phase-N/task-M.md` files - Ensures correct format
+- Adds missing files (CHANGELOG.md, BACKLOG.md if needed)
+
+**IMPORTANT**: This command updates your current multi-file structure to match framework changes (e.g., new dashboard sections, status markers, structural improvements).
 
 **Instructions**:
 
 1. **Read the framework guide**:
+   - Read DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference)
+   - Read DEVELOPMENT_FRAMEWORK.md lines 2101-2600 (File Templates)
+   - Read examples/ directory for current format
 
-   - Search for DEVELOPMENT_FRAMEWORK.md in these locations (in order):
-     - `.flow/DEVELOPMENT_FRAMEWORK.md`
-     - `.claude/DEVELOPMENT_FRAMEWORK.md`
-     - `./DEVELOPMENT_FRAMEWORK.md` (project root)
-     - `~/.claude/flow/DEVELOPMENT_FRAMEWORK.md` (global)
-   - Understand current framework structure and patterns
-   - Study the Progress Dashboard template and its location
-   - Note all status markers and section structure requirements
+2. **Read current structure**:
+   - Read `DASHBOARD.md`
+   - Read `PLAN.md`
+   - List phase directories: `ls .flow/phase-*/`
+   - Sample task files: Read a few `phase-N/task-M.md` files
 
-2. **Read the example plan**:
+3. **Create backups**:
+   - Create `.flow/backup-$(date +%Y-%m-%d-%H%M%S)/` directory
+   - Copy all current files to backup directory
+   - Confirm: "✅ Backed up current structure to [backup]"
 
-   - Search for EXAMPLE_PLAN.md in these locations (in order):
-     - `.flow/EXAMPLE_PLAN.md`
-     - `.claude/EXAMPLE_PLAN.md`
-     - `~/.claude/flow/EXAMPLE_PLAN.md` (global)
-   - Study the section order and formatting
-   - Note how Progress Dashboard is positioned
-   - Understand the complete structure template
+4. **Update files to match current templates**:
 
-3. **Read current plan**:
+   **DASHBOARD.md**:
+   - Ensure "📍 Current Work" section exists and is current
+   - Ensure "📊 Progress Overview" section exists with all phases
+   - Ensure "📈 Completion Status" section exists with percentages
+   - Update "Last Updated" timestamp
 
-   - Read `.flow/PLAN.md` (your project's current plan)
-   - Analyze its current structure
-   - Identify what needs updating to match framework
+   **PLAN.md**:
+   - Ensure Overview section exists (Purpose, Scope with V1/V2 split)
+   - Ensure Architecture section exists
+   - Ensure Testing Strategy section exists
+   - Ensure Development Phases section exists (high-level only)
+   - NO detailed tasks in PLAN.md (those go in task files)
 
-4. **Create backup**:
+   **Task Files** (`phase-N/task-M.md`):
+   - Ensure each has Task Overview section
+   - Ensure each has Iterations section
+   - Ensure brainstorming sessions are properly formatted
+   - Ensure status markers are correct (✅ ⏳ 🚧 🎨 ❌ 🔮)
 
-   - Copy current plan: `.flow/PLAN.md.version-update-backup-$(date +%Y-%m-%d-%H%M%S)`
-   - Confirm: "✅ Backed up .flow/PLAN.md to [backup]"
+   **Missing Files**:
+   - Create CHANGELOG.md if missing
+   - Create BACKLOG.md if deferred tasks exist
 
-5. **Analyze current plan against framework checklist**:
-
-   **CRITICAL FRAMEWORK VERSION PATTERNS** (v1.2.1+):
+5. **Report changes**:
 
    Compare user's PLAN.md against these patterns and identify what needs updating:
 
@@ -833,158 +808,167 @@ You are executing the `/flow-plan-update` command from the Flow framework.
    - Verify all sections follow framework structure
    - Ensure no content was lost
 
-9. **Confirm to user**:
+6. **Confirm to user**:
 ```
 
-✨ Plan structure updated to match latest Flow framework!
+✨ Multi-file structure updated to match latest Flow framework!
 
-💾 Backup: .flow/PLAN.md.version-update-backup-[timestamp]
-🎯 Updated: .flow/PLAN.md
+💾 Backup: .flow/backup-[timestamp]/
+🎯 Updated: All Flow files
 
-Changes made: + Fixed [N] iterations with duplicated action items (replaced with references) + Moved Progress Dashboard to correct location (if needed) + Removed duplicate progress sections (if found) + Updated status pointers to use jump links (if needed) + Added jump links to "Current Work" section (if missing) + Expanded [Y] collapsed iteration lists + Standardized status markers + [other changes specific to this update]
+**Files Updated**:
+- DASHBOARD.md - Updated sections and format
+- PLAN.md - Updated sections and format
+- phase-N/task-M.md - Updated [X] task files
+- Created missing files (if applicable)
 
-Next steps: 1. Review changes: diff [backup] .flow/PLAN.md 2. Verify: /flow-status 3. Continue work: /flow-next
+Changes made:
++ Updated dashboard sections
++ Ensured all files match current templates
++ Standardized status markers
++ Fixed [N] formatting issues
++ Created [Y] missing files
+
+Next steps:
+1. Review changes: diff -r [backup] .flow/
+2. Verify: /flow-status
+3. Continue work: /flow-next
 
 All your content preserved - only structure enhanced.
 
 ```
 
-10. **Handle edge cases**:
-- If `.flow/PLAN.md` doesn't exist: Suggest `/flow-blueprint` or `/flow-migrate`
-- If plan already matches latest structure: Report "Already up to date!"
-- If can't determine what to update: Ask user what framework version they're coming from
+7. **Handle edge cases**:
+- If `.flow/DASHBOARD.md` doesn't exist: Suggest `/flow-blueprint` or `/flow-migrate`
+- If structure already matches latest: Report "Already up to date!"
+- If can't determine what to update: Ask user for clarification
 
-**Output**: Update `.flow/PLAN.md` to latest framework structure, create backup, confirm changes to user.
+**Output**: Update all Flow files to latest framework structure, create backup, confirm changes to user.
 ```
 
 ---
 
 ## /flow-phase-add
 
-<!-- MCP_METADATA
-function_name: flow_phase_add
-category: structure_addition
-parameters:
-  - name: phase_name
-    type: str
-    required: true
-    description: Name of the phase to add
-  - name: phase_description
-    type: str
-    required: false
-    default: ""
-    description: Optional description of the phase
-returns: dict[str, Any]
-plan_operations: [READ, WRITE]
-framework_reading_required: false
-MCP_METADATA_END -->
-
 **File**: `flow-phase-add.md`
 
 ```markdown
 ---
-description: Add a new phase to the development plan
+description: Add a new phase directory and update dashboard
 ---
 
 You are executing the `/flow-phase-add` command from the Flow framework.
 
-**Purpose**: Add a new phase to the current PLAN.md file.
+**Purpose**: Add a new phase to the project by creating a phase directory and updating DASHBOARD.md.
 
-**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+**🟢 NO FRAMEWORK READING REQUIRED - Simple structure creation**
 
-- Simple structure addition (adds new phase section to PLAN.md)
-- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 567-613 for phase patterns
-
-**Context**:
-
-- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
-- **Working File**: .flow/PLAN.md (current project)
-
-**🚨 SCOPE BOUNDARY RULE**:
-If you discover NEW issues while working on this phase that are NOT part of the current work:
-
-1. **STOP** immediately
-2. **NOTIFY** user of the new issue
-3. **DISCUSS** what to do (add to brainstorm, create pre-task, defer, or handle now)
-4. **ONLY** proceed with user's explicit approval
+**Multi-File Architecture**: This command:
+- Creates `phase-N/` directory
+- Updates `DASHBOARD.md` with new phase
+- Updates `PLAN.md` Development Phases section
 
 **Instructions**:
 
-1. **INPUT VALIDATION** (Token-Efficient - Run BEFORE reading PLAN.md) ⚠️ UX PRINCIPLE 1 & 2:
+1. **INPUT VALIDATION**:
 
-   **Goal**: Accept minimal input, use [TBD] for missing metadata - never block for cosmetic reasons.
-
-   **Step 1: Hard Rule Check** (< 10 tokens):
    ```
    IF $ARGUMENTS is empty OR just whitespace:
-     REJECT: "❌ Missing phase name/description. Example: /flow-phase-add 'Testing and QA'"
-     STOP (don't proceed)
+     REJECT: "❌ Missing phase name. Example: /flow-phase-add 'Testing and QA'"
+     STOP
    ```
 
-   **Step 2: Accept Everything Else** ⚠️ UX PRINCIPLE 2 (Never Block for Cosmetic Reasons):
-   - Even minimal input like "Testing" is OK
-   - Will use [TBD] for Strategy and Goal if not inferable
-   - Proceed to step 2
+   Accept even minimal input like "Testing" - will use [TBD] for missing metadata.
 
-2. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+2. **Find .flow/DASHBOARD.md**:
+   ```bash
+   Primary location: .flow/DASHBOARD.md
 
-3. **Verify framework understanding**: Know that phases are top-level milestones (e.g., "Foundation", "Core Implementation", "Testing")
+   If not found:
+     Suggest: "Run /flow-blueprint first to create project structure"
+   ```
 
-4. **Parse arguments and extract metadata**: `$ARGUMENTS` = phase description
+3. **Read DASHBOARD.md**:
+   - Count existing phases to determine next phase number
+   - Example: If "Phase 1" and "Phase 2" exist, new phase is "Phase 3"
 
-   **Extract Strategy and Goal** (if provided in $ARGUMENTS):
-   - Example: "Testing Phase | Strategy: Comprehensive QA | Goal: Zero critical bugs"
-   - If metadata provided, use it
-   - If NOT provided, try to infer from phase name:
-     - "Testing" → Strategy: "Quality assurance and validation", Goal: "Ensure code quality and stability"
-     - "Foundation" → Strategy: "Setup and architecture", Goal: "Establish project foundation"
-     - "Polish" → Strategy: "UX and optimization", Goal: "Production-ready quality"
-   - If can't infer (unusual phase name or too vague), use [TBD]:
-     - Strategy: "[TBD] - Define strategy during phase start"
-     - Goal: "[TBD] - Define goal during phase start"
+4. **Parse arguments and infer metadata**:
 
-5. **Add new phase section** ⚠️ UX PRINCIPLE 6 (Honest Communication):
+   From `$ARGUMENTS`, extract or infer:
+   - **Phase name**: Use $ARGUMENTS directly
+   - **Strategy**: Try to infer from name:
+     - "Foundation" → "Setup and establish core architecture"
+     - "Implementation" / "Core" → "Build main features and functionality"
+     - "Testing" / "QA" → "Comprehensive testing and quality assurance"
+     - "Polish" / "Enhancement" → "Refinement and optimization"
+     - Can't infer → "[TBD] - Define during phase start"
+   - **Goal**: Try to infer from name:
+     - "Foundation" → "Establish solid project foundation"
+     - "Implementation" → "Complete core feature set"
+     - "Testing" → "Ensure production-ready quality"
+     - Can't infer → "[TBD] - Define during phase start"
 
+5. **Create phase directory**:
+   ```bash
+   mkdir .flow/phase-N/
+
+   # Where N = next phase number (e.g., phase-3/)
+   ```
+
+6. **Update DASHBOARD.md**:
+
+   Add to "📊 Progress Overview" section:
    ```markdown
-   ### Phase [N]: [$ARGUMENTS] ⏳
+   ### Phase [N]: [Phase Name] ⏳ PENDING
 
-   **Strategy**: [Extracted/Inferred/[TBD]]
+   **Goal**: [Inferred or [TBD]]
+   **Status**: Not started
 
-   **Goal**: [Extracted/Inferred/[TBD]]
-
-   ---
+   (No tasks yet - use /flow-task-add to add tasks)
    ```
 
-6. **Update .flow/PLAN.md**: Append new phase to Development Plan section
+   Update "📈 Completion Status" section:
+   - Increment phase count
+   - Add phase to breakdown (0% complete initially)
 
-7. **Update Progress Dashboard** (if it exists):
+7. **Update PLAN.md**:
 
-   - Update phase count in Progress Overview section
-   - No need to change "Current Work" pointer (new phase is ⏳ PENDING)
-   - Add new phase to completion status if tracking percentages
+   Add to "Development Phases" section:
+   ```markdown
+   ### Phase [N]: [Phase Name] ⏳
 
-8. **Confirm to user** (show what was used):
-   - "✅ Added Phase [N]: [$ARGUMENTS]"
-   - IF used [TBD]: "📝 Used [TBD] placeholders for: [Strategy/Goal]"
-   - IF inferred metadata: "💡 Inferred: Strategy = '[value]', Goal = '[value]'"
-   - "💡 Refine with `/flow-phase-start` when ready to begin"
+   **Strategy**: [Inferred or [TBD]]
+   **Goal**: [Inferred or [TBD]]
 
-**Output**: Update .flow/PLAN.md with new phase.
+   **Tasks**: See [phase-N/](phase-N/) directory for detailed task files
+   ```
+
+8. **Update DASHBOARD.md timestamp**:
+   - Update "Last Updated" to current timestamp
+
+9. **Confirm to user**:
+   ```
+   "✅ Added Phase [N]: [Phase Name]
+
+   📂 Created: .flow/phase-N/ directory
+   📝 Updated: DASHBOARD.md, PLAN.md
+
+   [If used [TBD]:]
+   📝 Used [TBD] placeholders for: [Strategy/Goal]
+   💡 Refine these during phase start
+
+   🎯 Next Steps:
+   - Use `/flow-task-add "Task Name"` to add tasks to this phase
+   - Use `/flow-phase-start` when ready to begin work"
+   ```
+
+**Output**: Create phase-N/ directory and update DASHBOARD.md + PLAN.md with new phase.
 
 ```
 
 ---
 
 ## /flow-phase-start
-
-<!-- MCP_METADATA
-function_name: flow_phase_start
-category: state_management
-parameters: []
-returns: dict[str, Any]
-plan_operations: [READ, WRITE]
-framework_reading_required: false
-MCP_METADATA_END -->
 
 **File**: `flow-phase-start.md`
 
@@ -997,13 +981,13 @@ You are executing the `/flow-phase-start` command from the Flow framework.
 
 **Purpose**: Mark the current phase as 🚧 IN PROGRESS (when first task starts).
 
-**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from DASHBOARD.md**
 - State transition (⏳ PENDING → 🚧 IN PROGRESS)
 - Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 567-613 for lifecycle context
 
-**Context**:
-- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
-- **Working File**: .flow/PLAN.md (current project)
+**Multi-File Architecture**: This command:
+- Updates `DASHBOARD.md` phase status
+- No changes to PLAN.md or task files
 
 **🚨 SCOPE BOUNDARY RULE**:
 If you discover NEW issues while working on this phase that are NOT part of the current work:
@@ -1014,35 +998,47 @@ If you discover NEW issues while working on this phase that are NOT part of the 
 
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+1. **Read DASHBOARD.md**:
+   - Find "📊 Progress Overview" section
+   - Locate first ⏳ PENDING phase
 
-2. **Find current phase**: Look for last phase marked ⏳ PENDING
+2. **Update phase status in dashboard**:
+   - Change phase marker from ⏳ PENDING to 🚧 IN PROGRESS
+   - Example:
+     ```markdown
+     ### Phase 2: Core Implementation ⏳ PENDING
+     ```
+     Becomes:
+     ```markdown
+     ### Phase 2: Core Implementation 🚧 IN PROGRESS
+     ```
 
-3. **Update phase status**: Change marker from ⏳ to 🚧 IN PROGRESS
+3. **Update "📍 Current Work" section**:
+   - Set current phase to the phase just started
+   - Clear task/iteration (no current work yet)
+   ```markdown
+   ## 📍 Current Work
+   - **Phase**: [Phase 2 - Core Implementation](phase-2/)
+   - **Task**: None yet - use `/flow-task-add [name]` to create first task
+   ```
 
-4. **Update Progress Dashboard**:
-   - Find "## 📋 Progress Dashboard" section
-   - Update current phase information
-   - Update last updated timestamp
-   - Add action description: "Phase [N] started"
+4. **Update "Last Updated" timestamp** at top of dashboard
 
-5. **Confirm to user**: "Started Phase [N]: [Name]. Use `/flow-task-add [description]` to create tasks."
+5. **Confirm to user**:
+   ```
+   ✅ Started Phase [N]: [Name]
 
-**Output**: Update .flow/PLAN.md with phase status change and Progress Dashboard update.
+   Next steps:
+   - Use `/flow-task-add [name]` to create tasks in this phase
+   - Or use `/flow-blueprint` if you want to regenerate the plan structure
+   ```
+
+**Output**: Updated `DASHBOARD.md` with phase status change.
 ```
 
 ---
 
 ## /flow-phase-complete
-
-<!-- MCP_METADATA
-function_name: flow_phase_complete
-category: state_management
-parameters: []
-returns: dict[str, Any]
-plan_operations: [READ, WRITE]
-framework_reading_required: false
-MCP_METADATA_END -->
 
 **File**: `flow-phase-complete.md`
 
@@ -1055,194 +1051,226 @@ You are executing the `/flow-phase-complete` command from the Flow framework.
 
 **Purpose**: Mark the current phase as ✅ COMPLETE (when all tasks done).
 
-**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from DASHBOARD.md**
 
 - State transition (🚧 IN PROGRESS → ✅ COMPLETE)
 - Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 567-613 for completion criteria
 
-**Context**:
-
-- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
-- **Working File**: .flow/PLAN.md (current project)
+**Multi-File Architecture**: This command:
+- Updates `DASHBOARD.md` phase status
+- No changes to PLAN.md or task files
 
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+1. **Read DASHBOARD.md**:
+   - Find "📊 Progress Overview" section
+   - Locate current phase marked 🚧 IN PROGRESS
 
-2. **Find current phase**: Look for phase marked 🚧 IN PROGRESS
+2. **Verify all tasks complete** in dashboard:
+   - Check that all tasks in this phase are marked ✅ COMPLETE
+   - If incomplete tasks found:
+     ```
+     ❌ Cannot complete phase - incomplete tasks found:
+     - Task 3: API Integration (🚧 IN PROGRESS)
+     - Task 5: Webhook Handler (⏳ PENDING)
 
-3. **Verify all tasks complete**: Check that all tasks in this phase are marked ✅ COMPLETE
+     Complete all tasks first or mark them as ❌ CANCELLED / 🔮 DEFERRED.
+     ```
 
-   - If incomplete tasks found: "Phase has incomplete tasks. Complete them first or mark as ❌ CANCELLED / 🔮 DEFERRED."
+3. **Update phase status in dashboard**:
+   - Change phase marker from 🚧 IN PROGRESS to ✅ COMPLETE
+   - Example:
+     ```markdown
+     ### Phase 2: Core Implementation 🚧 IN PROGRESS
+     ```
+     Becomes:
+     ```markdown
+     ### Phase 2: Core Implementation ✅ COMPLETE
+     ```
 
-4. **Update phase status**: Change marker from 🚧 to ✅ COMPLETE
+4. **Update "📍 Current Work" section**:
+   - **If next phase exists**: Advance to next phase (⏳ PENDING)
+     ```markdown
+     ## 📍 Current Work
+     - **Phase**: [Phase 3 - Testing & Hardening](phase-3/) ⏳ PENDING
+     - **Task**: None yet - use `/flow-phase-start` to begin this phase
+     ```
+   - **If no next phase**: Mark project complete
+     ```markdown
+     ## 📍 Current Work
+     - **Status**: 🎉 All phases complete!
+     - **Next**: Consider archiving or planning V2
+     ```
 
-5. **Update Progress Dashboard**:
+5. **Update completion percentages**:
+   - Recalculate phase percentages
+   - Update "📈 Completion Status" section
+   - Update overall project percentage
 
-   - Find "## 📋 Progress Dashboard" section
-   - Update current phase to next phase (or mark project complete if no next phase)
-   - Update completion percentages
-   - Update last updated timestamp
-   - Add action description: "Phase [N] complete"
+6. **Update "Last Updated" timestamp** at top of dashboard
 
-6. **Check for next phase**:
+7. **Confirm to user**:
+   ```
+   ✅ Completed Phase [N]: [Name]
 
-   - If next phase exists: Auto-advance to next phase (show name)
-   - If no next phase: "All phases complete! Project finished."
-
-7. **Show "What's Next" Section**:
-   ```markdown
-   ## 🎯 What's Next
-
-   Phase [N]: [Name] marked complete!
-
-   **Decision Tree**:
-   - **Next phase exists?** → Use `/flow-phase-start [optional: number]` to begin next phase
-   - **All phases complete?** → Project finished! 🎉 Consider archiving or starting V2 planning
-   - **Want to review progress?** → Use `/flow-summarize` to see complete project overview
-
-   **Next phase**: Phase [N+1]: [Name] (if applicable)
+   **What's Next**:
+   - **Next phase exists?** → Use `/flow-phase-start` to begin Phase [N+1]: [Name]
+   - **All phases complete?** → Project finished! 🎉 Use `/flow-summarize` to review
    ```
 
-**Output**: Update .flow/PLAN.md with phase completion, Progress Dashboard update, and clear next-step guidance.
+**Output**: Updated `DASHBOARD.md` with phase completion and next steps.
 ```
 
 ---
 
 ## /flow-task-add
 
-<!-- MCP_METADATA
-function_name: flow_task_add
-category: structure_addition
-parameters:
-  - name: task_name
-    type: str
-    required: true
-    description: Name of the task to add
-  - name: task_description
-    type: str
-    required: false
-    default: ""
-    description: Optional description of the task
-  - name: task_purpose
-    type: str
-    required: false
-    default: ""
-    description: Optional purpose statement for the task
-returns: dict[str, Any]
-plan_operations: [READ, WRITE]
-framework_reading_required: true
-framework_sections:
-  - Task Structure Rules (lines 238-566)
-MCP_METADATA_END -->
-
 **File**: `flow-task-add.md`
 
 ```markdown
 ---
-description: Add a new task under the current phase
+description: Create a new task file in current phase directory
 ---
 
 You are executing the `/flow-task-add` command from the Flow framework.
 
-**Purpose**: Add a new task to the current phase in PLAN.md.
+**Purpose**: Create a new task file in the current phase directory and update DASHBOARD.md.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
 
-- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-544 (Quick Reference section) - if not already in context from earlier in session, read it now
-- **Focus on**: Task Structure Rules (lines 47-107) - Golden Rule: Standalone OR Iterations, Never Both
-- **Deep dive if needed**: Read lines 597-920 for complete Task Structure Rules using Read(offset=597, limit=323)
+- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-600 (Quick Reference) - if not already in context
+- **Focus on**: Task Structure Rules (lines 198-270) - Golden Rule: Standalone OR Iterations, Never Both
+- **Read task template**: Lines 2402-2550 for task file template
 
-**Framework Reference**: This command requires framework knowledge to create correct task structure. See Quick Reference guide above for essential patterns.
-
-**Context**:
-
-- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
-- **Working File**: .flow/PLAN.md (current project)
-
-**🚨 SCOPE BOUNDARY RULE**:
-If you discover NEW issues while working on this task that are NOT part of the current work:
-
-1. **STOP** immediately
-2. **NOTIFY** user of the new issue
-3. **DISCUSS** what to do (add to brainstorm, create pre-task, defer, or handle now)
-4. **ONLY** proceed with user's explicit approval
+**Multi-File Architecture**: This command:
+- Creates `phase-N/task-M.md` file
+- Updates `DASHBOARD.md` with new task
+- Optionally updates `PLAN.md` if phase description needs updating
 
 **Instructions**:
 
-1. **INPUT VALIDATION** (Token-Efficient - Run BEFORE reading PLAN.md) ⚠️ UX PRINCIPLE 1 & 2:
+1. **INPUT VALIDATION**:
 
-   **Goal**: Accept minimal input, use [TBD] for missing metadata - never block for cosmetic reasons.
-
-   **Step 1: Hard Rule Check** (< 10 tokens):
    ```
    IF $ARGUMENTS is empty OR just whitespace:
-     REJECT: "❌ Missing task name/description. Example: /flow-task-add 'User Authentication'"
-     STOP (don't proceed)
+     REJECT: "❌ Missing task name. Example: /flow-task-add 'User Authentication'"
+     STOP
    ```
 
-   **Step 2: Accept Everything Else** ⚠️ UX PRINCIPLE 2 (Never Block for Cosmetic Reasons):
-   - Even minimal input like "API Design" is OK
-   - Will use [TBD] for Purpose if not inferable
-   - Proceed to step 2
+   Accept minimal input - will use [TBD] for missing metadata.
 
-2. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+2. **Read DASHBOARD.md**:
+   - Find current phase from "📍 Current Work" section
+   - Count existing tasks in current phase to determine next task number
+   - Example: If phase-2/ has task-1.md and task-2.md, new task is task-3.md
 
-3. **Parse arguments and extract metadata**: `$ARGUMENTS` = task description
+3. **Parse arguments and infer metadata**:
 
-   **Extract Purpose** (if provided in $ARGUMENTS):
-   - Example: "User Authentication | Purpose: Implement secure login system"
-   - If metadata provided, use it
-   - If NOT provided, try to infer from task name:
-     - "User Authentication" → Purpose: "Implement user authentication system"
-     - "API Design" → Purpose: "Design and document API endpoints"
-     - "Testing Infrastructure" → Purpose: "Setup testing framework and utilities"
-   - If can't infer (unusual task name or too vague), use [TBD]:
-     - Purpose: "[TBD] - Define purpose during task start or brainstorming"
+   From `$ARGUMENTS`, extract or infer:
+   - **Task name**: Use $ARGUMENTS directly
+   - **Purpose**: Try to infer:
+     - "User Authentication" → "Implement user authentication system"
+     - "API Design" → "Design and document API endpoints"
+     - "Database Schema" → "Design and implement database schema"
+     - "Testing" → "Implement testing infrastructure"
+     - Can't infer → "[TBD] - Define during task start"
+   - **Task type**: Guess if standalone or with iterations:
+     - Simple/small tasks → Standalone (direct action items)
+     - Complex/large tasks → With iterations (needs brainstorming)
+     - Default to "With iterations" if uncertain
 
-4. **Find current phase**: Look for last phase marked ⏳ or 🚧
+4. **Create task file**:
 
-5. **Add new task section** ⚠️ UX PRINCIPLE 6 (Honest Communication):
+   Create `phase-N/task-M.md` using template from DEVELOPMENT_FRAMEWORK.md:
 
    ```markdown
-   #### Task [N]: [$ARGUMENTS] ⏳
+   # Task [M]: [Task Name]
 
-   **Status**: PENDING
-   **Purpose**: [Extracted/Inferred/[TBD]]
+   **Status**: ⏳ PENDING
+   **Phase**: [Phase N - Name](../DASHBOARD.md#phase-N-name)
+   **Purpose**: [Inferred or [TBD]]
 
    ---
+
+   ## Task Overview
+
+   [Brief description based on task name]
+
+   **Why This Task**: [TBD] - Define during task start or brainstorming
+
+   [If complex task - add Dependencies section:]
+   **Dependencies**:
+   - **Requires**: [TBD]
+   - **Blocks**: [TBD]
+
+   ---
+
+   [If standalone task:]
+   ## Action Items
+
+   - [ ] [TBD] - Define action items during task start
+
+   [If task with iterations:]
+   ## Iterations
+
+   ### ⏳ Iteration 1: [TBD]
+
+   **Goal**: [TBD] - Define during brainstorming
+
+   **Status**: ⏳ PENDING
+
+   ---
+
+   ## Task Notes
+
+   **Discoveries**: (To be filled during work)
+
+   **Decisions**: (To be filled during work)
+
+   **References**: (Add relevant code/docs here)
    ```
 
-6. **Update .flow/PLAN.md**: Append task under current phase
+5. **Update DASHBOARD.md**:
 
-7. **Update Progress Dashboard** (if it exists):
+   Add to current phase in "📊 Progress Overview" section:
+   ```markdown
+   - ⏳ **Task [M]**: [Task Name]
+   ```
 
-   - Update task count in Progress Overview
-   - Add new task to phase's task list
-   - No need to change "Current Work" pointer (new task is ⏳ PENDING)
+   Update "📈 Completion Status":
+   - Increment task count for current phase
+   - Update phase completion percentage
 
-8. **Confirm to user** (show what was used):
-   - "✅ Added Task [N]: [$ARGUMENTS] to current phase"
-   - IF used [TBD]: "📝 Used [TBD] placeholder for Purpose"
-   - IF inferred metadata: "💡 Inferred Purpose = '[value]'"
-   - "💡 Refine with `/flow-task-start` or `/flow-brainstorm-start` when ready"
+   Update "🎯 Next Actions" if this is the first task:
+   - "Use /flow-task-start to begin Task [M]"
 
-**Output**: Update .flow/PLAN.md with new task.
+6. **Update DASHBOARD.md timestamp**:
+   - Update "Last Updated" to current timestamp
+
+7. **Confirm to user**:
+   ```
+   "✅ Created Task [M]: [Task Name]
+
+   📂 Created: .flow/phase-N/task-M.md
+   📝 Updated: DASHBOARD.md
+
+   [If used [TBD]:]
+   📝 Used [TBD] placeholders for: [Purpose/Action Items/Iterations]
+   💡 Refine during task start or brainstorming
+
+   🎯 Next Steps:
+   - Use `/flow-task-start` to begin work on this task
+   - Use `/flow-iteration-add` to add more iterations (if needed)
+   - Use `/flow-brainstorm-start` when ready to design"
+   ```
+
+**Output**: Create phase-N/task-M.md file and update DASHBOARD.md.
 
 ```
 
 ---
 
 ## /flow-task-start
-
-<!-- MCP_METADATA
-function_name: flow_task_start
-category: state_management
-parameters: []
-returns: dict[str, Any]
-plan_operations: [READ, WRITE]
-framework_reading_required: false
-MCP_METADATA_END -->
 
 **File**: `flow-task-start.md`
 
@@ -1255,13 +1283,14 @@ You are executing the `/flow-task-start` command from the Flow framework.
 
 **Purpose**: Mark the current task as 🚧 IN PROGRESS (when first iteration starts).
 
-**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from DASHBOARD.md and task file**
 - State transition (⏳ PENDING → 🚧 IN PROGRESS)
 - Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 567-613 for lifecycle context
 
-**Context**:
-- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
-- **Working File**: .flow/PLAN.md (current project)
+**Multi-File Architecture**: This command:
+- Updates task status in `phase-N/task-M.md`
+- Updates `DASHBOARD.md` current work section
+- Auto-starts parent phase if needed
 
 **🚨 SCOPE BOUNDARY RULE**:
 If you discover NEW issues while working on this task that are NOT part of the current work:
@@ -1272,58 +1301,69 @@ If you discover NEW issues while working on this task that are NOT part of the c
 
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+1. **Read DASHBOARD.md**:
+   - Find "📊 Progress Overview" section
+   - Locate current phase (🚧 IN PROGRESS or ⏳ PENDING)
+   - Find next ⏳ PENDING task in that phase
 
-2. **Determine target task** (argument is optional):
+2. **Determine target task**:
+   - Use first ⏳ PENDING task in current phase
+   - Extract phase number N and task number M
 
-   **If task number provided as argument**:
-   - Use the specified task number
-   - Verify task exists and is ⏳ PENDING
-   - If not found or not PENDING: "Task [N] not found or not in PENDING state"
-
-   **If no argument provided** (auto-detection):
-   - Find current phase (marked 🚧 IN PROGRESS)
-   - Find last ✅ COMPLETE task in that phase
-   - Calculate next task number (last complete + 1)
-   - Verify next task exists and is ⏳ PENDING
-   - If not found: List available ⏳ PENDING tasks in current phase and ask user to specify
-   - Example error: "Cannot auto-detect next task. Available pending tasks in Phase 2: Task 5, Task 7, Task 9. Use `/flow-task-start [number]` to specify."
-
-3. **Update task status**: Change marker from ⏳ to 🚧 IN PROGRESS
+3. **Update task file** (`phase-N/task-M.md`):
+   - Change task status at top of file:
+     ```markdown
+     **Status**: ⏳ PENDING
+     ```
+     Becomes:
+     ```markdown
+     **Status**: 🚧 IN PROGRESS
+     ```
 
 4. **Update parent phase status** (if needed):
-   - Find the phase containing this task
-   - Check if phase status is ⏳ PENDING
-   - If yes: Change phase marker from ⏳ to 🚧 IN PROGRESS
+   - If phase is ⏳ PENDING: Change to 🚧 IN PROGRESS in DASHBOARD.md
    - If phase already 🚧 IN PROGRESS: Skip this step
-   - Update phase status in both the phase header AND Progress Dashboard
 
-5. **Update Progress Dashboard**:
-   - Find "## 📋 Progress Dashboard" section
-   - Update current task information
-   - Update last updated timestamp
-   - Add action description: "Task [N] started"
+5. **Update DASHBOARD.md**:
+
+   a. **Update "📍 Current Work" section**:
+      ```markdown
+      ## 📍 Current Work
+      - **Phase**: [Phase 2 - Core Implementation](phase-2/)
+      - **Task**: [Task 3 - API Integration](phase-2/task-3.md)
+      - **Iteration**: None yet - use `/flow-iteration-add` or `/flow-brainstorm-start`
+      ```
+
+   b. **Update task status in "📊 Progress Overview"**:
+      - Change task marker from ⏳ to 🚧
+      - Example:
+        ```markdown
+        - ⏳ **Task 3**: API Integration (0/4 iterations)
+        ```
+        Becomes:
+        ```markdown
+        - 🚧 **Task 3**: API Integration (0/4 iterations) ← CURRENT
+        ```
+
+   c. **Update "Last Updated" timestamp** at top
 
 6. **Confirm to user**:
-   - If argument provided: "✅ Started Task [N]: [Name]"
-   - If auto-detected: "✅ Started Task [N]: [Name] (auto-detected next task)"
-   - Suggest next steps: "Use `/flow-iteration-add [description]` to create iterations, or `/flow-brainstorm-start [topics]` to brainstorm first."
+   ```
+   ✅ Started Task [N]: [Name]
 
-**Output**: Update .flow/PLAN.md with task status change and Progress Dashboard update.
+   Next steps:
+   - Use `/flow-iteration-add [name]` to add iterations
+   - Or use `/flow-brainstorm-start [topics]` to plan this task
+   ```
+
+**Output**:
+- Updated `phase-N/task-M.md` status
+- Updated `DASHBOARD.md` current work and task status
 ```
 
 ---
 
 ## /flow-task-complete
-
-<!-- MCP_METADATA
-function_name: flow_task_complete
-category: state_management
-parameters: []
-returns: dict[str, Any]
-plan_operations: [READ, WRITE]
-framework_reading_required: false
-MCP_METADATA_END -->
 
 **File**: `flow-task-complete.md`
 
@@ -1336,82 +1376,96 @@ You are executing the `/flow-task-complete` command from the Flow framework.
 
 **Purpose**: Mark the current task as ✅ COMPLETE (when all iterations done).
 
-**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from DASHBOARD.md and task file**
 
 - State transition (🚧 IN PROGRESS → ✅ COMPLETE)
 - Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 567-613 for completion criteria
 
-**Context**:
-
-- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
-- **Working File**: .flow/PLAN.md (current project)
+**Multi-File Architecture**: This command:
+- Updates task status in `phase-N/task-M.md`
+- Updates `DASHBOARD.md` with completion and next work
 
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+1. **Read DASHBOARD.md**:
+   - Find "📍 Current Work" section
+   - Extract current task: Phase N, Task M
+   - Navigate to task file link
 
-2. **Find current task**: Look for task marked 🚧 IN PROGRESS
+2. **Read current task file** (`phase-N/task-M.md`):
+   - Verify all iterations marked ✅ COMPLETE
+   - If incomplete iterations found:
+     ```
+     ❌ Cannot complete task - incomplete iterations found:
+     - Iteration 2: Error Handling (🚧 IN PROGRESS)
+     - Iteration 3: Retry Logic (⏳ PENDING)
 
-3. **Verify all iterations complete**: Check that all iterations in this task are marked ✅ COMPLETE
+     Complete all iterations first or mark as ❌ CANCELLED / 🔮 DEFERRED.
+     ```
 
-   - If incomplete iterations found: "Task has incomplete iterations. Complete them first or mark as ❌ CANCELLED / 🔮 DEFERRED."
+3. **Update task file** (`phase-N/task-M.md`):
+   - Change task status at top:
+     ```markdown
+     **Status**: 🚧 IN PROGRESS
+     ```
+     Becomes:
+     ```markdown
+     **Status**: ✅ COMPLETE
+     ```
 
-4. **Update task status**: Change marker from 🚧 to ✅ COMPLETE
+4. **Update DASHBOARD.md**:
 
-5. **Update Progress Dashboard**:
+   a. **Update task status in "📊 Progress Overview"**:
+      - Change task marker from 🚧 to ✅
+      - Remove "← CURRENT" indicator
+      - Example:
+        ```markdown
+        - 🚧 **Task 3**: API Integration (4/4 iterations) ← CURRENT
+        ```
+        Becomes:
+        ```markdown
+        - ✅ **Task 3**: API Integration (4/4 iterations)
+        ```
 
-   - Find "## 📋 Progress Dashboard" section
-   - Update current task to next task (or next phase if all tasks done)
-   - Update completion percentages
-   - Update last updated timestamp
-   - Add action description: "Task [N] complete"
+   b. **Update "📍 Current Work" section**:
+      - **If more tasks in phase**: Advance to next task
+        ```markdown
+        ## 📍 Current Work
+        - **Phase**: [Phase 2 - Core Implementation](phase-2/)
+        - **Task**: [Task 4 - Webhook Handler](phase-2/task-4.md) ⏳ PENDING
+        - **Next**: Use `/flow-task-start` to begin this task
+        ```
+      - **If all tasks in phase complete**: Suggest phase completion
+        ```markdown
+        ## 📍 Current Work
+        - **Phase**: [Phase 2 - Core Implementation](phase-2/) - All tasks complete!
+        - **Next**: Use `/flow-phase-complete` to mark phase as done
+        ```
 
-6. **Check if phase complete**:
+   c. **Update completion percentages**:
+      - Recalculate phase percentage
+      - Recalculate overall percentage
+      - Update "📈 Completion Status" section
 
-   - If all tasks in phase are ✅ COMPLETE: Suggest `/flow-phase-complete`
-   - If more tasks: Auto-advance to next task (show name)
+   d. **Update "Last Updated" timestamp** at top
 
-7. **Show "What's Next" Section**:
-   ```markdown
-   ## 🎯 What's Next
+5. **Confirm to user**:
+   ```
+   ✅ Completed Task [N]: [Name]
 
-   Task [N]: [Name] marked complete!
-
-   **Decision Tree**:
-   - **All tasks in phase complete?** → Use `/flow-phase-complete` to mark phase as ✅ COMPLETE
-   - **More tasks in phase?** → Use `/flow-task-start [optional: number]` to begin next task
-   - **Want to see current state?** → Use `/flow-status` to see suggestions
-
-   **Next task**: Task [N+1]: [Name] (if applicable)
+   **What's Next**:
+   - **More tasks in phase?** → Use `/flow-task-start` to begin Task [N+1]: [Name]
+   - **All tasks complete?** → Use `/flow-phase-complete` to mark phase as done
    ```
 
-**Output**: Update .flow/PLAN.md with task completion, Progress Dashboard update, and clear next-step guidance.
+**Output**:
+- Updated `phase-N/task-M.md` status
+- Updated `DASHBOARD.md` with completion and next work
 ```
 
 ---
 
 ## /flow-iteration-add
-
-<!-- MCP_METADATA
-function_name: flow_iteration_add
-category: structure_addition
-parameters:
-  - name: iteration_name
-    type: str
-    required: true
-    description: Name/goal of the iteration to add
-  - name: iteration_description
-    type: str
-    required: false
-    default: ""
-    description: Optional description of the iteration
-returns: dict[str, Any]
-plan_operations: [READ, WRITE]
-framework_reading_required: true
-framework_sections:
-  - Quick Reference (lines 1-544)
-  - Task Structure Rules (lines 606-934)
-MCP_METADATA_END -->
 
 **File**: `flow-iteration-add.md`
 
@@ -1422,13 +1476,17 @@ description: Add a new iteration under the current task
 
 You are executing the `/flow-iteration-add` command from the Flow framework.
 
-**Purpose**: Add a new iteration to the current task in PLAN.md.
+**Purpose**: Add a new iteration to the current task file and update DASHBOARD.md.
+
+**Multi-File Architecture**: This command:
+- Adds iteration section to `phase-N/task-M.md` file
+- Updates `DASHBOARD.md` with new iteration
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
 
-- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-544 (Quick Reference section) - if not already in context from earlier in session, read it now
-- **Focus on**: Iteration Patterns (lines in Quick Reference)
-- **Deep dive if needed**: Read lines 567-613 for Development Workflow using Read(offset=567, limit=47)
+- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
+- **Focus on**: Iteration Patterns, Task Structure Rules
+- **Deep dive if needed**: Read lines 238-566 for Task Structure Rules using Read(offset=238, limit=329)
 
 **🚨 SCOPE BOUNDARY RULE**:
 If you discover NEW issues while working on this iteration that are NOT part of the current work:
@@ -1440,64 +1498,79 @@ If you discover NEW issues while working on this iteration that are NOT part of 
 
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+1. **Navigate from dashboard** (dashboard-first pattern):
+   - Read `DASHBOARD.md`
+   - Find current phase and task from "📍 Current Work" section
+   - Extract: Phase number N, Task number M
 
-2. **Parse arguments**: `$ARGUMENTS` = iteration description
+2. **Parse arguments**:
+   - `iteration_name` = Name/goal of iteration (required)
+   - `iteration_description` = Optional description
 
-3. **Find current task**: Look for last task marked ⏳ or 🚧
+3. **Read current task file**:
+   - Open `phase-N/task-M.md`
+   - Count existing iterations to determine next iteration number
+   - Find "## Iterations" section
 
-4. **Add new iteration section**:
+4. **Add new iteration section** to task file:
 
    ```markdown
-   ##### Iteration [N]: [$ARGUMENTS] ⏳
+   ### ⏳ Iteration [N]: [iteration_name]
 
-   **Status**: PENDING
-   **Goal**: [What this iteration builds]
+   **Goal**: [iteration_name expanded or iteration_description if provided]
+   **Status**: ⏳ PENDING
 
    ---
    ```
-```
 
-5. **Update .flow/PLAN.md**: Append iteration under current task
+   **Template Notes**:
+   - Place AFTER last iteration in "## Iterations" section
+   - Use `###` heading level (three hashes)
+   - Status always starts as ⏳ PENDING
+   - Infer goal from iteration_name if no description provided
 
-6. **Update Progress Dashboard** (if it exists):
+5. **Update DASHBOARD.md**:
 
-   **CRITICAL - Read Framework Reference for Iteration List Format**:
-   - **Read DEVELOPMENT_FRAMEWORK.md lines 2555-2567** for CRITICAL iteration list format
-   - The framework specifies EXACT format for showing iterations in Progress Dashboard
-   - Key rules from framework:
-     - Task line shows count: `- 🚧 **Task 11**: Name Generation (3/5 iterations)`
-     - Each iteration MUST be listed as indented sub-bullet with number, name, and status
-     - Update both task count AND overall iteration count
-   - **DO NOT** write "(X iterations total)" without actually listing them
-   - **ALWAYS** expand the task to show full iteration list when adding iterations
+   a. **Find current task entry** in "📊 Progress Overview" section
 
-7. **Confirm to user**: "Added Iteration [N]: [$ARGUMENTS] to current task. Use `/flow-brainstorm-start [topic]` to begin."
+   b. **Update task iteration count**:
+      - Change: `- 🚧 **Task 3**: API Integration (1/3 iterations)`
+      - To: `- 🚧 **Task 3**: API Integration (1/4 iterations)`
 
-**Output**: Update .flow/PLAN.md with new iteration.
+   c. **Add iteration to expanded list** (if task is expanded):
+      ```markdown
+      - 🚧 **Task 3**: API Integration (1/4 iterations) ← CURRENT
+        - ✅ Iteration 1: REST Client Setup
+        - 🚧 Iteration 2: Error Handling ← ACTIVE
+        - ⏳ Iteration 3: Retry Logic
+        - ⏳ Iteration 4: [NEW ITERATION NAME]
+      ```
+
+   d. **Update completion percentages**:
+      - Recalculate phase percentage: `(completed_iterations / total_iterations) * 100`
+      - Recalculate overall percentage
+      - Update "📈 Completion Status" section
+
+   e. **Update "Last Updated" timestamp** at top of dashboard
+
+6. **Confirm to user**:
+   ```
+   ✅ Added Iteration [N]: [iteration_name] to Task [M]: [Task Name]
+
+   Next steps:
+   - Use `/flow-brainstorm-start [topics]` to plan this iteration
+   - Or add more iterations with `/flow-iteration-add [name]`
+   ```
+
+**Output**:
+- Updated `phase-N/task-M.md` with new iteration section
+- Updated `DASHBOARD.md` with iteration count and percentages
 
 ```
 
 ---
 
 ## /flow-brainstorm-start
-
-<!-- MCP_METADATA
-function_name: flow_brainstorm_start
-category: brainstorming
-parameters:
-  - name: topics
-    type: str
-    required: false
-    default: ""
-    description: Topics to discuss (prompts if not provided)
-returns: dict[str, Any]
-plan_operations: [READ, WRITE]
-framework_reading_required: true
-framework_sections:
-  - Quick Reference (lines 1-544)
-  - Brainstorming Session Pattern (lines 1535-2165)
-MCP_METADATA_END -->
 
 **File**: `flow-brainstorm-start.md`
 
@@ -1511,18 +1584,18 @@ You are executing the `/flow-brainstorm-start` command from the Flow framework.
 **Purpose**: Begin a brainstorming session for the current iteration with subjects provided by the user.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
-- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-544 (Quick Reference section) - if not already in context from earlier in session, read it now
-- **Focus on**: Subject Resolution Types (lines 108-128), Common Patterns (lines 134-207)
-- **Deep dive if needed**: Read lines 1531-2156 for complete Brainstorming Pattern using Read(offset=1531, limit=625)
+- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
+- **Focus on**: Subject Resolution Types, Common Patterns
+- **Deep dive if needed**: Read lines 1167-1797 for complete Brainstorming Pattern using Read(offset=1167, limit=631)
 
 **Framework Reference**: This command requires framework knowledge to structure brainstorming session correctly. See Quick Reference guide above for essential patterns.
 
 **Signature**: `/flow-brainstorm-start [optional: free-form text describing topics to discuss]`
 
-**Context**:
-- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
-- **Working File**: .flow/PLAN.md (current project)
-- **Framework Pattern**: See "Brainstorming Session Pattern" section in framework guide
+**Multi-File Architecture**: This command:
+- Reads `DASHBOARD.md` to find current iteration
+- Updates brainstorming section in `phase-N/task-M.md`
+- Updates `DASHBOARD.md` with "🚧 BRAINSTORMING" status
 
 **🚨 SCOPE BOUNDARY RULE** (CRITICAL - see DEVELOPMENT_FRAMEWORK.md lines 339-540):
 
@@ -1543,14 +1616,19 @@ If you discover NEW issues during brainstorming that are NOT part of the current
 
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+1. **Read DASHBOARD.md**:
+   - Find "📍 Current Work" section
+   - Extract current iteration: Phase N, Task M, Iteration K
+   - Navigate to task file link
 
-2. **Find current iteration**: Look for last iteration marked ⏳ or 🚧
+2. **Read current task file** (`phase-N/task-M.md`):
+   - Find iteration K in "## Iterations" section
+   - Check status (should be ⏳ PENDING or 🚧 IN PROGRESS)
 
 3. **Determine mode** (two modes available):
 
    **MODE 1: With Argument** (user provides topics in command)
-   - User provided topics in `$ARGUMENTS` (free-form text)
+   - User provided topics in `topics` parameter (free-form text)
    - Parse the user's input and extract individual subjects
    - User controls WHAT to brainstorm, AI structures HOW
    - Example: `/flow-brainstorm-start "API design, database schema, auth flow, error handling"`
@@ -1559,14 +1637,14 @@ If you discover NEW issues during brainstorming that are NOT part of the current
 
    **MODE 2: Without Argument** (interactive) ⚠️ CRITICAL
    - **NO arguments provided** by user
-   - **DO NOT** auto-generate subjects from task description
-   - **DO NOT** read PLAN.md and invent subjects automatically
+   - **DO NOT** auto-generate subjects from iteration description
+   - **DO NOT** read task file and invent subjects automatically
    - **DO NOT** proceed to create brainstorming section yet
    - **STOP and ask the user**:
 
      Example prompt to user:
      ```
-     I'll start a brainstorming session for [Task/Iteration Name].
+     I'll start a brainstorming session for Iteration [K]: [Name].
 
      **What subjects would you like to discuss?**
 
@@ -1575,10 +1653,10 @@ If you discover NEW issues during brainstorming that are NOT part of the current
      - Free-form text describing areas to explore
      - Bullet list of specific topics
 
-     Based on the task scope, here are some suggestions:
-     - [Suggestion 1 based on task description]
-     - [Suggestion 2 based on task description]
-     - [Suggestion 3 based on task description]
+     Based on the iteration scope, here are some suggestions:
+     - [Suggestion 1 based on iteration goal]
+     - [Suggestion 2 based on iteration goal]
+     - [Suggestion 3 based on iteration goal]
 
      Please provide the topics you'd like to brainstorm.
      ```
@@ -1594,63 +1672,80 @@ If you discover NEW issues during brainstorming that are NOT part of the current
    - Handle 1 to 100+ topics gracefully
    - If ambiguous, ask user for clarification
 
-5. **Update iteration status**: Change to 🚧 IN PROGRESS (Brainstorming)
+5. **Update task file** (`phase-N/task-M.md`):
 
-6. **Create brainstorming section**:
-   ```markdown
-   ### **Brainstorming Session - [Brief description from user input]**
+   a. **Update iteration status** to 🚧 IN PROGRESS (if ⏳ PENDING):
+      ```markdown
+      ### ⏳ Iteration 2: Error Handling
+      ```
+      Becomes:
+      ```markdown
+      ### 🚧 Iteration 2: Error Handling
+      ```
 
-   **Focus**: [Summarize the main goal based on subjects]
+   b. **Create brainstorming section** in iteration:
+      ```markdown
+      #### Brainstorming Session - Error Handling Strategy
 
-   **Subjects to Discuss** (tackle one at a time):
+      **Focus**: Design comprehensive error handling for Stripe API integration
 
-   1. ⏳ **[Subject 1]** - [Brief description if needed]
-   2. ⏳ **[Subject 2]** - [Brief description if needed]
-   3. ⏳ **[Subject 3]** - [Brief description if needed]
+      **Subjects to Discuss** (tackle one at a time):
+
+      1. ⏳ **API Error Types** - What errors can Stripe return?
+      2. ⏳ **Error Mapping** - How to map Stripe errors to our domain?
+      3. ⏳ **Retry Strategy** - When to retry, exponential backoff?
+      4. ⏳ **User Experience** - How to communicate errors to users?
+
+      **Resolved Subjects**:
+
+      ---
+      ```
+
+6. **Update DASHBOARD.md**:
+
+   a. **Update "📍 Current Work" section**:
+      ```markdown
+      ## 📍 Current Work
+      - **Phase**: [Phase 2 - Core Implementation](phase-2/)
+      - **Task**: [Task 3 - API Integration](phase-2/task-3.md)
+      - **Iteration**: [Iteration 2 - Error Handling](phase-2/task-3.md#iteration-2-error-handling) 🚧 BRAINSTORMING
+      - **Focus**: Designing comprehensive error handling strategy
+      ```
+
+   b. **Update iteration status in "📊 Progress Overview"**:
+      - Change iteration marker to show 🚧 with "BRAINSTORMING" indicator
+
+   c. **Update "Last Updated" timestamp** at top
+
+7. **Confirm to user** (only after creating brainstorming section):
+   ```
+   ✅ Started brainstorming session with [N] subjects for Iteration [K]: [Name]
+
+   **Subjects**:
+   1. [Subject 1]
+   2. [Subject 2]
+   3. [Subject 3]
    ...
 
-   **Resolved Subjects**:
-
-   ---
-```
-
-7. **Update Progress Dashboard**: Update current iteration status to "🚧 BRAINSTORMING"
-
-8. **Confirm to user** (only after creating brainstorming section):
-   - "Started brainstorming session with [N] subjects."
-   - List all subjects
-   - "Use `/flow-next-subject` to start discussing the first subject."
+   Use `/flow-next-subject` to start discussing the first subject.
+   ```
 
 **Key Principles**:
 - ✅ **User always provides topics** (via argument or when prompted)
-- ❌ **AI NEVER invents subjects** from task description without user input
+- ❌ **AI NEVER invents subjects** from iteration description without user input
 - ❌ **AI NEVER auto-generates** a subject list when no argument provided
 - ✅ **If no argument**: STOP, suggest topics, WAIT for user response
 - ✅ **After user provides topics**: THEN create brainstorming section
 
-**Output**: Update .flow/PLAN.md with brainstorming section, subject list, and status change (ONLY after user provides topics).
+**Output**:
+- Updated `phase-N/task-M.md` with brainstorming section
+- Updated `DASHBOARD.md` with "🚧 BRAINSTORMING" status
 
 ```
 
 ---
 
 ## /flow-brainstorm-subject
-
-<!-- MCP_METADATA
-function_name: flow_brainstorm_subject
-category: brainstorming
-parameters:
-  - name: subject_text
-    type: str
-    required: true
-    description: Subject to add to discussion
-returns: dict[str, Any]
-plan_operations: [READ, WRITE]
-framework_reading_required: true
-framework_sections:
-  - Quick Reference (lines 1-544)
-  - Brainstorming Session Pattern (lines 1535-2165)
-MCP_METADATA_END -->
 
 **File**: `flow-brainstorm-subject.md`
 
@@ -1664,11 +1759,15 @@ You are executing the `/flow-brainstorm-subject` command from the Flow framework
 **Purpose**: Add a new subject to the current brainstorming session.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
-- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-544 (Quick Reference section) - if not already in context from earlier in session, read it now
+- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Subject Creation Patterns (lines in Quick Reference)
-- **Deep dive if needed**: Read lines 1215-1313 for Subject Resolution Types using Read(offset=1215, limit=99)
+- **Deep dive if needed**: Read lines 1167-1797 for Brainstorming Pattern using Read(offset=1167, limit=631)
 
-**🚨 SCOPE BOUNDARY RULE** (CRITICAL - see DEVELOPMENT_FRAMEWORK.md lines 339-540):
+**Multi-File Architecture**: This command:
+- Reads `DASHBOARD.md` to find current iteration
+- Updates "Subjects to Discuss" list in `phase-N/task-M.md`
+
+**🚨 SCOPE BOUNDARY RULE** (CRITICAL):
 
 Adding subjects dynamically is a KEY feature of Flow. When you discover NEW issues while discussing current subjects:
 
@@ -1681,42 +1780,40 @@ Adding subjects dynamically is a KEY feature of Flow. When you discover NEW issu
    - **D**: Defer to separate iteration (after current work)
 4. **AWAIT USER APPROVAL** - Never proceed without explicit user decision
 
-**Use the Scope Boundary Alert Template** (see DEVELOPMENT_FRAMEWORK.md lines 356-390)
-
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+1. **Read DASHBOARD.md**:
+   - Find "📍 Current Work" section
+   - Extract current iteration: Phase N, Task M, Iteration K
 
-2. **Parse arguments**: `$ARGUMENTS` = subject name and optional brief description
+2. **Parse arguments**: `subject_text` = subject name and optional brief description
 
-3. **Find current brainstorming session**: Look for "Subjects to Discuss" section
+3. **Read current task file** (`phase-N/task-M.md`):
+   - Find current iteration's brainstorming session
+   - Locate "Subjects to Discuss" section
 
-4. **Add subject to list**:
+4. **Add subject to list** in task file:
    - Count existing subjects
-   - Append: `[N]. ⏳ **[$ARGUMENTS]** - [Brief description if provided]`
+   - Append new subject:
+     ```markdown
+     5. ⏳ **[Subject Text]** - [Brief description if provided]
+     ```
 
-5. **Update .flow/PLAN.md**: Add subject to "Subjects to Discuss" list
+5. **Update task file**: Save changes to `phase-N/task-M.md`
 
-6. **Confirm to user**: "Added Subject [N]: [$ARGUMENTS] to brainstorming session."
+6. **Confirm to user**:
+   ```
+   ✅ Added Subject [N]: [Subject Text] to brainstorming session
 
-**Output**: Update .flow/PLAN.md with new subject.
+   Use `/flow-next-subject` to discuss subjects in order.
+   ```
+
+**Output**: Updated `phase-N/task-M.md` with new subject in "Subjects to Discuss" list.
 ```
 
 ---
 
 ## /flow-brainstorm-review
-
-<!-- MCP_METADATA
-function_name: flow_brainstorm_review
-category: brainstorming
-parameters: []
-returns: dict[str, Any]
-plan_operations: [READ]
-framework_reading_required: true
-framework_sections:
-  - Quick Reference (lines 1-544)
-  - Brainstorming Session Pattern (lines 1535-2165)
-MCP_METADATA_END -->
 
 **File**: `flow-brainstorm-review.md`
 
@@ -1731,28 +1828,36 @@ You are executing the `/flow-brainstorm-review` command from the Flow framework.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
 
-- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-544 (Quick Reference section) - if not already in context from earlier in session, read it now
+- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Subject Resolution Types (A/B/C/D) (lines in Quick Reference)
 - **Deep dive if needed**: Read lines 1167-1797 for Brainstorming Session Pattern using Read(offset=1167, limit=631)
+
+**Multi-File Architecture**: This command:
+- Reads `DASHBOARD.md` to find current iteration
+- Reads brainstorming session from `phase-N/task-M.md`
+- Reviews all resolved subjects and suggests next steps
+- **READ-ONLY** - No file changes (user confirms before completing)
 
 **This is the review gate before `/flow-brainstorm-complete`.**
 
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+1. **Read DASHBOARD.md**:
+   - Find "📍 Current Work" section
+   - Extract current iteration: Phase N, Task M, Iteration K
 
-2. **Read framework documentation**: Find and read DEVELOPMENT_FRAMEWORK.md (search in .claude/, project root, or ~/.claude/flow/)
+2. **Read current task file** (`phase-N/task-M.md`):
+   - Find iteration K's brainstorming session
+   - Read all "Subjects to Discuss" and "Resolved Subjects"
 
-3. **Locate current iteration**: Use "Progress Dashboard" to find current Phase/Task/Iteration
+3. **Verify all subjects resolved**:
 
-4. **Verify all subjects resolved**:
-
-   - Check "Subjects to Discuss" section under current iteration's "Brainstorming Session"
+   - Check "Subjects to Discuss" section in task file
    - Count total subjects vs ✅ resolved subjects
    - If ANY subjects remain unmarked (⏳ PENDING), warn user: "Not all subjects resolved. Run `/flow-next-subject` to complete remaining subjects."
    - If all subjects are ✅ resolved, proceed to next step
 
-5. **Summarize resolved subjects**:
+4. **Summarize resolved subjects**:
 
    - Read all entries in "Resolved Subjects" section
    - Create concise summary of each resolution:
@@ -1761,7 +1866,7 @@ You are executing the `/flow-brainstorm-review` command from the Flow framework.
      - Key rationale points
    - Present in numbered list format
 
-6. **Show all action items**:
+5. **Show all action items**:
 
    - Extract all documented action items from resolved subjects
    - Categorize by type:
@@ -1771,7 +1876,7 @@ You are executing the `/flow-brainstorm-review` command from the Flow framework.
      - **Other Actions**: Miscellaneous tasks
    - Present in organized format
 
-7. **Categorize action items** (CRITICAL - Ask user to clarify):
+6. **Categorize action items** (CRITICAL - Ask user to clarify):
 
    **The 3 Types of Action Items**:
 
@@ -1818,7 +1923,7 @@ You are executing the `/flow-brainstorm-review` command from the Flow framework.
      - Iteration N+1: [Name] - [Why it's future work]
      ```
 
-8. **Consolidate action items into iteration** (if Type 2 items exist):
+7. **Consolidate action items into iteration** (if Type 2 items exist):
 
    After user confirms categorization:
 
@@ -1844,15 +1949,15 @@ You are executing the `/flow-brainstorm-review` command from the Flow framework.
      - Iteration should reference pre-tasks or state "See pre-implementation tasks below"
      - No action items consolidation needed
 
-9. **Await user confirmation**:
+8. **Await user confirmation**:
    - Do NOT automatically create iterations or pre-tasks
    - Show categorization above
    - Ask: "Does this categorization look correct? Should I adjust anything?"
    - If user confirms Type 1 (pre-tasks) exist: Ask if they want them created now
    - If user confirms Type 3 (new iterations): Ask if they want them created now
-   - After confirmation: Ask about action items consolidation (step 8)
+   - After confirmation: Ask about action items consolidation (step 7)
 
-10. **Show "What's Next" Section**:
+9. **Show "What's Next" Section**:
    ```markdown
    ## 🎯 What's Next
 
@@ -1867,24 +1972,15 @@ You are executing the `/flow-brainstorm-review` command from the Flow framework.
    - Need more iterations? → Use `/flow-iteration-add [description]` first
    ```
 
-**Output**: Comprehensive review summary with actionable suggestions, awaiting user confirmation.
+**Output**:
+- **READ-ONLY** - No files modified
+- Comprehensive review summary with actionable suggestions, awaiting user confirmation
+- User must confirm before proceeding to `/flow-brainstorm-complete`
 ```
 
 ---
 
 ## /flow-brainstorm-complete
-
-<!-- MCP_METADATA
-function_name: flow_brainstorm_complete
-category: brainstorming
-parameters: []
-returns: dict[str, Any]
-plan_operations: [READ, WRITE]
-framework_reading_required: true
-framework_sections:
-  - Quick Reference (lines 1-544)
-  - Brainstorming Session Pattern (lines 1535-2165)
-MCP_METADATA_END -->
 
 **File**: `flow-brainstorm-complete.md`
 
@@ -1899,81 +1995,111 @@ You are executing the `/flow-brainstorm-complete` command from the Flow framewor
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
 
-- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-544 (Quick Reference section) - if not already in context from earlier in session, read it now
+- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
 - **Focus on**: Completion Criteria (lines in Quick Reference)
-- **Deep dive if needed**: Read lines 1740-1797 for Completion Criteria using Read(offset=1740, limit=58)
+- **Deep dive if needed**: Read lines 1167-1797 for Brainstorming Pattern using Read(offset=1167, limit=631)
 
-**IMPORTANT**: Pre-implementation tasks should be documented IN PLAN.md during brainstorming, then completed BEFORE running this command.
+**Multi-File Architecture**: This command:
+- Reads `DASHBOARD.md` to find current iteration
+- Updates iteration status to 🎨 READY in `phase-N/task-M.md`
+- Updates `DASHBOARD.md` with "🎨 READY FOR IMPLEMENTATION" status
+
+**IMPORTANT**: Pre-implementation tasks should be documented in task file during brainstorming, then completed BEFORE running this command.
 
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+1. **Read DASHBOARD.md**:
+   - Find "📍 Current Work" section
+   - Extract current iteration: Phase N, Task M, Iteration K
 
-2. **Verify all subjects resolved**: Check "Subjects to Discuss" - all should be ✅
+2. **Read current task file** (`phase-N/task-M.md`):
+   - Find iteration K
+   - Verify all subjects in "Subjects to Discuss" are ✅ resolved
 
-3. **Check for pre-implementation tasks**:
+3. **Check for pre-implementation tasks** in task file:
 
-   - Look for "### **Pre-Implementation Tasks:**" section in PLAN.md
+   - Look for "#### Pre-Implementation Tasks" section in iteration
    - If found:
      - Check if all pre-tasks are marked ✅ COMPLETE
      - If any are ⏳ PENDING or 🚧 IN PROGRESS:
-       "Pre-implementation tasks exist but are not complete. Complete them first, then run this command again."
+       ```
+       ❌ Pre-implementation tasks exist but are not complete:
+       - [Task 1]: ⏳ PENDING
+       - [Task 2]: 🚧 IN PROGRESS
+
+       Complete them first, then run this command again.
+       ```
      - If all are ✅ COMPLETE: Proceed to step 4
-   - If not found:
-     - Ask user: "Are there any pre-implementation tasks that need to be completed before starting the main implementation? (Refactoring, system-wide changes, bug fixes discovered during brainstorming, etc.)"
-     - If yes: "Please document pre-implementation tasks in PLAN.md first (see framework guide), complete them, then run this command again."
-     - If no: Proceed to step 4
+   - If not found: Proceed to step 4
 
 4. **Verify iteration has up-to-date action items**:
 
-   - Read the current iteration's **Action Items** section
-   - Check if action items reference the brainstorming session:
+   - Read the iteration's goal or action items
+   - Check if they reference the brainstorming session:
      - ✅ **Good patterns**:
-       - "**Action Items**: See brainstorming session above - all action items documented in resolved subjects."
-       - "**Action Items**: See resolved subjects above (Type 2 items)"
-       - Has **Implementation Summary** with high-level checkboxes referencing subjects
+       - References brainstorming subjects
+       - Has action items from Type D resolutions
      - ❌ **Outdated patterns**:
-       - Old action items from before brainstorming session
-       - No reference to brainstorming subjects
-       - Detailed action items duplicated (not in subjects)
+       - No reference to brainstorming
+       - Action items don't match resolved subjects
 
    - **If action items are outdated**:
-     - Warn user: "The iteration's action items don't reference the brainstorming session. Should I update them to match the brainstorming subjects? (This will replace old action items with a summary + reference to resolved subjects)"
-     - **If YES**: Update iteration's action items using pattern from `/flow-brainstorm-review` step 8
-     - **If NO**: Ask user to manually update before proceeding, or confirm they want to proceed anyway
+     - Warn user: "The iteration's action items don't reference the brainstorming session. Should I update them to match the brainstorming subjects?"
+     - Wait for user confirmation
 
    - **If action items are up-to-date**: Proceed to step 5
 
-5. **Update iteration status**: Change from 🚧 to 🎨 READY FOR IMPLEMENTATION
+5. **Update task file** (`phase-N/task-M.md`):
 
-6. **Add note**: "**Status**: All brainstorming complete, pre-implementation tasks done, ready for implementation"
+   a. **Update iteration status** from 🚧 to 🎨:
+      ```markdown
+      ### 🚧 Iteration 2: Error Handling
+      ```
+      Becomes:
+      ```markdown
+      ### 🎨 Iteration 2: Error Handling
+      ```
 
-7. **Show "What's Next" Section**:
-   ```markdown
-   ## 🎯 What's Next
+   b. **Add completion note** after brainstorming session:
+      ```markdown
+      **Brainstorming Status**: ✅ COMPLETE
+      **Pre-Implementation Tasks**: ✅ COMPLETE (if applicable)
+      **Ready for**: `/flow-implement-start`
+      ```
 
-   Brainstorming session complete! Iteration marked 🎨 READY FOR IMPLEMENTATION.
+6. **Update DASHBOARD.md**:
 
-   **REQUIRED NEXT STEP**: Use `/flow-implement-start` to begin implementation.
+   a. **Update "📍 Current Work" section**:
+      ```markdown
+      ## 📍 Current Work
+      - **Phase**: [Phase 2 - Core Implementation](phase-2/)
+      - **Task**: [Task 3 - API Integration](phase-2/task-3.md)
+      - **Iteration**: [Iteration 2 - Error Handling](phase-2/task-3.md#iteration-2-error-handling) 🎨 READY FOR IMPLEMENTATION
+      - **Next**: Use `/flow-implement-start` to begin implementation
+      ```
 
-   **Before implementing**: Review your action items and ensure you understand the scope. If you discover new issues during implementation (scope violations), STOP and discuss with the user before proceeding.
+   b. **Update iteration status in "📊 Progress Overview"**:
+      - Change iteration marker to show 🎨 READY
+
+   c. **Update "Last Updated" timestamp** at top
+
+7. **Confirm to user**:
+   ```
+   ✅ Brainstorming session complete! Iteration [K]: [Name] marked 🎨 READY FOR IMPLEMENTATION
+
+   **Next Step**: Use `/flow-implement-start` to begin implementation
+
+   **Reminder**: If you discover new issues during implementation (scope violations), STOP and discuss with the user before proceeding.
    ```
 
-**Output**: Update .flow/PLAN.md with brainstorming completion status and clear next-step guidance.
+**Output**:
+- Updated `phase-N/task-M.md` with 🎨 READY status
+- Updated `DASHBOARD.md` with "🎨 READY FOR IMPLEMENTATION"
 ```
 
 ---
 
 ## /flow-implement-start
-
-<!-- MCP_METADATA
-function_name: flow_implement_start
-category: state_management
-parameters: []
-returns: dict[str, Any]
-plan_operations: [READ, WRITE]
-framework_reading_required: false
-MCP_METADATA_END -->
 
 **File**: `flow-implement-start.md`
 
@@ -1986,16 +2112,15 @@ You are executing the `/flow-implement-start` command from the Flow framework.
 
 **Purpose**: Begin implementation phase for the current iteration.
 
-**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+**🟢 NO FRAMEWORK READING REQUIRED - This command works from DASHBOARD.md and task file**
 
 - State transition (🎨 READY/⏳ PENDING → 🚧 IMPLEMENTING)
 - Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 1798-1836 for implementation workflow
 
-**Context**:
-
-- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
-- **Working File**: .flow/PLAN.md (current project)
-- **Framework Pattern**: See "Implementation Pattern" section in framework guide
+**Multi-File Architecture**: This command:
+- Reads `DASHBOARD.md` to find current work
+- Updates iteration status in `phase-N/task-M.md`
+- Updates `DASHBOARD.md` current work section
 - **Prerequisite**: Brainstorming must be ✅ COMPLETE and all pre-implementation tasks done
 
 **🚨 SCOPE BOUNDARY RULE** (CRITICAL - see DEVELOPMENT_FRAMEWORK.md lines 339-540):
@@ -2017,90 +2142,103 @@ If you discover NEW issues during implementation that are NOT part of the curren
 
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+1. **Read DASHBOARD.md**:
+   - Find "📍 Current Work" section
+   - Extract current task: Phase N, Task M, Iteration K
+   - Navigate to task file link
 
-2. **Find current iteration**:
+2. **Read current task file** (`phase-N/task-M.md`):
+   - Find iteration K in "## Iterations" section
+   - Check iteration status (should be 🎨 READY or ⏳ PENDING)
 
-   - **First**, look for iteration marked 🎨 READY FOR IMPLEMENTATION
-   - **If not found**, check if previous iteration is ✅ COMPLETE and next iteration is ⏳ PENDING
-     - If YES: Ask user "Previous iteration complete. Do you want to brainstorm this iteration first (recommended) or skip directly to implementation?"
-       - **User chooses brainstorm**: Respond "Please run `/flow-brainstorm-start` first to design this iteration"
-       - **User chooses skip**: Proceed with step 3 (treat ⏳ PENDING as ready to implement)
-     - If NO: Error "No iteration ready for implementation. Run `/flow-brainstorm-complete` first or check iteration status."
-
-3. **Read Testing Strategy section** (CRITICAL):
-
-   - Locate "## Testing Strategy" section in PLAN.md
-   - Understand the verification methodology (simulation, unit tests, TDD, manual QA, etc.)
-   - Note file locations, naming conventions, and when verification happens
-   - **IMPORTANT**: Follow Testing Strategy exactly - do NOT create test files that violate conventions
+3. **Read Testing Strategy** (CRITICAL):
+   - Read `PLAN.md` "## Testing Strategy" section
+   - Understand verification methodology (simulation, unit tests, TDD, manual QA)
+   - Note file locations, naming conventions
+   - **IMPORTANT**: Follow Testing Strategy exactly - do NOT violate conventions
 
 4. **Verify readiness** (if iteration was 🎨 READY):
-
    - Brainstorming should be marked ✅ COMPLETE
    - All pre-implementation tasks should be ✅ COMPLETE
    - If not ready: Warn user and ask to complete brainstorming/pre-tasks first
 
-5. **Update iteration status**: Change from 🎨 (or ⏳ if skipping brainstorm) to 🚧 IN PROGRESS
+5. **Handle ⏳ PENDING iterations** (no brainstorming yet):
+   - Ask user: "Previous iteration complete. Do you want to brainstorm this iteration first (recommended) or skip directly to implementation?"
+     - **User chooses brainstorm**: "Please run `/flow-brainstorm-start` first"
+     - **User chooses skip**: Proceed with implementation
 
-6. **Update parent task status** (if needed):
-   - Find the task containing this iteration
-   - Check if task status is ⏳ PENDING
-   - If yes: Change task marker from ⏳ to 🚧 IN PROGRESS
-   - If task already 🚧 IN PROGRESS: Skip this step
-   - Update task status in both the task header AND Progress Dashboard
+6. **Update task file** (`phase-N/task-M.md`):
 
-7. **Create implementation section**:
+   a. **Update iteration status** from 🎨/⏳ to 🚧 IN PROGRESS:
+      ```markdown
+      ### 🎨 Iteration 2: Error Handling
+      ```
+      Becomes:
+      ```markdown
+      ### 🚧 Iteration 2: Error Handling
+      ```
 
-   ```markdown
-   ### **Implementation - Iteration [N]: [Name]**
+   b. **Create implementation section** in task file:
+      ```markdown
+      #### Implementation - Iteration 2: Error Handling
 
-   **Status**: 🚧 IN PROGRESS
+      **Status**: 🚧 IN PROGRESS (2025-01-15)
 
-   **Action Items**: See resolved subjects above (Type 2/D items)
+      **Action Items**: See resolved subjects above (Type D items)
 
-   **Implementation Notes**:
+      **Implementation Notes**:
+      [Leave blank - filled during work]
 
-   [Leave blank for user to fill during implementation]
+      **Files Modified**:
+      [Leave blank - filled as work progresses]
 
-   **Files Modified**:
+      **Verification**: [Leave blank - how work verified]
 
-   [Leave blank - will be filled as work progresses]
+      ---
+      ```
 
-   **Verification**: [Leave blank - how work will be verified]
+   **IMPORTANT**: Implementation section REFERENCES subjects (don't duplicate action items)
 
-   ---
-   ```
+7. **Update parent task status** (if needed):
+   - If task is ⏳ PENDING: Change to 🚧 IN PROGRESS in task file AND DASHBOARD.md
+   - If task already 🚧: Skip
 
-   **IMPORTANT**: Do NOT copy/duplicate action items from subjects to implementation section. The implementation section REFERENCES subjects where action items are defined. This prevents token waste and maintains single source of truth.
-```
+8. **Update DASHBOARD.md**:
 
-8. **Update Progress Dashboard** (if it exists):
+   a. **Update "📍 Current Work" section**:
+      ```markdown
+      ## 📍 Current Work
+      - **Phase**: [Phase 2 - Core Implementation](phase-2/)
+      - **Task**: [Task 3 - API Integration](phase-2/task-3.md)
+      - **Iteration**: [Iteration 2 - Error Handling](phase-2/task-3.md#iteration-2-error-handling) 🚧 IMPLEMENTING
+      - **Focus**: Implementing comprehensive error handling with retry logic
+      ```
 
-   - Update current iteration status to "🚧 IMPLEMENTING" or "🚧 IN PROGRESS"
-   - Update "Last Updated" timestamp
-   - Current work pointer should already be correct (pointing to this iteration)
+   b. **Update iteration status in "📊 Progress Overview"**:
+      - Change iteration marker from 🎨/⏳ to 🚧
+      - Add "← ACTIVE" indicator
+
+   c. **Update "Last Updated" timestamp** at top
 
 9. **Confirm to user**:
-   - If brainstorming was done: "Implementation started! Let's begin with the first action item."
-   - If brainstorming was skipped: "Implementation started (brainstorming skipped). Let's begin with the first action item."
+   ```
+   ✅ Started implementation of Iteration [K]: [Name]
 
-**Output**: Update .flow/PLAN.md with implementation section, status change, and Dashboard update.
+   Action items from brainstorming subjects:
+   - [List Type D action items from resolved subjects]
+
+   Follow Testing Strategy in PLAN.md for verification.
+   ```
+
+**Output**:
+- Updated `phase-N/task-M.md` with implementation section
+- Updated `DASHBOARD.md` current work
 
 ```
 
 ---
 
 ## /flow-implement-complete
-
-<!-- MCP_METADATA
-function_name: flow_implement_complete
-category: state_management
-parameters: []
-returns: dict[str, Any]
-plan_operations: [READ, WRITE]
-framework_reading_required: false
-MCP_METADATA_END -->
 
 **File**: `flow-implement-complete.md`
 
@@ -2113,76 +2251,125 @@ You are executing the `/flow-implement-complete` command from the Flow framework
 
 **Purpose**: Mark the current iteration as complete.
 
-**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+**🟢 NO FRAMEWORK READING REQUIRED - This command works from DASHBOARD.md and task file**
 - State transition (🚧 IMPLEMENTING → ✅ COMPLETE)
 - Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 1798-1836 for completion criteria
 
+**Multi-File Architecture**: This command:
+- Updates iteration status in `phase-N/task-M.md`
+- Updates `DASHBOARD.md` completion percentages
+- Advances to next iteration or suggests task completion
+
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+1. **Read DASHBOARD.md**:
+   - Find "📍 Current Work" section
+   - Extract current iteration: Phase N, Task M, Iteration K
+   - Navigate to task file link
 
-2. **Find current iteration**: Look for iteration marked 🚧 IN PROGRESS
+2. **Read current task file** (`phase-N/task-M.md`):
+   - Find iteration K in "## Iterations" section
+   - Verify iteration marked 🚧 IN PROGRESS
 
 3. **Verify completion**:
-   - Check all action items are ✅ checked
-   - If unchecked items remain: Ask user "There are unchecked action items. Are you sure you want to mark complete? (yes/no)"
+   - Check brainstorming action items (if brainstorming was done)
+   - If unchecked items remain: Ask "There are unchecked action items. Are you sure you want to mark complete?"
 
 4. **Check for existing verification information**:
-   - Read Implementation Notes section - check if verification details already documented
-   - Review recent conversation context (last 5-10 messages) - look for testing/verification discussion
-   - If verification info found in EITHER location: Skip to step 6 (don't ask redundant questions)
+   - Read Implementation Notes section in task file
+   - Review recent conversation (last 5-10 messages) for testing/verification discussion
+   - If verification info found: Skip to step 6 (don't ask redundant questions)
    - If NO verification info found: Proceed to step 5
 
 5. **Prompt for verification notes** (ONLY if not already available):
-   - "How did you verify this iteration works? (tests, manual checks, etc.)"
+   ```
+   How did you verify this iteration works?
+   - Tests run? (unit, integration, simulation)
+   - Manual checks?
+   - Code review?
+   ```
 
-6. **Update iteration status**: Change from 🚧 to ✅ COMPLETE
+6. **Update task file** (`phase-N/task-M.md`):
 
-7. **Update implementation section**:
-   - Add verification notes (from user response OR extracted from context/notes)
-   - Add timestamp
+   a. **Update iteration status** from 🚧 to ✅:
+      ```markdown
+      ### 🚧 Iteration 2: Error Handling
+      ```
+      Becomes:
+      ```markdown
+      ### ✅ Iteration 2: Error Handling
+      ```
 
-8. **Add completion summary**:
-   ```markdown
-   **Implementation Results**:
-   - [Summarize what was built]
-   - [List key accomplishments]
+   b. **Update implementation section**:
+      ```markdown
+      #### Implementation - Iteration 2: Error Handling
 
-   **Verification**: [User's verification method]
+      **Status**: ✅ COMPLETE (2025-01-15)
 
-   **Completed**: [Date]
-```
+      **Implementation Notes**:
+      - Created `src/integrations/stripe/ErrorMapper.ts` (98 lines)
+      - Created `src/integrations/stripe/RetryPolicy.ts` (76 lines)
+      - Updated StripeClient with error handling and retry
 
-9. **Check if task/phase complete**:
+      **Files Modified**:
+      - `src/integrations/stripe/StripeClient.ts` - Added error handling
+      - `src/integrations/stripe/ErrorMapper.ts` - Created
+      - [... more files ...]
 
-   - If all iterations in task complete → Mark task ✅
-   - If all tasks in phase complete → Mark phase ✅
+      **Verification**:
+      - ✅ All error mapping tests passing
+      - ✅ Retry logic tests passing
+      - ✅ Integration test with Stripe API successful
+      ```
 
-10. **Update Progress Dashboard** (if it exists):
+7. **Check if task/phase complete**:
+   - Count iterations: How many ✅ COMPLETE vs total?
+   - If all iterations complete: Task is ready for `/flow-task-complete`
 
-   - Update current iteration status to "✅ COMPLETE"
-   - Update iteration completion count (e.g., "3/6 complete" → "4/6 complete")
-   - If moving to next iteration: Update "Current Work" pointer to next ⏳ PENDING iteration
-   - If task/phase complete: Update those statuses as well
-   - Update "Last Updated" timestamp
-   - Update completion percentages if tracked
+8. **Update DASHBOARD.md**:
 
-11. **Show "What's Next" Section**:
-    ```markdown
-    ## 🎯 What's Next
+   a. **Update iteration status in "📊 Progress Overview"**:
+      - Change iteration marker from 🚧 to ✅
+      - Update iteration count: `(1/4 iterations)` → `(2/4 iterations)`
 
-    Iteration [N] marked complete!
+   b. **Update "📍 Current Work" section**:
+      - **If more iterations**: Advance to next iteration
+        ```markdown
+        ## 📍 Current Work
+        - **Phase**: [Phase 2 - Core Implementation](phase-2/)
+        - **Task**: [Task 3 - API Integration](phase-2/task-3.md)
+        - **Iteration**: [Iteration 3 - Retry Logic](phase-2/task-3.md#iteration-3-retry-logic) ⏳ PENDING
+        - **Next**: Use `/flow-brainstorm-start` or `/flow-implement-start`
+        ```
+      - **If all iterations complete**:
+        ```markdown
+        ## 📍 Current Work
+        - **Phase**: [Phase 2 - Core Implementation](phase-2/)
+        - **Task**: [Task 3 - API Integration](phase-2/task-3.md) - All iterations complete!
+        - **Next**: Use `/flow-task-complete` to mark task as done
+        ```
 
-    **Decision Tree**:
-    - **More iterations planned?** → Use `/flow-iteration-add [description]` to create next iteration
-    - **Task complete (all iterations done)?** → Use `/flow-task-complete` to mark task as ✅ COMPLETE
-    - **Not sure what's next?** → Use `/flow-status` to see current state and suggestions
-    - **Want to see full project status?** → Use `/flow-summarize` for complete overview
+   c. **Update completion percentages**:
+      - Recalculate phase percentage
+      - Recalculate overall percentage
+      - Update "📈 Completion Status" section
 
-    **Current state**: [Show iteration count, e.g., "3/5 iterations complete" OR "All iterations complete - task ready to close"]
-    ```
+   d. **Update "Last Updated" timestamp** at top
 
-**Output**: Update .flow/PLAN.md with completion status, summary, Dashboard update, and clear next-step guidance.
+9. **Confirm to user**:
+   ```
+   ✅ Completed Iteration [K]: [Name]
+
+   **What's Next**:
+   - **More iterations?** → Use `/flow-brainstorm-start` or `/flow-implement-start` for next iteration
+   - **All iterations done?** → Use `/flow-task-complete` to mark task as complete
+
+   **Current state**: [X]/[Y] iterations complete
+   ```
+
+**Output**:
+- Updated `phase-N/task-M.md` with completion status
+- Updated `DASHBOARD.md` with progress and next work
 
 ```
 
@@ -2190,240 +2377,172 @@ You are executing the `/flow-implement-complete` command from the Flow framework
 
 ## /flow-status
 
-<!-- MCP_METADATA
-function_name: flow_status
-category: navigation_query
-parameters: []
-returns: dict[str, Any]
-plan_operations: [READ]
-framework_reading_required: false
-MCP_METADATA_END -->
-
 **File**: `flow-status.md`
 
 ```markdown
 ---
-description: Show current position and verify plan consistency
+description: Show current position and project progress
 ---
 
 You are executing the `/flow-status` command from the Flow framework.
 
-**Purpose**: Show current position in the plan and verify active work consistency.
+**Purpose**: Display current work position and project progress from the dashboard.
 
-**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
-- Dashboard-first approach using grep-based pattern matching
-- Reduces token usage by 95% (from 32,810 → ~1,530 tokens for large files)
-- Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 2015-2314 for dashboard structure reference
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from DASHBOARD.md**
+- Dashboard-first approach - reads ONLY DASHBOARD.md
+- Extremely efficient: <100 lines to read vs thousands in old architecture
+- This is the REFERENCE MODEL command - simplest example of multi-file navigation
 
-**PERFORMANCE NOTE**: This is the reference model for Category B commands - uses targeted greps instead of reading entire framework.
+**Multi-File Architecture**: Flow now uses separate files:
+- `DASHBOARD.md` - Progress tracking (⭐ read by this command)
+- `PLAN.md` - Static context (not read by this command)
+- `phase-N/task-M.md` - Task details (not read by this command)
 
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
-
-2. **Read Progress Dashboard ONLY** (Dashboard-first approach):
+1. **Find .flow/DASHBOARD.md**:
    ```bash
-   # Use Grep to read ONLY the Progress Dashboard section (~50 lines)
-   Grep pattern: "^## 📋 Progress Dashboard"
-   Use -A 20 flag to read ~20 lines after match
-```
+   # Primary location
+   .flow/DASHBOARD.md
 
-Extract from Dashboard text:
+   # If not found
+   Suggest: "/flow-blueprint to create new project" or "/flow-plan-update to migrate old single-file plan"
+   ```
 
-- Last Updated timestamp
-- Current Phase number and name
-- Current Task number and name
-- Current Iteration number and name
-- Current status (⏳ PENDING / 🚧 IMPLEMENTING / 🎨 READY / etc)
-- Completion percentages
+2. **Read DASHBOARD.md** (entire file):
+   ```bash
+   # Simply read the whole file - it's small and focused
+   Read: .flow/DASHBOARD.md
+   ```
 
-3.  **Verify current markers** (micro integrity - current work only):
+   DASHBOARD.md contains everything you need:
+   - Current work pointer (Phase/Task/Iteration)
+   - Progress overview for all phases
+   - Completion percentages
+   - Next actions
+   - Recent activity
+   - Last updated timestamp
 
-    Use 3 targeted Greps to verify ONLY the current items claimed by Dashboard:
+3. **Extract key information**:
 
-    **Grep 1 - Verify Current Phase**:
+   From "📍 Current Work" section:
+   - Current Phase (number and name)
+   - Current Task (number and name)
+   - Current Iteration (number and name)
+   - Current status emoji (⏳ 🚧 🎨 ✅ etc.)
+   - Focus description
 
-    ```bash
-    # If Dashboard says "Phase 2", verify Phase 2 marker
-    pattern: "^### Phase 2:"
-    Use -A 2 to read status line
-    Extract: Status emoji (⏳ 🚧 🎨 ✅ ❌ 🔮)
-    ```
+   From "📊 Progress Overview" section:
+   - All phases with their status
+   - Tasks within each phase
+   - Iteration counts per task
+   - Completion indicators
 
-    **Grep 2 - Verify Current Task**:
+   From "📈 Completion Status" section:
+   - Phases: X/Y complete
+   - Tasks: X/Y complete
+   - Iterations: X/Y complete
+   - Overall percentage
 
-    ```bash
-    # If Dashboard says "Task 4", verify Task 4 marker
-    pattern: "^#### Task 4:"
-    Use -A 2 to read status line
-    Extract: Status emoji
-    ```
+   From "🎯 Next Actions" section:
+   - Immediate actions (today)
+   - Short-term actions (this week)
+   - Upcoming milestones
 
-    **Grep 3 - Verify Current Iteration**:
+4. **Display formatted status**:
 
-    ```bash
-    # If Dashboard says "Iteration 6", verify Iteration 6 marker
-    pattern: "^##### Iteration 6:"
-    Use -A 2 to read status line
-    Extract: Status emoji
-    ```
+   ```
+   # [Project Name] - Status
 
-    **Grep 4 - Check for Pre-Implementation Tasks**:
+   📍 **Current Work**
+   Phase [N]: [Name] [Status]
+     └─ Task [M]: [Name] [Status]
+         └─ Iteration [K]: [Name] [Status]
 
-    ```bash
-    # Check if current iteration has pre-implementation tasks
-    pattern: "^### \*\*Pre-Implementation Tasks:\*\*$"
-    Search within current iteration scope
+   **Focus**: [Current focus description from dashboard]
 
-    If found:
-      Count pending: grep -c "^#### ⏳ Task [0-9]"
-      Count complete: grep -c "^#### ✅ Task [0-9]"
-      Extract task names and numbers for reporting
+   ---
 
-    Use awk to scope search to current iteration:
-    awk '/^##### Iteration X\.Y:.*🚧/,/^#####[^#]|^####[^#]/ {print}' PLAN.md
-    ```
+   📊 **Progress Overview**
 
-    **Grep 5 - Check Unresolved Brainstorming Subjects**:
+   ### Phase 1: [Name] [Status]
+   - Task 1: [Name] [Status] ([X/Y iterations])
+   - Task 2: [Name] [Status] ([X/Y iterations])
 
-    ```bash
-    # Check if iteration has unresolved subjects
-    Extract "Subjects to Discuss" section:
-    awk '/\*\*Subjects to Discuss\*\*:/,/\*\*Resolved Subjects\*\*:/ {print}'
+   ### Phase 2: [Name] [Status] ← CURRENT
+   - Task 1: [Name] [Status] ([X/Y iterations])
+   - Task 2: [Name] [Status] ([X/Y iterations]) ← CURRENT
 
-    Count unresolved: grep -c "^[0-9]\+\. ⏳"
+   ### Phase 3: [Name] [Status]
+   ...
 
-    If any unresolved:
-      Extract subject names for reporting
-    ```
+   ---
 
-4.  **Micro integrity check** (active work only):
+   📈 **Completion**
+   - Phases: [X/Y] ([percentage]%)
+   - Tasks: [X/Y] ([percentage]%)
+   - Iterations: [X/Y] ([percentage]%)
+   - **Overall**: [percentage]%
 
-    - Compare Dashboard claims vs actual markers for current phase/task/iteration
-    - **Skip all ✅ COMPLETE items** - Already verified, now frozen
-    - Report verification results:
+   ---
 
-      ```
-      🔍 Consistency Check (Current Work Only):
+   🎯 **Next Actions**
+   Immediate:
+   - [Action 1]
+   - [Action 2]
 
-      ✅ Phase 2 marker: 🚧 IN PROGRESS ✓
-      ✅ Task 4 marker: 🚧 IN PROGRESS ✓
-      ✅ Iteration 6 marker: 🚧 IMPLEMENTING ✓
+   Short-term:
+   - [Goal 1]
+   - [Goal 2]
 
-      Status: Dashboard aligned with markers ✓
-      ```
+   ---
 
-5.  **If inconsistency detected**:
+   📝 **Recent Activity**
+   [Show 3-5 most recent items from dashboard]
 
-    ```
-    ⚠️  INCONSISTENCY DETECTED:
+   ---
 
-    Dashboard claims: Iteration 6 🚧 IMPLEMENTING
-    Actual marker:    Iteration 6 ⏳ PENDING
+   **Last Updated**: [Timestamp from dashboard]
+   ```
 
-    Action: Update Progress Dashboard to match markers
-    (Status markers are ground truth, Dashboard is pointer)
-    ```
+5. **Suggest next action** (based on current iteration status):
 
-6.  **Display current position**:
+   Read the current iteration status from dashboard and suggest:
 
-    ```
-    📋 Current Position:
+   **If ⏳ PENDING**:
+   → "Use `/flow-brainstorm-start` to begin brainstorming this iteration"
 
-    Phase [N]: [Name] [Status]
-      └─ Task [N]: [Name] [Status]
-          └─ Iteration [N]: [Name] [Status]
+   **If 🚧 IN PROGRESS (Brainstorming)**:
+   → "Use `/flow-next-subject` to continue brainstorming"
+   → Or check "Next Actions" section in dashboard for specific guidance
 
-    🔍 Current Phase: [Detailed phase description]
+   **If 🚧 IN PROGRESS (Implementing)**:
+   → "Continue implementation. Use `/flow-implement-complete` when done"
 
-    [If in brainstorming with unresolved subjects:]
-    - Brainstorming subjects: ⏳ In progress (X/Y resolved)
-      - ⏳ Subject Name 1
-      - ⏳ Subject Name 2
+   **If 🎨 READY**:
+   → "Use `/flow-implement-start` to begin implementation"
 
-    [If in brainstorming with pre-tasks:]
-    - Brainstorming subjects: ✅ All resolved
-    - Pre-implementation tasks: ⏳ In progress (X/Y complete)
-      - ✅ Task 1: Name
-      - ⏳ Task 2: Name (NEXT)
-      - ⏳ Task 3: Name
+   **If ✅ COMPLETE**:
+   → "Use `/flow-iteration-add` to add next iteration"
+   → Or if task complete: "Use `/flow-task-complete` to finish this task"
 
-    Last Updated: [Timestamp from Dashboard]
-    ```
+6. **Optional: Verify dashboard is up-to-date**:
 
-7.  **Suggest next action** (comprehensive decision tree):
+   Check "Last Updated" timestamp:
+   - If recent (< 1 hour): All good
+   - If stale (> 24 hours): Suggest running `/flow-verify-plan` to check consistency
 
-    **Step 1: Check task status first**
+   Note: Don't read task files to verify - that's `/flow-verify-plan`'s job. This command trusts the dashboard.
 
-    **If current task is ✅ COMPLETE**:
-    → "Task complete! Use `/flow-task-start` [optional: task number] to begin next task"
-    → Display next pending task if available: "Next: Task [N]: [Name]"
-    → If all tasks in phase complete: "All tasks complete! Use `/flow-phase-complete` to mark phase done"
+**Key Principle**: DASHBOARD.md is the source of truth for current state. This command simply displays what's in the dashboard - it doesn't validate against task files (that's what `/flow-verify-plan` does).
 
-    **Step 2: Check iteration status marker**
-
-    **If ⏳ PENDING**:
-    → "Use `/flow-brainstorm-start [topics]` to begin brainstorming"
-
-    **If 🚧 IN PROGRESS**:
-    **Step 3: Determine which phase** (check in this order):
-
-    A. **Check for unresolved subjects** (from Grep 5):
-    If unresolved subjects exist:
-    → "Continue with `/flow-next-subject` to resolve next subject"
-    Display: Show count and list unresolved subject names
-
-    B. **Check for pre-implementation tasks** (from Grep 4):
-    If pre-tasks section exists:
-    Count pending pre-tasks
-
-         If any pending (⏳):
-           → "Continue with Task X: [Name]" (show next pending pre-task)
-           Display: "Pre-implementation tasks: [X/Y] complete"
-
-         If all complete (✅):
-           → "Pre-implementation tasks complete. Use `/flow-brainstorm-complete` to mark brainstorming done"
-
-    C. **Check for Implementation section**:
-    If "### **Implementation**" section exists:
-    → "Continue main implementation. Use `/flow-implement-complete` when done"
-
-    D. **Default** (subjects resolved, no pre-tasks, no implementation yet):
-    → "Use `/flow-brainstorm-complete` to finish brainstorming"
-
-    **If 🎨 READY**:
-    → "Use `/flow-implement-start` to begin implementation"
-
-    **If ✅ COMPLETE**:
-    → "Use `/flow-iteration-add [description]` to start next iteration"
-
-8.  **Show completion summary** (from Dashboard percentages):
-    - Display Phase completion percentage
-    - Display Task completion percentage
-    - Display overall project completion
-
-**Key Differences from `/flow-summarize`**:
-
-- `/flow-status` = **Micro scope** (current work only, ~1,530 tokens)
-- `/flow-summarize` = **Macro scope** (entire project tree, higher token usage)
-- Both verify integrity at their respective scopes
-
-**Output**: Display current position, micro verification results, next action suggestion.
+**Output**: Formatted status display with current position, progress overview, completion stats, and next action suggestion.
 
 ```
 
 ---
 
 ## /flow-summarize
-
-<!-- MCP_METADATA
-function_name: flow_summarize
-category: navigation_query
-parameters: []
-returns: dict[str, Any]
-plan_operations: [READ]
-framework_reading_required: false
-MCP_METADATA_END -->
 
 **File**: `flow-summarize.md`
 
@@ -2436,33 +2555,37 @@ You are executing the `/flow-summarize` command from the Flow framework.
 
 **Purpose**: Generate high-level overview of entire project structure and completion state.
 
-**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
-- Uses PLAN.md structure only (no framework knowledge needed)
-- Parses all phases/tasks/iterations with status markers
+**🟢 NO FRAMEWORK READING REQUIRED - This command works from DASHBOARD.md and task files**
+- Uses DASHBOARD.md for high-level view
+- Reads task files for detailed iteration status
 - Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 105-179 for hierarchy context
 
-**Context**:
-- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
-- **Working File**: .flow/PLAN.md (current project)
-- **Use case**: "Bird's eye view" of project health, progress across all phases, quick status reports
+**Multi-File Architecture**: This command:
+- Reads `DASHBOARD.md` for overall structure
+- Reads all `phase-N/task-M.md` files for detailed status
+- Generates comprehensive summary from all files
+
+**Use case**: "Bird's eye view" of project health, progress across all phases, quick status reports
 
 **Comparison to other commands**:
-- `/flow-status` = "Where am I RIGHT NOW?" (micro view - current iteration)
-- `/flow-summarize` = "What's the WHOLE PICTURE?" (macro view - all phases/tasks/iterations)
+- `/flow-status` = "Where am I RIGHT NOW?" (micro view - reads DASHBOARD.md only)
+- `/flow-summarize` = "What's the WHOLE PICTURE?" (macro view - reads all files)
 - `/flow-verify-plan` = "Is this accurate?" (validation)
-- `/flow-compact` = "Transfer full context" (comprehensive handoff)
 
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+1. **Read DASHBOARD.md**:
+   - Extract current work position
+   - Get all phases and tasks from "📊 Progress Overview"
+   - Get completion percentages from "📈 Completion Status"
 
-2. **Parse entire PLAN.md structure**:
-   - Extract Version (from metadata at top)
-   - Extract current Status line (from metadata)
-   - Parse ALL phases with their status markers
-   - For each phase, parse ALL tasks
-   - For each task, parse ALL iterations
-   - Track completion percentages at each level
+2. **Read all task files**:
+   - List all phase directories: `ls .flow/phase-*/`
+   - For each phase, list task files: `ls .flow/phase-N/`
+   - Read each `phase-N/task-M.md` to get:
+     - Task status
+     - All iterations with status markers
+     - Brainstorming status (if applicable)
 
 3. **Generate structured summary** (compact, scannable format):
 
@@ -2640,15 +2763,6 @@ V2 = Dynamic formulas, character stats integration, full feature set
 
 ## /flow-next-subject
 
-<!-- MCP_METADATA
-function_name: flow_next_subject
-category: navigation_query
-parameters: []
-returns: dict[str, Any]
-plan_operations: [READ, WRITE]
-framework_reading_required: false
-MCP_METADATA_END -->
-
 **File**: `flow-next-subject.md`
 
 ```markdown
@@ -2662,9 +2776,14 @@ You are executing the `/flow-next-subject` command from the Flow framework.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
 
-- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-544 (Quick Reference section) - if not already in context from earlier in session, read it now
-- **Focus on**: Subject Resolution Types (lines 108-132) - Types A/B/C/D decision matrix
-- **Deep dive if needed**: Read lines 1570-1680 for Subject Resolution details using Read(offset=1570, limit=110)
+- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
+- **Focus on**: Subject Resolution Types (lines in Quick Reference) - Types A/B/C/D decision matrix
+- **Deep dive if needed**: Read lines 1167-1797 for Brainstorming Pattern using Read(offset=1167, limit=631)
+
+**Multi-File Architecture**: This command:
+- Reads `DASHBOARD.md` to find current iteration
+- Reads/updates brainstorming session in `phase-N/task-M.md`
+- Marks subjects ✅ resolved in task file
 
 **Framework Reference**: This command requires framework knowledge to properly categorize resolution types. See Quick Reference guide above for essential patterns.
 
@@ -2698,9 +2817,13 @@ User responds → capture decision → document → mark ✅ → auto-advance to
 
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+1. **Read DASHBOARD.md**:
+   - Find "📍 Current Work" section
+   - Extract current iteration: Phase N, Task M, Iteration K
 
-2. **Find current brainstorming session**: Look for "Subjects to Discuss" section
+2. **Read current task file** (`phase-N/task-M.md`):
+   - Find iteration K's brainstorming session
+   - Locate "Subjects to Discuss" section
 
 3. **Find first unresolved subject**: Look for first ⏳ subject in the list
 
@@ -2740,8 +2863,8 @@ User responds → capture decision → document → mark ✅ → auto-advance to
    - **NO detailed implementation plans** - save for implementation phase
    - Capture: Decision + Rationale + Action Items (if any)
 
-   **Step D: Document resolution**
-   - Mark subject ✅ in "Subjects to Discuss" list
+   **Step D: Document resolution in task file**
+   - Mark subject ✅ in "Subjects to Discuss" list (in `phase-N/task-M.md`)
    - Add **CONCISE** resolution section under "Resolved Subjects":
      ```markdown
      ### ✅ **Subject [N]: [Name]**
@@ -2762,7 +2885,7 @@ User responds → capture decision → document → mark ✅ → auto-advance to
    - **Example of GOOD**: 10-20 line resolution with decision, rationale, 3-5 action items
 
    **Step E: Auto-advance OR prompt for review**
-   - Update PLAN.md with resolution
+   - Save changes to `phase-N/task-M.md`
    - Show progress: "[N] of [Total] subjects resolved"
    - Check if more ⏳ subjects exist:
      - **If YES** (more pending): Auto-show next unresolved subject
@@ -2796,21 +2919,12 @@ User responds → capture decision → document → mark ✅ → auto-advance to
 
 **Key Principle**: Moving to next subject implies current is resolved. No separate "resolve" command needed.
 
-**Output**: Update .flow/PLAN.md with subject resolution and show next subject.
+**Output**: Updated `phase-N/task-M.md` with subject resolution and show next subject.
 ```
 
 ---
 
 ## /flow-next-iteration
-
-<!-- MCP_METADATA
-function_name: flow_next_iteration
-category: navigation_query
-parameters: []
-returns: dict[str, Any]
-plan_operations: [READ]
-framework_reading_required: false
-MCP_METADATA_END -->
 
 **File**: `flow-next-iteration.md`
 
@@ -2823,20 +2937,28 @@ You are executing the `/flow-next-iteration` command from the Flow framework.
 
 **Purpose**: Display details about the next pending iteration in the current task.
 
-**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from DASHBOARD.md and task file**
 
 - Finds next ⏳ PENDING iteration in current task
 - Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 567-613 for iteration context
+
+**Multi-File Architecture**: This command:
+- Reads `DASHBOARD.md` to find current task
+- Reads `phase-N/task-M.md` to find next pending iteration
 
 **Pattern**: Works like `/flow-next-subject` but for iterations - shows what's coming next.
 
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+1. **Read DASHBOARD.md**:
+   - Find "📍 Current Work" section
+   - Extract current task: Phase N, Task M
 
-2. **Find current task**: Look for task marked 🚧 IN PROGRESS
+2. **Read current task file** (`phase-N/task-M.md`):
+   - Find "## Iterations" section
+   - Look for first iteration marked ⏳ PENDING
 
-3. **Find next pending iteration**: Look for first iteration in current task marked ⏳ PENDING
+3. **Find next pending iteration**: First ⏳ PENDING iteration in task file
 
 4. **If found, display iteration details**:
 ```
@@ -2870,15 +2992,6 @@ Ready to start? Use `/flow-brainstorm-start [topic]` to begin.
 
 ## /flow-next
 
-<!-- MCP_METADATA
-function_name: flow_next
-category: navigation_query
-parameters: []
-returns: dict[str, Any]
-plan_operations: [READ]
-framework_reading_required: false
-MCP_METADATA_END -->
-
 **File**: `flow-next.md`
 
 ```markdown
@@ -2890,28 +3003,38 @@ You are executing the `/flow-next` command from the Flow framework.
 
 **Purpose**: Auto-detect current context and suggest the next logical step.
 
-**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from DASHBOARD.md and task file**
 
 - Smart navigation using Dashboard and current context
 - Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 3277-3356 for decision tree reference
 
+**Multi-File Architecture**: This command:
+- Reads `DASHBOARD.md` to find current work
+- Reads `phase-N/task-M.md` to determine current state
+- Suggests next command based on context
+
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+1. **Read DASHBOARD.md**:
+   - Find "📍 Current Work" section
+   - Extract current iteration: Phase N, Task M, Iteration K
 
-2. **Determine current context**:
+2. **Read current task file** (`phase-N/task-M.md`):
+   - Find iteration K
+   - Check iteration status (⏳ 🚧 🎨 ✅)
 
-   - Check current iteration status (⏳ 🚧 🎨 ✅)
+3. **Determine current context**:
+
    - Check if in brainstorming session:
      - Look for "Subjects to Discuss" section
-     - Count unresolved subjects: grep -c "^[0-9]\+\. ⏳"
+     - Count unresolved subjects (⏳ markers)
    - Check for pre-implementation tasks:
-     - Look for "### **Pre-Implementation Tasks:**" section
-     - Count pending: grep -c "^#### ⏳ Task [0-9]"
-     - Count complete: grep -c "^#### ✅ Task [0-9]"
-   - Check if in main implementation (look for "### **Implementation**" section)
+     - Look for "#### Pre-Implementation Tasks" section
+     - Count pending vs complete
+   - Check if in main implementation:
+     - Look for "#### Implementation" section
 
-3. **Suggest next command based on context**:
+4. **Suggest next command based on context**:
 
    **Determine exact state**:
 
@@ -2960,15 +3083,6 @@ You are executing the `/flow-next` command from the Flow framework.
 
 ## /flow-rollback
 
-<!-- MCP_METADATA
-function_name: flow_rollback
-category: maintenance
-parameters: []
-returns: dict[str, Any]
-plan_operations: [READ, WRITE]
-framework_reading_required: false
-MCP_METADATA_END -->
-
 **File**: `flow-rollback.md`
 
 ```markdown
@@ -2978,61 +3092,96 @@ description: Undo last plan change
 
 You are executing the `/flow-rollback` command from the Flow framework.
 
-**Purpose**: Undo the last change made to PLAN.md.
+**Purpose**: Undo the last change made to plan files (DASHBOARD.md or task files).
 
-**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+**🟢 NO FRAMEWORK READING REQUIRED - This command works from plan files**
 
-- Undoes last change using Changelog section
+- Undoes last change using CHANGELOG.md
 - Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 1969-2014 for rollback patterns
+
+**Multi-File Architecture**: This command can rollback:
+- DASHBOARD.md status updates (phase/task/iteration status changes)
+- Task file changes (iteration added, status updated)
+- File moves (task archived, moved to backlog)
 
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+1. **Read CHANGELOG.md**:
+   - Look for "📝 Recent Activity" section
+   - If no CHANGELOG.md or no recent entries: "No recent changes to rollback."
 
-2. **Check if rollback is possible**:
+2. **Identify last change**:
 
-   - Look for "Changelog" section at bottom of PLAN.md
-   - If no recent changes logged: "No recent changes to rollback."
+   - Parse last entry in CHANGELOG.md
+   - Extract what was changed:
+     - "Phase N started" → DASHBOARD.md phase status
+     - "Task M completed" → DASHBOARD.md + task file status
+     - "Iteration K added" → Task file iteration section
+     - "Task M moved to backlog" → File moved to backlog/
+     - "Task M archived" → File moved to archive/
 
-3. **Identify last change**:
+3. **Ask for confirmation**:
 
-   - Parse last entry in Changelog
-   - Determine what was changed (phase added, task marked complete, etc.)
+   - Display last change details:
+     ```
+     Last change ([Date/Time]):
+     - Action: [Description]
+     - File(s): [Affected files]
+     - Change: [What was modified]
 
-4. **Ask for confirmation**:
+     Rollback this change? (yes/no)
+     ```
 
-   - "Last change: [Description of change]. Rollback? (yes/no)"
+4. **If confirmed, revert change based on type**:
 
-5. **If confirmed, revert change**:
+   **A. Status change rollback**:
+   - Read DASHBOARD.md
+   - Revert status marker to previous state
+   - Example: `🚧 IN PROGRESS` → `⏳ PENDING`
+   - Update task file status marker if applicable
 
-   - Remove last added section, OR
-   - Change status marker back to previous state, OR
-   - Uncheck last checked checkbox
+   **B. File move rollback**:
+   - Move file back: `backlog/phase-N-task-M.md` → `phase-N/task-M.md`
+   - Or: `archive/phase-N/task-M.md` → `phase-N/task-M.md`
+   - Update DASHBOARD.md to remove archived/backlog markers
+   - Update BACKLOG.md or CHANGELOG.md accordingly
 
-6. **Update Changelog**: Add rollback entry
+   **C. Section added rollback**:
+   - Remove last added section from task file
+   - Example: Remove last iteration, pre-task, or brainstorm subject
+   - Update DASHBOARD.md if iteration count changed
 
-7. **Confirm to user**: "Rolled back: [Description of change]"
+   **D. Checkbox rollback**:
+   - Uncheck last checked checkbox in task file
+   - Find Implementation section, uncheck last ✅ item
 
-**Limitation**: Can only rollback one step at a time. For major reverts, manually edit PLAN.md.
+5. **Update CHANGELOG.md**: Add rollback entry
 
-**Output**: Revert last change in PLAN.md.
+   ```markdown
+   ### [Date/Time]
+   - 🔄 Rolled back: [Description of reverted change]
+   ```
+
+6. **Confirm to user**:
+
+   ```
+   ✅ Rolled back: [Description of change]
+
+   **Reverted**:
+   - File: [file path]
+   - Change: [what was undone]
+
+   CHANGELOG.md updated with rollback entry.
+   ```
+
+**Limitation**: Can only rollback one step at a time. For major reverts, manually edit files or use git to revert commits.
+
+**Output**: Revert last change in plan files, update CHANGELOG.md.
 ```
 
 ---
 
 ## /flow-verify-plan
-
-<!-- MCP_METADATA
-function_name: flow_verify_plan
-category: maintenance
-parameters: []
-returns: dict[str, Any]
-plan_operations: [READ]
-framework_reading_required: true
-framework_sections:
-  - Quick Reference (lines 1-544)
-  - Plan File Template (lines 2731-2928)
-MCP_METADATA_END -->
 
 **File**: `flow-verify-plan.md`
 
@@ -3043,99 +3192,108 @@ description: Verify plan file matches actual codebase state
 
 You are executing the `/flow-verify-plan` command from the Flow framework.
 
-**Purpose**: Verify that PLAN.md is synchronized with the actual project state.
+**Purpose**: Verify that plan files (DASHBOARD.md, PLAN.md, task files) are synchronized with actual project state.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
 
-- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-544 (Quick Reference section) - if not already in context from earlier in session, read it now
-- **Focus on**: Framework Structure validation (lines in Quick Reference)
+- **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference section) - if not already in context from earlier in session, read it now
+- **Focus on**: Framework Structure validation, Status Markers (in Quick Reference)
 - **Deep dive if needed**: Read lines 105-179 for Framework Structure using Read(offset=105, limit=75)
+
+**Multi-File Architecture**: This command verifies:
+- `DASHBOARD.md` - Progress tracking and current work pointers
+- `PLAN.md` - Static overview (architecture, testing, constraints)
+- `phase-N/task-M.md` - Individual task files with iterations
+- Task files contain actual action items and implementation details
 
 **Context**:
 
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
-- **Working File**: .flow/PLAN.md (current project)
+- **Working Files**: .flow/DASHBOARD.md, .flow/PLAN.md, .flow/phase-N/task-M.md
 - **Use case**: Run before starting new AI session or compacting conversation to ensure context is accurate
 
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+1. **Read DASHBOARD.md**:
+   - Find "📍 Current Work" section for current phase/task/iteration
+   - Extract current phase number, task number, iteration number
+   - Note current iteration status (🚧 IN PROGRESS or 🎨 READY)
 
-2. **Find current iteration**: Look for iteration marked 🚧 IN PROGRESS or 🎨 READY FOR IMPLEMENTATION
-
-3. **Read current implementation section**:
-
-   - Find "Implementation - Iteration [N]" section
+2. **Read current task file**:
+   - Locate `.flow/phase-N/task-M.md` based on DASHBOARD.md
+   - Find current iteration section (marked 🚧 IN PROGRESS or 🎨 READY)
+   - Read "Implementation - Iteration [N]" section
    - Identify all action items
    - Note which items are marked as ✅ complete
 
-4. **Verify claimed completions against actual project state**:
+3. **Verify claimed completions against actual project state**:
 
    - For each ✅ completed action item, check if it actually exists:
-     - "Create UserAuth.ts" → Verify file exists
-     - "Add login endpoint" → Search for login endpoint in code
-     - "Update database schema" → Check schema files
+     - "Create UserAuth.ts" → Verify file exists using Glob or Read
+     - "Add login endpoint" → Search for login endpoint in code using Grep
+     - "Update database schema" → Check schema files exist
    - List any discrepancies found
 
-5. **Check for unreported work**:
+4. **Check for unreported work**:
 
-   - Look for modified files that aren't mentioned in PLAN.md
+   - Look for modified files that aren't mentioned in task file
    - Check git status (if available) for uncommitted changes
    - Identify files that were changed but not documented
+
+5. **Verify DASHBOARD.md accuracy**:
+   - Check that current work pointers match actual task file statuses
+   - Verify completion percentages align with actual work done
+   - Check that phase/task/iteration hierarchy is consistent
 
 6. **Report findings**:
 ```
 
 📋 Plan Verification Results:
 
-✅ Verified Complete:
+**Current Work** (from DASHBOARD.md):
+- Phase [N], Task [M], Iteration [K]
 
+**Task File**: [phase-N/task-M.md](phase-N/task-M.md)
+
+✅ Verified Complete:
 - [List action items that are correctly marked complete]
 
 ❌ Discrepancies Found:
-
 - [List action items marked complete but evidence not found]
+- [List DASHBOARD.md pointers that don't match task files]
 
 📝 Unreported Work:
-
-- [List files changed but not mentioned in PLAN.md]
+- [List files changed but not mentioned in task file]
 
 Status: [SYNCHRONIZED / NEEDS UPDATE]
 
 ```
 
 7. **If discrepancies found**:
-- Ask user: "PLAN.md is out of sync with project state. Update .flow/PLAN.md now? (yes/no)"
-- If yes: Update .flow/PLAN.md to reflect actual state:
-  - Uncheck items that aren't actually done
-  - Add notes about files modified
+- Ask user: "Plan files are out of sync with project state. Update files now? (yes/no)"
+- If yes: Update plan files to reflect actual state:
+  - Update task file (phase-N/task-M.md): Uncheck items that aren't actually done
+  - Update DASHBOARD.md: Fix current work pointers, completion percentages
+  - Add notes about files modified in task file "Implementation Notes" section
   - Update status markers if needed
-- If no: "Review discrepancies above and update PLAN.md manually."
+- If no: "Review discrepancies above and update plan files manually."
 
 8. **If synchronized**:
-- "PLAN.md is synchronized with project state. Ready to continue work."
+- "Plan files are synchronized with project state. Ready to continue work."
 
 **Manual alternative**:
-- Review PLAN.md action items manually
-- Check each completed item exists in codebase
+- Review DASHBOARD.md for current work location
+- Read current task file manually
+- Check each completed action item exists in codebase
 - Use `git status` and `git diff` to verify changes
-- Update .flow/PLAN.md to match reality
+- Update task file and DASHBOARD.md to match reality
 
-**Output**: Verification report and optional PLAN.md updates.
+**Output**: Verification report and optional plan file updates.
 ```
 
 ---
 
 ## /flow-compact
-
-<!-- MCP_METADATA
-function_name: flow_compact
-category: maintenance
-parameters: []
-returns: dict[str, Any]
-plan_operations: [READ]
-framework_reading_required: false
-MCP_METADATA_END -->
 
 **File**: `flow-compact.md`
 
@@ -3144,68 +3302,87 @@ You are executing the `/flow-compact` command from the Flow framework.
 
 **Purpose**: Generate comprehensive conversation report for context transfer to new AI instance.
 
-**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+**🟢 NO FRAMEWORK READING REQUIRED - This command works from plan files**
 
-- Generates comprehensive report using PLAN.md content and `/flow-status` logic
+- Generates comprehensive report using DASHBOARD.md, PLAN.md, and task file content
+- Uses `/flow-status` dashboard-first logic for current position
 - Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 2327-2362 for context preservation patterns
+
+**Multi-File Architecture**: This command reads:
+- `DASHBOARD.md` - Current work location and progress overview
+- `PLAN.md` - Architecture, testing strategy, constraints (static context)
+- `phase-N/task-M.md` - Current task file with iterations, brainstorming, implementation
 
 **Context**:
 
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
-- **Working File**: .flow/PLAN.md (current project)
+- **Working Files**: .flow/DASHBOARD.md, .flow/PLAN.md, .flow/phase-N/task-M.md
 - **Use case**: Before compacting conversation or starting new AI session - ensures zero context loss
 
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+1. **Read DASHBOARD.md**:
+   - Find "📍 Current Work" section for current phase/task/iteration
+   - Read "📊 Progress Overview" for completed work
+   - Read "🎯 Next Actions" for pending items
+   - Read "📝 Recent Activity" for conversation history
+   - Read "💡 Key Decisions This Week" for important context
 
-2. **Run status verification first**:
+2. **Read PLAN.md**:
+   - Extract "## 🎯 Project Goal" for feature overview
+   - Read "## 🏗️ Architecture" section for technical context
+   - Read "## 🧪 Testing Strategy" for quality requirements
+   - Read "## 📋 Constraints" for limitations
+   - Read "## 🎓 Learning Goals" for educational objectives
 
-   - Execute `/flow-status` command logic to verify current position
-   - Check for conflicting status sections (warn if found)
-   - Use this verified status as authoritative source for the report
+3. **Read current task file** (from DASHBOARD.md pointers):
+   - Locate `.flow/phase-N/task-M.md`
+   - Read "Task Overview" section (purpose, dependencies, scope)
+   - Read current iteration brainstorming subjects (decisions, rationale)
+   - Read "Implementation - Iteration [N]" section (action items, progress)
+   - Read "Task Notes" section (discoveries, decisions, references)
 
-3. **Generate comprehensive report covering**:
+4. **Generate comprehensive report covering**:
 
    **Current Work Context**:
 
-   - What feature/task are we working on?
+   - What feature/task are we working on? (from DASHBOARD.md)
    - What phase/task/iteration are we in? (with status)
-   - What was the original goal?
+   - What was the original goal? (from PLAN.md + task Purpose)
 
    **Conversation History**:
 
-   - What decisions were made during brainstorming? (with rationale)
-   - What subjects were discussed and resolved?
-   - What pre-implementation tasks were identified and completed?
-   - What action items were generated?
+   - What decisions were made during brainstorming? (from task file subjects)
+   - What subjects were discussed and resolved? (with resolution types)
+   - What pre-implementation tasks were identified and completed? (from task file)
+   - What action items were generated? (from Implementation section)
 
    **Implementation Progress**:
 
-   - What has been implemented so far?
-   - What files were created/modified?
-   - What verification was done?
-   - What remains incomplete?
+   - What has been implemented so far? (from task file Implementation Notes)
+   - What files were created/modified? (from Files Modified section)
+   - What verification was done? (from Verification section)
+   - What remains incomplete? (unchecked action items)
 
    **Challenges & Solutions**:
 
-   - What blockers were encountered?
-   - How were they resolved?
-   - What design trade-offs were made?
+   - What blockers were encountered? (from Implementation Notes)
+   - How were they resolved? (from Pre-Implementation Tasks or notes)
+   - What design trade-offs were made? (from brainstorming rationale)
 
    **Next Steps**:
 
-   - What is the immediate next action?
-   - What are the pending action items?
+   - What is the immediate next action? (from DASHBOARD.md "🎯 Next Actions")
+   - What are the pending action items? (from current iteration)
    - What should the next AI instance focus on?
 
    **Important Context**:
 
-   - Any quirks or special considerations for this feature
-   - Technical constraints or dependencies
-   - User preferences or decisions that must be preserved
+   - Any quirks or special considerations (from Task Notes)
+   - Technical constraints (from PLAN.md + Task Overview dependencies)
+   - User preferences or decisions that must be preserved (from decisions)
 
-4. **Report format**:
+5. **Report format**:
 ```
 
 # Context Transfer Report
@@ -3260,13 +3437,15 @@ You are executing the `/flow-compact` command from the Flow framework.
 
 6. **After generating report**:
 - "Context transfer report generated. Copy this report to a new AI session to continue work with zero context loss."
-- "Use `/flow-verify-plan` before starting new session to ensure PLAN.md is synchronized."
+- "Use `/flow-verify-plan` before starting new session to ensure plan files (DASHBOARD.md, task files) are synchronized."
 
 **Manual alternative**:
 - Read entire conversation history manually
+- Read DASHBOARD.md for current status
+- Read current task file for detailed context
+- Read PLAN.md for architectural constraints
 - Summarize key points, decisions, and progress
 - Document in separate notes file
-- Reference PLAN.md for structure
 
 **Output**: Comprehensive context transfer report.
 ```
@@ -3333,15 +3512,6 @@ Repeat for next iteration
 
 ## /flow-plan-split
 
-<!-- MCP_METADATA
-function_name: flow_plan_split
-category: maintenance
-parameters: []
-returns: dict[str, Any]
-plan_operations: [READ, WRITE]
-framework_reading_required: false
-MCP_METADATA_END -->
-
 **File**: `flow-plan-split.md`
 
 ```markdown
@@ -3351,149 +3521,143 @@ description: Archive old completed tasks to reduce PLAN.md size
 
 You are executing the `/flow-plan-split` command from the Flow framework.
 
-**Purpose**: Archive old completed tasks outside the recent context window to `.flow/ARCHIVE.md`, reducing PLAN.md size while preserving full project history.
+**Purpose**: Archive old completed tasks to reduce DASHBOARD.md clutter while preserving full project history in `archive/` directory.
 
-**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+**🟢 NO FRAMEWORK READING REQUIRED - This command works from plan files**
 
-- Archives completed tasks to ARCHIVE.md (keeps recent 3 tasks in PLAN.md)
+- Moves completed task FILES to archive/ directory (keeps recent 3 tasks visible)
+- Updates DASHBOARD.md and CHANGELOG.md to reflect archived tasks
 - Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 2363-2560 for archival patterns
+
+**Multi-File Architecture**: This command:
+- Moves `phase-N/task-M.md` files to `archive/phase-N/task-M.md`
+- Updates `DASHBOARD.md` to mark tasks as archived
+- Updates `CHANGELOG.md` to reference archived task files
 
 **Context**:
 
 - **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
-- **Working File**: .flow/PLAN.md (current project)
-- **Archive File**: .flow/ARCHIVE.md (created/appended)
+- **Working Files**: .flow/DASHBOARD.md, .flow/phase-N/task-M.md
+- **Archive Directory**: .flow/archive/ (task files moved here)
+- **Changelog**: .flow/CHANGELOG.md (updated with archive references)
 
-**When to Use**: When PLAN.md exceeds 2000 lines or has 10+ completed tasks, causing performance issues or difficult navigation.
+**When to Use**: When DASHBOARD.md has 10+ completed tasks, causing clutter or difficult navigation.
 
 **Archiving Strategy - Recent Context Window**:
 
-- **Keep in PLAN.md**: Current task + 3 previous tasks (regardless of status)
-- **Archive to ARCHIVE.md**: All ✅ COMPLETE tasks older than "current - 3"
-- **Always Keep**: Non-complete tasks (⏳ 🚧 ❌ 🔮) regardless of age
+- **Keep visible in DASHBOARD.md**: Current task + 3 previous tasks (regardless of status)
+- **Archive**: All ✅ COMPLETE tasks older than "current - 3"
+- **Always Keep Visible**: Non-complete tasks (⏳ 🚧 ❌ 🔮 🎨) regardless of age
 
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+1. **Read DASHBOARD.md**:
+   - Find "📍 Current Work" section
+   - Extract current task number (e.g., Task 13)
+   - Find "📊 Progress Overview" to list all tasks
 
-2. **Find current task number**:
-
-   - Read Progress Dashboard to identify current task
-   - Extract task number (e.g., if "Task 13" is current, task number = 13)
-
-3. **Calculate archiving threshold**:
+2. **Calculate archiving threshold**:
 
    - Threshold = Current task number - 3
    - Example: Current = 13, Threshold = 10
    - **Archive candidates**: Tasks 1-9 (if ✅ COMPLETE)
-   - **Keep in PLAN.md**: Tasks 10, 11, 12, 13 (current + 3 previous)
+   - **Keep visible**: Tasks 10, 11, 12, 13 (current + 3 previous)
 
-4. **Extract archivable tasks**:
+3. **Identify archivable tasks**:
 
    - Find all tasks with number < threshold AND status = ✅ COMPLETE
-   - Extract FULL task content:
-     - Task header and metadata
-     - All iterations (brainstorming, implementation, verification)
-     - All nested content
-   - **IMPORTANT**: Keep tasks that are ❌ ⏳ 🚧 🔮 even if old (incomplete work stays visible)
+   - List task files: `phase-N/task-M.md` for each archivable task
+   - **IMPORTANT**: Keep non-complete tasks visible (⏳ 🚧 ❌ 🔮 🎨) even if old
 
-5. **Create or append to ARCHIVE.md**:
+4. **Move task files to archive**:
 
-   **If .flow/ARCHIVE.md does NOT exist** (first split):
+   - Create `archive/` directory if doesn't exist
+   - For each archivable task:
+     - Create phase directory in archive: `archive/phase-N/` if needed
+     - Move `phase-N/task-M.md` to `archive/phase-N/task-M.md`
+     - Preserve full task content (iterations, brainstorming, everything)
+
+5. **Update CHANGELOG.md**:
+
+   **If .flow/CHANGELOG.md does NOT exist** (first archive):
 
    ```markdown
-   # Project Archive
+   # Project Changelog
 
-   This file contains completed tasks that have been archived from PLAN.md to reduce file size.
+   This file contains historical records of completed tasks moved to archive.
 
-   **Archive Info**:
+   ## 📦 Archived Tasks
 
-   - All content preserved (nothing deleted)
-   - Organized by Phase → Task → Iteration
-   - Reference: See PLAN.md Progress Dashboard for full project history
+   ### Phase N: [Phase Name]
 
-   **Last Updated**: [Current date]
-   **Tasks Archived**: [Count]
+   - **Task M**: [Task Name] - [archive/phase-N/task-M.md](archive/phase-N/task-M.md)
+     - Completed: [Date]
+     - Archived: [Date]
 
    ---
 
-   [Archived task content here - preserve phase structure]
+   **Last Updated**: [Date]
+   **Total Archived**: [Count] tasks
    ```
-```
 
-**If .flow/ARCHIVE.md ALREADY exists** (subsequent split):
+   **If .flow/CHANGELOG.md ALREADY exists**:
+   - Read existing CHANGELOG.md
+   - Add new archived tasks under appropriate phase sections
+   - Update "Last Updated" and "Total Archived" count
+   - Maintain phase hierarchy (don't duplicate phase headers)
 
-- Read existing ARCHIVE.md
-- Update "Last Updated" and "Tasks Archived" count
-- Append new archived tasks to appropriate phase sections
-- Maintain phase hierarchy (don't duplicate phase headers if they exist)
+6. **Update DASHBOARD.md**:
 
-6. **Update PLAN.md**:
-
-   **A. Remove archived task content**:
-
-   - Delete full task sections for archived tasks from Development Plan
-   - Preserve phase headers (even if all tasks archived)
-
-   **B. Update Progress Dashboard**:
-
+   **A. Update Progress Overview**:
    - Add 📦 marker to archived tasks
    - Format: `- ✅📦 Task 5: Feature Name (archived)`
-   - Keep full project history visible in Progress Overview
+   - Keep task in list but mark as archived
+   - Update completion percentages to reflect remaining visible tasks
 
-   **C. Update phase headers** (if all tasks archived):
-
+   **B. Update phase headers** (if all phase tasks archived):
    ```markdown
-   ### Phase 1: Foundation Setup ✅
+   ### Phase 1: Foundation ✅ COMPLETE
 
-   **Status**: COMPLETE (tasks archived)
-   **Completed**: [Date]
-   **Tasks**: [Count] tasks (📦 archived)
+   **Goal**: [Phase goal]
+   **Status**: 100% complete ([N] tasks archived to [archive/phase-1/](archive/phase-1/))
    ```
 
 7. **Verify and confirm**:
 
-   - Count lines before/after (use `wc -l`)
-   - Calculate reduction: `before - after = saved lines`
+   - Count archived files
+   - Calculate DASHBOARD.md size reduction
    - Confirm to user:
 
      ```
      ✅ Plan split complete!
 
-     **Archived**: X tasks to .flow/ARCHIVE.md
-     **PLAN.md size**: Reduced from Y lines to Z lines (-W lines, -P%)
-     **Recent context**: Kept Task [threshold] through Task [current]
+     **Archived**: [X] tasks to .flow/archive/
+     **Files moved**:
+       - phase-1/task-1.md → archive/phase-1/task-1.md
+       - phase-1/task-2.md → archive/phase-1/task-2.md
+       ...
+
+     **DASHBOARD.md**: Updated to mark [X] tasks as 📦 archived
+     **CHANGELOG.md**: Updated with archive references
+     **Recent context**: Kept Task [threshold] through Task [current] visible
 
      Your Progress Dashboard still shows complete project history.
-     Archived content available in .flow/ARCHIVE.md
+     Archived task files available in .flow/archive/
      ```
 
 **Edge Cases**:
 
 - **No old completed tasks**: "No tasks to archive. All completed tasks are within recent context window (current + 3 previous)."
 - **Current task < 4**: "Current task is Task [N]. Need at least Task 4 to enable archiving (keeps current + 3 previous)."
-- **Non-complete old tasks**: Keep them in PLAN.md with note: "Task [N] kept in PLAN.md (not complete - status: [status])"
+- **Non-complete old tasks**: Keep visible in DASHBOARD.md: "Task [N] kept visible (not complete - status: [status])"
 
-**Output**: Update .flow/PLAN.md (reduced) and create/append .flow/ARCHIVE.md (full history preserved).
+**Output**: Move task files to archive/, update DASHBOARD.md and CHANGELOG.md (full history preserved).
 
 ```
 
 ---
 
 ## /flow-backlog-add
-
-<!-- MCP_METADATA
-function_name: flow_backlog_add
-category: backlog
-parameters:
-  - name: task_numbers
-    type: str
-    required: true
-    description: Task number(s) to move to backlog (e.g. '14' or '14-22')
-returns: dict[str, Any]
-plan_operations: [READ, WRITE]
-framework_reading_required: false
-MCP_METADATA_END -->
 
 **File**: `flow-backlog-add.md`
 
@@ -3504,18 +3668,17 @@ description: Move task(s) to backlog to reduce active plan clutter
 
 You are executing the `/flow-backlog-add` command from the Flow framework.
 
-**Purpose**: Move pending tasks from PLAN.md to BACKLOG.md to reduce active plan size while preserving all task context (iterations, brainstorming, everything).
+**Purpose**: Move pending tasks to BACKLOG.md to reduce active dashboard clutter while preserving all task content.
 
-**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md**
+**🟢 NO FRAMEWORK READING REQUIRED - This command works from DASHBOARD.md and task files**
 
-- Moves full task content to backlog (token efficiency feature)
+- Moves task files to backlog directory (token efficiency feature)
 - Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 3407-3682 for backlog management patterns
 
-**Context**:
-
-- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
-- **Working File**: .flow/PLAN.md (current project)
-- **Backlog File**: .flow/BACKLOG.md (created/updated)
+**Multi-File Architecture**: This command:
+- Moves `phase-N/task-M.md` files to `backlog/` directory
+- Updates `DASHBOARD.md` to remove tasks from active view
+- Creates/updates `BACKLOG.md` with references to backogged tasks
 
 **Key Insight**: Backlog is for **token efficiency**, not prioritization. Tasks aren't "low priority" - they're just "not now" (weeks/months away).
 
@@ -3527,131 +3690,97 @@ You are executing the `/flow-backlog-add` command from the Flow framework.
 
 **Instructions**:
 
-1. **Find .flow/PLAN.md**: Look for .flow/PLAN.md (primary location: .flow/ directory)
+1. **Read DASHBOARD.md**:
+   - Find "📊 Progress Overview" section
+   - Locate tasks by number
 
 2. **Parse arguments**:
-   - Single task: `$ARGUMENTS` = task number (e.g., "14")
-   - Range: `$ARGUMENTS` = start-end (e.g., "14-22")
+   - Single task: `task_numbers` = task number (e.g., "14")
+   - Range: `task_numbers` = start-end (e.g., "14-22")
    - Extract task number(s) to move
 
 3. **Validate tasks**:
-   - Verify each task exists in PLAN.md
+   - Find task files: `phase-N/task-M.md`
    - Check task status - warn if moving tasks that are 🚧 IN PROGRESS or ✅ COMPLETE
    - Recommended: Only move ⏳ PENDING tasks
    - If user confirms moving non-pending tasks, proceed
 
-4. **Extract full task content from PLAN.md**:
-   - For each task number, extract COMPLETE task section:
-     - Task header: `#### Task [N]: [Name] [Status]`
-     - All task metadata (Status, Purpose, etc.)
-     - ALL iterations (full content with brainstorming, implementation, verification)
-     - ALL nested content (pre-tasks, bugs discovered, etc.)
-   - Use awk range extraction:
-     ```bash
-     awk '/^#### Task 14:/,/^####[^#]|^###[^#]/ {print}' PLAN.md
-     ```
+4. **Move task files to backlog**:
+   - Create `backlog/` directory if doesn't exist
+   - For each task:
+     - Move `phase-N/task-M.md` to `backlog/phase-N-task-M.md`
+     - Preserve all content (iterations, brainstorming, everything)
 
-5. **Create or update .flow/BACKLOG.md**:
+5. **Update BACKLOG.md**:
 
    **If BACKLOG.md does NOT exist** (first time):
 
    ```markdown
    # Project Backlog
 
-   This file contains tasks moved from PLAN.md to reduce active plan size while preserving all context.
+   This file lists tasks moved to backlog/ directory to reduce active dashboard size.
 
    **Backlog Info**:
+   - Task files moved to backlog/ directory
    - Tasks retain original numbers for easy reference
    - Full content preserved (brainstorming, iterations, everything)
-   - Pull tasks back to active plan when ready to work on them
+   - Pull tasks back when ready to work on them
 
    **Last Updated**: [Current date]
    **Tasks in Backlog**: [Count]
 
    ---
 
-   ## 📋 Backlog Dashboard
+   ## 📋 Backlog Tasks
 
-   **Tasks Waiting**:
-   - **Task [N]**: [Name]
-   - **Task [N]**: [Name]
-
-   ---
-
-   ### Phase [N]: [Phase Name from PLAN.md]
-
-   [Extracted task content here - preserve original task numbers]
+   - **Task [N]**: [Name] - [backlog/phase-N-task-M.md](backlog/phase-N-task-M.md)
+   - **Task [N]**: [Name] - [backlog/phase-N-task-M.md](backlog/phase-N-task-M.md)
    ```
 
    **If BACKLOG.md ALREADY exists**:
    - Read existing BACKLOG.md
    - Update "Last Updated" timestamp
    - Update "Tasks in Backlog" count
-   - Add tasks to Backlog Dashboard list
-   - Append task content to appropriate phase section
-   - Maintain phase hierarchy (don't duplicate phase headers if they exist)
+   - Add tasks to "📋 Backlog Tasks" list
 
-6. **Update PLAN.md**:
+6. **Update DASHBOARD.md**:
+   - Remove tasks from "📊 Progress Overview" section
+   - Or mark as moved: `- ⏳ Task 14: Potency system (moved to backlog)`
+   - Update completion percentages
 
-   **A. Remove task content**:
-   - Delete full task sections for backlogged tasks
-   - Leave gap in task numbering (don't renumber)
-   - Add comment marking removal:
-     ```markdown
-     [Task 14 moved to backlog - see .flow/BACKLOG.md]
-     [Task 15 moved to backlog - see .flow/BACKLOG.md]
-     ```
-
-   **B. Do NOT update Progress Dashboard**:
-   - Backlog tasks are invisible to dashboard (no 📦 marker)
-   - Keep task numbers in dashboard but mark as moved:
-     ```markdown
-     - ⏳ Task 14: Potency system (moved to backlog)
-     ```
-   - Or simply remove from dashboard (user preference)
-
-7. **Reset task status to ⏳ PENDING** (in BACKLOG.md):
-   - All backlogged tasks reset to ⏳ PENDING
+7. **Reset task status to ⏳ PENDING** (in backlog files):
+   - Open each backlog file
+   - Change task status to ⏳ PENDING
    - Fresh start when pulled back
 
 8. **Verify and confirm**:
-   - Count lines before/after PLAN.md (use `wc -l`)
-   - Calculate reduction
+   - Count moved files
    - Confirm to user:
 
      ```
      ✅ Moved to backlog!
 
-     **Backlogged**: [N] task(s) to .flow/BACKLOG.md
-     **PLAN.md size**: Reduced from Y lines to Z lines (-W lines, -P%)
-     **Tasks moved**: Task [list of numbers]
+     **Backlogged**: [N] task(s) to backlog/ directory
+     **Files moved**: Task [list of numbers]
+     **Location**: backlog/phase-N-task-M.md
 
      Use `/flow-backlog-view` to see backlog contents.
      Use `/flow-backlog-pull <task-number>` to bring a task back when ready.
      ```
 
 **Edge Cases**:
-- **Task doesn't exist**: "Task [N] not found in PLAN.md"
+- **Task doesn't exist**: "Task [N] not found"
 - **Invalid range**: "Invalid range format. Use: /flow-backlog-add 14-22"
 - **Empty range**: "No tasks found in range 14-22"
-- **Already in backlog**: Check BACKLOG.md first, warn if task already there
+- **Already in backlog**: Check backlog/ directory first, warn if task already there
 
-**Output**: Update .flow/PLAN.md (reduced), create/update .flow/BACKLOG.md (tasks preserved).
+**Output**: Move task files to backlog/ directory, update DASHBOARD.md and BACKLOG.md.
 
 ```
 
 ---
 
 ## /flow-backlog-view
-
-<!-- MCP_METADATA
-function_name: flow_backlog_view
-category: backlog
-parameters: []
-returns: dict[str, Any]
-plan_operations: [READ]
-framework_reading_required: false
-MCP_METADATA_END -->
 
 **File**: `flow-backlog-view.md`
 
@@ -3662,35 +3791,31 @@ description: Show backlog contents (tasks waiting)
 
 You are executing the `/flow-backlog-view` command from the Flow framework.
 
-**Purpose**: Display backlog dashboard showing all tasks currently in backlog.
+**Purpose**: Display backlog showing all tasks currently in backlog directory.
 
-**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from BACKLOG.md**
+**🟢 NO FRAMEWORK READING REQUIRED - This command works from BACKLOG.md and backlog/ directory**
 
-- Simple read operation (shows backlog dashboard)
+- Simple read operation (shows backlog list)
 - Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 3407-3682 for backlog context
 
-**Context**:
-
-- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
-- **Backlog File**: .flow/BACKLOG.md (read-only for this command)
+**Multi-File Architecture**: This command:
+- Reads `BACKLOG.md` for task list
+- Lists files in `backlog/` directory
 
 **Instructions**:
 
-1. **Check if .flow/BACKLOG.md exists**:
-   - If NOT found: "📦 Backlog is empty. Use `/flow-backlog-add <task>` to move tasks from active plan."
+1. **Check if BACKLOG.md exists**:
+   - If NOT found: "📦 Backlog is empty. Use `/flow-backlog-add <task>` to move tasks."
    - If found: Proceed to step 2
 
-2. **Read Backlog Dashboard section**:
-   - Use Grep to extract dashboard:
-     ```bash
-     grep -A 20 "^## 📋 Backlog Dashboard" BACKLOG.md
-     ```
-   - Extract task list from "Tasks Waiting" section
-
-3. **Parse backlog metadata**:
+2. **Read BACKLOG.md**:
    - Extract "Last Updated" timestamp
    - Extract "Tasks in Backlog" count
-   - Parse task list (task numbers and names)
+   - Read "📋 Backlog Tasks" section for task list
+
+3. **Verify backlog/ directory**:
+   - List files in `backlog/` directory
+   - Confirm task files exist: `backlog/phase-N-task-M.md`
 
 4. **Display backlog contents**:
 
@@ -3700,52 +3825,28 @@ You are executing the `/flow-backlog-view` command from the Flow framework.
    **Last Updated**: [Date]
 
    **Tasks Waiting**:
-   - **Task 14**: Potency system
-   - **Task 15**: Points & Luck systems
-   - **Task 16**: Database persistence
-   - **Task 17**: Damage variance
-   - **Task 18**: Game integration
-   - **Task 19**: Attribute Guarantee - HIGH
-   - **Task 20**: Context Modifiers - CRITICAL
-   - **Task 21**: Affix Synergy - MEDIUM
-   - **Task 22**: Retry Handler - HIGH
+   - **Task 14**: Potency system - [backlog/phase-2-task-14.md](backlog/phase-2-task-14.md)
+   - **Task 15**: Points & Luck systems - [backlog/phase-2-task-15.md](backlog/phase-2-task-15.md)
+   - **Task 16**: Database persistence - [backlog/phase-3-task-16.md](backlog/phase-3-task-16.md)
 
    ---
 
    **Next Steps**:
-   - Use `/flow-backlog-pull <task-number>` to move a task back to active plan
-   - Example: `/flow-backlog-pull 14` brings Task 14 back as next task in active phase
+   - Use `/flow-backlog-pull <task-number>` to move a task back to active work
+   - Example: `/flow-backlog-pull 14` brings Task 14 back to its original phase
    ```
 
 5. **Optional: Show task details** (if user wants more info):
-   - Can read full task content from BACKLOG.md on request
-   - Default view is just dashboard (lightweight)
+   - Can read full task file from backlog/ on request
+   - Default view is just list (lightweight)
 
-**Output**: Display backlog dashboard with task list and guidance.
+**Output**: Display backlog list with task files and guidance.
 
 ```
 
 ---
 
 ## /flow-backlog-pull
-
-<!-- MCP_METADATA
-function_name: flow_backlog_pull
-category: backlog
-parameters:
-  - name: task_number
-    type: str
-    required: true
-    description: Task number to pull from backlog
-  - name: position
-    type: str
-    required: false
-    default: ""
-    description: Optional positioning instruction
-returns: dict[str, Any]
-plan_operations: [READ, WRITE]
-framework_reading_required: false
-MCP_METADATA_END -->
 
 **File**: `flow-backlog-pull.md`
 
@@ -3758,293 +3859,89 @@ You are executing the `/flow-backlog-pull` command from the Flow framework.
 
 **Purpose**: Move a task from BACKLOG.md back to PLAN.md with sequential renumbering in active phase.
 
-**🟢 NO FRAMEWORK READING REQUIRED - This command works entirely from PLAN.md and BACKLOG.md**
+**🟢 NO FRAMEWORK READING REQUIRED - This command works from DASHBOARD.md, BACKLOG.md, and task files**
 
-- Moves task content back to active plan
+- Moves task file back from backlog/ to phase directory
 - Optional background reading (NOT required): DEVELOPMENT_FRAMEWORK.md lines 3407-3682 for backlog patterns
 
-**Context**:
+**Multi-File Architecture**: This command:
+- Moves `backlog/phase-N-task-M.md` back to `phase-N/task-M.md`
+- Updates `DASHBOARD.md` to show task
+- Updates `BACKLOG.md` to remove task
 
-- **Framework Guide**: DEVELOPMENT_FRAMEWORK.md (auto-locate in `.claude/`, project root, or `~/.claude/flow/`)
-- **Working File**: .flow/PLAN.md (current project)
-- **Backlog File**: .flow/BACKLOG.md (read and remove from)
-
-**Signature**: `/flow-backlog-pull <task-number> [instruction-text]`
+**Signature**: `/flow-backlog-pull <task-number> [position]`
 
 **Examples**:
-- `/flow-backlog-pull 14` - Pull Task 14, insert at end of active phase with next available number
-- `/flow-backlog-pull 14 insert after task 13` - Pull Task 14, position after Task 13 (but still renumber sequentially)
-- `/flow-backlog-pull 14 add to phase 5` - Pull Task 14, add to Phase 5 instead of active phase
+- `/flow-backlog-pull 14` - Pull Task 14 back to its original phase
+- `/flow-backlog-pull 14 add to phase 5` - Pull Task 14 to Phase 5 instead
 
 **Instructions**:
 
-1. **Check if .flow/BACKLOG.md exists**:
+1. **Check if BACKLOG.md exists**:
    - If NOT found: "📦 Backlog is empty. Nothing to pull."
    - If found: Proceed
 
 2. **Parse arguments**:
-   - Required: Task number to pull (e.g., "14")
-   - Optional: Instruction text for positioning (e.g., "insert after task 13")
-   - Extract task number and instruction (if provided)
+   - Required: `task_number` - Task number to pull (e.g., "14")
+   - Optional: `position` - Positioning instruction (e.g., "add to phase 5")
 
 3. **Validate task exists in backlog**:
-   - Search BACKLOG.md for `#### Task [N]:`
-   - If NOT found: "Task [N] not found in backlog. Use `/flow-backlog-view` to see what's available."
+   - Read BACKLOG.md to find task entry
+   - Find backlog file: `backlog/phase-N-task-M.md`
+   - If NOT found: "Task [N] not found in backlog. Use `/flow-backlog-view` to see available."
    - If found: Proceed
 
-4. **Extract full task content from BACKLOG.md**:
-   - Use awk to extract complete task section:
-     ```bash
-     awk '/^#### Task 14:/,/^####[^#]|^###[^#]/ {print}' BACKLOG.md
-     ```
-   - Preserve ALL content (iterations, brainstorming, metadata, etc.)
+4. **Determine target phase**:
+   - **Default**: Use task's original phase (from filename `phase-N-task-M.md`)
+   - **With position instruction**: Parse for target phase
+     - "add to phase 5" → Move to phase-5/
+   - **If phase doesn't exist**: Create phase directory
 
-5. **Determine insertion position in PLAN.md**:
-
-   **A. Find active phase**:
-   - Read Progress Dashboard to identify current phase
-   - If instruction specifies different phase, use that instead
-
-   **B. Calculate new task number**:
-   - Find highest task number in target phase
+5. **Determine new task number**:
+   - List existing tasks in target phase
+   - Find highest task number
    - New task number = highest + 1
-   - Example: Phase 4 has Tasks 11, 12, 13 → New task becomes Task 14
+   - Example: phase-2/ has task-1.md, task-2.md → new task is task-3.md
 
-   **C. Determine insertion point** (where in file):
-   - **Default** (no instruction): Insert after last task in target phase
-   - **With instruction**: Parse instruction for positioning
-     - "insert after task 13" → Find Task 13, insert after it
-     - "insert before task 12" → Find Task 12, insert before it
-     - "add to phase 5" → Find Phase 5, insert at end
-   - **Position ≠ Number**: Task positioned after 13 but numbered as 14 (sequential)
+6. **Move task file back**:
+   - Move `backlog/phase-N-task-M.md` to `phase-N/task-K.md` (K = new number)
+   - Update task metadata in file:
+     - Update task number in header
+     - Reset status to ⏳ PENDING
+   - Preserve all content (iterations, brainstorming, everything)
 
-6. **Renumber task header**:
-   - Change `#### Task 14:` (old backlog number) to `#### Task [new-number]:`
-   - Example: Backlog Task 14 becomes PLAN.md Task 14 (if next available)
-   - Update task metadata with new number
+7. **Update BACKLOG.md**:
+   - Remove task from "📋 Backlog Tasks" list
+   - Decrement "Tasks in Backlog" count
+   - Update "Last Updated" timestamp
 
-7. **Insert task into PLAN.md**:
-   - Insert full task content at determined position
-   - Maintain proper markdown hierarchy
-   - Preserve all nested content
+8. **Update DASHBOARD.md**:
+   - Add task to "📊 Progress Overview" in target phase
+   - Mark as ⏳ PENDING
+   - Update phase task count
+   - Update completion percentages
 
-8. **Remove task from BACKLOG.md**:
-   - Delete complete task section from BACKLOG.md
-   - Update Backlog Dashboard:
-     - Remove task from "Tasks Waiting" list
-     - Decrement "Tasks in Backlog" count
-     - Update "Last Updated" timestamp
-   - **No trace left** - as if task was never in backlog
+9. **Verify and confirm**:
+   ```
+   ✅ Pulled from backlog!
 
-9. **Update PLAN.md Progress Dashboard** (if it exists):
-   - Add pulled task to dashboard
-   - Update task count for target phase
-   - Mark as ⏳ PENDING (fresh start)
+   **Task**: Task [old-number] → Task [new-number]
+   **File**: backlog/phase-N-task-M.md → phase-N/task-K.md
+   **Phase**: Phase [N]: [Name]
+   **Status**: ⏳ PENDING (ready to start)
 
-10. **Verify and confirm**:
-    - Confirm to user:
+   **Backlog**: [N-1] tasks remaining
 
-      ```
-      ✅ Pulled from backlog!
-
-      **Task**: Task [old-number] from backlog → Task [new-number] in PLAN.md
-      **Phase**: Phase [N]: [Name]
-      **Position**: [Description based on instruction or default]
-      **Status**: ⏳ PENDING (ready to start)
-
-      **Backlog**: [N-1] tasks remaining
-
-      Use `/flow-task-start [new-number]` to begin this task when ready.
-      ```
+   Use `/flow-task-start` to begin this task when ready.
+   ```
 
 **Edge Cases**:
 - **Backlog empty**: "Backlog is empty. Nothing to pull."
-- **Task not in backlog**: "Task [N] not in backlog. Use `/flow-backlog-view` to see available tasks."
-- **Invalid instruction**: Warn and use default positioning
+- **Task not in backlog**: "Task [N] not in backlog."
+- **Target phase doesn't exist**: Create phase directory
 - **No active phase**: Ask user which phase to add task to
 
-**Output**: Update .flow/PLAN.md (task added), update .flow/BACKLOG.md (task removed).
+**Output**: Move task file from backlog/ to phase directory, update DASHBOARD.md and BACKLOG.md.
 
 ```
 
----
-
-## /flow-reinstall
-
-<!-- MCP_METADATA
-function_name: flow_reinstall
-category: maintenance
-parameters: []
-returns: dict[str, Any]
-plan_operations: []
-framework_reading_required: false
-framework_sections: []
-MCP_METADATA_END -->
-
-**File**: `flow-reinstall.md`
-
-```markdown
----
-description: Force reinstall of Flow MCP server to latest version by clearing cache and restarting
----
-
-# Flow Reinstall - Force Update to Latest Version
-
-You are executing the `/flow-reinstall` command from the Flow framework.
-
-**Purpose**: Clear uvx cache and restart Flow MCP server to ensure you're running the latest published version.
-
-**🟢 NO FRAMEWORK READING REQUIRED - This is a maintenance command that doesn't interact with PLAN.md**
-
-**When to use**:
-- After a new Flow version is published to PyPI
-- When MCP tool responses seem outdated or incorrect
-- When debugging MCP server issues
-- When instructed to update Flow
-
----
-
-## Steps
-
-### 1. Find Running MCP Server Processes
-
-Use `ps` to find all running `mcp-server-flow` processes:
-
-```bash
-ps aux | grep mcp-server-flow | grep -v grep
-```
-
-**Expected output**: Lines showing Python processes running mcp_server.py
-
-### 2. Kill Running Processes
-
-If processes are found, kill them:
-
-```bash
-ps aux | grep mcp-server-flow | grep -v grep | awk '{print $2}' | xargs kill -9
-```
-
-**What this does**:
-- Finds all mcp-server-flow processes
-- Extracts PIDs (process IDs)
-- Kills them forcefully with SIGKILL
-
-### 3. Find Cached Versions
-
-Check uvx cache directories for cached Flow installations:
-
-```bash
-ls -la ~/.cache/uv/archive-v0/ | grep mcp-server-flow
-```
-
-**Expected output**: Directories with hash names containing cached mcp-server-flow wheels
-
-### 4. Delete Cached Versions
-
-Delete all cached Flow installations:
-
-```bash
-find ~/.cache/uv/archive-v0/ -type d -name "*" -exec sh -c 'ls {} 2>/dev/null | grep -q mcp-server-flow && echo {}' \; | xargs rm -rf
-```
-
-**Alternative (safer)**: List directories first, then delete manually:
-
-```bash
-# Find directories containing mcp-server-flow
-find ~/.cache/uv/archive-v0/ -type f -name "*mcp-server-flow*" | sed 's|/[^/]*$||' | sort -u
-
-# Then delete each directory manually
-rm -rf ~/.cache/uv/archive-v0/[HASH_DIRECTORY]
-```
-
-### 5. Verify Cache is Clear
-
-Verify no cached versions remain:
-
-```bash
-find ~/.cache/uv -name "*mcp-server-flow*" 2>/dev/null
-```
-
-**Expected output**: Empty (no results)
-
-### 6. Instruct User to Restart
-
-After clearing cache and killing processes, inform the user:
-
-```
-✅ Flow MCP Server Cache Cleared
-
-**What was done**:
-- Killed [N] running mcp-server-flow processes
-- Deleted [N] cached installations from ~/.cache/uv/
-
-**Next Step**:
-IMPORTANT: You must restart this conversation for changes to take effect.
-
-1. Close this Claude Code session
-2. Start a new conversation
-3. The latest Flow version will be downloaded automatically on first MCP tool use
-
-**Why restart is needed**:
-Claude Code spawns MCP servers at session start. A new session is required to spawn a fresh server with the latest version.
-```
-
----
-
-## Safety Notes
-
-**Safe operations**:
-- Killing mcp-server-flow processes only affects Flow MCP server
-- Deleting uvx cache only affects cached Python packages (will be re-downloaded on demand)
-- No project files or PLAN.md are touched
-
-**What gets deleted**:
-- `~/.cache/uv/archive-v0/[HASH]/` - Cached wheel files (~250KB per version)
-- No source code or framework files are modified
-
-**Recovery**:
-If something goes wrong, the MCP server will be re-downloaded automatically on next use from PyPI.
-
----
-
-## Example Output
-
-```bash
-$ ps aux | grep mcp-server-flow | grep -v grep
-user  12345  0.1  0.2  /path/to/python mcp_server.py
-user  12346  0.1  0.2  /path/to/python mcp_server.py
-
-$ ps aux | grep mcp-server-flow | grep -v grep | awk '{print $2}' | xargs kill -9
-# (no output, processes killed)
-
-$ find ~/.cache/uv/archive-v0/ -type f -name "*mcp-server-flow*"
-/Users/user/.cache/uv/archive-v0/7Xzq81CHwYy7mX_2BXpSb/mcp_server_flow-1.2.11-py3-none-any.whl
-
-$ rm -rf ~/.cache/uv/archive-v0/7Xzq81CHwYy7mX_2BXpSb/
-
-$ find ~/.cache/uv -name "*mcp-server-flow*" 2>/dev/null
-# (no output, cache cleared)
-```
-
----
-
-## Troubleshooting
-
-**No processes found**: Normal if MCP server hasn't been used yet this session
-
-**Permission denied**: Use `sudo` if cache directories require elevated permissions (rare)
-
-**Cache directory doesn't exist**: Normal on fresh installations, skip deletion step
-
-**Still seeing old version after restart**:
-- Verify PyPI has the new version: https://pypi.org/project/mcp-server-flow/
-- Check mcp.json doesn't pin old version (should be `"mcp-server-flow"` without version)
-- Try `uvx --force mcp-server-flow` manually to test
-
-```
-
----
-
-**Version**: 1.0.9
-**Last Updated**: 2025-10-02
-```

@@ -429,21 +429,5 @@ echo "📊 Size: $(wc -c < "$OUTPUT_FILE") bytes"
 echo "📝 Lines: $(wc -l < "$OUTPUT_FILE") lines"
 echo ""
 
-# Generate MCP server tools from updated metadata
-echo "🐍 Generating MCP server tools..."
-echo ""
-
-MCP_VENV_PYTHON="$SCRIPT_DIR/mcp-server-flow/.venv/bin/python"
-MCP_GENERATOR="$SCRIPT_DIR/scripts/generate_mcp_tools.py"
-
-if [ -f "$MCP_VENV_PYTHON" ] && [ -f "$MCP_GENERATOR" ]; then
-  "$MCP_VENV_PYTHON" "$MCP_GENERATOR"
-  echo ""
-else
-  echo "⚠️  MCP generator not found - skipping MCP server generation"
-  echo "   (Expected: $MCP_VENV_PYTHON and $MCP_GENERATOR)"
-  echo ""
-fi
-
 echo "✨ The standalone script is ready to distribute!"
 echo "   Includes: Commands + Framework + Example (complete package)"

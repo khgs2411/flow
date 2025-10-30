@@ -334,87 +334,6 @@ else
   echo "  gh release create v${VERSION} --title \"v${VERSION} - ${RELEASE_TITLE}\" flow.sh"
 fi
 
-# Step 7: Publish MCP server to PyPI
-echo ""
-echo -e "${BLUE}📦 Step 7/7: Publishing MCP server to PyPI...${NC}"
-echo ""
-
-read -p "Publish mcp-server-flow to PyPI? (requires uv and PyPI credentials) (y/n): " -n 1 -r
-echo ""
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-  MCP_DIR="$SCRIPT_DIR/mcp-server-flow"
-  MCP_PYPROJECT="$MCP_DIR/pyproject.toml"
-
-  if [ ! -f "$MCP_PYPROJECT" ]; then
-    echo -e "${RED}❌ mcp-server-flow/pyproject.toml not found${NC}"
-    echo ""
-  else
-    # Update version in pyproject.toml
-    echo -e "${CYAN}📝 Updating MCP server version to ${VERSION}...${NC}"
-    sed -i '' "s/^version = \".*\"/version = \"${VERSION}\"/" "$MCP_PYPROJECT"
-    echo -e "${GREEN}✅ Updated pyproject.toml${NC}"
-    echo ""
-
-    # Clean old builds
-    echo -e "${CYAN}🧹 Cleaning old builds...${NC}"
-    rm -rf "$MCP_DIR/dist"/*.whl "$MCP_DIR/dist"/*.tar.gz 2>/dev/null || true
-    echo -e "${GREEN}✅ Cleaned dist directory${NC}"
-    echo ""
-
-    # Build the package
-    echo -e "${CYAN}🔨 Building MCP package...${NC}"
-    cd "$MCP_DIR"
-    uv build
-    echo -e "${GREEN}✅ Built MCP package${NC}"
-    echo ""
-
-    # Publish to PyPI
-    echo -e "${CYAN}🚀 Publishing to PyPI...${NC}"
-    uv publish
-
-    if [ $? -eq 0 ]; then
-      echo -e "${GREEN}✅ Published mcp-server-flow v${VERSION} to PyPI${NC}"
-      echo ""
-      echo "Installation command:"
-      echo "  uvx mcp-server-flow@${VERSION}"
-      echo ""
-
-      # Add MCP package files to git
-      cd "$SCRIPT_DIR"
-      git add "$MCP_PYPROJECT" 2>/dev/null || true
-
-      # Create additional commit for MCP version update if there are changes
-      if ! git diff --cached --quiet; then
-        git commit -m "Update MCP server version to ${VERSION}"
-        echo -e "${GREEN}✅ Committed MCP version update${NC}"
-        echo ""
-
-        # Push the additional commit
-        read -p "Push MCP version commit to GitHub? (y/n): " -n 1 -r
-        echo ""
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-          git push origin master
-          echo -e "${GREEN}✅ Pushed MCP version update${NC}"
-          echo ""
-        fi
-      fi
-    else
-      echo -e "${RED}❌ Failed to publish to PyPI${NC}"
-      echo ""
-    fi
-
-    cd "$SCRIPT_DIR"
-  fi
-else
-  echo -e "${YELLOW}⚠️  Skipped PyPI publishing${NC}"
-  echo ""
-  echo "To publish manually:"
-  echo "  cd mcp-server-flow"
-  echo "  uv build"
-  echo "  uv publish"
-  echo ""
-fi
-
 echo ""
 echo "=================================================="
 echo -e "${GREEN}✅ Release v${VERSION} Complete!${NC}"
@@ -428,11 +347,9 @@ echo "  • Commit: $(git rev-parse --short HEAD)"
 echo ""
 echo -e "${CYAN}Distribution:${NC}"
 echo "  • GitHub: flow.sh attached to release"
-echo "  • PyPI: uvx mcp-server-flow@${VERSION}"
 echo ""
 echo -e "${CYAN}Next Steps:${NC}"
 echo "  • Update README.md if needed (screenshots, features, etc.)"
 echo "  • Announce release in project channels"
 echo "  • Monitor GitHub issues for feedback"
-echo "  • Test MCP server: uvx mcp-server-flow@${VERSION}"
 echo ""
