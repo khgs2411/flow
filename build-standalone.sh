@@ -199,8 +199,9 @@ OPTIONS:
 
 DEPLOYMENT STRUCTURE:
   .claude/commands/          Slash commands (\${#COMMANDS[@]} files)
-  .flow/                     Framework documentation
-    └── DEVELOPMENT_FRAMEWORK.md
+  .flow/framework/           AI reference files (read-only for user)
+    ├── DEVELOPMENT_FRAMEWORK.md
+    └── examples/
 
 This script is SELF-CONTAINED - no external files needed!
 
@@ -338,8 +339,12 @@ deploy_commands() {
 deploy_framework() {
   local target_dir="$1"
   local force="$2"
-  local framework_file="$target_dir/DEVELOPMENT_FRAMEWORK.md"
-  local examples_dir="$target_dir/examples"
+  local framework_dir="$target_dir/framework"
+  local framework_file="$framework_dir/DEVELOPMENT_FRAMEWORK.md"
+  local examples_dir="$framework_dir/examples"
+
+  # Create framework directory
+  mkdir -p "$framework_dir" || { echo -e "${RED}❌ mkdir framework/${NC}"; return 1; }
 
   # If force mode, delete existing files first to ensure clean write
   if [ "$force" = true ]; then
@@ -349,24 +354,24 @@ deploy_framework() {
 
   # Deploy framework guide
   if [ -f "$framework_file" ] && [ "$force" = false ]; then
-    echo -e "${YELLOW}⏭️  Skip DEVELOPMENT_FRAMEWORK.md${NC}"
+    echo -e "${YELLOW}⏭️  Skip framework/DEVELOPMENT_FRAMEWORK.md${NC}"
   else
-    get_framework_content > "$framework_file" && echo -e "${GREEN}✅ DEVELOPMENT_FRAMEWORK.md${NC}" || { echo -e "${RED}❌ Framework${NC}"; return 1; }
+    get_framework_content > "$framework_file" && echo -e "${GREEN}✅ framework/DEVELOPMENT_FRAMEWORK.md${NC}" || { echo -e "${RED}❌ Framework${NC}"; return 1; }
   fi
 
   # Deploy examples
   if [ -d "$examples_dir" ] && [ "$force" = false ]; then
-    echo -e "${YELLOW}⏭️  Skip examples/${NC}"
+    echo -e "${YELLOW}⏭️  Skip framework/examples/${NC}"
   else
     # Create examples directory structure
-    mkdir -p "$examples_dir/phase-1" || { echo -e "${RED}❌ examples/phase-1${NC}"; return 1; }
-    mkdir -p "$examples_dir/phase-2" || { echo -e "${RED}❌ examples/phase-2${NC}"; return 1; }
+    mkdir -p "$examples_dir/phase-1" || { echo -e "${RED}❌ framework/examples/phase-1${NC}"; return 1; }
+    mkdir -p "$examples_dir/phase-2" || { echo -e "${RED}❌ framework/examples/phase-2${NC}"; return 1; }
 
     # Deploy example files
-    get_example_dashboard > "$examples_dir/DASHBOARD.md" && echo -e "${GREEN}✅ examples/DASHBOARD.md${NC}" || { echo -e "${RED}❌ examples/DASHBOARD.md${NC}"; return 1; }
-    get_example_plan > "$examples_dir/PLAN.md" && echo -e "${GREEN}✅ examples/PLAN.md${NC}" || { echo -e "${RED}❌ examples/PLAN.md${NC}"; return 1; }
-    get_example_task_standalone > "$examples_dir/phase-1/task-1.md" && echo -e "${GREEN}✅ examples/phase-1/task-1.md${NC}" || { echo -e "${RED}❌ examples/phase-1/task-1.md${NC}"; return 1; }
-    get_example_task_iterations > "$examples_dir/phase-2/task-3.md" && echo -e "${GREEN}✅ examples/phase-2/task-3.md${NC}" || { echo -e "${RED}❌ examples/phase-2/task-3.md${NC}"; return 1; }
+    get_example_dashboard > "$examples_dir/DASHBOARD.md" && echo -e "${GREEN}✅ framework/examples/DASHBOARD.md${NC}" || { echo -e "${RED}❌ framework/examples/DASHBOARD.md${NC}"; return 1; }
+    get_example_plan > "$examples_dir/PLAN.md" && echo -e "${GREEN}✅ framework/examples/PLAN.md${NC}" || { echo -e "${RED}❌ framework/examples/PLAN.md${NC}"; return 1; }
+    get_example_task_standalone > "$examples_dir/phase-1/task-1.md" && echo -e "${GREEN}✅ framework/examples/phase-1/task-1.md${NC}" || { echo -e "${RED}❌ framework/examples/phase-1/task-1.md${NC}"; return 1; }
+    get_example_task_iterations > "$examples_dir/phase-2/task-3.md" && echo -e "${GREEN}✅ framework/examples/phase-2/task-3.md${NC}" || { echo -e "${RED}❌ framework/examples/phase-2/task-3.md${NC}"; return 1; }
   fi
 
   return 0
@@ -380,10 +385,10 @@ validate() {
   echo -e "\n${CYAN}🔍 Validating...${NC}\n"
 
   # Check framework
-  [ ! -f "$flow_dir/DEVELOPMENT_FRAMEWORK.md" ] && { echo -e "${RED}❌ Framework missing${NC}"; valid=false; } || echo -e "${GREEN}✅ Framework${NC}"
+  [ ! -f "$flow_dir/framework/DEVELOPMENT_FRAMEWORK.md" ] && { echo -e "${RED}❌ Framework missing${NC}"; valid=false; } || echo -e "${GREEN}✅ Framework${NC}"
 
   # Check examples
-  [ ! -d "$flow_dir/examples" ] && { echo -e "${RED}❌ Examples missing${NC}"; valid=false; } || echo -e "${GREEN}✅ Examples (4 files)${NC}"
+  [ ! -d "$flow_dir/framework/examples" ] && { echo -e "${RED}❌ Examples missing${NC}"; valid=false; } || echo -e "${GREEN}✅ Examples (4 files)${NC}"
 
   # Check commands
   local count=0
@@ -435,19 +440,20 @@ main() {
     echo -e "${GREEN}✅ Flow Framework Installed!${NC}\n"
     echo -e "${CYAN}📂 Structure:${NC}"
     echo "   .claude/commands/       (${#COMMANDS[@]} slash commands)"
-    echo "   .flow/                  (framework docs + examples)"
-    echo "     ├── DEVELOPMENT_FRAMEWORK.md"
-    echo "     └── examples/"
-    echo "         ├── DASHBOARD.md"
-    echo "         ├── PLAN.md"
-    echo "         ├── phase-1/task-1.md"
-    echo "         └── phase-2/task-3.md"
+    echo "   .flow/                  (your workspace)"
+    echo "     └── framework/        (AI reference files)"
+    echo "         ├── DEVELOPMENT_FRAMEWORK.md"
+    echo "         └── examples/"
+    echo "             ├── DASHBOARD.md"
+    echo "             ├── PLAN.md"
+    echo "             ├── phase-1/task-1.md"
+    echo "             └── phase-2/task-3.md"
     echo ""
     echo -e "${CYAN}🚀 Next Steps:${NC}"
     echo "   1. Restart Claude Code (if running)"
     echo "   2. Run: /flow-blueprint <your-feature-name>"
-    echo "   3. Read: .flow/DEVELOPMENT_FRAMEWORK.md"
-    echo "   4. Examples: .flow/examples/ (now installed locally!)"
+    echo "   3. Read: .flow/framework/DEVELOPMENT_FRAMEWORK.md"
+    echo "   4. Examples: .flow/framework/examples/"
     echo ""
     echo "💡 Share this script - it's self-contained!"
     echo "=================================================="

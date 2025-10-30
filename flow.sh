@@ -67,8 +67,9 @@ OPTIONS:
 
 DEPLOYMENT STRUCTURE:
   .claude/commands/          Slash commands (\${#COMMANDS[@]} files)
-  .flow/                     Framework documentation
-    └── DEVELOPMENT_FRAMEWORK.md
+  .flow/framework/           AI reference files (read-only for user)
+    ├── DEVELOPMENT_FRAMEWORK.md
+    └── examples/
 
 This script is SELF-CONTAINED - no external files needed!
 
@@ -118,10 +119,11 @@ This file contains all slash command definitions for the Flow framework. Copy th
 
 - **Plan File**: `.flow/PLAN.md` (Flow manages the plan from this directory)
 - **Framework Guide**: Search in order:
-  1. `.flow/DEVELOPMENT_FRAMEWORK.md`
-  2. `.claude/DEVELOPMENT_FRAMEWORK.md`
+  1. `.flow/framework/DEVELOPMENT_FRAMEWORK.md` (primary - in user's project)
+  2. `.claude/DEVELOPMENT_FRAMEWORK.md` (project root)
   3. `./DEVELOPMENT_FRAMEWORK.md` (project root)
   4. `~/.claude/flow/DEVELOPMENT_FRAMEWORK.md` (global)
+- **Examples**: `.flow/framework/examples/` (reference files for AI to learn from)
 
 **Finding PLAN.md** (all commands except `/flow-blueprint` and `/flow-migrate`):
 
@@ -191,7 +193,7 @@ You are executing the `/flow-blueprint` command from the Flow framework.
 
 - **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-600 (Quick Reference section) - if not already in context
 - **Read file templates**: DEVELOPMENT_FRAMEWORK.md lines 2101-2600 (DASHBOARD.md, PLAN.md, task-N.md templates)
-- **Read examples**: `.flow/examples/` directory for real-world examples
+- **Read examples**: `.flow/framework/examples/` directory for real-world examples
 
 **Multi-File Architecture**: This command creates:
 - `DASHBOARD.md` - Progress tracking (single source of truth, user's main workspace)
@@ -278,7 +280,7 @@ Testing: Simulation-based per service"
 
 2. **Read framework guide AND examples** (after validation):
    - Search for DEVELOPMENT_FRAMEWORK.md (`.flow/`, `.claude/`, `./`, `~/.claude/flow/`)
-   - Search for examples in `.flow/examples/` (DASHBOARD.md, PLAN.md, task files)
+   - Search for examples in `.flow/framework/examples/` (DASHBOARD.md, PLAN.md, task files)
    - Read to understand:
      - Multi-file structure (DASHBOARD vs PLAN vs task files)
      - File templates
@@ -322,6 +324,23 @@ Testing: Simulation-based per service"
    c. **Estimate phase/task structure** (Mode A only):
       - Based on requirements, estimate phases needed
       - Ask: "I'm thinking X phases: [list]. Does this structure make sense? Any changes?"
+
+   d. **Ask about Key Decisions** (IMPORTANT - human-in-loop):
+      - If you identify design decisions during structure creation, **ASK USER IMMEDIATELY**:
+        ```
+        "I identified a decision point: [question]"
+        "- Option A: [description]"
+        "- Option B: [description]"
+        "Your choice? (or say 'decide later' to add to Key Decisions section)"
+        ```
+      - **If user chooses**: Document choice in PLAN.md Architecture section or relevant file
+      - **If user says "decide later"**: Add to DASHBOARD.md Key Decisions section as unresolved
+      - **DO NOT** create unresolved Key Decisions without asking user first
+      - Examples of decisions to ask about:
+        - Version numbering (v1.X.0 vs v2.0.0)
+        - Architecture patterns (REST vs GraphQL, SQL vs NoSQL)
+        - Testing approach (if not already gathered in step 4b)
+        - Deployment strategy (if relevant to project)
 
 5. **Determine what files to create**:
 
@@ -475,11 +494,11 @@ You are executing the `/flow-migrate` command from the Flow framework.
 
    - **Read DEVELOPMENT_FRAMEWORK.md lines 1-353** (Quick Reference)
    - **Read DEVELOPMENT_FRAMEWORK.md lines 2101-2600** (File Templates)
-   - **Read examples/** directory to see multi-file structure:
-     - `examples/DASHBOARD.md` - Dashboard format
-     - `examples/PLAN.md` - Static plan format
-     - `examples/phase-1/task-1.md` - Standalone task example
-     - `examples/phase-2/task-3.md` - Task with iterations example
+   - **Read framework/examples/** directory to see multi-file structure:
+     - `framework/examples/DASHBOARD.md` - Dashboard format
+     - `framework/examples/PLAN.md` - Static plan format
+     - `framework/examples/phase-1/task-1.md` - Standalone task example
+     - `framework/examples/phase-2/task-3.md` - Task with iterations example
    - **Understand**:
      - Multi-file hierarchy: DASHBOARD.md + PLAN.md + phase-N/task-M.md
      - Flow's hierarchy: PHASE → TASK → ITERATION → BRAINSTORM → IMPLEMENTATION
@@ -532,18 +551,18 @@ You are executing the `/flow-migrate` command from the Flow framework.
    **Path A - STRUCTURED** (already has phases/tasks):
 
    - Keep existing hierarchy
-   - **CRITICAL**: Use examples/ directory as reference for all files
-   - **Create DASHBOARD.md** (use examples/DASHBOARD.md as template):
+   - **CRITICAL**: Use framework/examples/ directory as reference for all files
+   - **Create DASHBOARD.md** (use framework/examples/DASHBOARD.md as template):
      - "📍 Current Work" section with current phase/task/iteration
      - "📊 Progress Overview" with all phases and tasks
      - "📈 Completion Status" with percentages
-   - **Create PLAN.md** (use examples/PLAN.md as template):
+   - **Create PLAN.md** (use framework/examples/PLAN.md as template):
      - Overview section with Purpose, Goals (text only, no checklists), Scope (V1 only unless user specifies V2)
      - Architecture section with system context (high-level, not prescriptive)
      - DO/DON'T Guidelines section
      - Notes & Learnings section
    - **Create phase-N/ directories** for each phase
-   - **Create task files** (use examples/phase-2/task-3.md as template):
+   - **Create task files** (use framework/examples/phase-2/task-3.md as template):
      - Task overview
      - Iterations with brainstorming sessions
      - Pre-implementation tasks (if applicable)
@@ -705,7 +724,7 @@ You are executing the `/flow-plan-update` command from the Flow framework.
 1. **Read the framework guide**:
    - Read DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference)
    - Read DEVELOPMENT_FRAMEWORK.md lines 2101-2600 (File Templates)
-   - Read examples/ directory for current format
+   - Read framework/examples/ directory for current format
 
 2. **Read current structure**:
    - Read `DASHBOARD.md`
@@ -4061,22 +4080,27 @@ Flow uses a **multi-file architecture** where work is split across focused files
 ├── PLAN.md                   # 📖 Static context (overview, architecture, scope)
 ├── BACKLOG.md                # 📦 Deferred/future tasks
 ├── ARCHIVE.md                # 🗄️ Completed work (created by /flow-plan-split)
-├── phase-1/
+├── phase-1/                  # 👤 USER'S WORK FILES
 │   ├── task-1.md            # 📝 Task with iterations, brainstorming, implementation
 │   ├── task-2.md
 │   └── task-3.md
-├── phase-2/
+├── phase-2/                  # 👤 USER'S WORK FILES
 │   ├── task-1.md
 │   └── task-2.md
-├── examples/                 # 📚 Example files (reference)
-│   ├── DASHBOARD.md
-│   ├── PLAN.md
-│   └── phase-1/
-│       └── task-1.md
-└── DEVELOPMENT_FRAMEWORK.md  # 🎓 This file (methodology)
+└── framework/                # 🤖 AI REFERENCE FILES (read-only for user)
+    ├── DEVELOPMENT_FRAMEWORK.md  # 🎓 Complete methodology guide
+    └── examples/             # 📚 Example files for AI to learn from
+        ├── DASHBOARD.md
+        ├── PLAN.md
+        ├── phase-1/
+        │   └── task-1.md
+        └── phase-2/
+            └── task-3.md
 ```
 
 ### File Purposes
+
+**👤 USER'S FILES** (What you work in):
 
 **DASHBOARD.md** (⭐ Most Important - Single Source of Truth):
 - User spends most time here
@@ -4108,6 +4132,18 @@ Flow uses a **multi-file architecture** where work is split across focused files
 - Created by `/flow-plan-split`
 - Archives all completed tasks
 - Task files become references: "See ARCHIVE.md"
+
+**🤖 AI REFERENCE FILES** (Read-only, for AI agents):
+
+**framework/DEVELOPMENT_FRAMEWORK.md** (This File):
+- Complete Flow methodology
+- Templates, patterns, best practices
+- AI reads this to understand how Flow works
+
+**framework/examples/** (Example Project):
+- Real example of Flow in use (payment gateway project)
+- AI learns patterns from these examples
+- Shows DASHBOARD.md, PLAN.md, and task file formats
 
 ---
 
@@ -6317,11 +6353,51 @@ Before marking iteration complete, verify:
 
 ---
 
+#### Brainstorming Session - [Iteration Name]
+
+(Optional - design decisions will be documented here if needed)
+
+**Focus**: [What we're designing - TBD]
+
+**Subjects to Discuss**:
+- (Add subjects with /flow-brainstorm-subject)
+
+**Resolved Subjects**:
+- (Filled during brainstorming)
+
+---
+
+#### Action Items
+
+- [ ] [TBD - Define during brainstorming or add directly]
+
+---
+
 ### ⏳ Iteration 2: [Name]
 
 **Goal**: [One sentence - what this iteration achieves]
 
 **Status**: ⏳ PENDING
+
+---
+
+#### Brainstorming Session - [Iteration Name]
+
+(Optional - design decisions will be documented here if needed)
+
+**Focus**: [What we're designing - TBD]
+
+**Subjects to Discuss**:
+- (Add subjects with /flow-brainstorm-subject)
+
+**Resolved Subjects**:
+- (Filled during brainstorming)
+
+---
+
+#### Action Items
+
+- [ ] [TBD - Define during brainstorming or add directly]
 
 ---
 
@@ -7597,6 +7673,17 @@ get_example_dashboard() {
 
 ---
 
+## 📚 Framework Patterns Demonstrated
+
+This example project demonstrates Flow's **Resolution Items Pattern**:
+
+- **See**: [phase-2/task-3.md](phase-2/task-3.md) - Iteration 1 and 2
+- **Pattern**: During brainstorming, each subject produces "Resolution Items"
+- **Consolidation**: `/flow-brainstorming-review` consolidates all Resolution Items into single Action Items list
+- **Benefit**: Prevents scattered action items, ensures brainstorming flows cleanly into implementation
+
+---
+
 ## 💡 Key Decisions
 
 **Decision Needed**: Should we implement circuit breaker pattern for retry logic?
@@ -7992,6 +8079,21 @@ Build a robust Stripe API client with error handling, retry logic for transient 
 
 #### Action Items
 
+<!--
+  FRAMEWORK PATTERN: Resolution Items → Action Items Flow
+
+  Notice how this Action Items list is a CONSOLIDATION of all Resolution Items from
+  the 3 resolved subjects above. This is the core pattern:
+
+  1. During brainstorming: Each subject produces "Resolution Items"
+  2. When done brainstorming: Run /flow-brainstorming-review
+  3. AI consolidates all Resolution Items into single Action Items list here
+  4. During implementation: Work from this consolidated list (NOT from individual subjects)
+
+  This prevents scattered action items and ensures all brainstorming decisions flow
+  into implementation in a structured way.
+-->
+
 (Consolidated from Resolution Items above by `/flow-brainstorming-review`)
 
 - [x] Create `StripeClient` singleton class in src/integrations/stripe/
@@ -8200,6 +8302,8 @@ Added circuit breaker to PLAN.md V2 scope with reasoning and implementation note
 
 #### Action Items
 
+<!-- See comment in Iteration 1 for explanation of Resolution Items → Action Items flow -->
+
 (Consolidated from Resolution Items above by `/flow-brainstorming-review`)
 
 - [x] Create `ErrorMapper` class in src/integrations/stripe/
@@ -8380,8 +8484,12 @@ deploy_commands() {
 deploy_framework() {
   local target_dir="$1"
   local force="$2"
-  local framework_file="$target_dir/DEVELOPMENT_FRAMEWORK.md"
-  local examples_dir="$target_dir/examples"
+  local framework_dir="$target_dir/framework"
+  local framework_file="$framework_dir/DEVELOPMENT_FRAMEWORK.md"
+  local examples_dir="$framework_dir/examples"
+
+  # Create framework directory
+  mkdir -p "$framework_dir" || { echo -e "${RED}❌ mkdir framework/${NC}"; return 1; }
 
   # If force mode, delete existing files first to ensure clean write
   if [ "$force" = true ]; then
@@ -8391,24 +8499,24 @@ deploy_framework() {
 
   # Deploy framework guide
   if [ -f "$framework_file" ] && [ "$force" = false ]; then
-    echo -e "${YELLOW}⏭️  Skip DEVELOPMENT_FRAMEWORK.md${NC}"
+    echo -e "${YELLOW}⏭️  Skip framework/DEVELOPMENT_FRAMEWORK.md${NC}"
   else
-    get_framework_content > "$framework_file" && echo -e "${GREEN}✅ DEVELOPMENT_FRAMEWORK.md${NC}" || { echo -e "${RED}❌ Framework${NC}"; return 1; }
+    get_framework_content > "$framework_file" && echo -e "${GREEN}✅ framework/DEVELOPMENT_FRAMEWORK.md${NC}" || { echo -e "${RED}❌ Framework${NC}"; return 1; }
   fi
 
   # Deploy examples
   if [ -d "$examples_dir" ] && [ "$force" = false ]; then
-    echo -e "${YELLOW}⏭️  Skip examples/${NC}"
+    echo -e "${YELLOW}⏭️  Skip framework/examples/${NC}"
   else
     # Create examples directory structure
-    mkdir -p "$examples_dir/phase-1" || { echo -e "${RED}❌ examples/phase-1${NC}"; return 1; }
-    mkdir -p "$examples_dir/phase-2" || { echo -e "${RED}❌ examples/phase-2${NC}"; return 1; }
+    mkdir -p "$examples_dir/phase-1" || { echo -e "${RED}❌ framework/examples/phase-1${NC}"; return 1; }
+    mkdir -p "$examples_dir/phase-2" || { echo -e "${RED}❌ framework/examples/phase-2${NC}"; return 1; }
 
     # Deploy example files
-    get_example_dashboard > "$examples_dir/DASHBOARD.md" && echo -e "${GREEN}✅ examples/DASHBOARD.md${NC}" || { echo -e "${RED}❌ examples/DASHBOARD.md${NC}"; return 1; }
-    get_example_plan > "$examples_dir/PLAN.md" && echo -e "${GREEN}✅ examples/PLAN.md${NC}" || { echo -e "${RED}❌ examples/PLAN.md${NC}"; return 1; }
-    get_example_task_standalone > "$examples_dir/phase-1/task-1.md" && echo -e "${GREEN}✅ examples/phase-1/task-1.md${NC}" || { echo -e "${RED}❌ examples/phase-1/task-1.md${NC}"; return 1; }
-    get_example_task_iterations > "$examples_dir/phase-2/task-3.md" && echo -e "${GREEN}✅ examples/phase-2/task-3.md${NC}" || { echo -e "${RED}❌ examples/phase-2/task-3.md${NC}"; return 1; }
+    get_example_dashboard > "$examples_dir/DASHBOARD.md" && echo -e "${GREEN}✅ framework/examples/DASHBOARD.md${NC}" || { echo -e "${RED}❌ framework/examples/DASHBOARD.md${NC}"; return 1; }
+    get_example_plan > "$examples_dir/PLAN.md" && echo -e "${GREEN}✅ framework/examples/PLAN.md${NC}" || { echo -e "${RED}❌ framework/examples/PLAN.md${NC}"; return 1; }
+    get_example_task_standalone > "$examples_dir/phase-1/task-1.md" && echo -e "${GREEN}✅ framework/examples/phase-1/task-1.md${NC}" || { echo -e "${RED}❌ framework/examples/phase-1/task-1.md${NC}"; return 1; }
+    get_example_task_iterations > "$examples_dir/phase-2/task-3.md" && echo -e "${GREEN}✅ framework/examples/phase-2/task-3.md${NC}" || { echo -e "${RED}❌ framework/examples/phase-2/task-3.md${NC}"; return 1; }
   fi
 
   return 0
@@ -8422,10 +8530,10 @@ validate() {
   echo -e "\n${CYAN}🔍 Validating...${NC}\n"
 
   # Check framework
-  [ ! -f "$flow_dir/DEVELOPMENT_FRAMEWORK.md" ] && { echo -e "${RED}❌ Framework missing${NC}"; valid=false; } || echo -e "${GREEN}✅ Framework${NC}"
+  [ ! -f "$flow_dir/framework/DEVELOPMENT_FRAMEWORK.md" ] && { echo -e "${RED}❌ Framework missing${NC}"; valid=false; } || echo -e "${GREEN}✅ Framework${NC}"
 
   # Check examples
-  [ ! -d "$flow_dir/examples" ] && { echo -e "${RED}❌ Examples missing${NC}"; valid=false; } || echo -e "${GREEN}✅ Examples (4 files)${NC}"
+  [ ! -d "$flow_dir/framework/examples" ] && { echo -e "${RED}❌ Examples missing${NC}"; valid=false; } || echo -e "${GREEN}✅ Examples (4 files)${NC}"
 
   # Check commands
   local count=0
@@ -8477,19 +8585,20 @@ main() {
     echo -e "${GREEN}✅ Flow Framework Installed!${NC}\n"
     echo -e "${CYAN}📂 Structure:${NC}"
     echo "   .claude/commands/       (${#COMMANDS[@]} slash commands)"
-    echo "   .flow/                  (framework docs + examples)"
-    echo "     ├── DEVELOPMENT_FRAMEWORK.md"
-    echo "     └── examples/"
-    echo "         ├── DASHBOARD.md"
-    echo "         ├── PLAN.md"
-    echo "         ├── phase-1/task-1.md"
-    echo "         └── phase-2/task-3.md"
+    echo "   .flow/                  (your workspace)"
+    echo "     └── framework/        (AI reference files)"
+    echo "         ├── DEVELOPMENT_FRAMEWORK.md"
+    echo "         └── examples/"
+    echo "             ├── DASHBOARD.md"
+    echo "             ├── PLAN.md"
+    echo "             ├── phase-1/task-1.md"
+    echo "             └── phase-2/task-3.md"
     echo ""
     echo -e "${CYAN}🚀 Next Steps:${NC}"
     echo "   1. Restart Claude Code (if running)"
     echo "   2. Run: /flow-blueprint <your-feature-name>"
-    echo "   3. Read: .flow/DEVELOPMENT_FRAMEWORK.md"
-    echo "   4. Examples: .flow/examples/ (now installed locally!)"
+    echo "   3. Read: .flow/framework/DEVELOPMENT_FRAMEWORK.md"
+    echo "   4. Examples: .flow/framework/examples/"
     echo ""
     echo "💡 Share this script - it's self-contained!"
     echo "=================================================="

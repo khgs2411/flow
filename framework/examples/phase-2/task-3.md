@@ -107,6 +107,21 @@ Build a robust Stripe API client with error handling, retry logic for transient 
 
 #### Action Items
 
+<!--
+  FRAMEWORK PATTERN: Resolution Items → Action Items Flow
+
+  Notice how this Action Items list is a CONSOLIDATION of all Resolution Items from
+  the 3 resolved subjects above. This is the core pattern:
+
+  1. During brainstorming: Each subject produces "Resolution Items"
+  2. When done brainstorming: Run /flow-brainstorming-review
+  3. AI consolidates all Resolution Items into single Action Items list here
+  4. During implementation: Work from this consolidated list (NOT from individual subjects)
+
+  This prevents scattered action items and ensures all brainstorming decisions flow
+  into implementation in a structured way.
+-->
+
 (Consolidated from Resolution Items above by `/flow-brainstorming-review`)
 
 - [x] Create `StripeClient` singleton class in src/integrations/stripe/
@@ -314,6 +329,8 @@ Added circuit breaker to PLAN.md V2 scope with reasoning and implementation note
 ---
 
 #### Action Items
+
+<!-- See comment in Iteration 1 for explanation of Resolution Items → Action Items flow -->
 
 (Consolidated from Resolution Items above by `/flow-brainstorming-review`)
 

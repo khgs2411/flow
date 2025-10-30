@@ -80,6 +80,17 @@
 
 ---
 
+## 📚 Framework Patterns Demonstrated
+
+This example project demonstrates Flow's **Resolution Items Pattern**:
+
+- **See**: [phase-2/task-3.md](phase-2/task-3.md) - Iteration 1 and 2
+- **Pattern**: During brainstorming, each subject produces "Resolution Items"
+- **Consolidation**: `/flow-brainstorming-review` consolidates all Resolution Items into single Action Items list
+- **Benefit**: Prevents scattered action items, ensures brainstorming flows cleanly into implementation
+
+---
+
 ## 💡 Key Decisions
 
 **Decision Needed**: Should we implement circuit breaker pattern for retry logic?

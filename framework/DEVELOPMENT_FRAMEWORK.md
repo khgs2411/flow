@@ -18,22 +18,27 @@ Flow uses a **multi-file architecture** where work is split across focused files
 ├── PLAN.md                   # 📖 Static context (overview, architecture, scope)
 ├── BACKLOG.md                # 📦 Deferred/future tasks
 ├── ARCHIVE.md                # 🗄️ Completed work (created by /flow-plan-split)
-├── phase-1/
+├── phase-1/                  # 👤 USER'S WORK FILES
 │   ├── task-1.md            # 📝 Task with iterations, brainstorming, implementation
 │   ├── task-2.md
 │   └── task-3.md
-├── phase-2/
+├── phase-2/                  # 👤 USER'S WORK FILES
 │   ├── task-1.md
 │   └── task-2.md
-├── examples/                 # 📚 Example files (reference)
-│   ├── DASHBOARD.md
-│   ├── PLAN.md
-│   └── phase-1/
-│       └── task-1.md
-└── DEVELOPMENT_FRAMEWORK.md  # 🎓 This file (methodology)
+└── framework/                # 🤖 AI REFERENCE FILES (read-only for user)
+    ├── DEVELOPMENT_FRAMEWORK.md  # 🎓 Complete methodology guide
+    └── examples/             # 📚 Example files for AI to learn from
+        ├── DASHBOARD.md
+        ├── PLAN.md
+        ├── phase-1/
+        │   └── task-1.md
+        └── phase-2/
+            └── task-3.md
 ```
 
 ### File Purposes
+
+**👤 USER'S FILES** (What you work in):
 
 **DASHBOARD.md** (⭐ Most Important - Single Source of Truth):
 - User spends most time here
@@ -65,6 +70,18 @@ Flow uses a **multi-file architecture** where work is split across focused files
 - Created by `/flow-plan-split`
 - Archives all completed tasks
 - Task files become references: "See ARCHIVE.md"
+
+**🤖 AI REFERENCE FILES** (Read-only, for AI agents):
+
+**framework/DEVELOPMENT_FRAMEWORK.md** (This File):
+- Complete Flow methodology
+- Templates, patterns, best practices
+- AI reads this to understand how Flow works
+
+**framework/examples/** (Example Project):
+- Real example of Flow in use (payment gateway project)
+- AI learns patterns from these examples
+- Shows DASHBOARD.md, PLAN.md, and task file formats
 
 ---
 
@@ -2274,11 +2291,51 @@ Before marking iteration complete, verify:
 
 ---
 
+#### Brainstorming Session - [Iteration Name]
+
+(Optional - design decisions will be documented here if needed)
+
+**Focus**: [What we're designing - TBD]
+
+**Subjects to Discuss**:
+- (Add subjects with /flow-brainstorm-subject)
+
+**Resolved Subjects**:
+- (Filled during brainstorming)
+
+---
+
+#### Action Items
+
+- [ ] [TBD - Define during brainstorming or add directly]
+
+---
+
 ### ⏳ Iteration 2: [Name]
 
 **Goal**: [One sentence - what this iteration achieves]
 
 **Status**: ⏳ PENDING
+
+---
+
+#### Brainstorming Session - [Iteration Name]
+
+(Optional - design decisions will be documented here if needed)
+
+**Focus**: [What we're designing - TBD]
+
+**Subjects to Discuss**:
+- (Add subjects with /flow-brainstorm-subject)
+
+**Resolved Subjects**:
+- (Filled during brainstorming)
+
+---
+
+#### Action Items
+
+- [ ] [TBD - Define during brainstorming or add directly]
 
 ---
 

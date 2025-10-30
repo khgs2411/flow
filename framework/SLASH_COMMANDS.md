@@ -18,10 +18,11 @@ This file contains all slash command definitions for the Flow framework. Copy th
 
 - **Plan File**: `.flow/PLAN.md` (Flow manages the plan from this directory)
 - **Framework Guide**: Search in order:
-  1. `.flow/DEVELOPMENT_FRAMEWORK.md`
-  2. `.claude/DEVELOPMENT_FRAMEWORK.md`
+  1. `.flow/framework/DEVELOPMENT_FRAMEWORK.md` (primary - in user's project)
+  2. `.claude/DEVELOPMENT_FRAMEWORK.md` (project root)
   3. `./DEVELOPMENT_FRAMEWORK.md` (project root)
   4. `~/.claude/flow/DEVELOPMENT_FRAMEWORK.md` (global)
+- **Examples**: `.flow/framework/examples/` (reference files for AI to learn from)
 
 **Finding PLAN.md** (all commands except `/flow-blueprint` and `/flow-migrate`):
 
@@ -91,7 +92,7 @@ You are executing the `/flow-blueprint` command from the Flow framework.
 
 - **Read once per session**: DEVELOPMENT_FRAMEWORK.md lines 1-600 (Quick Reference section) - if not already in context
 - **Read file templates**: DEVELOPMENT_FRAMEWORK.md lines 2101-2600 (DASHBOARD.md, PLAN.md, task-N.md templates)
-- **Read examples**: `.flow/examples/` directory for real-world examples
+- **Read examples**: `.flow/framework/examples/` directory for real-world examples
 
 **Multi-File Architecture**: This command creates:
 - `DASHBOARD.md` - Progress tracking (single source of truth, user's main workspace)
@@ -178,7 +179,7 @@ Testing: Simulation-based per service"
 
 2. **Read framework guide AND examples** (after validation):
    - Search for DEVELOPMENT_FRAMEWORK.md (`.flow/`, `.claude/`, `./`, `~/.claude/flow/`)
-   - Search for examples in `.flow/examples/` (DASHBOARD.md, PLAN.md, task files)
+   - Search for examples in `.flow/framework/examples/` (DASHBOARD.md, PLAN.md, task files)
    - Read to understand:
      - Multi-file structure (DASHBOARD vs PLAN vs task files)
      - File templates
@@ -222,6 +223,23 @@ Testing: Simulation-based per service"
    c. **Estimate phase/task structure** (Mode A only):
       - Based on requirements, estimate phases needed
       - Ask: "I'm thinking X phases: [list]. Does this structure make sense? Any changes?"
+
+   d. **Ask about Key Decisions** (IMPORTANT - human-in-loop):
+      - If you identify design decisions during structure creation, **ASK USER IMMEDIATELY**:
+        ```
+        "I identified a decision point: [question]"
+        "- Option A: [description]"
+        "- Option B: [description]"
+        "Your choice? (or say 'decide later' to add to Key Decisions section)"
+        ```
+      - **If user chooses**: Document choice in PLAN.md Architecture section or relevant file
+      - **If user says "decide later"**: Add to DASHBOARD.md Key Decisions section as unresolved
+      - **DO NOT** create unresolved Key Decisions without asking user first
+      - Examples of decisions to ask about:
+        - Version numbering (v1.X.0 vs v2.0.0)
+        - Architecture patterns (REST vs GraphQL, SQL vs NoSQL)
+        - Testing approach (if not already gathered in step 4b)
+        - Deployment strategy (if relevant to project)
 
 5. **Determine what files to create**:
 
@@ -375,11 +393,11 @@ You are executing the `/flow-migrate` command from the Flow framework.
 
    - **Read DEVELOPMENT_FRAMEWORK.md lines 1-353** (Quick Reference)
    - **Read DEVELOPMENT_FRAMEWORK.md lines 2101-2600** (File Templates)
-   - **Read examples/** directory to see multi-file structure:
-     - `examples/DASHBOARD.md` - Dashboard format
-     - `examples/PLAN.md` - Static plan format
-     - `examples/phase-1/task-1.md` - Standalone task example
-     - `examples/phase-2/task-3.md` - Task with iterations example
+   - **Read framework/examples/** directory to see multi-file structure:
+     - `framework/examples/DASHBOARD.md` - Dashboard format
+     - `framework/examples/PLAN.md` - Static plan format
+     - `framework/examples/phase-1/task-1.md` - Standalone task example
+     - `framework/examples/phase-2/task-3.md` - Task with iterations example
    - **Understand**:
      - Multi-file hierarchy: DASHBOARD.md + PLAN.md + phase-N/task-M.md
      - Flow's hierarchy: PHASE → TASK → ITERATION → BRAINSTORM → IMPLEMENTATION
@@ -432,18 +450,18 @@ You are executing the `/flow-migrate` command from the Flow framework.
    **Path A - STRUCTURED** (already has phases/tasks):
 
    - Keep existing hierarchy
-   - **CRITICAL**: Use examples/ directory as reference for all files
-   - **Create DASHBOARD.md** (use examples/DASHBOARD.md as template):
+   - **CRITICAL**: Use framework/examples/ directory as reference for all files
+   - **Create DASHBOARD.md** (use framework/examples/DASHBOARD.md as template):
      - "📍 Current Work" section with current phase/task/iteration
      - "📊 Progress Overview" with all phases and tasks
      - "📈 Completion Status" with percentages
-   - **Create PLAN.md** (use examples/PLAN.md as template):
+   - **Create PLAN.md** (use framework/examples/PLAN.md as template):
      - Overview section with Purpose, Goals (text only, no checklists), Scope (V1 only unless user specifies V2)
      - Architecture section with system context (high-level, not prescriptive)
      - DO/DON'T Guidelines section
      - Notes & Learnings section
    - **Create phase-N/ directories** for each phase
-   - **Create task files** (use examples/phase-2/task-3.md as template):
+   - **Create task files** (use framework/examples/phase-2/task-3.md as template):
      - Task overview
      - Iterations with brainstorming sessions
      - Pre-implementation tasks (if applicable)
@@ -605,7 +623,7 @@ You are executing the `/flow-plan-update` command from the Flow framework.
 1. **Read the framework guide**:
    - Read DEVELOPMENT_FRAMEWORK.md lines 1-353 (Quick Reference)
    - Read DEVELOPMENT_FRAMEWORK.md lines 2101-2600 (File Templates)
-   - Read examples/ directory for current format
+   - Read framework/examples/ directory for current format
 
 2. **Read current structure**:
    - Read `DASHBOARD.md`
