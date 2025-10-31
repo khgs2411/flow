@@ -1,6 +1,6 @@
 ---
 name: flow-reviewer
-description: Review and verify Flow framework plan consistency. Use when user says "review", "verify", "check", "validate", "is this complete", or wants to inspect plan status. Validates status markers match reality, checks for phantom tasks, ensures brainstorming complete before implementation, verifies task structure follows rules. Read-only inspection using Grep, Read, Glob tools only - never modifies files.
+description: Review and verify Flow framework plan consistency. Use when user says "review", "review the plan", "review this", "verify", "verify this", "check", "check the plan", "validate", "is this complete", "are we done", or wants to inspect plan status. Validates status markers match reality, checks for phantom tasks, ensures brainstorming complete before implementation, verifies task structure follows rules. Read-only inspection using Grep, Read, Glob tools only - never modifies files.
 ---
 
 # Flow Reviewer

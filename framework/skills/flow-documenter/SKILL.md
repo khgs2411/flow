@@ -1,6 +1,6 @@
 ---
 name: flow-documenter
-description: Document findings and maintain task notes in Flow framework. Use when user says "document", "add notes", "write this down", "summarize", "generate changelog", or wants to capture discoveries. Helps update task Notes sections, create summaries with /flow-summarize, and keep documentation synchronized with work. Focuses on concise, actionable documentation.
+description: Document findings and maintain task notes in Flow framework. Use when user says "document", "document this", "document finding", "add notes", "add this to notes", "write this down", "summarize", "summarize this", "generate changelog", "create changelog", or wants to capture discoveries. Helps update task Notes sections, create summaries with /flow-summarize, and keep documentation synchronized with work. Focuses on concise, actionable documentation.
 ---
 
 # Flow Documenter

@@ -1,6 +1,6 @@
 ---
 name: flow-implementer
-description: Guide implementation workflow in Flow framework. Use when user says "implement", "let's code", "start building", "time to write code", "execute action items", or is ready to implement. Enforces pre-implementation gate (brainstorming must be complete), guides use of /flow-implement-start and /flow-implement-complete commands, tracks action item completion, ensures verification before marking work complete.
+description: Guide implementation workflow in Flow framework. Use when user says "implement", "implement this", "let's code", "let's implement", "start building", "time to write code", "time to code", "execute action items", "ready to implement", or is ready to implement. Enforces pre-implementation gate (brainstorming must be complete), guides use of /flow-implement-start and /flow-implement-complete commands, tracks action item completion, ensures verification before marking work complete.
 ---
 
 # Flow Implementer

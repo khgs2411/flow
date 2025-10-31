@@ -67,8 +67,10 @@ OPTIONS:
 
 DEPLOYMENT STRUCTURE:
   .claude/commands/          Slash commands (\${#COMMANDS[@]} files)
+  .claude/skills/            Agent Skills (6 Skills with supporting files)
   .flow/framework/           AI reference files (read-only for user)
     ├── DEVELOPMENT_FRAMEWORK.md
+    ├── skills/SKILLS_GUIDE.md
     └── examples/
 
 This script is SELF-CONTAINED - no external files needed!
@@ -2127,6 +2129,8 @@ You are executing the `/flow-brainstorm-review` command from the Flow framework.
    - If user confirms Type 3 (new iterations): Ask if they want them created now
    - After confirmation: Ask about action items consolidation (step 7)
 
+8b. **Reminder**: If you discover new issues during implementation (scope violations), STOP and discuss with the user before proceeding.
+
 9. **Show "What's Next" Section**:
    ```markdown
    ## 🎯 What's Next
@@ -2255,13 +2259,15 @@ You are executing the `/flow-brainstorm-complete` command from the Flow framewor
 
    c. **Update "Last Updated" timestamp** at top
 
+   d. **Reminder**: If you discover new issues during implementation (scope violations), STOP and discuss with the user before proceeding.
+
 7. **Confirm to user**:
    ```
    ✅ Brainstorming session complete! Iteration [K]: [Name] marked 🎨 READY FOR IMPLEMENTATION
 
    **Next Step**: Use `/flow-implement-start` to begin implementation
 
-   **Reminder**: If you discover new issues during implementation (scope violations), STOP and discuss with the user before proceeding.
+  
    ```
 
 <!-- COMMAND_END -->
@@ -8931,6 +8937,5459 @@ allowed-tools: Read, Grep, Glob
 SKILLS_GUIDE_EOF
 }
 
+# Skill extraction functions
+get_skill_flow_navigator() {
+  cat <<'SKILL_FLOW_NAVIGATOR_EOF'
+---
+name: flow-navigator
+description: Navigate Flow framework's multi-file architecture (DASHBOARD.md, PLAN.md, phase-N/task-M.md). Use when user asks "where am I", "what's next", "what should I work on next", "what do I work on", "show status", "show me status", "current work", "what should I do", or wants to understand project structure and progress. Provides dashboard-first navigation guidance with status awareness.
+allowed-tools: Read, Grep, Glob
+---
+
+# Flow Navigator
+
+Navigate Flow framework projects using the dashboard-first pattern. This Skill helps you understand project structure, locate current work, and guide users through their Flow workflow.
+
+## When to Use This Skill
+
+Activate when the user asks questions like:
+- "Where am I in the project?"
+- "What should I work on next?"
+- "Show me the current status"
+- "What's left to do?"
+- "Where are we in the plan?"
+- "What's the progress?"
+
+## Dashboard-First Navigation Pattern
+
+**Golden Rule**: Always start with DASHBOARD.md before diving into details.
+
+### Step 1: Read DASHBOARD.md
+
+Start here for every navigation request:
+
+```
+Read .flow/DASHBOARD.md
+```
+
+The dashboard contains:
+- **Current Work** section → Shows active phase/task/iteration
+- **Progress Overview** section → Shows all phases with status markers
+- **Key Decisions** section → Important architectural choices
+- **Success Criteria** section → What "done" looks like
+
+### Step 2: Parse Current Work
+
+Extract the active work location:
+
+```markdown
+## 📍 Current Work
+- **Phase**: [Phase 2 - Implementation](phase-2/)
+- **Task**: [Task 3 - API Integration](phase-2/task-3.md)
+- **Iteration**: [Iteration 2 - Error Handling] 🚧 IMPLEMENTING
+```
+
+This tells you:
+- Current phase number and name
+- Current task number and file path
+- Current iteration status
+
+### Step 3: Read Task File (Only When Needed)
+
+**When to read task files**:
+- User asks for specific details about current task
+- User wants to see action items or implementation notes
+- User needs to understand iteration goals
+
+**When to stay at dashboard level**:
+- User only wants high-level status
+- User asks "what's next" (dashboard shows this)
+- Quick progress checks
+
+**Pattern**:
+```
+Read .flow/phase-N/task-M.md
+```
+
+### Step 4: Use Status Markers
+
+Understand progress through markers:
+- ✅ **COMPLETE** - Work finished and verified
+- 🚧 **IN PROGRESS** - Currently being worked on
+- ⏳ **PENDING** - Not started yet
+- 🎨 **READY** - Brainstorming complete, ready to implement
+- ❌ **CANCELLED** - Decided not to do this
+- 🔮 **FUTURE** - Deferred to later version
+
+## Common Navigation Patterns
+
+### Pattern 1: "What should I do next?"
+
+1. Read DASHBOARD.md
+2. Check "Current Work" section
+3. If iteration is 🚧 IMPLEMENTING: "Continue working on [iteration name]"
+4. If no active work: Check next ⏳ PENDING task/iteration
+
+### Pattern 2: "Where are we in the plan?"
+
+1. Read DASHBOARD.md
+2. Count completed vs total tasks/iterations
+3. Report: "Phase X in progress, Y/Z tasks complete"
+4. Highlight current focus from "Current Work"
+
+### Pattern 3: "Show me the current status"
+
+1. Read DASHBOARD.md
+2. Report from "Current Work" section
+3. Show active iteration with status marker
+4. List immediate next steps
+
+### Pattern 4: "What's left to do?"
+
+1. Read DASHBOARD.md "Progress Overview"
+2. Count ⏳ PENDING items across all phases
+3. Provide breakdown: "X tasks, Y iterations remaining"
+4. Optionally list high-level task names
+
+## Multi-File Architecture
+
+Flow projects use this structure:
+
+```
+.flow/
+├── DASHBOARD.md          # Start here - high-level view
+├── PLAN.md               # Architecture, scope, decisions
+├── phase-1/
+│   ├── task-1.md         # Detailed task breakdown
+│   ├── task-2.md
+│   └── task-3.md
+├── phase-2/
+│   └── task-1.md
+└── phase-3/
+    └── task-1.md
+```
+
+**Navigation hierarchy**:
+1. DASHBOARD.md → Overview, current work, progress
+2. PLAN.md → Architecture decisions, scope boundaries
+3. phase-N/task-M.md → Detailed iterations, action items, implementation notes
+
+## Read-Only Philosophy
+
+**This Skill is for navigation, not modification.**
+
+✅ **DO**:
+- Read files to understand structure
+- Parse status markers
+- Report progress to user
+- Suggest next steps
+
+❌ **DON'T**:
+- Modify DASHBOARD.md or task files
+- Update status markers
+- Add/remove tasks
+- Make architectural changes
+
+**When user wants changes**: Guide them to appropriate slash commands:
+- `/flow-task-start` - Start working on a task
+- `/flow-implement-start` - Begin iteration implementation
+- `/flow-implement-complete` - Mark iteration done
+- `/flow-status` - Show current status (command version)
+
+## Examples
+
+### Example 1: Quick Status Check
+
+```
+User: "What's next?"
+
+Response:
+1. Read .flow/DASHBOARD.md
+2. Parse "Current Work" section
+3. Report: "You're on Phase 2, Task 3, Iteration 2 (Error Handling) 🚧 IN PROGRESS.
+
+   Current focus: Implementing retry logic with exponential backoff.
+
+   Next step: Complete this iteration, then move to Iteration 3 (Logging)."
+```
+
+### Example 2: Progress Overview
+
+```
+User: "Show me where we are in the plan"
+
+Response:
+1. Read .flow/DASHBOARD.md
+2. Count completion:
+   - Phase 1: ✅ COMPLETE (3/3 tasks)
+   - Phase 2: 🚧 IN PROGRESS (1/4 tasks complete)
+   - Phase 3: ⏳ PENDING
+
+3. Report: "Phase 2 in progress. Completed 4 of 10 total iterations.
+
+   Currently implementing: Task 3, Iteration 2 (Error Handling)
+
+   Remaining work: 2 iterations in current task, then 3 more tasks in Phase 2, plus Phase 3."
+```
+
+### Example 3: Lost User
+
+```
+User: "I'm confused, where am I?"
+
+Response:
+1. Read .flow/DASHBOARD.md
+2. Show clear location:
+   "You're in the **Flow Framework Agent Skills** project.
+
+   📍 Current Location:
+   - Phase: Phase 2 - Core Skills Implementation
+   - Task: Task 1 - flow-navigator Skill
+   - Iteration: Iteration 1 - SKILL.md creation 🚧 IMPLEMENTING
+
+   What you're doing: Creating the navigation Skill file with dashboard-first instructions.
+
+   Files you're working in: framework/skills/flow-navigator/SKILL.md"
+```
+
+## Best Practices
+
+1. **Always read DASHBOARD.md first** - Never skip straight to task files
+2. **Respect status markers** - They're the source of truth for progress
+3. **Stay high-level by default** - Only dive into details when asked
+4. **Use exact marker symbols** - Don't paraphrase (✅ not "done", 🚧 not "working")
+5. **Reference file paths** - Help user understand multi-file structure
+6. **Suggest slash commands** - When user wants to make changes
+
+## References
+
+- **Dashboard-first approach**: See `/flow-status` slash command (reference model)
+- **Status markers**: DEVELOPMENT_FRAMEWORK.md lines 1872-1968
+- **Multi-file architecture**: DEVELOPMENT_FRAMEWORK.md lines 105-179
+- **Quick Reference Guide**: DEVELOPMENT_FRAMEWORK.md lines 1-353
+SKILL_FLOW_NAVIGATOR_EOF
+}
+
+get_skill_flow_planner() {
+  cat <<'SKILL_FLOW_PLANNER_EOF'
+---
+name: flow-planner
+description: Plan new features, tasks, and iterations in Flow framework. Use when user says "add task", "add a task", "create task", "plan feature", "plan this feature", "create iteration", "add iteration", "break this down", "how should we structure this", "how do I structure", or wants to add new work to the plan. Guides task structure decisions (standalone vs iterations), suggests brainstorming for complex features, references planning slash commands.
+---
+
+# Flow Planner
+
+Help users plan and structure new work in Flow framework projects. This Skill guides AI in understanding Flow's planning patterns and using appropriate slash commands for adding phases, tasks, and iterations.
+
+## When to Use This Skill
+
+Activate when the user wants to add new work:
+- "Add a new task"
+- "Plan this feature"
+- "Create iterations for..."
+- "Break this down into steps"
+- "How should we structure this?"
+- "Add this to the plan"
+- "What's the best way to organize this work?"
+
+## Planning Philosophy
+
+**Flow's Core Principle**: Plan before code. Structure work hierarchically (phases → tasks → iterations) with clear boundaries and iterative refinement.
+
+**Key Decision**: Every task is EITHER:
+- **Standalone** - Direct action items, no iterations
+- **Task with Iterations** - No direct action items, ONLY iterations
+
+**NEVER mix both** - This is the Golden Rule.
+
+## Task Structure Decision Tree
+
+```
+User wants to add work
+    ↓
+Is it complex/multi-step?
+    ↓
+YES → Task with Iterations
+    ↓
+    Break into 3-5 iterations
+    Each iteration = milestone
+    ↓
+NO → Standalone Task
+    ↓
+    Direct action items
+    Complete in one go
+```
+
+## Planning Slash Commands
+
+### Core Commands
+
+**`/flow-task-add [name]`**
+- Creates new task file in current phase
+- Use when: Adding new task to phase
+- Prompts for: Standalone vs Iterations decision
+
+**`/flow-iteration-add [name]`**
+- Adds iteration to current task
+- Use when: Breaking down complex task
+- Creates: New iteration with goal, action items
+
+**`/flow-phase-add [name]`**
+- Creates new phase directory
+- Use when: Major milestone or category of work
+- Updates: DASHBOARD.md with new phase
+
+**`/flow-brainstorm-start [topics]`**
+- Begins design discussion
+- Use when: Complex features need planning
+- Helps: Make decisions before implementing
+
+### When to Suggest Brainstorming
+
+Use this decision tree to determine if brainstorming is needed:
+
+```
+User wants to add work
+    ↓
+Does it involve design decisions?
+    ↓
+YES → Brainstorm first
+    ↓
+    Multiple valid approaches?
+    Trade-offs to discuss?
+    Architectural impact?
+    Integration complexity?
+    ↓
+    Use /flow-brainstorm-start
+    ↓
+NO → Direct implementation
+    ↓
+    Clear requirements?
+    Single obvious approach?
+    Isolated change?
+    ↓
+    Skip brainstorming
+```
+
+**Always suggest brainstorming for**:
+- Complex features with multiple approaches
+- Architectural decisions needed
+- Integration with external systems
+- Performance-critical features
+- Features affecting multiple areas
+- Database schema changes
+- API contract design
+- Error handling strategies
+- Security-sensitive features
+
+**Skip brainstorming for**:
+- Simple additions (new file, basic function)
+- Well-defined tasks (clear requirements)
+- Repetitive work (similar to previous tasks)
+- Bug fixes with obvious solutions
+- Trivial refactoring
+
+## Brainstorming Subject Resolution Types
+
+When users DO need brainstorming, help them understand how subjects get resolved. There are 4 types:
+
+### Type A: Pre-Implementation Task
+
+**When**: Small blocking code change needed BEFORE iteration starts
+
+**Criteria**:
+- Required for iteration (blocking)
+- Small scope (< 30 min)
+- Can be done independently
+- Examples: Fix interface, rename file, update enum, fix bug
+
+**Example Subject**:
+```markdown
+Subject: Type Definition Updates
+
+Decision: Need to update PaymentStatus enum to include new states
+
+Resolution Type: A (Pre-Implementation Task)
+
+Action Items:
+- [ ] Update PaymentStatus enum in types.ts
+- [ ] Update 4 switch statements to handle new states
+- [ ] Add tests for new states
+```
+
+**What happens**: These action items go into "Pre-Implementation Tasks" section and must be completed BEFORE main implementation starts.
+
+### Type B: Immediate Documentation
+
+**When**: Architectural decision that affects system design
+
+**Criteria**:
+- No code changes yet
+- Updates PLAN.md Architecture section NOW
+- Examples: Design pattern choice, API contract, data model
+
+**Example Subject**:
+```markdown
+Subject: Error Recovery Strategy
+
+Decision: Implement retry with exponential backoff, no circuit breaker for V1
+
+Resolution Type: B (Documentation)
+
+Documentation Update:
+Updated PLAN.md Architecture section with retry strategy diagram and V2 scope for circuit breaker
+```
+
+**What happens**: AI updates PLAN.md immediately during brainstorming, before implementation.
+
+### Type C: Auto-Resolved
+
+**When**: Subject answered by another subject's decision
+
+**Criteria**:
+- No independent decision needed
+- Cascade from another subject
+- Examples: Implementation detail determined by architecture choice
+
+**Example Subject**:
+```markdown
+Subject: Retry Delay Calculation
+
+Decision: Use exponential backoff as decided in Subject 1
+
+Resolution Type: C (Auto-Resolved by Subject 1)
+```
+
+**What happens**: No action items, just note which subject resolved this.
+
+### Type D: Iteration Action Items
+
+**When**: Substantial feature work that IS the iteration
+
+**Criteria**:
+- Main implementation work
+- Takes significant time (> 30 min)
+- Examples: Build API endpoint, implement validator, create service
+
+**Example Subject**:
+```markdown
+Subject: Retry Implementation
+
+Decision: Implement RetryPolicy class with configurable backoff strategy
+
+Resolution Type: D (Iteration Action Items)
+
+Action Items:
+- [ ] Create RetryPolicy class
+- [ ] Implement exponential backoff algorithm
+- [ ] Add configuration for max retries, base delay
+- [ ] Integrate with StripeClient
+- [ ] Add tests for retry scenarios
+```
+
+**What happens**: These action items become the iteration's implementation action items.
+
+## Complexity Indicators
+
+Help users recognize task complexity:
+
+### Simple Task (No Brainstorming)
+
+**Indicators**:
+- Single file change
+- Clear requirements from user
+- No integration points
+- < 1 hour to complete
+- Similar to previous work
+
+**Examples**:
+- "Add a validation function"
+- "Fix typo in error message"
+- "Export existing function"
+- "Add logging statement"
+
+**Guidance**: "This looks straightforward - I suggest a standalone task with direct action items. No brainstorming needed."
+
+### Complex Task (Needs Brainstorming)
+
+**Indicators**:
+- Multiple approaches possible
+- Affects system architecture
+- Integration with external services
+- > 4 hours to complete
+- User says "I'm not sure how to..."
+
+**Examples**:
+- "Add authentication system"
+- "Integrate Stripe payments"
+- "Implement caching layer"
+- "Design database schema"
+
+**Guidance**: "This is complex - I recommend brainstorming first. Let's use `/flow-brainstorm-start` to discuss: [list 3-5 subjects]."
+
+### Borderline Task (Ask User)
+
+**Indicators**:
+- Moderate complexity (2-4 hours)
+- Some design decisions needed
+- User hasn't expressed preference
+
+**Examples**:
+- "Add error handling to API"
+- "Refactor data layer"
+- "Implement search feature"
+
+**Guidance**: "This could go either way. We could brainstorm the approach first, or jump into iterations if you already have a clear vision. Which would you prefer?"
+
+## Task Structure Patterns
+
+### Pattern 1: Standalone Task
+
+**Use when**: Simple, focused work
+
+```markdown
+# Task 3: Add Logging
+
+**Status**: ⏳ PENDING
+
+## Action Items
+- [ ] Create logger utility
+- [ ] Add log statements to main functions
+- [ ] Test logging output
+- [ ] Update documentation
+```
+
+**Characteristics**:
+- Single focus area
+- Clear action items
+- Can complete in one session
+- No need to break down further
+
+### Pattern 2: Task with Iterations (Skeleton → Veins → Flesh)
+
+**Use when**: Complex, multi-phase work
+
+```markdown
+# Task 3: API Integration
+
+**Status**: ⏳ PENDING
+
+## Iterations
+
+### ⏳ Iteration 1: Skeleton - Basic API client
+**Goal**: Minimal working connection
+
+### ⏳ Iteration 2: Veins - Core endpoints
+**Goal**: Essential CRUD operations
+
+### ⏳ Iteration 3: Flesh - Error handling & retry
+**Goal**: Production-ready reliability
+```
+
+**Characteristics**:
+- Multiple milestones
+- Each iteration is testable
+- Progressive complexity
+- Incremental value delivery
+
+**NO direct action items in task** - Only in iterations
+
+### Pattern 3: Task with Brainstorming
+
+**Use when**: Design decisions needed
+
+```markdown
+# Task 2: Database Schema
+
+**Status**: 🚧 IN PROGRESS
+
+## Iterations
+
+### 🚧 Iteration 1: Design schema structure
+**Status**: 🚧 BRAINSTORMING
+
+#### Brainstorming Session
+**Subjects to Discuss**:
+1. ⏳ Table relationships - One-to-many or many-to-many?
+2. ⏳ Indexing strategy - Which fields to index?
+3. ⏳ Migration approach - How to handle schema changes?
+```
+
+**When to use**:
+- Multiple valid approaches exist
+- Trade-offs need discussion
+- User needs to make decisions
+
+## Step-by-Step Planning Workflow
+
+### Step 1: Understand the Request
+
+Ask clarifying questions:
+- "What's the goal of this feature?"
+- "Are there any constraints or requirements?"
+- "Does this build on existing work?"
+
+### Step 2: Determine Complexity
+
+**Simple** → Standalone task
+**Complex** → Task with iterations
+**Uncertain** → Suggest brainstorming first
+
+### Step 3: Propose Structure
+
+Present options to user:
+```
+I suggest structuring this as:
+
+**Option A: Standalone Task** - "Add Feature X"
+- Direct action items
+- Single completion
+- Estimated: 1-2 hours
+
+**Option B: Task with 3 Iterations**
+- Iteration 1: Basic implementation
+- Iteration 2: Add advanced features
+- Iteration 3: Polish and optimize
+- Estimated: 4-6 hours
+
+Which approach fits better?
+```
+
+### Step 4: Create the Structure
+
+Use appropriate slash command:
+- `/flow-task-add "Task Name"` - Create task
+- Follow prompts for standalone vs iterations
+- If iterations: `/flow-iteration-add "Iteration Name"` for each
+
+### Step 5: Add Context
+
+Help user fill in:
+- **Purpose**: Why this task exists
+- **Dependencies**: What it requires/blocks
+- **Design Notes**: Key considerations
+- **Action Items**: Concrete steps (standalone) or iteration goals (with iterations)
+
+## Common Patterns
+
+### Pattern: Feature Addition
+
+```
+User: "Add user authentication"
+
+Response:
+This is a complex feature - I suggest a task with 3 iterations:
+
+1. Iteration 1: Basic login/logout (Skeleton)
+2. Iteration 2: JWT tokens & session management (Veins)
+3. Iteration 3: Password reset & email verification (Flesh)
+
+Should we also brainstorm the auth approach first?
+(OAuth, JWT, session-based, etc.)
+```
+
+### Pattern: Bug Fix
+
+```
+User: "Fix the pagination bug"
+
+Response:
+This sounds like a standalone task:
+
+Task: Fix Pagination Bug
+- [ ] Reproduce the issue
+- [ ] Identify root cause
+- [ ] Implement fix
+- [ ] Add regression test
+- [ ] Verify fix works
+
+Does this structure work?
+```
+
+### Pattern: Refactoring
+
+```
+User: "Refactor the data layer"
+
+Response:
+This is complex - let's break it down:
+
+Task: Refactor Data Layer (4 iterations)
+1. Iteration 1: Extract interfaces
+2. Iteration 2: Migrate to new pattern
+3. Iteration 3: Update tests
+4. Iteration 4: Remove old code
+
+We should brainstorm:
+- New architecture pattern
+- Migration strategy
+- Backwards compatibility
+
+Should I start `/flow-brainstorm-start` for this?
+```
+
+## Best Practices
+
+1. **Always clarify complexity** - Don't assume, ask user
+2. **Suggest iterations for complex work** - Better to break down than have massive tasks
+3. **Propose brainstorming when uncertain** - Design first, implement second
+4. **Use Flow's metaphor** - Skeleton → Veins → Flesh
+5. **Reference slash commands** - Guide user to use Flow's tools
+6. **Keep iterations focused** - Each should have clear goal and completion criteria
+
+## Task Structure Golden Rules
+
+**DO**:
+- ✅ Standalone task with action items
+- ✅ Task with iterations (no direct action items)
+- ✅ Each iteration has specific goal
+- ✅ Iterations build on each other
+
+**DON'T**:
+- ❌ Mix action items and iterations in same task
+- ❌ Create task with only 1 iteration (make it standalone)
+- ❌ Make iterations too large (break down further)
+- ❌ Skip brainstorming for complex features
+
+## Iteration Sizing Guidelines
+
+**Good Iteration Size**:
+- Completable in 1-2 hours
+- Clear completion criteria
+- Testable milestone
+- Adds incremental value
+
+**Too Large** (split into multiple iterations):
+- "Implement entire feature"
+- "Build and test everything"
+- No clear milestone
+
+**Too Small** (combine or make standalone):
+- "Add one line of code"
+- "Rename a variable"
+- Trivial changes
+
+## Examples
+
+### Example 1: User Asks to Add Feature
+
+```
+User: "I want to add real-time notifications"
+
+AI Response:
+Let me help you plan this feature. Real-time notifications is complex - I suggest:
+
+**Task: Real-Time Notifications** (3 iterations)
+
+**Iteration 1: Skeleton - WebSocket Connection**
+- Goal: Establish basic WebSocket connection
+- Action items:
+  - Set up WebSocket server
+  - Implement client connection
+  - Basic ping/pong keepalive
+
+**Iteration 2: Veins - Notification System**
+- Goal: Core notification sending/receiving
+- Action items:
+  - Design notification message format
+  - Implement server-side broadcast
+  - Add client-side handlers
+
+**Iteration 3: Flesh - UI & Polish**
+- Goal: User-facing notification display
+- Action items:
+  - Create notification UI component
+  - Add notification history
+  - Implement dismiss/mark-read
+
+Before we start, should we brainstorm:
+- WebSocket library choice (ws, socket.io, native)?
+- Notification types and priority system?
+- Persistence strategy?
+
+Use `/flow-task-add "Real-Time Notifications"` to create this structure.
+```
+
+### Example 2: User Asks to Fix Bug
+
+```
+User: "The search filter isn't working correctly"
+
+AI Response:
+This looks like a standalone task - focused bug fix:
+
+**Task: Fix Search Filter Bug**
+
+**Action Items**:
+- [ ] Reproduce the bug with test case
+- [ ] Debug the filter logic
+- [ ] Identify root cause (likely query building)
+- [ ] Implement fix
+- [ ] Add unit test for this scenario
+- [ ] Verify fix resolves issue
+
+Estimated: 1-2 hours
+
+Use `/flow-task-add "Fix Search Filter Bug"` to create this task.
+```
+
+### Example 3: User Unsure How to Structure
+
+```
+User: "I need to integrate with Stripe for payments"
+
+AI Response:
+Stripe integration is substantial - let's think through the structure:
+
+**Two approaches**:
+
+**Option A: Task with 4 Iterations** (Recommended)
+- Iteration 1: Setup Stripe client & test connection
+- Iteration 2: Implement payment processing
+- Iteration 3: Add webhook handling
+- Iteration 4: Error handling & edge cases
+
+**Option B: Brainstorm First** (For complex decisions)
+Run `/flow-brainstorm-start` to discuss:
+- Payment flow (one-time vs subscription)
+- Error handling strategy
+- Webhook security
+- Testing approach (Stripe test mode)
+
+Which approach do you prefer? Or should we brainstorm first?
+```
+
+### Example 4: Guiding Brainstorming Subject Resolution
+
+```
+User: "Let's brainstorm the retry logic for API calls"
+
+AI Response:
+Great! Let's start brainstorming. I'll suggest some subjects:
+
+Subjects to Discuss:
+1. Retry Strategy - Exponential backoff vs fixed delay vs linear?
+2. Error Classification - Which errors should trigger retry vs immediate fail?
+3. Max Retry Attempts - How many retries before giving up?
+4. Existing Error Handler - Need to update ErrorHandler.ts to support async?
+5. Timeout Configuration - Per-request timeout vs total operation timeout?
+
+Use `/flow-brainstorm-start` to begin. I'll help you categorize each decision:
+- Type A: Pre-implementation tasks (must do before main work)
+- Type B: Architecture docs (update PLAN.md now)
+- Type C: Auto-resolved (answered by other decisions)
+- Type D: Main implementation work (the actual iteration)
+
+---
+
+[After discussing Subject 4...]
+
+User: "We need to update ErrorHandler.ts to support async operations"
+
+AI Response:
+This sounds like Type A (Pre-Implementation Task). Let me confirm:
+
+✅ Is it blocking? YES - Can't implement retry logic without async support
+✅ Is it small? YES - Estimated 20-30 minutes
+✅ Can it be done independently? YES - Self-contained change
+
+Resolution Type: A (Pre-Implementation Task)
+
+Action Items:
+- [ ] Update ErrorHandler.ts to support async operations
+- [ ] Add retryAsync() method
+- [ ] Update 3 existing call sites to use async version
+- [ ] Add tests for async error handling
+
+This will go into "Pre-Implementation Tasks" section and must be completed
+BEFORE we run `/flow-implement-start`.
+
+---
+
+[After discussing Subject 1...]
+
+User: "Let's use exponential backoff with base delay of 1 second"
+
+AI Response:
+This sounds like Type D (Iteration Action Items). Let me confirm:
+
+✅ Is it substantial work? YES - Core feature implementation
+✅ Does it take > 30 min? YES - Estimated 2-3 hours
+✅ Is it the main iteration work? YES - This IS what we're building
+
+Resolution Type: D (Iteration Action Items)
+
+Action Items:
+- [ ] Create RetryPolicy class
+- [ ] Implement exponential backoff algorithm (base: 1s, max: 32s)
+- [ ] Add configuration for max retries (default: 3)
+- [ ] Integrate with API client
+- [ ] Add tests for retry scenarios
+
+These become the iteration's implementation action items.
+```
+
+## Interaction with Other Flow Commands
+
+**Planning Stage** (This Skill):
+- `/flow-task-add` - Create task
+- `/flow-iteration-add` - Add iterations
+- `/flow-brainstorm-start` - Design decisions
+
+**Implementation Stage** (flow-implementer Skill):
+- `/flow-implement-start` - Begin work
+- `/flow-implement-complete` - Finish iteration
+
+**Navigation Stage** (flow-navigator Skill):
+- `/flow-status` - Check progress
+- `/flow-next` - What to do next
+
+## References
+
+- **Task Structure Rules**: DEVELOPMENT_FRAMEWORK.md lines 238-566
+- **Brainstorming Pattern**: DEVELOPMENT_FRAMEWORK.md lines 1167-1797
+- **Complete Workflow**: DEVELOPMENT_FRAMEWORK.md lines 614-940
+- **Quick Reference**: DEVELOPMENT_FRAMEWORK.md lines 1-353
+SKILL_FLOW_PLANNER_EOF
+}
+
+get_skill_flow_planner_templates() {
+  cat <<'SKILL_FLOW_PLANNER_TEMPLATES_EOF'
+# Flow Planning Templates
+
+Ready-to-use templates for creating phases, tasks, and iterations in Flow framework. Copy and customize these structures for your planning needs.
+
+## Template 1: Standalone Task
+
+Use when: Simple, focused work that doesn't need breaking down
+
+```markdown
+# Task [N]: [Task Name]
+
+**Status**: ⏳ PENDING
+**Phase**: [Phase [N] - [Phase Name]](../DASHBOARD.md#phase-[n]-[phase-name])
+**Purpose**: [Brief description of what this task accomplishes]
+
+## Overview
+
+[1-2 paragraphs explaining the task's context, why it's needed, and how it fits into the larger project]
+
+## Action Items
+
+- [ ] [Concrete action step 1]
+- [ ] [Concrete action step 2]
+- [ ] [Concrete action step 3]
+- [ ] [Concrete action step 4]
+- [ ] [Concrete action step 5]
+
+## Notes
+
+**Key Considerations**:
+- [Important point to remember]
+- [Trade-off or constraint]
+- [Dependency or prerequisite]
+
+**References**:
+- [Link to related documentation]
+- [Link to relevant framework section]
+```
+
+### Example: Standalone Task
+
+```markdown
+# Task 3: Add Request Logging
+
+**Status**: ⏳ PENDING
+**Phase**: [Phase 2 - Core Features](../DASHBOARD.md#phase-2-core-features)
+**Purpose**: Add structured logging for all HTTP requests to aid debugging
+
+## Overview
+
+Currently, the application doesn't log HTTP requests, making it difficult to debug issues in production. This task adds middleware to log all incoming requests with relevant metadata (method, path, duration, status code).
+
+## Action Items
+
+- [ ] Create logging middleware function
+- [ ] Add request ID generation
+- [ ] Log request start (method, path, headers)
+- [ ] Log request completion (status, duration)
+- [ ] Add middleware to express app
+- [ ] Test logging output format
+- [ ] Update documentation
+
+## Notes
+
+**Key Considerations**:
+- Use structured logging (JSON format)
+- Don't log sensitive data (passwords, tokens)
+- Include correlation IDs for request tracing
+
+**References**:
+- Express middleware docs
+- Winston logging library
+```
+
+---
+
+## Template 2: Task with Iterations
+
+Use when: Complex, multi-step work that needs progressive refinement
+
+```markdown
+# Task [N]: [Task Name]
+
+**Status**: ⏳ PENDING
+**Phase**: [Phase [N] - [Phase Name]](../DASHBOARD.md#phase-[n]-[phase-name])
+**Purpose**: [Brief description of what this task accomplishes]
+
+## Overview
+
+[1-2 paragraphs explaining the task's context, complexity, and why it's broken into iterations]
+
+## Iterations
+
+### ⏳ Iteration 1: [Skeleton] - [Minimal version]
+**Goal**: [What minimal functionality this iteration delivers]
+**Status**: ⏳ PENDING
+
+#### Action Items
+- [ ] [Core action 1]
+- [ ] [Core action 2]
+- [ ] [Core action 3]
+
+### ⏳ Iteration 2: [Veins] - [Core functionality]
+**Goal**: [What essential features this iteration adds]
+**Status**: ⏳ PENDING
+
+#### Action Items
+- [ ] [Essential feature 1]
+- [ ] [Essential feature 2]
+- [ ] [Essential feature 3]
+
+### ⏳ Iteration 3: [Flesh] - [Polish and edge cases]
+**Goal**: [What production-ready features this iteration completes]
+**Status**: ⏳ PENDING
+
+#### Action Items
+- [ ] [Polish item 1]
+- [ ] [Edge case handling 1]
+- [ ] [Final touches 1]
+
+## Notes
+
+**Task Structure**:
+- This task follows Flow's iterative pattern: Skeleton → Veins → Flesh
+- Each iteration is independently testable and adds value
+- No direct action items in task - only in iterations
+
+**Dependencies**:
+- [Prerequisite work that must be complete]
+- [Related tasks that affect this one]
+
+**References**:
+- [Link to related documentation]
+- [Link to framework patterns]
+```
+
+### Example: Task with Iterations
+
+```markdown
+# Task 2: User Authentication System
+
+**Status**: ⏳ PENDING
+**Phase**: [Phase 1 - Foundation](../DASHBOARD.md#phase-1-foundation)
+**Purpose**: Implement secure user authentication with JWT tokens
+
+## Overview
+
+The application needs a complete authentication system supporting user registration, login, logout, and token-based session management. This is complex enough to warrant iterative development, building from basic login to full production-ready auth.
+
+## Iterations
+
+### ⏳ Iteration 1: Skeleton - Basic Login/Logout
+**Goal**: Minimal working login/logout with password hashing
+**Status**: ⏳ PENDING
+
+#### Action Items
+- [ ] Create User model with password field
+- [ ] Implement password hashing (bcrypt)
+- [ ] Create POST /login endpoint
+- [ ] Create POST /logout endpoint
+- [ ] Add basic session storage
+- [ ] Test login/logout flow
+
+### ⏳ Iteration 2: Veins - JWT Tokens & Auth Middleware
+**Goal**: Secure token-based authentication for protected routes
+**Status**: ⏳ PENDING
+
+#### Action Items
+- [ ] Generate JWT tokens on login
+- [ ] Create auth middleware to verify tokens
+- [ ] Add token to response headers
+- [ ] Implement token refresh logic
+- [ ] Add protected route examples
+- [ ] Test token validation
+
+### ⏳ Iteration 3: Flesh - Registration & Password Reset
+**Goal**: Complete auth system with all user flows
+**Status**: ⏳ PENDING
+
+#### Action Items
+- [ ] Create POST /register endpoint
+- [ ] Add email verification flow
+- [ ] Implement forgot-password endpoint
+- [ ] Create password reset token system
+- [ ] Add rate limiting to auth endpoints
+- [ ] Test complete user lifecycle
+
+## Notes
+
+**Task Structure**:
+- Skeleton: Get basic auth working
+- Veins: Add security and token management
+- Flesh: Polish with registration and recovery flows
+
+**Dependencies**:
+- Database schema must be set up
+- Email service configured (for Iteration 3)
+
+**References**:
+- JWT library: jsonwebtoken
+- DEVELOPMENT_FRAMEWORK.md lines 567-613
+```
+
+---
+
+## Template 3: Individual Iteration
+
+Use when: Adding a new iteration to an existing task
+
+```markdown
+### ⏳ Iteration [N]: [Iteration Name]
+**Goal**: [Clear, specific goal this iteration achieves]
+**Status**: ⏳ PENDING
+
+#### Action Items
+- [ ] [Action step 1]
+- [ ] [Action step 2]
+- [ ] [Action step 3]
+- [ ] [Action step 4]
+- [ ] [Action step 5]
+
+#### Design Notes
+**Approach**: [Brief explanation of the implementation approach]
+
+**Key Decisions**:
+- [Important decision 1 and rationale]
+- [Important decision 2 and rationale]
+
+**Testing**: [How to verify this iteration works]
+```
+
+### Example: Individual Iteration
+
+```markdown
+### ⏳ Iteration 4: Add Redis Caching
+**Goal**: Reduce database load by caching frequently accessed data
+**Status**: ⏳ PENDING
+
+#### Action Items
+- [ ] Set up Redis client connection
+- [ ] Identify cacheable queries (user profiles, product listings)
+- [ ] Implement cache-aside pattern
+- [ ] Add cache invalidation on updates
+- [ ] Set appropriate TTLs for different data types
+- [ ] Add cache hit/miss metrics
+- [ ] Test cache behavior under load
+
+#### Design Notes
+**Approach**: Use cache-aside pattern where application checks cache first, then falls back to database. Invalidate cache entries on write operations.
+
+**Key Decisions**:
+- TTL: 5 minutes for user profiles, 1 hour for product listings
+- Cache key format: `{resource}:{id}` (e.g., `user:123`)
+- Invalidation: Delete on update, let expire on delete
+
+**Testing**:
+- Verify cache hits reduce DB queries
+- Confirm stale data doesn't persist after updates
+- Load test with Redis enabled vs disabled
+```
+
+---
+
+## Template 4: Task with Brainstorming
+
+Use when: Complex decisions need discussion before implementation
+
+```markdown
+# Task [N]: [Task Name]
+
+**Status**: ⏳ PENDING
+**Phase**: [Phase [N] - [Phase Name]](../DASHBOARD.md#phase-[n]-[phase-name])
+**Purpose**: [Brief description]
+
+## Overview
+
+[Explanation of task and why it needs design discussion]
+
+## Iterations
+
+### ⏳ Iteration 1: Design [Core System]
+**Goal**: Make key architectural decisions
+**Status**: ⏳ PENDING
+
+#### Brainstorming Session
+
+**Subjects to Discuss**:
+1. ⏳ **[Subject 1]** - [Key question to decide]
+2. ⏳ **[Subject 2]** - [Trade-off to evaluate]
+3. ⏳ **[Subject 3]** - [Approach to determine]
+
+**Resolved Subjects**:
+[Will be filled during `/flow-brainstorm-start`]
+
+### ⏳ Iteration 2: Implement [Core]
+**Goal**: Build based on design decisions
+**Status**: ⏳ PENDING
+
+#### Action Items
+- [ ] [Implementation step 1]
+- [ ] [Implementation step 2]
+- [ ] [Implementation step 3]
+
+### ⏳ Iteration 3: [Additional Features]
+**Goal**: [Next increment]
+**Status**: ⏳ PENDING
+
+## Notes
+
+**Why Brainstorming First**:
+- [Reason brainstorming is valuable]
+- [What decisions need discussion]
+```
+
+### Example: Task with Brainstorming
+
+```markdown
+# Task 1: Database Schema Design
+
+**Status**: ⏳ PENDING
+**Phase**: [Phase 1 - Foundation](../DASHBOARD.md#phase-1-foundation)
+**Purpose**: Design normalized database schema supporting all product requirements
+
+## Overview
+
+The database schema is foundational - poor choices here create technical debt. We need to discuss relationships, indexing strategy, and migration approach before implementation.
+
+## Iterations
+
+### ⏳ Iteration 1: Design Schema Structure
+**Goal**: Finalize table structure, relationships, and indexing
+**Status**: ⏳ PENDING
+
+#### Brainstorming Session
+
+**Subjects to Discuss**:
+1. ⏳ **User-Product Relationship** - One-to-many or many-to-many with junction table?
+2. ⏳ **Indexing Strategy** - Which columns to index? Composite indexes needed?
+3. ⏳ **Soft Deletes** - Use soft deletes (deleted_at) or hard deletes?
+4. ⏳ **Timestamps** - What audit fields (created_at, updated_at, created_by)?
+5. ⏳ **Migration Approach** - How to handle schema changes in production?
+
+**Resolved Subjects**:
+[Will be filled during brainstorming]
+
+### ⏳ Iteration 2: Create Initial Migration
+**Goal**: Implement decided schema in SQL migration
+**Status**: ⏳ PENDING
+
+#### Action Items
+- [ ] Write SQL migration file
+- [ ] Create database models (ORM)
+- [ ] Add indexes per brainstorming decisions
+- [ ] Test migration up/down
+- [ ] Seed test data
+
+### ⏳ Iteration 3: Add Constraints and Triggers
+**Goal**: Production-ready schema with validation
+**Status**: ⏳ PENDING
+
+#### Action Items
+- [ ] Add foreign key constraints
+- [ ] Create database triggers for audit fields
+- [ ] Add check constraints for data validation
+- [ ] Test constraint enforcement
+- [ ] Document schema design
+
+## Notes
+
+**Why Brainstorming First**:
+- Schema changes are expensive once production data exists
+- Trade-offs between normalization and performance need discussion
+- Team alignment on conventions (soft deletes, audit fields) needed upfront
+```
+
+---
+
+## Template 5: Phase Structure
+
+Use when: Adding a new phase to the project
+
+```markdown
+# Phase [N]: [Phase Name]
+
+**Goal**: [High-level goal this phase accomplishes]
+**Status**: ⏳ PENDING
+**Complexity**: [Simple / Medium / Complex]
+
+## Overview
+
+[2-3 paragraphs explaining:
+- What this phase delivers
+- Why it's a distinct phase
+- How it relates to previous/next phases]
+
+## Tasks
+
+1. **Task 1**: [Task Name] - [Brief description]
+2. **Task 2**: [Task Name] - [Brief description]
+3. **Task 3**: [Task Name] - [Brief description]
+
+## Success Criteria
+
+This phase is complete when:
+- [ ] [Measurable outcome 1]
+- [ ] [Measurable outcome 2]
+- [ ] [Measurable outcome 3]
+
+## Dependencies
+
+**Requires** (must be done first):
+- [Prerequisite phase or work]
+
+**Blocks** (waiting on this):
+- [Dependent phases or work]
+
+## Notes
+
+**Estimated Duration**: [Time estimate]
+**Risk Level**: [Low / Medium / High]
+**Key Challenges**: [Anticipated difficulties]
+```
+
+---
+
+## Usage Guidelines
+
+### When to Use Each Template
+
+**Standalone Task**:
+- Bug fixes
+- Simple feature additions
+- Documentation updates
+- Configuration changes
+- Estimated < 2 hours
+
+**Task with Iterations**:
+- Complex features
+- System integrations
+- Architecture changes
+- New modules/services
+- Estimated > 2 hours
+
+**Task with Brainstorming**:
+- Architectural decisions
+- Multiple valid approaches
+- Performance-critical features
+- External integrations
+- Trade-offs need discussion
+
+### Customization Tips
+
+1. **Adjust iteration count** - Use 2-5 iterations based on complexity
+2. **Add sections as needed** - Testing Strategy, Performance Notes, Security Considerations
+3. **Reference framework docs** - Link to relevant DEVELOPMENT_FRAMEWORK.md sections
+4. **Include examples** - Add code snippets or diagrams when helpful
+5. **Keep action items atomic** - Each checkbox is a clear, completable step
+
+### Common Mistakes to Avoid
+
+❌ **DON'T**: Mix standalone and iteration patterns in same task
+✅ **DO**: Choose one structure and stick with it
+
+❌ **DON'T**: Create task with only 1 iteration
+✅ **DO**: Make it standalone if there's only one phase
+
+❌ **DON'T**: Have action items both in task AND in iterations
+✅ **DO**: Action items only in iterations (for task-with-iterations pattern)
+
+❌ **DON'T**: Make iterations too small (< 30 min) or too large (> 1 day)
+✅ **DO**: Size iterations to 1-3 hours of focused work
+
+## References
+
+- **Task Structure Rules**: DEVELOPMENT_FRAMEWORK.md lines 238-566
+- **Brainstorming Patterns**: DEVELOPMENT_FRAMEWORK.md lines 1167-1797
+- **Complete Workflow**: DEVELOPMENT_FRAMEWORK.md lines 614-940
+- **Status Markers Guide**: DEVELOPMENT_FRAMEWORK.md lines 1872-1968
+SKILL_FLOW_PLANNER_TEMPLATES_EOF
+}
+
+get_skill_flow_implementer() {
+  cat <<'SKILL_FLOW_IMPLEMENTER_EOF'
+---
+name: flow-implementer
+description: Guide implementation workflow in Flow framework. Use when user says "implement", "implement this", "let's code", "let's implement", "start building", "time to write code", "time to code", "execute action items", "ready to implement", or is ready to implement. Enforces pre-implementation gate (brainstorming must be complete), guides use of /flow-implement-start and /flow-implement-complete commands, tracks action item completion, ensures verification before marking work complete.
+---
+
+# Flow Implementer
+
+Help users execute implementation work in Flow framework projects. This Skill ensures AI follows Flow's implementation pattern: verify readiness → start implementation → execute action items → verify completion → mark complete.
+
+## When to Use This Skill
+
+Activate when the user wants to start coding:
+- "Let's implement this"
+- "Start coding"
+- "Build the feature"
+- "Time to write code"
+- "Ready to implement"
+- "Execute the action items"
+- "Begin implementation"
+
+## Implementation Philosophy
+
+**Flow's Core Principle**: Design before code. Implementation happens AFTER brainstorming is complete (if needed) and pre-implementation tasks are done.
+
+**Key Gates**:
+- **Pre-Implementation Gate**: Brainstorming must be ✅ COMPLETE (if iteration had brainstorming)
+- **Pre-Tasks Gate**: All pre-implementation tasks must be ✅ COMPLETE
+- **Verification Gate**: All action items done, tests passing, ready for next work
+
+**Implementation Pattern**: Start → Execute → Verify → Complete
+
+## Pre-Implementation Gate Check
+
+Before starting ANY implementation, verify readiness:
+
+### Check 1: Brainstorming Status (if applicable)
+
+```
+IF iteration has brainstorming section:
+    IF brainstorming status ≠ ✅ COMPLETE:
+        ❌ BLOCK implementation
+        SUGGEST: "Brainstorming must be completed first. Use `/flow-next-subject` to continue brainstorming."
+    ELSE:
+        ✅ PASS gate
+ELSE:
+    ✅ PASS gate (no brainstorming needed)
+```
+
+### Check 2: Pre-Implementation Tasks (if applicable)
+
+```
+IF iteration has "Pre-Implementation Tasks" section:
+    IF any pre-task status ≠ ✅ COMPLETE:
+        ❌ BLOCK implementation
+        LIST incomplete pre-tasks
+        SUGGEST: "Complete pre-tasks first, then use `/flow-implement-start`"
+    ELSE:
+        ✅ PASS gate
+ELSE:
+    ✅ PASS gate (no pre-tasks)
+```
+
+### Check 3: Iteration Status
+
+```
+IF iteration status = 🚧 IN PROGRESS:
+    ✅ PASS (already implementing)
+IF iteration status = 🎨 READY or ⏳ PENDING:
+    SUGGEST: "Use `/flow-implement-start` to begin implementation"
+```
+
+## Implementation Workflow
+
+### Step 1: Start Implementation
+
+**Command**: `/flow-implement-start`
+
+**What it does**:
+- Marks iteration 🚧 IN PROGRESS
+- Creates "Implementation" section in task file
+- Updates DASHBOARD.md current work
+
+**When to suggest**: User is ready to code and gates passed
+
+### Step 2: Execute Action Items
+
+**Sequential Execution**:
+1. Read action items from iteration (or brainstorming Type D subjects)
+2. Execute each action item in order
+3. Check off items as completed: `- [x] Action item`
+4. Document progress in "Implementation Notes"
+
+**Parallel Execution** (when safe):
+- If action items are independent (no dependencies)
+- Example: Creating multiple unrelated files
+- Still check off sequentially for tracking
+
+**Handling Blockers**:
+```
+IF encounter blocker during implementation:
+    DOCUMENT blocker in Implementation Notes
+    ASSESS severity:
+        - Minor (< 15 min fix): Handle and continue
+        - Major (> 15 min, out of scope): STOP and notify user
+        - Blocking (cannot proceed): Mark iteration ❌ BLOCKED, notify user
+```
+
+### Step 3: Verify Completion
+
+Before marking iteration complete, verify:
+
+**Verification Checklist**:
+- [ ] All action items checked off (✅)
+- [ ] Code compiles/runs without errors
+- [ ] Tests passing (if applicable)
+- [ ] Files modified documented
+- [ ] Implementation notes updated
+- [ ] No unresolved blockers
+
+**Testing Strategy** (from PLAN.md):
+- Follow Testing Strategy section in PLAN.md
+- Run tests according to project conventions
+- Document test results in Implementation Notes
+
+### Step 4: Complete Implementation
+
+**Command**: `/flow-implement-complete`
+
+**What it does**:
+- Marks iteration ✅ COMPLETE
+- Updates completion date
+- Updates DASHBOARD.md progress
+- Advances to next iteration
+
+**When to suggest**: All verification criteria met
+
+## Implementation Slash Commands
+
+### `/flow-implement-start`
+
+**Use when**: Starting implementation for current iteration
+
+**Prerequisites**:
+- Brainstorming ✅ COMPLETE (if applicable)
+- Pre-tasks ✅ COMPLETE (if applicable)
+- Iteration status = 🎨 READY or ⏳ PENDING
+
+**Effect**:
+- Changes iteration status to 🚧 IN PROGRESS
+- Creates implementation section in task file
+- Updates DASHBOARD.md
+
+### `/flow-implement-complete`
+
+**Use when**: All action items done and verified
+
+**Prerequisites**:
+- All action items checked off
+- Verification criteria met
+- No unresolved blockers
+
+**Effect**:
+- Marks iteration ✅ COMPLETE
+- Updates completion date
+- Advances to next iteration or task
+
+## Action Item Execution Patterns
+
+### Pattern 1: Sequential Implementation
+
+**Use when**: Action items depend on each other
+
+```markdown
+Action Items:
+- [x] Create database schema
+- [x] Implement data access layer (depends on schema)
+- [x] Add service layer (depends on DAL)
+- [x] Create API endpoints (depends on service)
+```
+
+**Approach**:
+1. Complete item 1
+2. Verify item 1 works
+3. Move to item 2
+4. Repeat until all done
+
+### Pattern 2: Parallel Implementation
+
+**Use when**: Action items are independent
+
+```markdown
+Action Items:
+- [ ] Create logger utility
+- [ ] Create validator utility
+- [ ] Create formatter utility
+```
+
+**Approach**:
+1. Create all three files
+2. Verify each works independently
+3. Check off all items
+
+### Pattern 3: Incremental Verification
+
+**Use when**: Complex implementation with multiple steps
+
+```markdown
+Action Items:
+- [x] Implement basic authentication (VERIFY: can login)
+- [x] Add JWT token generation (VERIFY: tokens valid)
+- [x] Add token refresh (VERIFY: refresh works)
+- [x] Add logout (VERIFY: tokens invalidated)
+```
+
+**Approach**:
+1. Complete one action item
+2. Test/verify immediately
+3. Document verification in notes
+4. Move to next item
+
+## Pre-Implementation Tasks Pattern
+
+### What Are Pre-Implementation Tasks?
+
+Small blocking tasks (< 30 min) that must be completed BEFORE main iteration work starts.
+
+**Examples**:
+- Refactor interface to support new pattern
+- Update enum with missing values
+- Fix bug in legacy code
+- Rename file to match convention
+
+### When to Complete Pre-Tasks
+
+```
+IF iteration has "Pre-Implementation Tasks" section:
+    FOR EACH pre-task:
+        Complete pre-task
+        Mark ✅ COMPLETE with date
+        Document changes in pre-task section
+    ONLY AFTER ALL PRE-TASKS DONE:
+        Run /flow-implement-start for main iteration
+```
+
+### Pre-Task Structure
+
+```markdown
+#### Pre-Implementation Tasks
+
+##### ⏳ Pre-Task 1: Update ErrorHandler to support async
+
+**Why Blocking**: Retry logic requires async error handling
+
+**Scope** (< 30 min):
+- Update ErrorHandler.ts with async support
+- Add retryAsync() method
+- Update 3 call sites
+
+**Files**:
+- src/utils/ErrorHandler.ts
+
+---
+
+##### ✅ Pre-Task 1: Update ErrorHandler to support async
+
+**Completed**: 2025-10-30
+
+**Changes Made**:
+- Added async support to ErrorHandler class
+- Implemented retryAsync() method with exponential backoff
+- Updated call sites in BillingService, PaymentService, OrderService
+- Added unit tests for async error handling
+
+**Files Modified**:
+- src/utils/ErrorHandler.ts (+42 lines)
+- tests/utils/ErrorHandler.test.ts (+28 lines)
+```
+
+## Verification Best Practices
+
+### What to Verify
+
+**Code Quality**:
+- [ ] No syntax errors
+- [ ] No linting errors
+- [ ] Follows project conventions
+- [ ] Code is readable and well-structured
+
+**Functionality**:
+- [ ] Feature works as intended
+- [ ] Edge cases handled
+- [ ] Error handling implemented
+- [ ] No regressions introduced
+
+**Testing**:
+- [ ] Unit tests pass
+- [ ] Integration tests pass (if applicable)
+- [ ] Manual testing done (if no automated tests)
+
+**Documentation**:
+- [ ] Implementation notes updated
+- [ ] Files modified list complete
+- [ ] Verification results documented
+
+### When to Mark ❌ BLOCKED
+
+Mark iteration ❌ BLOCKED when:
+- External dependency not available
+- Blocker requires > 1 hour to resolve
+- Need user decision before proceeding
+- Technical limitation discovered
+
+**Blocked Pattern**:
+```markdown
+### ❌ Iteration 2: Error Handling
+
+**Status**: ❌ BLOCKED
+
+**Blocker**: Stripe SDK doesn't support custom retry logic in v12
+
+**Options**:
+A) Downgrade to Stripe SDK v11 (supports custom retry)
+B) Wait for v13 release (eta 2 weeks)
+C) Implement wrapper around SDK calls
+
+**Waiting for**: User decision on approach
+```
+
+## Detailed Verification Guidance
+
+For comprehensive guidance on verification, testing patterns, completion criteria, bug documentation, and decision-making, see **[VERIFICATION.md](VERIFICATION.md)**.
+
+That resource includes:
+- **Testing Patterns**: Unit testing, integration testing, manual testing checklists, and TDD patterns with complete code examples
+- **What "Done" Looks Like**: 6 detailed completion criteria with examples
+- **When to Document Bugs and Issues**: Bug documentation templates, severity levels, and fix-immediately vs defer guidance
+- **Deciding: ❌ BLOCKED vs Continue**: Decision flowchart, 8 scenarios with examples, and real-world case studies
+
+## Scope Boundary Rules
+
+### When You Discover New Work
+
+During implementation, if you discover issues NOT in current action items:
+
+1. **STOP** - Don't make assumptions
+2. **ASSESS** - Categorize the issue:
+   - Syntax error in file you're editing? Fix and document
+   - Missing functionality? Discuss with user
+   - New feature idea? Defer to future iteration
+   - Blocking bug? Propose pre-implementation task
+
+3. **NOTIFY** user with structured options:
+   - **Option A**: Create pre-implementation task (< 30 min, blocking)
+   - **Option B**: Add as new brainstorming subject (design needed)
+   - **Option C**: Handle immediately (if user approves)
+   - **Option D**: Defer to separate iteration (after current work)
+
+4. **AWAIT** user decision before proceeding
+
+### Example: Scope Boundary Alert
+
+```
+⚠️ SCOPE BOUNDARY ALERT
+
+During implementation of Iteration 2 (Error Handling), discovered:
+
+**Issue**: PaymentService.ts uses deprecated error format that conflicts with new retry logic
+
+**Impact**: Cannot complete current action item without addressing this
+
+**Options**:
+A) Create pre-implementation task (estimated 20 min):
+   - Update PaymentService error format
+   - Update 2 call sites
+   - Add to Pre-Implementation Tasks section
+
+B) Add as brainstorming subject:
+   - Need to design error format standard across all services
+   - Affects more than just PaymentService
+
+C) Handle immediately:
+   - Fix PaymentService.ts now as part of current work
+   - Document change in Implementation Notes
+
+D) Defer to separate iteration:
+   - Work around issue for now
+   - Create new iteration for error format standardization
+
+Which approach would you prefer?
+```
+
+## Common Implementation Patterns
+
+### Pattern: Feature Implementation
+
+```
+User: "Let's implement the authentication system"
+
+AI Response:
+I'll help you implement the authentication system. Let me check readiness:
+
+✅ Brainstorming Session - COMPLETE (4 subjects resolved)
+✅ Pre-Implementation Tasks - COMPLETE (updated User model)
+✅ Iteration Status - 🎨 READY
+
+Ready to implement! Use `/flow-implement-start` to begin.
+
+Action items from brainstorming:
+1. Create AuthService class
+2. Implement login/logout methods
+3. Add JWT token generation
+4. Integrate with API endpoints
+5. Add authentication middleware
+
+Estimated time: 3-4 hours
+
+Should I start implementation?
+```
+
+### Pattern: Handling Blockers
+
+```
+User: "Start implementing the payment integration"
+
+AI Response:
+I'll help you implement payment integration. Let me check readiness:
+
+❌ Pre-Implementation Tasks - INCOMPLETE
+
+Found 2 incomplete pre-tasks:
+1. ⏳ Pre-Task 1: Refactor PaymentConfig interface
+2. ⏳ Pre-Task 2: Update environment variables
+
+These tasks must be completed before main implementation. Should I help you complete them now?
+```
+
+### Pattern: Verification Before Completion
+
+```
+User: "Are we done with this iteration?"
+
+AI Response:
+Let me verify completion criteria:
+
+✅ All action items checked off (5/5)
+✅ Code compiles without errors
+✅ Tests passing (unit: 12/12, integration: 3/3)
+✅ Files modified documented (4 files)
+✅ Implementation notes updated
+✅ No unresolved blockers
+
+Verification complete! All criteria met.
+
+Use `/flow-implement-complete` to mark this iteration done and move to the next one.
+```
+
+### Pattern: Incremental Progress
+
+```
+User: "How's the implementation going?"
+
+AI Response:
+Implementation progress for Iteration 2: Error Handling
+
+Completed (3/5):
+- [x] Create RetryPolicy class
+- [x] Implement exponential backoff algorithm
+- [x] Add configuration for max retries
+
+In Progress (1/5):
+- [ ] Integrate with StripeClient ← CURRENT (60% done)
+
+Pending (1/5):
+- [ ] Add tests for retry scenarios
+
+Estimated completion: 1 hour
+
+Working on integrating RetryPolicy with StripeClient.ts. Will move to tests next.
+```
+
+## Interaction with Other Flow Skills
+
+**Planning Stage** (flow-planner Skill):
+- `/flow-task-add` - Create task
+- `/flow-iteration-add` - Add iterations
+- `/flow-brainstorm-start` - Design decisions
+
+**Implementation Stage** (This Skill):
+- `/flow-implement-start` - Begin work ← YOU ARE HERE
+- `/flow-implement-complete` - Finish iteration ← YOU ARE HERE
+
+**Navigation Stage** (flow-navigator Skill):
+- `/flow-status` - Check progress
+- `/flow-next` - What to do next
+
+## References
+
+- **Implementation Pattern**: DEVELOPMENT_FRAMEWORK.md lines 1798-1836
+- **Status Markers**: DEVELOPMENT_FRAMEWORK.md lines 1872-1968
+- **Brainstorming Pattern**: DEVELOPMENT_FRAMEWORK.md lines 1167-1797
+- **Pre-Implementation Tasks**: DEVELOPMENT_FRAMEWORK.md lines 1683-1723
+- **Scope Boundary Rules**: DEVELOPMENT_FRAMEWORK.md lines 339-540
+
+## Implementation Gate Checklist
+
+Before implementing, verify ALL gates passed:
+
+```
+[ ] Brainstorming complete (if applicable)
+[ ] Pre-implementation tasks complete (if applicable)
+[ ] Current iteration status = 🎨 READY or ⏳ PENDING
+[ ] User confirmed ready to implement
+```
+
+If ALL checked → Use `/flow-implement-start`
+
+If ANY unchecked → Address blockers first
+
+## Completion Checklist
+
+Before marking complete, verify ALL criteria met:
+
+```
+[ ] All action items checked off
+[ ] Code compiles/runs
+[ ] Tests passing
+[ ] Files modified documented
+[ ] Implementation notes updated
+[ ] No unresolved blockers
+[ ] Verification completed
+```
+
+If ALL checked → Use `/flow-implement-complete`
+
+If ANY unchecked → Continue implementation
+SKILL_FLOW_IMPLEMENTER_EOF
+}
+
+get_skill_flow_implementer_patterns() {
+  cat <<'SKILL_FLOW_IMPLEMENTER_PATTERNS_EOF'
+# Implementation Patterns
+
+This document provides detailed patterns for handling pre-implementation tasks and executing action items in Flow framework.
+
+## Table of Contents
+
+1. [Pre-Implementation Tasks Pattern](#pre-implementation-tasks-pattern)
+2. [Action Item Execution Best Practices](#action-item-execution-best-practices)
+3. [Sequential vs Parallel Execution](#sequential-vs-parallel-execution)
+4. [Breaking Down Large Action Items](#breaking-down-large-action-items)
+5. [Common Implementation Scenarios](#common-implementation-scenarios)
+
+---
+
+## Pre-Implementation Tasks Pattern
+
+### What Are Pre-Implementation Tasks?
+
+**Pre-implementation tasks** are small, blocking pieces of work (< 30 min) that must be completed BEFORE starting the main iteration implementation.
+
+**Key Characteristics**:
+- **Small scope**: Can be completed in < 30 minutes
+- **Blocking**: Main iteration cannot start without them
+- **Independent**: Can be done separately from main work
+- **Discovered during brainstorming**: Identified when resolving Type A subjects
+
+### When to Create Pre-Implementation Tasks
+
+Create pre-implementation tasks when you discover during brainstorming:
+
+**Code Structure Issues**:
+- Interface signature doesn't support new pattern
+- Enum missing required values
+- Type definitions need updates
+- File naming doesn't match conventions
+
+**Legacy Code Issues**:
+- Old code doesn't support async operations
+- Error handling pattern incompatible
+- Deprecated API being used
+- Missing error states
+
+**Refactoring Needs**:
+- Duplicate code needs extraction
+- Hard-coded values need configuration
+- Tight coupling needs decoupling
+- Missing abstraction layer
+
+**Bug Fixes**:
+- Race condition in existing code
+- Memory leak in utility function
+- Off-by-one error in loop
+- Missing null checks
+
+### Pre-Implementation Task Structure
+
+#### Template
+
+```markdown
+#### Pre-Implementation Tasks
+
+These tasks MUST be completed BEFORE starting main implementation of this iteration.
+
+##### ⏳ Pre-Task 1: [Name]
+
+**Why Blocking**: [Explanation of why this blocks implementation]
+
+**Scope** (< 30 min):
+- [Specific change 1]
+- [Specific change 2]
+- [Specific change 3]
+
+**Files**:
+- [File path 1]
+- [File path 2]
+
+**Test**: [How to verify it's done]
+
+---
+
+##### ✅ Pre-Task 1: [Name]
+
+**Completed**: [Date]
+
+**Changes Made**:
+- [What was actually done]
+- [Any deviations from plan]
+
+**Files Modified**:
+- [File path 1] ([+/-] X lines)
+- [File path 2] ([+/-] Y lines)
+
+**Verification**:
+- [How it was tested]
+```
+
+### Example 1: Interface Update
+
+**Before (Planning)**:
+
+```markdown
+##### ⏳ Pre-Task 1: Update PaymentProcessor interface
+
+**Why Blocking**: Current interface doesn't support async retry logic needed for main implementation
+
+**Scope** (< 30 min):
+- Add `retryPolicy?: RetryPolicy` parameter to ProcessPaymentOptions
+- Update 3 implementations (StripeProcessor, PayPalProcessor, MockProcessor)
+- Update type definitions file
+
+**Files**:
+- src/types/payment.ts
+- src/processors/StripeProcessor.ts
+- src/processors/PayPalProcessor.ts
+- src/processors/MockProcessor.ts
+
+**Test**: TypeScript compiles without errors, all processors accept new parameter
+```
+
+**After (Completed)**:
+
+```markdown
+##### ✅ Pre-Task 1: Update PaymentProcessor interface
+
+**Completed**: 2025-10-30
+
+**Changes Made**:
+- Added `retryPolicy?: RetryPolicy` to ProcessPaymentOptions interface
+- Updated all 3 processor implementations with optional parameter
+- Added JSDoc comments explaining retry policy usage
+- Discovered MockProcessor was missing error handling - fixed that too
+
+**Files Modified**:
+- src/types/payment.ts (+8 lines)
+- src/processors/StripeProcessor.ts (+12 lines)
+- src/processors/PayPalProcessor.ts (+10 lines)
+- src/processors/MockProcessor.ts (+15 lines, +8 for error handling fix)
+
+**Verification**:
+- TypeScript compiles cleanly
+- All unit tests passing
+- Mock tests verify optional parameter behavior
+```
+
+### Example 2: Enum Update
+
+**Before (Planning)**:
+
+```markdown
+##### ⏳ Pre-Task 2: Add missing payment states to enum
+
+**Why Blocking**: Retry logic needs "pending_retry" and "failed_permanent" states
+
+**Scope** (< 15 min):
+- Add two new states to PaymentStatus enum
+- Update 4 switch statements to handle new states
+- Update state transition documentation
+
+**Files**:
+- src/types/payment.ts
+- src/services/PaymentService.ts
+- src/services/RetryService.ts
+- docs/payment-states.md
+
+**Test**: No switch statement exhaustiveness errors, docs updated
+```
+
+**After (Completed)**:
+
+```markdown
+##### ✅ Pre-Task 2: Add missing payment states to enum
+
+**Completed**: 2025-10-30
+
+**Changes Made**:
+- Added `PENDING_RETRY` and `FAILED_PERMANENT` to PaymentStatus enum
+- Updated 4 switch statements with proper handling
+- Added state transition diagram to docs
+- Also added `CANCELLED_BY_USER` state (discovered during implementation)
+
+**Files Modified**:
+- src/types/payment.ts (+3 states)
+- src/services/PaymentService.ts (+8 lines)
+- src/services/RetryService.ts (+6 lines)
+- docs/payment-states.md (+state diagram)
+
+**Verification**:
+- TypeScript exhaustiveness checks pass
+- All switch statements handle new states
+- State diagram reviewed and accurate
+```
+
+### Example 3: Legacy Code Refactor
+
+**Before (Planning)**:
+
+```markdown
+##### ⏳ Pre-Task 3: Update ErrorHandler to support async operations
+
+**Why Blocking**: Current ErrorHandler is synchronous, retry logic requires async
+
+**Scope** (< 30 min):
+- Add `handleAsync()` method to ErrorHandler class
+- Implement async error recovery pattern
+- Update 3 existing call sites to use async version
+- Keep sync version for backwards compatibility
+
+**Files**:
+- src/utils/ErrorHandler.ts
+- src/services/BillingService.ts
+- src/services/PaymentService.ts
+- src/services/OrderService.ts
+
+**Test**: All services use async handler, no regressions in error handling
+```
+
+**After (Completed)**:
+
+```markdown
+##### ✅ Pre-Task 3: Update ErrorHandler to support async operations
+
+**Completed**: 2025-10-30
+
+**Changes Made**:
+- Added `handleAsync()` method with Promise-based error recovery
+- Implemented exponential backoff helper function
+- Updated all 3 call sites to async pattern
+- Kept sync `handle()` method for backwards compatibility
+- Added comprehensive unit tests for async error handling
+
+**Files Modified**:
+- src/utils/ErrorHandler.ts (+65 lines)
+- tests/utils/ErrorHandler.test.ts (+42 lines)
+- src/services/BillingService.ts (+8 lines)
+- src/services/PaymentService.ts (+12 lines)
+- src/services/OrderService.ts (+6 lines)
+
+**Verification**:
+- All unit tests passing (12 new tests)
+- Integration tests with services passing
+- No regressions in existing error handling
+- Async pattern verified with multiple retry scenarios
+```
+
+### Pre-Implementation Task Workflow
+
+```
+1. During brainstorming, identify Type A subjects
+   ↓
+2. /flow-brainstorm-review creates Pre-Implementation Tasks section
+   ↓
+3. Complete each pre-task sequentially
+   ↓
+4. Mark each ✅ COMPLETE with date and details
+   ↓
+5. Verify all pre-tasks done
+   ↓
+6. ONLY THEN run /flow-implement-start for main iteration
+```
+
+---
+
+## Action Item Execution Best Practices
+
+### General Principles
+
+**1. Read Before Execute**
+- Read ALL action items before starting
+- Understand dependencies between items
+- Identify which can be parallel vs sequential
+
+**2. Check Off Immediately**
+- Mark item `[x]` as soon as completed
+- Don't batch multiple completions
+- Provides clear progress tracking
+
+**3. Document as You Go**
+- Update Implementation Notes with discoveries
+- Note any deviations from plan
+- Document workarounds or alternative approaches
+
+**4. Verify Incrementally**
+- Test after each action item (if possible)
+- Don't wait until end to verify everything
+- Catch issues early while context is fresh
+
+### Action Item Checklist Format
+
+**Good Action Items** (specific, measurable):
+```markdown
+- [ ] Create `src/payment/RetryPolicy.ts` class
+- [ ] Implement exponential backoff algorithm (base: 1s, max: 32s)
+- [ ] Add configuration for max retries (default: 3)
+- [ ] Integrate RetryPolicy with StripeClient.processPayment()
+- [ ] Add unit tests for retry scenarios (success, failure, timeout)
+```
+
+**Poor Action Items** (vague, unmeasurable):
+```markdown
+- [ ] Handle retries
+- [ ] Make it work
+- [ ] Add tests
+- [ ] Fix issues
+```
+
+### Execution Order Strategies
+
+#### Strategy 1: Dependency Order
+
+Execute items based on what depends on what.
+
+**Example**:
+```markdown
+1. [x] Create RetryPolicy class (nothing depends on this yet)
+2. [x] Implement backoff algorithm (depends on class existing)
+3. [x] Add configuration (depends on algorithm structure)
+4. [x] Integrate with client (depends on all above)
+5. [x] Add tests (depends on everything working)
+```
+
+#### Strategy 2: Risk Order
+
+Do risky/uncertain items first to catch blockers early.
+
+**Example**:
+```markdown
+1. [x] Research Stripe API rate limits (uncertain, might change approach)
+2. [x] Implement retry logic (core feature, most risk)
+3. [x] Add configuration (low risk, straightforward)
+4. [x] Add logging (low risk, enhancement)
+5. [x] Add tests (low risk, verification)
+```
+
+#### Strategy 3: Value Order
+
+Deliver most valuable functionality first.
+
+**Example**:
+```markdown
+1. [x] Implement basic payment processing (core value)
+2. [x] Add error handling (high value, prevents crashes)
+3. [x] Integrate with database (high value, persistence)
+4. [x] Add logging (medium value, debugging)
+5. [x] Add rate limiting (low value, optimization)
+```
+
+### Handling Blockers
+
+**When you encounter a blocker**:
+
+1. **Document the blocker immediately**:
+   ```markdown
+   **Implementation Notes**:
+   - Created RetryPolicy class
+   - Implemented backoff algorithm
+   - **BLOCKER**: Stripe SDK v12 doesn't support custom retry hooks
+     - Cannot complete action item 4 (integrate with client)
+     - Options: downgrade to v11, wait for v13, implement wrapper
+     - Needs user decision
+   ```
+
+2. **Notify user with options**:
+   ```
+   ⚠️ BLOCKER ENCOUNTERED
+
+   Action Item: "Integrate RetryPolicy with StripeClient"
+
+   Issue: Stripe SDK v12 doesn't expose retry hooks for custom logic
+
+   Options:
+   A) Downgrade to Stripe SDK v11 (supports custom retry, but older)
+   B) Wait for SDK v13 release (has retry hooks, ETA 2 weeks)
+   C) Implement wrapper around SDK calls (adds complexity)
+   D) Mark iteration ❌ BLOCKED and move to different work
+
+   Which approach should we take?
+   ```
+
+3. **Wait for user decision** before proceeding
+
+### Parallel Action Items
+
+**Safe for parallel execution**:
+- Independent files
+- Different modules
+- No shared state
+- Can verify independently
+
+**Example**:
+```markdown
+Action Items (can do in parallel):
+- [ ] Create `logger.ts` utility
+- [ ] Create `validator.ts` utility
+- [ ] Create `formatter.ts` utility
+- [ ] Create `parser.ts` utility
+
+All four can be created simultaneously.
+```
+
+**NOT safe for parallel**:
+- One depends on another
+- Shared file/state
+- Must be tested together
+
+**Example**:
+```markdown
+Action Items (MUST be sequential):
+- [ ] Create database schema
+- [ ] Create data access layer (needs schema)
+- [ ] Create service layer (needs DAL)
+- [ ] Create API endpoints (needs service)
+
+These have dependencies - do in order.
+```
+
+---
+
+## Sequential vs Parallel Execution
+
+### Sequential Execution Pattern
+
+**When to use**: Action items have dependencies
+
+**Pattern**:
+```
+Item 1 → Item 2 → Item 3 → Item 4
+```
+
+**Example: Building API Endpoint**
+
+```markdown
+#### Action Items (Sequential)
+
+- [x] Define API request/response types
+  ↓ (next item needs types)
+- [x] Implement validation logic
+  ↓ (next item needs validation)
+- [x] Create service method
+  ↓ (next item needs service)
+- [x] Create API endpoint handler
+  ↓ (next item needs endpoint)
+- [x] Add integration tests
+
+**Why Sequential**: Each item builds on the previous one.
+```
+
+**Execution Strategy**:
+1. Complete item 1 fully
+2. Verify item 1 works
+3. Move to item 2
+4. Repeat until all done
+
+### Parallel Execution Pattern
+
+**When to use**: Action items are independent
+
+**Pattern**:
+```
+    ┌─ Item 1
+    ├─ Item 2
+    ├─ Item 3
+    └─ Item 4
+```
+
+**Example: Creating Utility Functions**
+
+```markdown
+#### Action Items (Parallel)
+
+- [x] Create logger utility
+- [x] Create validator utility
+- [x] Create formatter utility
+- [x] Create error handler utility
+
+**Why Parallel**: None depend on each other, all are standalone utilities.
+```
+
+**Execution Strategy**:
+1. Create all files at once
+2. Implement all functions
+3. Verify each independently
+4. Check off all items
+
+### Hybrid Execution Pattern
+
+**When to use**: Mix of dependent and independent items
+
+**Pattern**:
+```
+Item 1 →  ┌─ Item 2a
+          ├─ Item 2b  → Item 3
+          └─ Item 2c
+```
+
+**Example: Feature with Multiple Components**
+
+```markdown
+#### Action Items (Hybrid)
+
+- [x] Create base authentication interface
+  ↓
+  ┌─ [x] Implement JWT auth provider (uses interface)
+  ├─ [x] Implement OAuth provider (uses interface)
+  └─ [x] Implement API key provider (uses interface)
+  ↓
+- [x] Create auth middleware (uses all providers)
+- [x] Add tests for all auth methods
+
+**Why Hybrid**: Interface must exist first, then providers can be built in parallel, then middleware needs all providers.
+```
+
+**Execution Strategy**:
+1. Complete item 1 (interface)
+2. Complete items 2a, 2b, 2c in parallel
+3. Complete item 3 (middleware)
+4. Complete item 4 (tests)
+
+### Decision Tree: Sequential or Parallel?
+
+```
+Does Item B need Item A's output?
+    ↓
+YES → Sequential (A → B)
+    ↓
+NO → Check for shared resources
+    ↓
+    Same file/state?
+        ↓
+    YES → Sequential (safer)
+        ↓
+    NO → Parallel (A + B)
+```
+
+---
+
+## Breaking Down Large Action Items
+
+### When to Break Down
+
+**Signs an action item is too large**:
+- Estimated > 2 hours
+- Involves multiple files
+- Multiple sub-steps needed
+- Unclear how to complete
+- High risk of failure
+
+**Example of Too-Large Item**:
+```markdown
+- [ ] Implement payment system
+```
+
+This is too vague and large. Break it down!
+
+### Breakdown Strategies
+
+#### Strategy 1: By Component
+
+Break into logical components/modules.
+
+**Before**:
+```markdown
+- [ ] Implement payment system
+```
+
+**After**:
+```markdown
+- [ ] Create PaymentProcessor interface
+- [ ] Implement StripeProcessor class
+- [ ] Implement PayPalProcessor class
+- [ ] Create PaymentService to coordinate processors
+- [ ] Add payment validation logic
+- [ ] Add error handling and retry
+- [ ] Add tests for all processors
+```
+
+#### Strategy 2: By Layer
+
+Break into architectural layers.
+
+**Before**:
+```markdown
+- [ ] Add user authentication
+```
+
+**After**:
+```markdown
+- [ ] Database: Create users table with auth fields
+- [ ] Data Layer: Create UserRepository with auth methods
+- [ ] Service Layer: Create AuthService with login/logout
+- [ ] API Layer: Create /login and /logout endpoints
+- [ ] Middleware: Add authentication middleware
+- [ ] Tests: Add auth integration tests
+```
+
+#### Strategy 3: By Phase
+
+Break into implementation phases (skeleton → veins → flesh).
+
+**Before**:
+```markdown
+- [ ] Build search feature
+```
+
+**After**:
+```markdown
+Skeleton (basic functionality):
+- [ ] Create search API endpoint that returns hardcoded results
+- [ ] Add search input in UI
+- [ ] Wire UI to API
+
+Veins (core functionality):
+- [ ] Implement database search query
+- [ ] Add pagination to results
+- [ ] Add sorting options
+
+Flesh (polish):
+- [ ] Add search filters (date, type, status)
+- [ ] Add search highlighting
+- [ ] Add search suggestions
+- [ ] Optimize query performance
+```
+
+#### Strategy 4: By File
+
+Break into file-level changes.
+
+**Before**:
+```markdown
+- [ ] Refactor error handling
+```
+
+**After**:
+```markdown
+- [ ] Update ErrorHandler.ts with new error types
+- [ ] Update PaymentService.ts error handling
+- [ ] Update OrderService.ts error handling
+- [ ] Update BillingService.ts error handling
+- [ ] Update error handling tests
+- [ ] Update error documentation
+```
+
+### Breakdown Examples
+
+#### Example 1: API Integration
+
+**Too Large**:
+```markdown
+- [ ] Integrate with Stripe API
+```
+
+**Properly Broken Down**:
+```markdown
+- [ ] Create StripeClient class with API key configuration
+- [ ] Implement createPayment() method
+- [ ] Implement getPayment() method
+- [ ] Implement refundPayment() method
+- [ ] Add error mapping (Stripe errors → our errors)
+- [ ] Add retry logic for transient failures
+- [ ] Add webhook signature validation
+- [ ] Add unit tests with mocked Stripe API
+- [ ] Add integration tests with Stripe test mode
+```
+
+#### Example 2: Database Schema
+
+**Too Large**:
+```markdown
+- [ ] Design and implement database schema
+```
+
+**Properly Broken Down**:
+```markdown
+- [ ] Create users table with fields and constraints
+- [ ] Create payments table with foreign keys
+- [ ] Create orders table with relationships
+- [ ] Add indexes on frequently queried fields
+- [ ] Create migration script for schema
+- [ ] Add seed data for development
+- [ ] Test schema with sample queries
+- [ ] Document schema in ER diagram
+```
+
+#### Example 3: Refactoring
+
+**Too Large**:
+```markdown
+- [ ] Refactor legacy payment code
+```
+
+**Properly Broken Down**:
+```markdown
+- [ ] Extract payment processing into separate class
+- [ ] Replace hard-coded values with configuration
+- [ ] Convert callbacks to async/await
+- [ ] Add proper error handling
+- [ ] Replace any types with proper interfaces
+- [ ] Update tests to match new structure
+- [ ] Verify no regressions with integration tests
+- [ ] Update documentation
+```
+
+---
+
+## Common Implementation Scenarios
+
+### Scenario 1: Creating New Feature
+
+**Context**: Building a new feature from scratch
+
+**Recommended Pattern**: Sequential with verification
+
+```markdown
+#### Action Items
+
+- [x] Design and document API contract
+  → Verification: API spec reviewed and approved
+
+- [x] Create database schema and migration
+  → Verification: Migration runs cleanly, schema correct
+
+- [x] Implement data access layer
+  → Verification: Unit tests for DAL passing
+
+- [x] Implement service layer
+  → Verification: Service tests passing
+
+- [x] Create API endpoints
+  → Verification: Integration tests passing
+
+- [x] Add error handling
+  → Verification: Error cases tested and working
+
+- [x] Add logging and monitoring
+  → Verification: Logs visible, metrics tracked
+
+- [x] Write documentation
+  → Verification: Docs accurate and complete
+```
+
+### Scenario 2: Bug Fix
+
+**Context**: Fixing a specific bug
+
+**Recommended Pattern**: Diagnose → Fix → Verify
+
+```markdown
+#### Action Items
+
+- [x] Reproduce bug with test case
+  → Verification: Test fails, reproducing bug
+
+- [x] Debug and identify root cause
+  → Verification: Root cause documented
+
+- [x] Implement fix
+  → Verification: Test now passes
+
+- [x] Add regression test
+  → Verification: New test prevents bug from returning
+
+- [x] Verify fix doesn't break anything else
+  → Verification: All tests still passing
+```
+
+### Scenario 3: Refactoring
+
+**Context**: Improving existing code structure
+
+**Recommended Pattern**: Incremental with safety checks
+
+```markdown
+#### Action Items
+
+- [x] Add comprehensive tests for current behavior
+  → Verification: Tests passing, covering all cases
+
+- [x] Extract method/class/module
+  → Verification: Tests still passing
+
+- [x] Update call sites to use new code
+  → Verification: Tests still passing
+
+- [x] Remove old code
+  → Verification: Tests still passing
+
+- [x] Clean up and optimize
+  → Verification: Tests still passing, code cleaner
+```
+
+### Scenario 4: Integration
+
+**Context**: Integrating with external system
+
+**Recommended Pattern**: Mock → Real → Error handling
+
+```markdown
+#### Action Items
+
+- [x] Create client interface and types
+  → Verification: Interface matches external API
+
+- [x] Implement client with mock responses
+  → Verification: Mock client works, tests passing
+
+- [x] Replace mock with real API calls
+  → Verification: Integration test with real API succeeds
+
+- [x] Add error handling and retry logic
+  → Verification: Error cases handled gracefully
+
+- [x] Add rate limiting and timeouts
+  → Verification: Rate limits respected, timeouts working
+```
+
+### Scenario 5: Performance Optimization
+
+**Context**: Improving performance of existing feature
+
+**Recommended Pattern**: Measure → Optimize → Verify
+
+```markdown
+#### Action Items
+
+- [x] Add performance benchmarks
+  → Verification: Baseline performance measured
+
+- [x] Profile and identify bottlenecks
+  → Verification: Bottlenecks documented
+
+- [x] Implement optimization (e.g., caching)
+  → Verification: Benchmarks show improvement
+
+- [x] Verify functionality unchanged
+  → Verification: All tests still passing
+
+- [x] Document performance characteristics
+  → Verification: Docs updated with new benchmarks
+```
+
+---
+
+## Best Practices Summary
+
+**Pre-Implementation Tasks**:
+- ✅ Keep scope < 30 minutes
+- ✅ Complete ALL before starting main work
+- ✅ Document why each is blocking
+- ✅ Mark completed with date and details
+
+**Action Items**:
+- ✅ Make items specific and measurable
+- ✅ Check off immediately after completion
+- ✅ Execute in logical order (dependencies first)
+- ✅ Verify incrementally, not just at end
+- ✅ Document blockers and deviations
+
+**Breaking Down Large Items**:
+- ✅ If > 2 hours, break it down
+- ✅ Use component, layer, phase, or file breakdown
+- ✅ Ensure sub-items are still specific
+- ✅ Maintain logical grouping
+
+**Sequential vs Parallel**:
+- ✅ Sequential when items depend on each other
+- ✅ Parallel when items are independent
+- ✅ Hybrid when mix of both
+- ✅ When in doubt, go sequential (safer)
+
+**Common Scenarios**:
+- ✅ New feature: Sequential with verification
+- ✅ Bug fix: Diagnose → Fix → Verify
+- ✅ Refactoring: Incremental with safety checks
+- ✅ Integration: Mock → Real → Error handling
+- ✅ Optimization: Measure → Optimize → Verify
+SKILL_FLOW_IMPLEMENTER_PATTERNS_EOF
+}
+
+get_skill_flow_implementer_verification() {
+  cat <<'SKILL_FLOW_IMPLEMENTER_VERIFICATION_EOF'
+# Implementation Verification Guide
+
+This document provides detailed verification patterns, completion criteria, and decision-making guidance for implementation work in Flow framework. Reference this guide when you need detailed examples and templates for verifying your work.
+
+> **Note**: This is a Level 3 resource for the flow-implementer Skill. See [SKILL.md](SKILL.md) for core implementation workflow.
+
+## Table of Contents
+
+1. [Testing Patterns](#testing-patterns)
+2. [What "Done" Looks Like](#what-done-looks-like)
+3. [When to Document Bugs and Issues](#when-to-document-bugs-and-issues)
+4. [Deciding: ❌ BLOCKED vs Continue](#deciding--blocked-vs-continue)
+
+---
+
+## Testing Patterns
+
+### Unit Testing Pattern
+
+**When**: Testing individual functions/methods in isolation
+
+**Example Structure**:
+```typescript
+describe('RetryPolicy', () => {
+  describe('calculateDelay', () => {
+    it('should return base delay for first retry', () => {
+      const policy = new RetryPolicy({ baseDelay: 1000, maxRetries: 3 });
+      expect(policy.calculateDelay(1)).toBe(1000);
+    });
+
+    it('should apply exponential backoff', () => {
+      const policy = new RetryPolicy({ baseDelay: 1000, maxRetries: 3 });
+      expect(policy.calculateDelay(2)).toBe(2000);
+      expect(policy.calculateDelay(3)).toBe(4000);
+    });
+
+    it('should cap at max delay', () => {
+      const policy = new RetryPolicy({ baseDelay: 1000, maxDelay: 5000 });
+      expect(policy.calculateDelay(10)).toBe(5000);
+    });
+  });
+});
+```
+
+**What to Test**:
+- Happy path (expected inputs → expected outputs)
+- Edge cases (empty, null, undefined, boundary values)
+- Error cases (invalid inputs → proper errors)
+- State changes (method calls affect object state correctly)
+
+### Integration Testing Pattern
+
+**When**: Testing multiple components working together
+
+**Example Structure**:
+```typescript
+describe('Payment Integration', () => {
+  it('should process payment with retry on transient failure', async () => {
+    // Setup: Create real instances (or test doubles)
+    const stripe = new StripeClient(testApiKey);
+    const processor = new PaymentProcessor(stripe);
+
+    // Mock Stripe to fail once, then succeed
+    jest.spyOn(stripe, 'createCharge')
+      .mockRejectedValueOnce(new TransientError('rate_limit'))
+      .mockResolvedValueOnce({ id: 'ch_123', status: 'succeeded' });
+
+    // Execute: Run the full flow
+    const result = await processor.process({
+      amount: 1000,
+      currency: 'usd',
+      retryPolicy: { maxRetries: 3 }
+    });
+
+    // Verify: Check end-to-end behavior
+    expect(result.status).toBe('succeeded');
+    expect(stripe.createCharge).toHaveBeenCalledTimes(2); // Failed once, succeeded second time
+  });
+});
+```
+
+**What to Test**:
+- Component interactions (A calls B correctly)
+- Data flow (data transforms correctly through layers)
+- Error propagation (errors bubble up properly)
+- Side effects (database writes, API calls, file I/O)
+
+### Manual Testing Checklist
+
+**When**: No automated tests exist or testing UI/UX
+
+**Checklist Template**:
+```markdown
+**Manual Testing - [Feature Name]**
+
+**Setup**:
+- [ ] Environment: [development/staging]
+- [ ] Test data: [describe test data used]
+- [ ] Prerequisites: [any setup needed]
+
+**Test Cases**:
+1. Happy Path:
+   - [ ] Action: [what you did]
+   - [ ] Expected: [what should happen]
+   - [ ] Actual: [what actually happened]
+   - [ ] Result: ✅ PASS / ❌ FAIL
+
+2. Edge Case:
+   - [ ] Action: [what you did]
+   - [ ] Expected: [what should happen]
+   - [ ] Actual: [what actually happened]
+   - [ ] Result: ✅ PASS / ❌ FAIL
+
+**Issues Found**:
+- [Bug 1 description + severity]
+- [Bug 2 description + severity]
+
+**Verified**: [Date] by [Name]
+```
+
+### Test-Driven Development (TDD) Pattern
+
+**When**: Complex logic where tests help design
+
+**Flow**:
+```
+1. RED: Write failing test
+   ↓
+2. GREEN: Write minimal code to pass
+   ↓
+3. REFACTOR: Improve code while keeping tests green
+   ↓
+Repeat
+```
+
+**Example Iteration**:
+```typescript
+// Step 1: RED - Write failing test
+test('should calculate exponential backoff', () => {
+  const delay = calculateBackoff(2, 1000);
+  expect(delay).toBe(2000);
+});
+// Run test → FAILS (function doesn't exist)
+
+// Step 2: GREEN - Minimal implementation
+function calculateBackoff(attempt: number, baseDelay: number): number {
+  return attempt * baseDelay;
+}
+// Run test → PASSES
+
+// Step 3: REFACTOR - Improve implementation
+function calculateBackoff(attempt: number, baseDelay: number): number {
+  return Math.pow(2, attempt - 1) * baseDelay;
+}
+// Run test → STILL PASSES (for attempt=2: 2^1 * 1000 = 2000)
+
+// Step 4: Add more tests to drive better design
+test('should handle attempt=1', () => {
+  expect(calculateBackoff(1, 1000)).toBe(1000); // 2^0 * 1000
+});
+```
+
+---
+
+## What "Done" Looks Like
+
+### Iteration Completion Criteria
+
+An iteration is **truly done** when ALL of the following are true:
+
+#### 1. All Action Items Completed
+
+```markdown
+✅ Correct:
+- [x] Create RetryPolicy class
+- [x] Implement backoff algorithm
+- [x] Add configuration
+- [x] Integrate with client
+- [x] Add tests
+
+❌ Incorrect:
+- [x] Create RetryPolicy class
+- [x] Implement backoff algorithm
+- [ ] Add configuration          ← NOT DONE
+- [x] Integrate with client
+- [x] Add tests
+```
+
+#### 2. Code Works Correctly
+
+**Verification Methods** (choose based on project):
+- Unit tests passing (all green)
+- Integration tests passing
+- Manual testing completed with checklist
+- Code review approved
+- No compiler/linter errors
+
+**Example**:
+```bash
+✅ All tests passing:
+  PASS  src/payment/RetryPolicy.test.ts
+  PASS  src/payment/StripeClient.test.ts
+  PASS  integration/payment.integration.test.ts
+
+  Test Suites: 3 passed, 3 total
+  Tests:       24 passed, 24 total
+```
+
+#### 3. No Unresolved Blockers
+
+**Resolved Blocker Example**:
+```markdown
+**Implementation Notes**:
+- Created RetryPolicy class
+- **Blocker Encountered**: Stripe SDK v12 doesn't support custom retry
+  - **Resolution**: Implemented wrapper pattern around SDK calls
+  - **Impact**: Added StripeClientWrapper.ts (86 lines)
+- Integrated wrapper with payment processor
+```
+
+**Unresolved Blocker Example** (iteration NOT done):
+```markdown
+**Implementation Notes**:
+- Created RetryPolicy class
+- **Blocker Encountered**: Stripe SDK v12 doesn't support custom retry
+  - **Status**: ❌ WAITING FOR USER DECISION
+  - **Options Presented**: Downgrade to v11, wait for v13, or implement wrapper
+  - **Action**: Cannot proceed until user chooses approach
+```
+
+#### 4. Implementation Notes Updated
+
+**Complete Notes Example**:
+```markdown
+**Implementation Notes**:
+
+Created comprehensive retry logic for payment processing:
+
+**What Was Built**:
+- RetryPolicy class with configurable backoff (src/payment/RetryPolicy.ts, 124 lines)
+- Exponential backoff algorithm (base: 1s, max: 32s, jitter: 20%)
+- Error classification (transient vs permanent errors)
+- Integration with StripeClient via wrapper pattern
+
+**Design Decisions**:
+- Chose exponential backoff over linear (better for API rate limiting)
+- Added jitter to prevent thundering herd problem
+- Made policy injectable for easy testing
+
+**Challenges & Solutions**:
+- Challenge: Stripe SDK v12 doesn't support custom retry
+  - Solution: Implemented StripeClientWrapper to intercept API calls
+- Challenge: Difficult to test retry timing
+  - Solution: Made clock injectable via dependency injection
+
+**Deviations from Plan**:
+- Originally planned to use Stripe's built-in retry, but discovered it's not customizable
+- Added StripeClientWrapper.ts (not in original action items, but necessary)
+
+**Bugs Fixed**:
+- Fixed off-by-one error in backoff calculation (was 2^attempt, now 2^(attempt-1))
+```
+
+#### 5. Files Modified Documented
+
+**Complete Documentation Example**:
+```markdown
+**Files Modified**:
+- src/payment/RetryPolicy.ts (created, 124 lines)
+- src/payment/StripeClientWrapper.ts (created, 86 lines)
+- src/payment/StripeClient.ts (modified, +24 lines, -8 lines)
+- src/types/payment.ts (modified, +12 lines for retry types)
+- tests/payment/RetryPolicy.test.ts (created, 98 lines)
+- tests/payment/StripeClientWrapper.test.ts (created, 64 lines)
+- integration/payment.integration.test.ts (modified, +42 lines)
+```
+
+#### 6. Ready for Next Work
+
+**Verification Questions**:
+- Can the next iteration start immediately? YES / NO
+- Are there any dependencies that need resolving? YES / NO
+- Does anything need user decision before continuing? YES / NO
+
+**Example - Ready**:
+```markdown
+✅ READY FOR NEXT ITERATION
+
+Current Status:
+- Iteration 2 (Retry Logic) complete and verified
+- All tests passing
+- No blockers for Iteration 3 (Error Logging)
+- Can proceed immediately with /flow-implement-complete
+```
+
+**Example - NOT Ready**:
+```markdown
+❌ NOT READY - NEEDS USER DECISION
+
+Current Status:
+- Iteration 2 (Retry Logic) functionally complete
+- All tests passing
+- **Blocker for Iteration 3**: User needs to decide on logging library
+  - Options: Winston, Pino, or custom logger
+  - Cannot start Iteration 3 until decision made
+- Mark Iteration 2 complete, but address blocker before starting Iteration 3
+```
+
+---
+
+## When to Document Bugs and Issues
+
+### Bug Discovery During Implementation
+
+**When you discover bugs in EXISTING code** (not your changes):
+
+#### Document in Implementation Notes
+
+```markdown
+**Implementation Notes**:
+
+Created payment retry logic.
+
+**Bugs Discovered in Existing Code**:
+
+##### Bug 1: Race Condition in PaymentService
+
+**Location**: `src/services/PaymentService.ts:145-152`
+
+**Problem**:
+```typescript
+// Current buggy code
+async processPayment(amount: number) {
+  const status = await this.checkStatus();
+  // Race condition: status can change between check and update
+  await this.updatePayment(status);
+}
+```
+
+**Impact**: Could cause duplicate charges in concurrent requests
+
+**Action Taken**: Documented here, created separate task for fix (not in scope of current iteration)
+
+**Recommendation**: High priority fix for next sprint
+```
+
+#### When to Fix Immediately vs Defer
+
+**Fix Immediately** (document in Implementation Notes):
+- Blocking bug in file you're currently modifying
+- Syntax error preventing compilation
+- Trivial fix (< 5 minutes)
+- Part of your current action items
+
+**Defer** (document and create task):
+- Bug in unrelated code
+- Requires significant refactoring
+- Needs design discussion
+- Out of scope for current iteration
+
+### Issue Severity Levels
+
+**Critical** (Fix immediately or BLOCK iteration):
+- Causes data loss
+- Security vulnerability
+- System crash/unavailability
+- Blocking current work
+
+**High** (Document and create follow-up task):
+- Incorrect functionality
+- Performance degradation
+- Race condition/concurrency issue
+- Affects multiple users
+
+**Medium** (Document for backlog):
+- Edge case handling missing
+- Poor error messages
+- Minor performance issue
+- Affects few users
+
+**Low** (Document for future):
+- Code quality issue
+- Missing tests
+- Documentation gap
+- Nice-to-have improvement
+
+---
+
+## Deciding: ❌ BLOCKED vs Continue
+
+### When to Mark ❌ BLOCKED
+
+Mark iteration **❌ BLOCKED** when you **CANNOT PROCEED** without external help:
+
+**Valid Blocking Scenarios**:
+
+1. **External Dependency Unavailable**:
+   ```markdown
+   ❌ BLOCKED: Stripe API test environment down
+   - Cannot run integration tests
+   - Need API to be back up before proceeding
+   - Estimated wait: 2-4 hours (according to status page)
+   ```
+
+2. **Need User Decision**:
+   ```markdown
+   ❌ BLOCKED: Need architecture decision
+   - Two viable approaches for retry logic:
+     A) Client-side retry (simpler, less reliable)
+     B) Server-side retry queue (complex, more reliable)
+   - Cannot proceed without user choosing approach
+   - Next action: Present options to user, await decision
+   ```
+
+3. **Technical Limitation Discovered**:
+   ```markdown
+   ❌ BLOCKED: Library doesn't support required feature
+   - Stripe SDK v12 doesn't expose retry hooks
+   - Options: downgrade to v11, wait for v13, or implement wrapper
+   - Estimated resolution time: > 2 hours (needs investigation)
+   ```
+
+4. **Missing Information**:
+   ```markdown
+   ❌ BLOCKED: Missing API credentials
+   - Need production Stripe API key to test
+   - Cannot verify integration without real credentials
+   - User must provide credentials
+   ```
+
+### When to CONTINUE (Not Block)
+
+**DO NOT mark blocked** if you can work around or continue:
+
+**Continue Scenarios**:
+
+1. **Minor Issue with Workaround**:
+   ```markdown
+   ✅ CONTINUING: Test flakiness found
+   - Integration test occasionally fails (timing issue)
+   - **Workaround**: Added retry logic to test itself
+   - Can proceed with implementation
+   - **Note**: Will fix flakiness in separate cleanup task
+   ```
+
+2. **Discover Out-of-Scope Work**:
+   ```markdown
+   ✅ CONTINUING: Found refactoring opportunity
+   - Noticed ErrorHandler could be refactored for better reuse
+   - **Decision**: Out of scope for this iteration
+   - **Action**: Documented for future refactoring task
+   - Proceeding with current implementation using existing ErrorHandler
+   ```
+
+3. **Can Complete Action Items Without Resolution**:
+   ```markdown
+   ✅ CONTINUING: Documentation incomplete
+   - Found outdated API documentation
+   - **Action**: Using source code as reference instead
+   - Can complete implementation despite docs being stale
+   - **Note**: Will update docs in separate task
+   ```
+
+4. **Temporary Solution Acceptable**:
+   ```markdown
+   ✅ CONTINUING: Performance not optimal
+   - Current retry logic takes 30s worst case (goal was 20s)
+   - **Decision**: Acceptable for V1, will optimize in V2
+   - Can mark iteration complete with known limitation
+   - **Note**: Documented in Implementation Notes for V2 improvement
+   ```
+
+### Decision Flowchart
+
+```
+Encounter Issue
+    ↓
+Can I complete action items without resolving this?
+    ↓
+YES → CONTINUE
+  ↓
+  Document issue in Implementation Notes
+  Create follow-up task if needed
+  Proceed with implementation
+    ↓
+NO → Assess Impact
+  ↓
+  Is this a minor issue (< 30 min to resolve)?
+    ↓
+    YES → FIX NOW
+      ↓
+      Resolve issue
+      Document in Implementation Notes
+      Continue implementation
+    ↓
+    NO → BLOCKED
+      ↓
+      Mark iteration ❌ BLOCKED
+      Document blocker clearly
+      Present options to user
+      Wait for decision/resolution
+```
+
+### Example: Blocked vs Continue
+
+**Scenario**: Discovered Stripe API rate limiting during testing
+
+**Option 1: Mark BLOCKED** (if cannot proceed):
+```markdown
+❌ BLOCKED: Hit Stripe API rate limit
+
+**Issue**: Integration tests hitting Stripe API rate limit (100 requests/hour in test mode)
+
+**Impact**: Cannot run integration tests to verify implementation
+
+**Cannot Proceed Because**:
+- Tests are mandatory for completion
+- No way to verify retry logic works without testing against real API
+- Mock tests insufficient (need real API behavior)
+
+**Options**:
+A) Request higher rate limit from Stripe support (ETA: 1-2 days)
+B) Space out test runs (run tests every hour, very slow)
+C) Use more sophisticated mocking to reduce API calls
+
+**Waiting for**: User decision on approach
+```
+
+**Option 2: CONTINUE** (if can work around):
+```markdown
+✅ CONTINUING: Stripe API rate limit hit
+
+**Issue**: Integration tests hitting Stripe API rate limit (100 requests/hour in test mode)
+
+**Workaround**: Implemented smart test mocking
+- Created realistic mock responses based on Stripe API documentation
+- Validated mock responses against real API (used 10 of 100 requests)
+- Remaining integration tests use mocks
+- Will run full integration test suite during deployment (production has higher limits)
+
+**Impact**: Can proceed with confidence
+- Core logic tested with mocks
+- Sample verification with real API successful
+- Documented limitation for deployment testing
+
+**Next Steps**: Continue with implementation
+```
+SKILL_FLOW_IMPLEMENTER_VERIFICATION_EOF
+}
+
+get_skill_flow_architect() {
+  cat <<'SKILL_FLOW_ARCHITECT_EOF'
+---
+name: flow-architect
+description: Guide architectural decisions and PLAN.md updates in Flow framework. Use when user discusses "architecture", "how should we architect", "design patterns", "how should we structure", "how do we structure", "technology choice", "should we use", "DO/DON'T rules", "update architecture", or wants to update Architecture section in PLAN.md. Helps document architectural decisions, update DO/DON'T guidelines, define scope boundaries, and record technology choices during brainstorming.
+---
+
+# Flow Architect
+
+Help users make and document architectural decisions in Flow framework projects. This Skill activates during brainstorming when design patterns, technology choices, or system structure need to be captured in PLAN.md.
+
+## When to Use This Skill
+
+Activate when the user discusses architecture:
+- "How should we architect this?"
+- "What's the best structure for..."
+- "Should we use [pattern/library/approach]?"
+- "Update the architecture section"
+- "Add a DO/DON'T rule"
+- "What technology should we choose?"
+- "Document this design decision"
+- "Define the scope boundaries"
+
+## Architecture Philosophy
+
+**Flow's Core Principle**: Document architectural decisions during brainstorming, not during implementation. PLAN.md preserves design rationale for future reference.
+
+**Key Sections in PLAN.md**:
+- **Architecture**: High-level system structure, component boundaries, data flow
+- **DO/DON'T Guidelines**: Discovered patterns and anti-patterns with rationale
+- **Scope**: What's in V1 vs future versions, boundaries and constraints
+
+**When to Update**:
+- Major architectural decision made
+- Pattern discovered that should be followed consistently
+- Technology choice finalized
+- Scope boundary clarified
+- Anti-pattern identified
+
+## PLAN.md Architecture Section
+
+### What Goes in Architecture
+
+**High-level Structure**:
+- System components and their relationships
+- Module boundaries and responsibilities
+- Data flow between components
+- Integration points (external APIs, services, databases)
+- Key design patterns being used
+
+**Example Architecture Section**:
+```markdown
+## Architecture
+
+### System Structure
+
+**Core Components**:
+- **PaymentProcessor**: Orchestrates payment flow, handles retries
+- **StripeClient**: Wrapper around Stripe SDK, manages API calls
+- **ErrorMapper**: Translates Stripe errors to domain errors
+- **RetryPolicy**: Configurable backoff and retry logic
+
+**Data Flow**:
+```
+User → PaymentProcessor → StripeClient → Stripe API
+         ↓ (on error)
+    ErrorMapper → RetryPolicy → StripeClient (retry)
+```
+
+**Integration Points**:
+- Stripe API v2024-10 (payment processing)
+- Webhook endpoint (payment status updates)
+- Database (transaction log)
+```
+
+### What Doesn't Go in Architecture
+
+**Avoid These**:
+- ❌ Implementation details (specific line numbers, code snippets)
+- ❌ Completed work (belongs in task notes)
+- ❌ Bugs and fixes (belongs in iteration notes)
+- ❌ Speculation about future features (keep focused on V1)
+
+## DO/DON'T Guidelines
+
+### When to Add Guidelines
+
+**Add a guideline when you discover**:
+- A pattern that should be followed consistently
+- An anti-pattern that should be avoided
+- A constraint from the technology/platform
+- A design decision with specific rationale
+
+**DO NOT add guidelines for**:
+- Obvious best practices (don't state "write tests")
+- One-off decisions (not patterns)
+- Implementation details (belongs in code comments)
+- Preferences without rationale
+
+### Guideline Structure
+
+**Format**:
+```markdown
+### DO: [Action]
+
+**Rationale**: [Why this pattern works]
+
+**Example**:
+```[language]
+// Good approach
+```
+
+**Anti-pattern**:
+```[language]
+// What to avoid
+```
+```
+
+**Real Example**:
+```markdown
+### DO: Use RetryPolicy for all Stripe API calls
+
+**Rationale**: Stripe API has transient failures (rate limits, network issues). Retry logic with exponential backoff prevents user-facing errors.
+
+**Example**:
+```typescript
+const result = await retryPolicy.execute(() =>
+  stripe.createCharge({ amount, currency })
+);
+```
+
+**Anti-pattern**:
+```typescript
+// Don't call Stripe directly without retry
+const result = await stripe.createCharge({ amount, currency });
+```
+```
+
+### DON'T: [Anti-pattern]
+
+**Rationale**: [Why this causes problems]
+
+**Impact**: [Consequences of ignoring this]
+
+**Example**:
+```markdown
+### DON'T: Retry permanently failed payments
+
+**Rationale**: Permanent failures (invalid card, insufficient funds) will never succeed. Retrying wastes resources and delays error feedback to user.
+
+**Impact**:
+- User waits longer for error message
+- Unnecessary load on Stripe API
+- Potential rate limit violations
+
+**How to Identify Permanent Failures**:
+- Stripe error codes: `card_declined`, `insufficient_funds`, `invalid_card`
+- Use ErrorMapper to classify errors
+```
+
+## Technology Choices
+
+### When to Document Technology Decisions
+
+**Document when you choose**:
+- External library or framework
+- Design pattern (e.g., Repository pattern, Strategy pattern)
+- Architecture style (e.g., layered, hexagonal, microservices)
+- Third-party service (e.g., Stripe, Twilio, SendGrid)
+
+### Technology Choice Format
+
+```markdown
+## Technology Choices
+
+### [Component/Area]: [Technology]
+
+**Decision**: Using [technology/pattern] for [purpose]
+
+**Rationale**:
+- [Reason 1: why this choice]
+- [Reason 2: advantage over alternatives]
+- [Reason 3: fits project constraints]
+
+**Alternatives Considered**:
+- [Alternative 1]: [Why not chosen]
+- [Alternative 2]: [Why not chosen]
+
+**Trade-offs**:
+- ✅ Pros: [advantages]
+- ❌ Cons: [disadvantages]
+- ⚖️ Acceptable for V1: [why trade-offs are OK]
+```
+
+**Example**:
+```markdown
+### Retry Logic: Custom Implementation
+
+**Decision**: Building custom retry policy instead of using Stripe SDK built-in retry
+
+**Rationale**:
+- Stripe SDK v12 doesn't expose retry configuration
+- Need fine-grained control over backoff timing
+- Want to distinguish transient vs permanent errors
+
+**Alternatives Considered**:
+- Stripe SDK built-in retry: Not customizable enough
+- Generic retry library (async-retry): Doesn't understand Stripe error semantics
+
+**Trade-offs**:
+- ✅ Pros: Full control, testable, Stripe-aware
+- ❌ Cons: More code to maintain
+- ⚖️ Acceptable for V1: Retry logic is isolated in RetryPolicy class
+```
+
+## Scope Boundaries
+
+### Defining Scope
+
+**V1 Scope** (what's included):
+- Core functionality needed for first release
+- Must-have features
+- Blocking dependencies
+
+**V2/V3 Scope** (what's deferred):
+- Nice-to-have features
+- Optimizations
+- Edge cases
+- Advanced features
+
+### Scope Section Format
+
+```markdown
+## Scope
+
+### V1 - MVP (Current)
+
+**In Scope**:
+- [Core feature 1]
+- [Core feature 2]
+- [Core feature 3]
+
+**Out of Scope** (defer to V2):
+- [Enhancement 1]: [Why deferred]
+- [Enhancement 2]: [Why deferred]
+
+**Constraints**:
+- [Constraint 1]: [Impact on design]
+- [Constraint 2]: [Impact on design]
+```
+
+**Example**:
+```markdown
+## Scope
+
+### V1 - MVP (Current)
+
+**In Scope**:
+- Payment processing (charge credit cards)
+- Basic retry logic (transient failures only)
+- Error mapping (Stripe errors → domain errors)
+- Transaction logging
+
+**Out of Scope** (defer to V2):
+- Refunds: Not needed for initial launch
+- Subscription billing: Future business model
+- Multi-currency: US only for V1
+- Webhook verification: Will add when scaling
+
+**Constraints**:
+- Stripe API v2024-10 (latest stable)
+- TypeScript 5.x (project standard)
+- Must handle 100 req/sec (growth expectation)
+```
+
+## Updating PLAN.md During Brainstorming
+
+### Workflow
+
+1. **Read current PLAN.md**:
+   - Check existing Architecture section
+   - Review current DO/DON'T guidelines
+   - Understand scope boundaries
+
+2. **Discuss with user**:
+   - Present architectural options clearly
+   - Explain trade-offs for each approach
+   - Reference existing patterns in codebase
+
+3. **Update PLAN.md** (after user decides):
+   - Add/update Architecture section
+   - Add new DO/DON'T guidelines
+   - Document technology choices
+   - Clarify scope boundaries
+
+4. **Reference in task file**:
+   - Link to PLAN.md sections in task notes
+   - Don't duplicate content in task files
+
+### Subject Resolution Type B
+
+Architectural decisions are often **Type B subjects** in brainstorming:
+- **Type B**: Documentation-only updates (no code)
+- Resolved by updating PLAN.md
+- No action items needed
+- Marked resolved when PLAN.md updated
+
+**Example Type B Subject**:
+```markdown
+### Subject 2: Define Retry Strategy
+
+**Status**: ✅ RESOLVED (Type B - Documentation)
+
+**Question**: What retry strategy should we use for Stripe API calls?
+
+**Decision**: Exponential backoff with jitter (1s, 2s, 4s, 8s, 16s max)
+
+**Rationale**:
+- Prevents thundering herd problem (jitter)
+- Standard for API rate limiting
+- Stripe recommends exponential backoff
+
+**PLAN.md Updated**:
+- Added "Retry Logic" to Architecture section
+- Added "DO: Use RetryPolicy for all Stripe calls" guideline
+- Documented RetryPolicy configuration in Technology Choices
+```
+
+## Common Architecture Patterns
+
+### Pattern: Layered Architecture
+
+```
+Presentation Layer (API endpoints, controllers)
+    ↓
+Business Layer (services, domain logic)
+    ↓
+Data Layer (repositories, database access)
+    ↓
+External Layer (third-party APIs)
+```
+
+**When to use**: Clear separation of concerns, traditional web apps
+
+### Pattern: Wrapper/Adapter
+
+**When to use**: Integrating with external service, need to control interface
+
+**Example**:
+```markdown
+### StripeClient Wrapper
+
+**Purpose**: Wrap Stripe SDK to add retry logic and error mapping
+
+**Benefits**:
+- Isolates Stripe-specific code
+- Single place for retry configuration
+- Easier to test (can mock wrapper)
+- Can swap Stripe for different provider
+
+**Structure**:
+```typescript
+class StripeClient {
+  constructor(
+    private stripe: Stripe,
+    private retryPolicy: RetryPolicy,
+    private errorMapper: ErrorMapper
+  ) {}
+
+  async createCharge(params: ChargeParams): Promise<Charge> {
+    return this.retryPolicy.execute(async () => {
+      try {
+        return await this.stripe.charges.create(params);
+      } catch (error) {
+        throw this.errorMapper.map(error);
+      }
+    });
+  }
+}
+```
+```
+
+### Pattern: Strategy Pattern
+
+**When to use**: Multiple algorithms for same operation, chosen at runtime
+
+**Example**: RetryPolicy with different backoff strategies (linear, exponential, custom)
+
+## Interaction with Other Flow Skills
+
+**Planning Stage** (flow-planner Skill):
+- `/flow-brainstorm-start` - Begin architectural discussion
+- `/flow-brainstorm-subject` - Add design decision to discuss
+
+**Architecture Stage** (This Skill):
+- Discuss architectural options ← YOU ARE HERE
+- Update PLAN.md with decisions ← YOU ARE HERE
+- Resolve Type B subjects (documentation)
+
+**Implementation Stage** (flow-implementer Skill):
+- `/flow-implement-start` - Build based on architecture
+- Reference PLAN.md architecture during coding
+
+## Detailed Guidance
+
+For comprehensive patterns, examples, and templates, see **[PLAN_UPDATES.md](PLAN_UPDATES.md)**:
+
+- **When to Update PLAN.md**: Type B subjects, workflows, timing guidance
+- **Architecture vs Scope**: Detailed distinction with decision tree and examples
+- **DO/DON'T Examples**: 4 comprehensive patterns with full code (API integration, error handling, configuration, testing)
+- **Technology Choice Templates**: Complete documentation format with 2 real examples
+- **Keeping PLAN.md Focused**: What to include/avoid, red flags, how to slim down
+
+## References
+
+- **PLAN.md Structure**: DEVELOPMENT_FRAMEWORK.md lines 2363-2560
+- **Brainstorming Pattern**: DEVELOPMENT_FRAMEWORK.md lines 1167-1797
+- **Subject Resolution Type B**: DEVELOPMENT_FRAMEWORK.md lines 1247-1268
+- **DO/DON'T Guidelines**: Include rationale and examples, avoid speculation
+
+## Key Reminders
+
+**Before suggesting architecture changes**:
+- [ ] Read current PLAN.md Architecture section
+- [ ] Understand existing patterns in codebase
+- [ ] Present multiple options with trade-offs
+- [ ] Let user make final decision
+
+**After user decides**:
+- [ ] Update PLAN.md with decision
+- [ ] Add DO/DON'T if pattern emerges
+- [ ] Document technology choice with rationale
+- [ ] Resolve brainstorming subject (Type B)
+
+**Keep PLAN.md focused**:
+- High-level decisions, not implementation details
+- Rationale, not speculation
+- Patterns, not one-off choices
+- V1 scope, defer V2/V3 discussions
+SKILL_FLOW_ARCHITECT_EOF
+}
+
+get_skill_flow_architect_plan_updates() {
+  cat <<'SKILL_FLOW_ARCHITECT_PLAN_UPDATES_EOF'
+# PLAN.md Update Patterns
+
+This document provides best practices and patterns for updating PLAN.md during brainstorming sessions in Flow framework projects. Use this as a reference when documenting architectural decisions, DO/DON'T guidelines, technology choices, and scope boundaries.
+
+> **Note**: This is a Level 3 resource for the flow-architect Skill. See [SKILL.md](SKILL.md) for core architectural guidance.
+
+## Table of Contents
+
+1. [When to Update PLAN.md](#when-to-update-planmd)
+2. [Architecture vs Scope](#architecture-vs-scope)
+3. [DO/DON'T Guideline Examples](#dodont-guideline-examples)
+4. [Technology Choice Documentation](#technology-choice-documentation)
+5. [Keeping PLAN.md Focused](#keeping-planmd-focused)
+
+## When to Update PLAN.md
+
+### During Brainstorming (Type B Subjects)
+
+**Type B subjects** are resolved by updating PLAN.md documentation:
+- Architectural decisions finalized
+- Design patterns chosen
+- Technology/library selection complete
+- Scope boundaries clarified
+- DO/DON'T pattern discovered
+
+**Workflow**:
+1. Discuss options during brainstorming
+2. User makes final decision
+3. Update PLAN.md with decision + rationale
+4. Mark brainstorming subject as ✅ RESOLVED (Type B)
+
+**Example Subject**:
+```markdown
+### Subject 3: Choose Error Mapping Strategy
+
+**Status**: ✅ RESOLVED (Type B - Documentation)
+
+**Question**: How should we map Stripe errors to domain errors?
+
+**Decision**: Use dedicated ErrorMapper class with error code lookup table
+
+**Rationale**:
+- Centralizes error mapping logic
+- Easy to extend with new error codes
+- Testable in isolation
+- Keeps StripeClient focused
+
+**PLAN.md Updated**:
+- Added ErrorMapper to Architecture section (Component list)
+- Added "DO: Use ErrorMapper for all Stripe errors" guideline
+```
+
+### Not During Implementation
+
+**DON'T update PLAN.md during implementation** for:
+- Bug fixes (document in iteration notes)
+- Implementation details (document in code comments)
+- Completed work (document in task files)
+- Discovered issues (document in implementation notes)
+
+**Exception**: If implementation reveals a pattern that should be followed consistently, note it for future brainstorming session to add to DO/DON'T guidelines.
+
+## Architecture vs Scope
+
+### Architecture Section: HOW the system works
+
+**Use Architecture section for**:
+- System structure (components, modules, layers)
+- Component responsibilities and boundaries
+- Data flow between components
+- Integration points (external services, APIs)
+- Design patterns being used
+- Key technical constraints
+
+**Example - Architecture Section**:
+```markdown
+## Architecture
+
+### Component Structure
+
+**Core Modules**:
+- **PaymentProcessor** (Orchestrator)
+  - Coordinates payment workflow
+  - Handles transaction lifecycle
+  - Delegates to specialized components
+
+- **StripeClient** (Integration Adapter)
+  - Wraps Stripe SDK
+  - Applies retry policy to all API calls
+  - Maps Stripe responses to domain models
+
+- **ErrorMapper** (Error Translation)
+  - Classifies errors (transient vs permanent)
+  - Maps Stripe error codes to domain errors
+  - Provides user-friendly error messages
+
+- **RetryPolicy** (Resilience)
+  - Configurable exponential backoff
+  - Jitter to prevent thundering herd
+  - Different policies for different error types
+
+### Data Flow
+
+```
+User Request
+  ↓
+PaymentProcessor.process()
+  ↓
+StripeClient.createCharge() → [RetryPolicy wraps call]
+  ↓
+Stripe API
+  ↓ (success)
+Return Charge ID
+  ↓ (failure - transient)
+RetryPolicy → exponential backoff → retry
+  ↓ (failure - permanent)
+ErrorMapper → domain error → return to user
+```
+
+### Integration Points
+
+**External Services**:
+- Stripe API v2024-10 (payment processing)
+  - Rate limit: 100 req/sec
+  - Retry-after header respected
+  - Webhook for async updates
+
+**Database**:
+- Transaction log (PostgreSQL)
+  - Payment attempts (for audit)
+  - Retry history (for analytics)
+```
+
+### Scope Section: WHAT is included
+
+**Use Scope section for**:
+- Features included in V1
+- Features deferred to V2/V3
+- Explicit exclusions
+- Business constraints
+- Performance requirements
+- Platform limitations
+
+**Example - Scope Section**:
+```markdown
+## Scope
+
+### V1 - MVP (Current Release)
+
+**In Scope**:
+- Credit card payments (Visa, Mastercard, Amex)
+- Basic retry for transient failures
+- Error classification (permanent vs transient)
+- Transaction logging for audit
+- Synchronous payment flow
+
+**Out of Scope** (defer to V2):
+- Refund processing: Not needed for launch
+- Subscription billing: Future business model
+- Multi-currency support: US market only for V1
+- Webhook processing: Will add with async flow
+- Saved payment methods: V2 feature
+
+**Constraints**:
+- Stripe API v2024-10 required
+- TypeScript 5.x (project standard)
+- Response time < 3 seconds (includes retries)
+- Must handle 100 payments/sec
+
+**Platform Limitations**:
+- Stripe test mode: 100 req/hour (not a production issue)
+- No 3D Secure in V1 (adds complexity, defer to V2)
+```
+
+### Quick Decision Tree
+
+```
+Need to document decision
+    ↓
+Does it explain HOW the system is structured?
+    ↓
+YES → Architecture section
+  - Components
+  - Data flow
+  - Patterns
+  - Integration points
+    ↓
+NO → Does it define WHAT is included/excluded?
+    ↓
+YES → Scope section
+  - V1 features
+  - V2 deferred
+  - Constraints
+  - Limitations
+```
+
+## DO/DON'T Guideline Examples
+
+### Example 1: API Integration Pattern
+
+```markdown
+### DO: Use RetryPolicy for all external API calls
+
+**Rationale**: External APIs have transient failures (network issues, rate limits, temporary unavailability). Retry logic with exponential backoff provides resilience without user-facing errors.
+
+**Pattern**:
+```typescript
+// Good: Wrapped with retry policy
+const result = await retryPolicy.execute(async () => {
+  return await externalApi.call(params);
+});
+```
+
+**Anti-pattern**:
+```typescript
+// Bad: Direct call without retry
+const result = await externalApi.call(params); // Fails on transient errors
+```
+
+**When to Apply**:
+- All calls to Stripe API
+- All calls to third-party services
+- Any network request that can fail transiently
+
+**Exceptions**:
+- Internal service calls (use different error handling)
+- Database queries (use transaction retry instead)
+```
+
+### Example 2: Error Handling Constraint
+
+```markdown
+### DON'T: Retry permanent failures
+
+**Rationale**: Permanent failures (invalid input, insufficient funds, authorization denied) will never succeed no matter how many times you retry. Retrying wastes resources and delays error feedback to users.
+
+**Impact**:
+- User waits longer for error message
+- Unnecessary load on payment provider
+- Risk of hitting rate limits
+- Wasted compute resources
+
+**How to Identify Permanent Failures**:
+```typescript
+// Use ErrorMapper to classify
+const error = errorMapper.map(stripeError);
+
+if (error.type === 'permanent') {
+  // Don't retry - return error immediately
+  throw error;
+}
+
+if (error.type === 'transient') {
+  // Safe to retry
+  await retryPolicy.execute(() => operation());
+}
+```
+
+**Permanent Error Codes** (Stripe):
+- `card_declined` - Card issuer rejected
+- `insufficient_funds` - Not enough money
+- `invalid_card` - Card details invalid
+- `expired_card` - Card past expiration
+```
+
+### Example 3: Configuration Management
+
+```markdown
+### DO: Make retry policies configurable per environment
+
+**Rationale**: Different environments have different performance characteristics and requirements. Test environments need faster retries for quick feedback. Production needs conservative retries to handle real failures.
+
+**Configuration**:
+```typescript
+// config/retry.ts
+export const retryConfig = {
+  development: {
+    maxRetries: 2,
+    baseDelay: 100, // 100ms
+    maxDelay: 1000, // 1 second
+  },
+  test: {
+    maxRetries: 1,
+    baseDelay: 10, // 10ms (fast tests)
+    maxDelay: 100,
+  },
+  production: {
+    maxRetries: 5,
+    baseDelay: 1000, // 1 second
+    maxDelay: 32000, // 32 seconds
+  },
+};
+```
+
+**Usage**:
+```typescript
+const policy = new RetryPolicy(retryConfig[process.env.NODE_ENV]);
+```
+```
+
+### Example 4: Testing Pattern
+
+```markdown
+### DO: Test error scenarios with mocks
+
+**Rationale**: External API failures are hard to reproduce in tests. Use mocks to simulate transient failures, permanent failures, and edge cases consistently.
+
+**Pattern**:
+```typescript
+describe('PaymentProcessor with retries', () => {
+  it('should retry on transient failure', async () => {
+    // Mock: fail twice, then succeed
+    const mockStripe = jest.fn()
+      .mockRejectedValueOnce(new TransientError('rate_limit'))
+      .mockRejectedValueOnce(new TransientError('network_error'))
+      .mockResolvedValueOnce({ id: 'ch_123', status: 'succeeded' });
+
+    const result = await processor.process(payment);
+
+    expect(mockStripe).toHaveBeenCalledTimes(3); // 2 retries + success
+    expect(result.status).toBe('succeeded');
+  });
+
+  it('should not retry on permanent failure', async () => {
+    const mockStripe = jest.fn()
+      .mockRejectedValueOnce(new PermanentError('card_declined'));
+
+    await expect(processor.process(payment)).rejects.toThrow('card_declined');
+
+    expect(mockStripe).toHaveBeenCalledTimes(1); // No retries
+  });
+});
+```
+```
+
+## Technology Choice Documentation
+
+### Template
+
+```markdown
+### [Component/Feature]: [Technology/Pattern]
+
+**Decision**: Using [specific technology] for [purpose]
+
+**Rationale**:
+- [Reason 1: primary benefit]
+- [Reason 2: fits project needs]
+- [Reason 3: team familiarity / community support]
+
+**Alternatives Considered**:
+- [Alternative 1]: [Why not chosen - specific reason]
+- [Alternative 2]: [Why not chosen - specific reason]
+
+**Trade-offs**:
+- ✅ Pros:
+  - [Advantage 1]
+  - [Advantage 2]
+- ❌ Cons:
+  - [Disadvantage 1]
+  - [Disadvantage 2]
+- ⚖️ Acceptable for V1: [Why trade-offs are acceptable]
+
+**Migration Path** (if relevant):
+- V1: [Current approach]
+- V2: [Future improvement if needed]
+```
+
+### Example 1: Library Selection
+
+```markdown
+### Retry Logic: Custom Implementation
+
+**Decision**: Building custom RetryPolicy class instead of using generic retry library
+
+**Rationale**:
+- Need Stripe-specific error classification (transient vs permanent)
+- Stripe SDK v12 doesn't expose retry configuration
+- Want exponential backoff with jitter (not all libraries support this)
+- Need different policies for different error types
+
+**Alternatives Considered**:
+- **async-retry**: Generic library, but doesn't understand Stripe errors
+  - Would need wrapper anyway for error classification
+  - Adds dependency for limited benefit
+- **Stripe SDK built-in**: Not customizable in v12
+  - No access to retry timing
+  - Can't distinguish transient from permanent
+  - Would need to wait for v13 (6+ months)
+
+**Trade-offs**:
+- ✅ Pros:
+  - Full control over retry behavior
+  - Stripe-aware error handling
+  - Testable in isolation
+  - Zero external dependencies
+- ❌ Cons:
+  - More code to maintain (~75 lines)
+  - Need to implement backoff algorithm ourselves
+  - Testing async timing can be tricky
+- ⚖️ Acceptable for V1:
+  - Retry logic is isolated in single class
+  - Well-tested with mocks (time-injection pattern)
+  - Can swap for library later if needed (interface stays same)
+
+**Migration Path**:
+- V1: Custom RetryPolicy class
+- V2: Monitor if Stripe SDK v13+ adds customizable retry
+- V3: Consider migrating to SDK if it meets needs
+```
+
+### Example 2: Design Pattern
+
+```markdown
+### Error Handling: Strategy Pattern
+
+**Decision**: Using Strategy pattern for error classification
+
+**Rationale**:
+- Different error types need different handling strategies
+- Easy to add new error types without modifying existing code
+- Testable strategies in isolation
+- Clear separation of concerns
+
+**Implementation**:
+```typescript
+interface ErrorStrategy {
+  canHandle(error: StripeError): boolean;
+  handle(error: StripeError): DomainError;
+}
+
+class TransientErrorStrategy implements ErrorStrategy {
+  canHandle(error: StripeError): boolean {
+    return ['rate_limit', 'network_error'].includes(error.code);
+  }
+  handle(error: StripeError): DomainError {
+    return new TransientError(error.message, { retryable: true });
+  }
+}
+
+class PermanentErrorStrategy implements ErrorStrategy {
+  canHandle(error: StripeError): boolean {
+    return ['card_declined', 'insufficient_funds'].includes(error.code);
+  }
+  handle(error: StripeError): DomainError {
+    return new PermanentError(error.message, { retryable: false });
+  }
+}
+```
+
+**Alternatives Considered**:
+- **Simple if/else chain**: Harder to test, grows complex with more error types
+- **Error code mapping table**: Less flexible, can't handle complex logic
+
+**Trade-offs**:
+- ✅ Pros: Extensible, testable, clean
+- ❌ Cons: More classes (4 strategies + manager)
+- ⚖️ Acceptable: Error handling is core feature, worth the structure
+```
+
+## Keeping PLAN.md Focused
+
+### What TO Include
+
+**Architecture Section**:
+- ✅ High-level component structure
+- ✅ Data flow diagrams (text-based)
+- ✅ Integration points with external systems
+- ✅ Key design patterns being used
+- ✅ Technical constraints affecting design
+
+**DO/DON'T Guidelines**:
+- ✅ Patterns discovered from real experience
+- ✅ Anti-patterns that caused problems
+- ✅ Platform-specific constraints
+- ✅ Examples with code snippets
+
+**Technology Choices**:
+- ✅ Major library/framework selections
+- ✅ Design pattern choices
+- ✅ Rationale and trade-offs
+
+**Scope**:
+- ✅ V1 feature list
+- ✅ Explicitly deferred features (V2/V3)
+- ✅ Performance requirements
+- ✅ Platform constraints
+
+### What NOT to Include
+
+**Avoid in Architecture**:
+- ❌ Implementation details (specific line numbers)
+- ❌ Completed work (belongs in task files)
+- ❌ Bug fixes (belongs in iteration notes)
+- ❌ Todos and action items (belongs in task files)
+- ❌ Speculation about V2 features (keep focused on V1)
+
+**Avoid in DO/DON'T**:
+- ❌ Obvious best practices ("write tests", "use version control")
+- ❌ One-off decisions that aren't patterns
+- ❌ Personal preferences without rationale
+- ❌ Guidelines without examples
+
+**Avoid in Scope**:
+- ❌ Detailed implementation plans (belongs in tasks)
+- ❌ Tentative "maybe" features (defer or commit)
+- ❌ Features without user value justification
+
+### Red Flags (PLAN.md Getting Too Large)
+
+**Warning signs**:
+- PLAN.md over 300 lines (probably too detailed)
+- Architecture section listing every file
+- DO/DON'T with 20+ guidelines (too many patterns)
+- Scope including V2/V3/V4 features
+
+**How to slim down**:
+1. Move implementation details to code comments
+2. Move completed work to task files or ARCHIVE.md
+3. Consolidate similar guidelines
+4. Focus scope on V1 only, defer V2/V3 discussion
+
+### Example: Too Detailed vs Just Right
+
+**❌ Too Detailed** (avoid):
+```markdown
+## Architecture
+
+### File Structure
+- src/
+  - payment/
+    - PaymentProcessor.ts (145 lines)
+      - process() method (lines 23-67)
+      - validate() method (lines 69-89)
+      - log() method (lines 91-103)
+    - StripeClient.ts (213 lines)
+      - createCharge() (lines 45-98)
+      ...
+```
+
+**✅ Just Right**:
+```markdown
+## Architecture
+
+### Component Structure
+
+**PaymentProcessor** (Orchestrator):
+- Validates payment requests
+- Coordinates Stripe API calls
+- Logs transactions
+
+**StripeClient** (Integration):
+- Wraps Stripe SDK
+- Applies retry policy
+- Maps errors to domain model
+```
+
+## Summary
+
+**Key Principles**:
+1. Update PLAN.md during brainstorming (Type B subjects)
+2. Distinguish Architecture (HOW) from Scope (WHAT)
+3. DO/DON'T guidelines need rationale + examples
+4. Document technology choices with trade-offs
+5. Keep PLAN.md focused on V1, high-level decisions
+
+**When in doubt**:
+- Ask: "Is this a pattern others should follow?" → DO/DON'T
+- Ask: "Does this explain system structure?" → Architecture
+- Ask: "Does this define what's included?" → Scope
+- Ask: "Is this implementation detail?" → Code comments / task file
+SKILL_FLOW_ARCHITECT_PLAN_UPDATES_EOF
+}
+
+get_skill_flow_reviewer() {
+  cat <<'SKILL_FLOW_REVIEWER_EOF'
+---
+name: flow-reviewer
+description: Review and verify Flow framework plan consistency. Use when user says "review", "review the plan", "review this", "verify", "verify this", "check", "check the plan", "validate", "is this complete", "are we done", or wants to inspect plan status. Validates status markers match reality, checks for phantom tasks, ensures brainstorming complete before implementation, verifies task structure follows rules. Read-only inspection using Grep, Read, Glob tools only - never modifies files.
+---
+
+# Flow Reviewer
+
+Help users verify plan consistency, validate status markers, and review implementation completeness in Flow framework projects. This Skill performs read-only inspections to ensure the plan matches reality.
+
+## When to Use This Skill
+
+Activate when the user wants verification:
+- "Review the plan"
+- "Verify the status"
+- "Check if we're done"
+- "Is the implementation complete?"
+- "Validate the structure"
+- "Are there any issues?"
+- "Check for inconsistencies"
+- "Verify all tasks are tracked"
+
+## Review Philosophy
+
+**Read-Only Inspection**: This Skill observes and reports, never modifies.
+
+**What We Check**:
+- Status markers match actual state
+- No phantom tasks (DASHBOARD promises what doesn't exist)
+- Brainstorming complete before implementation starts
+- Task structure follows Flow rules
+- Action items are all checked off when complete
+- File references are valid
+
+**Tools Available**: `Read`, `Grep`, `Glob` (read-only tools only)
+
+## Review Checklist
+
+### 1. Status Marker Consistency
+
+**Check**: Do status markers reflect actual state?
+
+**How to verify**:
+```bash
+# Find all IN PROGRESS items
+grep -r "🚧 IN PROGRESS" .flow/
+
+# Find all COMPLETE items
+grep -r "✅ COMPLETE" .flow/
+
+# Find all PENDING items
+grep -r "⏳ PENDING" .flow/
+```
+
+**Common issues**:
+- Task marked 🚧 IN PROGRESS but all iterations are ✅ COMPLETE
+- Iteration marked ⏳ PENDING but has implementation section
+- Multiple items marked 🚧 IN PROGRESS (should only be one active)
+
+**Example problem**:
+```markdown
+### 🚧 Iteration 2: Error Handling
+
+**Status**: ✅ COMPLETE (2025-10-30)  ← MISMATCH!
+```
+
+**Report**:
+```
+❌ Status Marker Mismatch
+- Iteration 2 header shows 🚧 IN PROGRESS
+- Implementation section shows ✅ COMPLETE
+- Action: Update header to match implementation status
+```
+
+### 2. Phantom Task Detection
+
+**Check**: Does every task listed in DASHBOARD.md have a corresponding file?
+
+**How to verify**:
+```bash
+# List all tasks mentioned in DASHBOARD
+grep "Task [0-9]" .flow/DASHBOARD.md
+
+# Check if task files exist
+ls .flow/phase-*/task-*.md
+```
+
+**Common issues**:
+- DASHBOARD lists "Task 5" but `.flow/phase-2/task-5.md` doesn't exist
+- Task file references non-existent iterations
+
+**Example problem**:
+```markdown
+DASHBOARD.md:
+- 🚧 **Task 3**: API Integration (2/4 iterations)
+
+But: .flow/phase-2/task-3.md doesn't exist
+```
+
+**Report**:
+```
+❌ Phantom Task Detected
+- DASHBOARD.md references Task 3: API Integration
+- File .flow/phase-2/task-3.md does not exist
+- Action: Create task file or remove from DASHBOARD
+```
+
+### 3. Implementation Gate Verification
+
+**Check**: Is implementation starting before brainstorming is complete?
+
+**How to verify**:
+```bash
+# Check if iteration has brainstorming
+grep -A 20 "## Brainstorming" task-file.md
+
+# Check brainstorming status
+grep "Brainstorming.*Status.*COMPLETE" task-file.md
+
+# Check if implementation started
+grep "## Implementation" task-file.md
+```
+
+**Gate Rule**: If iteration has brainstorming, it must be ✅ COMPLETE before implementation starts.
+
+**Example problem**:
+```markdown
+## Brainstorming
+**Status**: 🚧 IN PROGRESS
+
+## Implementation
+**Status**: 🚧 IN PROGRESS  ← GATE VIOLATION!
+```
+
+**Report**:
+```
+❌ Implementation Gate Violation
+- Iteration 2 has brainstorming IN PROGRESS
+- Implementation section already started
+- Action: Complete brainstorming before implementing
+```
+
+### 4. Task Structure Validation
+
+**Check**: Does task follow the Golden Rule (Standalone XOR Iterations)?
+
+**Golden Rule**: Tasks have EITHER:
+- Direct action items (standalone task)
+- OR iterations with action items in each iteration
+- NEVER both
+
+**How to verify**:
+```bash
+# Check if task has direct action items
+grep -A 5 "## Action Items" task-file.md
+
+# Check if task has iterations
+grep "### " task-file.md | grep "Iteration"
+```
+
+**Example problem**:
+```markdown
+# Task 3: API Integration
+
+## Action Items
+- [ ] Create StripeClient
+- [ ] Add error handling
+
+## Iterations
+
+### Iteration 1: Setup
+...
+```
+
+**Report**:
+```
+❌ Task Structure Violation (Golden Rule)
+- Task 3 has both direct action items AND iterations
+- Golden Rule: Tasks must be EITHER standalone OR have iterations, never both
+- Action: Move action items into iterations or remove iterations
+```
+
+### 5. Action Item Completion Check
+
+**Check**: Are all action items checked off when iteration is marked complete?
+
+**How to verify**:
+```bash
+# Find iteration marked COMPLETE
+grep -B 2 "Status.*COMPLETE" task-file.md
+
+# Check for unchecked action items in that iteration
+grep -A 30 "### ✅ Iteration" task-file.md | grep "\[ \]"
+```
+
+**Example problem**:
+```markdown
+### ✅ Iteration 2: Error Handling
+**Status**: ✅ COMPLETE
+
+#### Action Items
+- [x] Create ErrorMapper
+- [ ] Add tests  ← UNCHECKED!
+- [x] Integrate with client
+```
+
+**Report**:
+```
+❌ Incomplete Action Items
+- Iteration 2 marked ✅ COMPLETE
+- But action item "Add tests" is unchecked
+- Action: Either complete the item or mark iteration as IN PROGRESS
+```
+
+### 6. File Reference Validation
+
+**Check**: Do all file references point to existing files?
+
+**How to verify**:
+```bash
+# Find file references in task files
+grep -r "\`.*\.ts\`" .flow/ | grep -v "example"
+
+# Check if referenced files exist
+ls path/to/file.ts
+```
+
+**Example problem**:
+```markdown
+**Files Modified**:
+- src/payment/StripeClient.ts
+- src/payment/DoesNotExist.ts  ← FILE DOESN'T EXIST!
+```
+
+**Report**:
+```
+⚠️ Invalid File Reference
+- Iteration 2 references src/payment/DoesNotExist.ts
+- File does not exist in repository
+- Action: Verify file path or remove invalid reference
+```
+
+## Status Markers Reference
+
+### Valid Status Markers
+
+**Task/Iteration Status**:
+- ✅ `COMPLETE` - Work finished and verified
+- 🚧 `IN PROGRESS` - Currently working on this
+- ⏳ `PENDING` - Not started yet
+- 🎨 `READY` - Ready to implement (brainstorming complete)
+- ❌ `CANCELLED` - Work abandoned
+- 🔮 `DEFERRED` - Moved to future version
+
+**Phase Status**:
+- ✅ `COMPLETE` - All tasks in phase done
+- 🚧 `IN PROGRESS` - Currently working in this phase
+- ⏳ `PENDING` - Phase not started
+
+### Status Marker Lifecycle
+
+**Iteration Lifecycle**:
+```
+⏳ PENDING
+  ↓ (brainstorming started)
+🚧 IN PROGRESS (brainstorming)
+  ↓ (brainstorming complete, ready to implement)
+🎨 READY
+  ↓ (/flow-implement-start)
+🚧 IN PROGRESS (implementing)
+  ↓ (/flow-implement-complete)
+✅ COMPLETE
+```
+
+**Common Mistakes**:
+- ❌ Skipping 🎨 READY (going from brainstorming to implementation without marking ready)
+- ❌ Multiple items marked 🚧 IN PROGRESS (should only be one active)
+- ❌ Marking ✅ COMPLETE with unchecked action items
+- ❌ Using ⏳ PENDING after implementation started
+
+## Common Review Patterns
+
+### Pattern 1: Full Plan Review
+
+**When**: User asks "review the entire plan"
+
+**Steps**:
+1. Read DASHBOARD.md to understand structure
+2. For each phase:
+   - Verify phase status matches task statuses
+   - Check all tasks listed have files
+3. For each task:
+   - Verify task status matches iteration statuses
+   - Check structure (standalone XOR iterations)
+4. For each iteration:
+   - Verify status marker consistency
+   - Check action items if marked complete
+5. Report all findings
+
+**Output format**:
+```markdown
+## Plan Review Results
+
+**Summary**: 15 items checked, 2 issues found
+
+### ✅ Passing Checks (13)
+- All phase statuses consistent
+- No phantom tasks detected
+- Task structure valid
+- ...
+
+### ❌ Issues Found (2)
+
+#### Issue 1: Status Marker Mismatch
+- **Location**: Phase 2, Task 3, Iteration 2
+- **Problem**: Header shows 🚧 but implementation shows ✅
+- **Action**: Update header to ✅ COMPLETE
+
+#### Issue 2: Unchecked Action Items
+- **Location**: Phase 2, Task 4, Iteration 1
+- **Problem**: Iteration marked complete but 1 action item unchecked
+- **Action**: Complete action item or mark iteration IN PROGRESS
+```
+
+### Pattern 2: Task-Specific Review
+
+**When**: User asks "review Task 3"
+
+**Steps**:
+1. Read task file
+2. Check task status consistency
+3. Verify structure (standalone XOR iterations)
+4. For each iteration:
+   - Status marker consistency
+   - Action item completion
+   - Implementation gate (brainstorming before implementation)
+5. Report findings
+
+### Pattern 3: Status Audit
+
+**When**: User asks "check all status markers"
+
+**Steps**:
+1. Grep for all status markers
+2. For each marker:
+   - Verify it's in valid lifecycle position
+   - Check consistency with surrounding content
+3. Check for multiple IN PROGRESS items (should be max 1)
+4. Report findings
+
+## Review Commands
+
+### Check for Phantom Tasks
+
+```bash
+# List tasks from DASHBOARD
+grep -E "Task [0-9]" .flow/DASHBOARD.md
+
+# List actual task files
+ls .flow/phase-*/task-*.md
+
+# Compare (manual check)
+```
+
+### Find Incomplete Work
+
+```bash
+# Find all IN PROGRESS items
+grep -r "🚧 IN PROGRESS" .flow/
+
+# Find unchecked action items
+grep -r "\[ \]" .flow/phase-*/*.md
+```
+
+### Verify Implementation Gates
+
+```bash
+# Find iterations with brainstorming
+grep -r "## Brainstorming" .flow/phase-*/
+
+# Check if brainstorming is complete
+grep -A 2 "## Brainstorming" .flow/phase-*/*.md | grep "Status"
+```
+
+### Validate Task Structure
+
+```bash
+# Check for direct action items in tasks
+grep -A 5 "## Action Items" .flow/phase-*/task-*.md
+
+# Check for iterations
+grep "### " .flow/phase-*/task-*.md | grep -i iteration
+```
+
+## Interaction with Other Flow Skills
+
+**Planning Stage** (flow-planner Skill):
+- Planner creates structure
+- Reviewer validates structure
+
+**Implementation Stage** (flow-implementer Skill):
+- Implementer executes work
+- Reviewer verifies completion
+
+**Architecture Stage** (flow-architect Skill):
+- Architect documents decisions
+- Reviewer checks references are valid
+
+**Review Stage** (This Skill):
+- Inspect plan consistency ← YOU ARE HERE
+- Report findings, don't fix ← YOU ARE HERE
+
+## Reporting Guidelines
+
+### Report Format
+
+**Use this structure for review findings**:
+
+```markdown
+## Review Results
+
+**Scope**: [What was reviewed]
+**Date**: [Review date]
+**Status**: [✅ All Clear | ⚠️ Issues Found]
+
+### Summary
+- X checks performed
+- Y issues found
+- Z warnings
+
+### ✅ Passing Checks
+- [List what's working correctly]
+
+### ❌ Issues Found
+- [List problems discovered]
+
+### ⚠️ Warnings
+- [List potential concerns]
+
+### 📋 Recommendations
+- [Suggested actions to fix issues]
+```
+
+### Severity Levels
+
+**❌ Critical**: Must fix before proceeding
+- Phantom tasks (DASHBOARD promises don't exist)
+- Implementation started before brainstorming complete
+- Task structure violates Golden Rule
+
+**⚠️ Warning**: Should fix soon
+- Status marker inconsistency (cosmetic)
+- Unchecked action items with work complete
+- Minor file reference issues
+
+**ℹ️ Info**: Nice to fix
+- Formatting inconsistencies
+- Missing optional documentation
+
+## References
+
+- **Status Markers**: DEVELOPMENT_FRAMEWORK.md lines 1872-1968
+- **Task Structure Rules**: DEVELOPMENT_FRAMEWORK.md lines 238-566
+- **Implementation Gates**: DEVELOPMENT_FRAMEWORK.md lines 1798-1836
+- **Slash Command**: `/flow-verify-plan` (automated verification)
+
+## Key Reminders
+
+**Before reviewing**:
+- [ ] Understand what user wants reviewed (full plan, specific task, status audit)
+- [ ] Use read-only tools (Grep, Read, Glob)
+- [ ] Never modify files during review
+
+**During review**:
+- [ ] Check status marker consistency
+- [ ] Verify no phantom tasks
+- [ ] Validate implementation gates
+- [ ] Check task structure (Golden Rule)
+- [ ] Verify action item completion
+
+**After review**:
+- [ ] Report findings in structured format
+- [ ] Prioritize issues by severity
+- [ ] Suggest specific actions to fix
+- [ ] Don't modify files - let user or other Skills handle fixes
+SKILL_FLOW_REVIEWER_EOF
+}
+
+get_skill_flow_reviewer_verify() {
+  cat <<'SKILL_FLOW_REVIEWER_VERIFY_EOF'
+# Verification Scripts
+
+Quick reference for common Flow framework verification tasks using bash commands.
+
+> **Note**: This is a Level 3 resource for the flow-reviewer Skill. See [SKILL.md](SKILL.md) for complete review guidance.
+
+## Status Consistency Checks
+
+### Find All IN PROGRESS Items
+```bash
+grep -r "🚧 IN PROGRESS" .flow/
+```
+
+### Count Active Work Items
+```bash
+grep -r "🚧 IN PROGRESS" .flow/ | wc -l
+# Should be 1 (only one active item at a time)
+```
+
+### Find Mismatched Status Markers
+```bash
+# Find headers marked IN PROGRESS
+grep -B 2 "### 🚧" .flow/phase-*/*.md
+
+# Check if their implementation sections match
+grep -A 5 "Status.*COMPLETE" .flow/phase-*/*.md | grep "### 🚧"
+```
+
+## Incomplete Work Detection
+
+### Find Unchecked Action Items
+```bash
+grep -r "\[ \]" .flow/phase-*/*.md
+```
+
+### Find Iterations Marked Complete with Unchecked Items
+```bash
+for file in .flow/phase-*/task-*.md; do
+  if grep -q "### ✅.*Iteration" "$file"; then
+    echo "Checking $file..."
+    grep -A 50 "### ✅.*Iteration" "$file" | grep "\[ \]" && echo "❌ Found unchecked items in complete iteration"
+  fi
+done
+```
+
+## Phantom Task Detection
+
+### List Tasks from DASHBOARD
+```bash
+grep -E "Task [0-9]:" .flow/DASHBOARD.md | sed 's/.*Task /Task /'
+```
+
+### List Actual Task Files
+```bash
+ls .flow/phase-*/task-*.md | xargs -n 1 basename
+```
+
+### Compare (Find Missing Files)
+```bash
+# Extract task numbers from DASHBOARD
+dashboard_tasks=$(grep -oE "Task [0-9]+" .flow/DASHBOARD.md | sort -u)
+
+# Check each one exists
+for task in $dashboard_tasks; do
+  task_num=$(echo $task | grep -oE "[0-9]+")
+  if ! ls .flow/phase-*/task-${task_num}.md 2>/dev/null | grep -q .; then
+    echo "❌ Phantom task: $task (file missing)"
+  fi
+done
+```
+
+## Implementation Gate Verification
+
+### Check Brainstorming Status Before Implementation
+```bash
+for file in .flow/phase-*/task-*.md; do
+  if grep -q "## Brainstorming" "$file"; then
+    brainstorm_status=$(grep -A 2 "## Brainstorming" "$file" | grep "Status" | head -1)
+    impl_status=$(grep -A 2 "## Implementation" "$file" | grep "Status" | head -1 2>/dev/null)
+
+    if echo "$impl_status" | grep -q "IN PROGRESS" && ! echo "$brainstorm_status" | grep -q "COMPLETE"; then
+      echo "❌ Gate violation in $file"
+      echo "   Brainstorming: $brainstorm_status"
+      echo "   Implementation: $impl_status"
+    fi
+  fi
+done
+```
+
+## Task Structure Validation
+
+### Find Tasks with Both Standalone Items AND Iterations
+```bash
+for file in .flow/phase-*/task-*.md; do
+  has_items=$(grep -c "^## Action Items" "$file" 2>/dev/null || echo 0)
+  has_iterations=$(grep -c "### .*Iteration" "$file" 2>/dev/null || echo 0)
+
+  if [ "$has_items" -gt 0 ] && [ "$has_iterations" -gt 0 ]; then
+    echo "❌ Golden Rule violation: $file has both standalone items AND iterations"
+  fi
+done
+```
+
+## Common Verification Workflows
+
+### Full Plan Health Check
+```bash
+#!/bin/bash
+echo "=== Flow Plan Health Check ==="
+echo
+
+echo "1. Checking for multiple IN PROGRESS items..."
+in_progress=$(grep -r "🚧 IN PROGRESS" .flow/ | wc -l)
+if [ "$in_progress" -gt 1 ]; then
+  echo "⚠️  Found $in_progress IN PROGRESS items (should be max 1)"
+  grep -r "🚧 IN PROGRESS" .flow/
+else
+  echo "✅ Only $in_progress IN PROGRESS item"
+fi
+echo
+
+echo "2. Checking for phantom tasks..."
+# (phantom task check from above)
+echo
+
+echo "3. Checking for unchecked items in complete iterations..."
+# (unchecked items check from above)
+echo
+
+echo "=== Health Check Complete ==="
+```
+
+### Quick Status Audit
+```bash
+echo "Task Status Summary:"
+echo "==================="
+echo "COMPLETE: $(grep -r "✅ COMPLETE" .flow/ | wc -l)"
+echo "IN PROGRESS: $(grep -r "🚧 IN PROGRESS" .flow/ | wc -l)"
+echo "PENDING: $(grep -r "⏳ PENDING" .flow/ | wc -l)"
+echo "READY: $(grep -r "🎨 READY" .flow/ | wc -l)"
+```
+
+## Issue Reporting Template
+
+When verification finds issues, report them like this:
+
+```markdown
+## Verification Results
+
+**Date**: 2025-10-30
+**Scope**: Full plan review
+
+### Issues Found
+
+#### ❌ Issue 1: Multiple IN PROGRESS Items
+- **Details**: Found 3 items marked 🚧 IN PROGRESS
+- **Locations**:
+  - Phase 2, Task 3, Iteration 2
+  - Phase 2, Task 4, Iteration 1
+  - Phase 3, Task 1, Iteration 1
+- **Action**: Mark 2 as complete or pending, keep only 1 active
+
+#### ⚠️ Warning: Unchecked Action Items
+- **Details**: Iteration marked complete but has unchecked items
+- **Location**: Phase 2, Task 3, Iteration 2
+- **Action**: Check off items or mark iteration IN PROGRESS
+```
+SKILL_FLOW_REVIEWER_VERIFY_EOF
+}
+
+get_skill_flow_documenter() {
+  cat <<'SKILL_FLOW_DOCUMENTER_EOF'
+---
+name: flow-documenter
+description: Document findings and maintain task notes in Flow framework. Use when user says "document", "document this", "document finding", "add notes", "add this to notes", "write this down", "summarize", "summarize this", "generate changelog", "create changelog", or wants to capture discoveries. Helps update task Notes sections, create summaries with /flow-summarize, and keep documentation synchronized with work. Focuses on concise, actionable documentation.
+---
+
+# Flow Documenter
+
+Help users document discoveries, maintain task notes, and generate summaries in Flow framework projects. This Skill ensures documentation stays synchronized with actual work and follows Flow patterns.
+
+## When to Use This Skill
+
+Activate when the user wants to document:
+- "Document this finding"
+- "Add notes to the task"
+- "Write this down"
+- "Summarize what we did"
+- "Generate a changelog"
+- "Update the task notes"
+- "Record this discovery"
+
+## Documentation Philosophy
+
+**Keep it Actionable**: Documentation should help future work, not just record history.
+
+**Where to Document**:
+- **Task ## Notes**: Discoveries, decisions, patterns found during work
+- **Implementation Notes**: What was built, why, challenges solved
+- **DASHBOARD.md**: Phase/task completion summaries
+- **PLAN.md**: Architecture decisions, DO/DON'T guidelines (via flow-architect)
+
+**Slash Commands**:
+- `/flow-summarize`: Generate project summary from all phases/tasks/iterations
+
+## Task Notes Section
+
+### What Goes in ## Notes
+
+**Discoveries**:
+- Patterns found during implementation
+- Unexpected behaviors discovered
+- Design insights that emerged
+- Technical constraints learned
+
+**Decisions**:
+- Choices made and why
+- Trade-offs accepted
+- Approaches tried and rejected
+
+**References**:
+- Related tasks or iterations
+- External documentation consulted
+- Framework patterns followed
+
+### Task Notes Template
+
+```markdown
+## Notes
+
+**Key Discoveries**:
+- [Discovery 1]: [What was found and why it matters]
+- [Discovery 2]: [What was found and why it matters]
+
+**Design Decisions**:
+- [Decision 1]: Chose [approach] because [rationale]
+- [Decision 2]: Deferred [feature] to V2 due to [constraint]
+
+**Challenges & Solutions**:
+- **Challenge**: [Problem encountered]
+  - **Solution**: [How it was solved]
+  - **Impact**: [Effect on design/implementation]
+
+**References**:
+- Related to [Task X, Iteration Y]
+- Pattern from DEVELOPMENT_FRAMEWORK.md lines [X-Y]
+- External: [URL or doc reference]
+```
+
+### Example Task Notes
+
+```markdown
+## Notes
+
+**Key Discoveries**:
+- **Stripe SDK Limitation**: v12 doesn't expose retry configuration hooks
+  - Led to custom RetryPolicy implementation
+  - See PLAN.md Technology Choices section for detailed rationale
+- **Error Classification Pattern**: Transient vs permanent errors need different handling
+  - Implemented ErrorMapper with strategy pattern
+  - Allows easy extension for new error types
+
+**Design Decisions**:
+- Chose exponential backoff over linear for retry logic
+  - Rationale: Better for API rate limiting (Stripe recommendation)
+  - Added jitter to prevent thundering herd problem
+- Deferred refund processing to V2
+  - Rationale: Not needed for initial launch, adds complexity
+  - Can be added later without refactoring payment flow
+
+**Challenges & Solutions**:
+- **Challenge**: Testing retry timing is difficult (delays slow down test suite)
+  - **Solution**: Made clock injectable for testing (dependency injection)
+  - **Impact**: Tests run fast, retry logic still thoroughly tested
+- **Challenge**: Stripe test API has rate limit (100 req/hour)
+  - **Solution**: Used mocks for most tests, real API for critical paths
+  - **Impact**: Test suite completes in < 10 seconds
+
+**References**:
+- Related to Task 3, Iteration 2 (Error Handling)
+- Pattern from DEVELOPMENT_FRAMEWORK.md lines 1798-1836 (Implementation Pattern)
+- Stripe API Docs: https://stripe.com/docs/api/errors
+```
+
+## Bug Documentation
+
+### When to Document Bugs
+
+**In Task Notes** (if discovered during implementation):
+- Bugs found in existing code (not your changes)
+- Workarounds applied
+- Issues deferred to future tasks
+
+**Use Bug Documentation Template**:
+
+```markdown
+**Bugs Discovered**:
+
+### Bug 1: [Short Description]
+
+**Location**: `path/to/file.ts:lines X-Y`
+
+**Problem**:
+```[language]
+// Current buggy code
+```
+
+**Impact**: [What breaks or degrades]
+
+**Action Taken**: [Fixed immediately | Documented for future | Workaround applied]
+
+**Fix** (if applied):
+```[language]
+// Corrected code
+```
+
+**Recommendation**: [Priority level and next steps]
+```
+
+### Example Bug Documentation
+
+```markdown
+**Bugs Discovered**:
+
+### Bug 1: Race Condition in PaymentService
+
+**Location**: `src/services/PaymentService.ts:145-152`
+
+**Problem**:
+```typescript
+async processPayment(amount: number) {
+  const status = await this.checkStatus();
+  // Race condition: status can change between check and update
+  await this.updatePayment(status);
+}
+```
+
+**Impact**: Could cause duplicate charges in concurrent requests
+
+**Action Taken**: Documented here, created separate task for fix (not in scope of current iteration)
+
+**Recommendation**: High priority fix for next sprint - use database transactions
+```
+
+## Changelog Generation
+
+### Using /flow-summarize
+
+The `/flow-summarize` command generates summaries from PLAN.md structure:
+
+```bash
+/flow-summarize
+```
+
+**Outputs**:
+- All phases with completion status
+- All tasks with iteration counts
+- High-level summary of what was accomplished
+
+### Manual Changelog Format
+
+For release notes or detailed changelogs:
+
+```markdown
+## Changelog - [Version/Date]
+
+### Added
+- [Feature 1]: [Brief description]
+- [Feature 2]: [Brief description]
+
+### Changed
+- [Change 1]: [What changed and why]
+- [Change 2]: [What changed and why]
+
+### Fixed
+- [Bug 1]: [What was fixed]
+- [Bug 2]: [What was fixed]
+
+### Deprecated
+- [Old feature]: [Replacement or removal plan]
+```
+
+### Example Changelog
+
+```markdown
+## Changelog - Payment Integration V1
+
+### Added
+- Payment processing via Stripe API
+  - Credit card charges (Visa, Mastercard, Amex)
+  - Retry logic with exponential backoff
+  - Error classification (transient vs permanent)
+- Transaction logging for audit trail
+- Error handling with user-friendly messages
+
+### Changed
+- Refactored PaymentService to use dependency injection
+  - Improves testability
+  - Allows easy swapping of payment providers
+- Updated error responses to include retry guidance
+
+### Fixed
+- Race condition in payment status checks
+  - Now uses database transactions
+  - Prevents duplicate charge scenarios
+
+### Deferred to V2
+- Refund processing
+- Subscription billing
+- Multi-currency support
+```
+
+## DASHBOARD Updates
+
+### When to Update DASHBOARD
+
+**Task completion**:
+- Mark task ✅ COMPLETE
+- Update completion percentages
+- Update "📍 Current Work" section
+
+**Phase completion**:
+- Mark phase ✅ COMPLETE
+- Add phase summary
+- Update overall project status
+
+### DASHBOARD Update Pattern
+
+```markdown
+## 📍 Current Work
+
+- **Phase**: [Current Phase Name](phase-X/)
+- **Task**: [Current Task Name](phase-X/task-Y.md)
+- **Status**: [Brief status summary]
+- **Next**: [What to do next]
+
+---
+
+## 📊 Progress Overview
+
+### Phase X: [Phase Name] ✅ COMPLETE
+
+**Summary**: [1-2 sentence summary of what was accomplished]
+
+**Key Deliverables**:
+- [Deliverable 1]
+- [Deliverable 2]
+
+**Tasks**:
+- ✅ **Task 1**: [Name] (X/Y iterations)
+- ✅ **Task 2**: [Name] (X/Y iterations)
+```
+
+## Pre-Implementation Task Documentation
+
+### Pre-Task Notes Pattern
+
+When documenting completed pre-implementation tasks:
+
+```markdown
+#### Pre-Implementation Tasks
+
+##### ✅ Pre-Task 1: [Name]
+
+**Completed**: 2025-01-15
+
+**Why Blocking**: [Explanation of why this had to be done first]
+
+**Changes Made**:
+- [Change 1]: [Description]
+- [Change 2]: [Description]
+- [Change 3]: [Description]
+
+**Files Modified**:
+- `path/to/file1.ts` (+X lines, -Y lines)
+- `path/to/file2.ts` (+X lines, -Y lines)
+
+**Impact on Main Iteration**:
+[How this pre-task enables or simplifies the main work]
+```
+
+## Discovery Documentation
+
+### When You Discover Something Important
+
+**Document immediately** in task notes if it's:
+- A pattern that should be followed consistently
+- A constraint that affects future work
+- An insight that changes understanding
+- A decision that future developers need to know
+
+### Discovery Template
+
+```markdown
+**Discovery: [Short Title]**
+
+**Context**: [When/how this was discovered]
+
+**What We Learned**:
+[Detailed explanation of the discovery]
+
+**Implications**:
+- [Impact 1]: [How this affects current or future work]
+- [Impact 2]: [How this affects current or future work]
+
+**Action Taken**:
+- [Action 1]: [What was done in response]
+- [Action 2]: [What was done in response]
+```
+
+### Example Discovery
+
+```markdown
+**Discovery: Stripe Webhook Signatures Expire After 5 Minutes**
+
+**Context**: While implementing webhook endpoint, discovered signature validation fails for delayed webhooks
+
+**What We Learned**:
+Stripe webhook signatures include a timestamp and expire after 5 minutes to prevent replay attacks. If webhook processing is delayed (queue backlog, system downtime), validation will fail even for legitimate webhooks.
+
+**Implications**:
+- **Current Work**: Need to capture raw webhook payload before validation for debugging
+- **Future Work**: V2 webhook processing must handle signature expiration gracefully
+- **Monitoring**: Add alerts for webhook validation failures
+
+**Action Taken**:
+- Documented in PLAN.md Scope section (V1 assumes < 5min processing)
+- Added pre-validation logging of raw payload
+- Created V2 task for robust webhook handling
+```
+
+## Interaction with Other Flow Skills
+
+**Planning Stage** (flow-planner Skill):
+- Planner creates structure
+- Documenter captures decisions made
+
+**Architecture Stage** (flow-architect Skill):
+- Architect updates PLAN.md
+- Documenter adds task-specific notes
+
+**Implementation Stage** (flow-implementer Skill):
+- Implementer executes work
+- Documenter records discoveries ← YOU ARE HERE
+
+**Review Stage** (flow-reviewer Skill):
+- Reviewer validates consistency
+- Documenter updates based on findings
+
+## References
+
+- **Task Structure**: DEVELOPMENT_FRAMEWORK.md lines 238-566
+- **Implementation Pattern**: DEVELOPMENT_FRAMEWORK.md lines 1798-1836
+- **Status Markers**: DEVELOPMENT_FRAMEWORK.md lines 1872-1968
+- **Slash Command**: `/flow-summarize` (generate summaries)
+
+## Key Reminders
+
+**Before documenting**:
+- [ ] Identify correct location (Task Notes, DASHBOARD, PLAN.md)
+- [ ] Keep it concise and actionable
+- [ ] Focus on "why" not just "what"
+
+**During documentation**:
+- [ ] Use templates for consistency
+- [ ] Link to related tasks/iterations
+- [ ] Include impact/implications
+
+**After documenting**:
+- [ ] Verify documentation is findable (proper section, clear title)
+- [ ] Check if DASHBOARD needs updating
+- [ ] Consider if discovery should go in PLAN.md (via flow-architect)
+SKILL_FLOW_DOCUMENTER_EOF
+}
+
 deploy_commands() {
   local target_dir="$1"
   local force="$2"
@@ -9022,21 +14481,138 @@ deploy_framework() {
 deploy_skills() {
   local target_dir="$1"
   local force="$2"
-  local skills_dir="$target_dir/skills"
   local success_count=0
 
-  # For now, Skills are templates only (no actual Skills to deploy yet)
-  # This function will be expanded in Phase 2 when actual Skills are created
+  # target_dir already points to .claude/skills, no need to add /skills again
+  mkdir -p "$target_dir" || { echo -e "${RED}❌ mkdir skills/${NC}"; return 1; }
 
-  # Note: Skills will deploy to .claude/skills/flow-*/SKILL.md once created
-  # Template Skills (_TEMPLATE, _TEMPLATE-MULTI) are NOT deployed to user projects
+  # Deploy flow-navigator Skill
+  local navigator_dir="$target_dir/flow-navigator"
+  mkdir -p "$navigator_dir" || { echo -e "${RED}❌ mkdir flow-navigator${NC}"; return 1; }
 
+  if [ "$force" = true ] && [ -f "$navigator_dir/SKILL.md" ]; then
+    rm -f "$navigator_dir/SKILL.md"
+  fi
+
+  if [ -f "$navigator_dir/SKILL.md" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow-navigator/SKILL.md${NC}"
+  else
+    get_skill_flow_navigator > "$navigator_dir/SKILL.md" && { echo -e "${GREEN}✅ flow-navigator/SKILL.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow-navigator/SKILL.md${NC}"
+  fi
+
+  # Deploy flow-planner Skill
+  local planner_dir="$target_dir/flow-planner"
+  mkdir -p "$planner_dir" || { echo -e "${RED}❌ mkdir flow-planner${NC}"; return 1; }
+
+  if [ "$force" = true ]; then
+    [ -f "$planner_dir/SKILL.md" ] && rm -f "$planner_dir/SKILL.md"
+    [ -f "$planner_dir/TEMPLATES.md" ] && rm -f "$planner_dir/TEMPLATES.md"
+  fi
+
+  if [ -f "$planner_dir/SKILL.md" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow-planner/SKILL.md${NC}"
+  else
+    get_skill_flow_planner > "$planner_dir/SKILL.md" && { echo -e "${GREEN}✅ flow-planner/SKILL.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow-planner/SKILL.md${NC}"
+  fi
+
+  if [ -f "$planner_dir/TEMPLATES.md" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow-planner/TEMPLATES.md${NC}"
+  else
+    get_skill_flow_planner_templates > "$planner_dir/TEMPLATES.md" && { echo -e "${GREEN}✅ flow-planner/TEMPLATES.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow-planner/TEMPLATES.md${NC}"
+  fi
+
+  # Deploy flow-implementer Skill
+  local implementer_dir="$target_dir/flow-implementer"
+  mkdir -p "$implementer_dir" || { echo -e "${RED}❌ mkdir flow-implementer${NC}"; return 1; }
+
+  if [ "$force" = true ]; then
+    [ -f "$implementer_dir/SKILL.md" ] && rm -f "$implementer_dir/SKILL.md"
+    [ -f "$implementer_dir/PATTERNS.md" ] && rm -f "$implementer_dir/PATTERNS.md"
+    [ -f "$implementer_dir/VERIFICATION.md" ] && rm -f "$implementer_dir/VERIFICATION.md"
+  fi
+
+  if [ -f "$implementer_dir/SKILL.md" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow-implementer/SKILL.md${NC}"
+  else
+    get_skill_flow_implementer > "$implementer_dir/SKILL.md" && { echo -e "${GREEN}✅ flow-implementer/SKILL.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow-implementer/SKILL.md${NC}"
+  fi
+
+  if [ -f "$implementer_dir/PATTERNS.md" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow-implementer/PATTERNS.md${NC}"
+  else
+    get_skill_flow_implementer_patterns > "$implementer_dir/PATTERNS.md" && { echo -e "${GREEN}✅ flow-implementer/PATTERNS.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow-implementer/PATTERNS.md${NC}"
+  fi
+
+  if [ -f "$implementer_dir/VERIFICATION.md" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow-implementer/VERIFICATION.md${NC}"
+  else
+    get_skill_flow_implementer_verification > "$implementer_dir/VERIFICATION.md" && { echo -e "${GREEN}✅ flow-implementer/VERIFICATION.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow-implementer/VERIFICATION.md${NC}"
+  fi
+
+  # Deploy flow-architect Skill
+  local architect_dir="$target_dir/flow-architect"
+  mkdir -p "$architect_dir" || { echo -e "${RED}❌ mkdir flow-architect${NC}"; return 1; }
+
+  if [ "$force" = true ]; then
+    [ -f "$architect_dir/SKILL.md" ] && rm -f "$architect_dir/SKILL.md"
+    [ -f "$architect_dir/PLAN_UPDATES.md" ] && rm -f "$architect_dir/PLAN_UPDATES.md"
+  fi
+
+  if [ -f "$architect_dir/SKILL.md" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow-architect/SKILL.md${NC}"
+  else
+    get_skill_flow_architect > "$architect_dir/SKILL.md" && { echo -e "${GREEN}✅ flow-architect/SKILL.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow-architect/SKILL.md${NC}"
+  fi
+
+  if [ -f "$architect_dir/PLAN_UPDATES.md" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow-architect/PLAN_UPDATES.md${NC}"
+  else
+    get_skill_flow_architect_plan_updates > "$architect_dir/PLAN_UPDATES.md" && { echo -e "${GREEN}✅ flow-architect/PLAN_UPDATES.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow-architect/PLAN_UPDATES.md${NC}"
+  fi
+
+  # Deploy flow-reviewer Skill
+  local reviewer_dir="$target_dir/flow-reviewer"
+  mkdir -p "$reviewer_dir" || { echo -e "${RED}❌ mkdir flow-reviewer${NC}"; return 1; }
+
+  if [ "$force" = true ]; then
+    [ -f "$reviewer_dir/SKILL.md" ] && rm -f "$reviewer_dir/SKILL.md"
+    [ -f "$reviewer_dir/VERIFY.md" ] && rm -f "$reviewer_dir/VERIFY.md"
+  fi
+
+  if [ -f "$reviewer_dir/SKILL.md" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow-reviewer/SKILL.md${NC}"
+  else
+    get_skill_flow_reviewer > "$reviewer_dir/SKILL.md" && { echo -e "${GREEN}✅ flow-reviewer/SKILL.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow-reviewer/SKILL.md${NC}"
+  fi
+
+  if [ -f "$reviewer_dir/VERIFY.md" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow-reviewer/VERIFY.md${NC}"
+  else
+    get_skill_flow_reviewer_verify > "$reviewer_dir/VERIFY.md" && { echo -e "${GREEN}✅ flow-reviewer/VERIFY.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow-reviewer/VERIFY.md${NC}"
+  fi
+
+  # Deploy flow-documenter Skill
+  local documenter_dir="$target_dir/flow-documenter"
+  mkdir -p "$documenter_dir" || { echo -e "${RED}❌ mkdir flow-documenter${NC}"; return 1; }
+
+  if [ "$force" = true ] && [ -f "$documenter_dir/SKILL.md" ]; then
+    rm -f "$documenter_dir/SKILL.md"
+  fi
+
+  if [ -f "$documenter_dir/SKILL.md" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow-documenter/SKILL.md${NC}"
+  else
+    get_skill_flow_documenter > "$documenter_dir/SKILL.md" && { echo -e "${GREEN}✅ flow-documenter/SKILL.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow-documenter/SKILL.md${NC}"
+  fi
+
+  echo "$success_count"
   return 0
 }
 
 validate() {
   local commands_dir="$1"
   local flow_dir="$2"
+  local skills_dir="$3"
   local valid=true
 
   echo -e "\n${CYAN}🔍 Validating...${NC}\n"
@@ -9055,6 +14631,24 @@ validate() {
 
   echo -e "${GREEN}✅ Commands: $count/${#COMMANDS[@]}${NC}"
   [ "$count" -eq 0 ] && { echo -e "${RED}❌ No commands${NC}"; valid=false; }
+
+  # Check Skills
+  local skills_count=0
+  [ -f "$skills_dir/flow-navigator/SKILL.md" ] && ((skills_count++))
+  [ -f "$skills_dir/flow-planner/SKILL.md" ] && ((skills_count++))
+  [ -f "$skills_dir/flow-implementer/SKILL.md" ] && ((skills_count++))
+  [ -f "$skills_dir/flow-architect/SKILL.md" ] && ((skills_count++))
+  [ -f "$skills_dir/flow-reviewer/SKILL.md" ] && ((skills_count++))
+  [ -f "$skills_dir/flow-documenter/SKILL.md" ] && ((skills_count++))
+
+  if [ "$skills_count" -eq 6 ]; then
+    echo -e "${GREEN}✅ Skills: $skills_count/6 (with supporting files)${NC}"
+  elif [ "$skills_count" -gt 0 ]; then
+    echo -e "${YELLOW}⚠️  Skills: $skills_count/6 (partial)${NC}"
+  else
+    echo -e "${RED}❌ No Skills${NC}"
+    valid=false
+  fi
 
   [ "$valid" = true ]
 }
@@ -9075,10 +14669,12 @@ main() {
   echo -e "Mode: ${CYAN}Self-contained${NC}\n"
 
   local commands_dir="$(pwd)/.claude/commands"
+  local skills_dir="$(pwd)/.claude/skills"
   local flow_dir="$(pwd)/.flow"
 
   # Create directories
   mkdir -p "$commands_dir" || { echo -e "${RED}❌ mkdir .claude/commands failed${NC}"; exit 1; }
+  mkdir -p "$skills_dir" || { echo -e "${RED}❌ mkdir .claude/skills failed${NC}"; exit 1; }
   mkdir -p "$flow_dir" || { echo -e "${RED}❌ mkdir .flow failed${NC}"; exit 1; }
   echo -e "${BLUE}📁 Created directories${NC}\n"
 
@@ -9090,27 +14686,42 @@ main() {
   echo -e "\n${BLUE}📚 Installing framework documentation...${NC}\n"
   deploy_framework "$flow_dir" "$FORCE"
 
+  # Deploy Skills
+  echo -e "\n${BLUE}🎯 Installing Agent Skills...${NC}\n"
+  local skills_count=$(deploy_skills "$skills_dir" "$FORCE")
+
   # Validate
-  if validate "$commands_dir" "$flow_dir"; then
+  if validate "$commands_dir" "$flow_dir" "$skills_dir"; then
     echo ""
     echo "=================================================="
     echo -e "${GREEN}✅ Flow Framework Installed!${NC}\n"
     echo -e "${CYAN}📂 Structure:${NC}"
     echo "   .claude/commands/       (${#COMMANDS[@]} slash commands)"
+    echo "   .claude/skills/         (6 Agent Skills)"
     echo "   .flow/                  (your workspace)"
     echo "     └── framework/        (AI reference files)"
     echo "         ├── DEVELOPMENT_FRAMEWORK.md"
+    echo "         ├── skills/SKILLS_GUIDE.md"
     echo "         └── examples/"
     echo "             ├── DASHBOARD.md"
     echo "             ├── PLAN.md"
     echo "             ├── phase-1/task-1.md"
     echo "             └── phase-2/task-3.md"
     echo ""
+    echo -e "${CYAN}🎯 Agent Skills Installed:${NC}"
+    echo "   flow-navigator       - Dashboard-first navigation"
+    echo "   flow-planner         - Planning new features/iterations"
+    echo "   flow-implementer     - Implementation workflow guidance"
+    echo "   flow-architect       - Architecture decisions & DO/DON'Ts"
+    echo "   flow-reviewer        - Plan/code verification (read-only)"
+    echo "   flow-documenter      - Task notes & discoveries"
+    echo ""
     echo -e "${CYAN}🚀 Next Steps:${NC}"
     echo "   1. Restart Claude Code (if running)"
     echo "   2. Run: /flow-blueprint <your-feature-name>"
     echo "   3. Read: .flow/framework/DEVELOPMENT_FRAMEWORK.md"
     echo "   4. Examples: .flow/framework/examples/"
+    echo "   5. Skills Guide: .flow/framework/skills/SKILLS_GUIDE.md"
     echo ""
     echo "💡 Share this script - it's self-contained!"
     echo "=================================================="

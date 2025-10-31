@@ -1,6 +1,6 @@
 ---
 name: flow-architect
-description: Guide architectural decisions and PLAN.md updates in Flow framework. Use when user discusses "architecture", "design patterns", "how should we structure", "technology choice", "DO/DON'T rules", or wants to update Architecture section in PLAN.md. Helps document architectural decisions, update DO/DON'T guidelines, define scope boundaries, and record technology choices during brainstorming.
+description: Guide architectural decisions and PLAN.md updates in Flow framework. Use when user discusses "architecture", "how should we architect", "design patterns", "how should we structure", "how do we structure", "technology choice", "should we use", "DO/DON'T rules", "update architecture", or wants to update Architecture section in PLAN.md. Helps document architectural decisions, update DO/DON'T guidelines, define scope boundaries, and record technology choices during brainstorming.
 ---
 
 # Flow Architect

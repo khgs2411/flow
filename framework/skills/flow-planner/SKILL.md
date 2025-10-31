@@ -1,6 +1,6 @@
 ---
 name: flow-planner
-description: Plan new features, tasks, and iterations in Flow framework. Use when user says "add task", "plan feature", "create iteration", "break this down", "how should we structure this", or wants to add new work to the plan. Guides task structure decisions (standalone vs iterations), suggests brainstorming for complex features, references planning slash commands.
+description: Plan new features, tasks, and iterations in Flow framework. Use when user says "add task", "add a task", "create task", "plan feature", "plan this feature", "create iteration", "add iteration", "break this down", "how should we structure this", "how do I structure", or wants to add new work to the plan. Guides task structure decisions (standalone vs iterations), suggests brainstorming for complex features, references planning slash commands.
 ---
 
 # Flow Planner

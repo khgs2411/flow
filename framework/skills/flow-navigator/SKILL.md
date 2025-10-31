@@ -1,6 +1,6 @@
 ---
 name: flow-navigator
-description: Navigate Flow framework's multi-file architecture (DASHBOARD.md, PLAN.md, phase-N/task-M.md). Use when user asks "where am I", "what's next", "show status", "current work", "what should I do", or wants to understand project structure and progress. Provides dashboard-first navigation guidance with status awareness.
+description: Navigate Flow framework's multi-file architecture (DASHBOARD.md, PLAN.md, phase-N/task-M.md). Use when user asks "where am I", "what's next", "what should I work on next", "what do I work on", "show status", "show me status", "current work", "what should I do", or wants to understand project structure and progress. Provides dashboard-first navigation guidance with status awareness.
 allowed-tools: Read, Grep, Glob
 ---
 

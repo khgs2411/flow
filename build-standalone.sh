@@ -199,8 +199,10 @@ OPTIONS:
 
 DEPLOYMENT STRUCTURE:
   .claude/commands/          Slash commands (\${#COMMANDS[@]} files)
+  .claude/skills/            Agent Skills (6 Skills with supporting files)
   .flow/framework/           AI reference files (read-only for user)
     ├── DEVELOPMENT_FRAMEWORK.md
+    ├── skills/SKILLS_GUIDE.md
     └── examples/
 
 This script is SELF-CONTAINED - no external files needed!
@@ -306,7 +308,129 @@ cat >> "$OUTPUT_FILE" <<'MIDDLE7_EOF'
 SKILLS_GUIDE_EOF
 }
 
+# Skill extraction functions
+get_skill_flow_navigator() {
+  cat <<'SKILL_FLOW_NAVIGATOR_EOF'
 MIDDLE7_EOF
+
+# Embed flow-navigator SKILL.md
+cat "$FRAMEWORK_DIR/skills/flow-navigator/SKILL.md" >> "$OUTPUT_FILE"
+
+cat >> "$OUTPUT_FILE" <<'MIDDLE8_EOF'
+SKILL_FLOW_NAVIGATOR_EOF
+}
+
+get_skill_flow_planner() {
+  cat <<'SKILL_FLOW_PLANNER_EOF'
+MIDDLE8_EOF
+
+# Embed flow-planner SKILL.md
+cat "$FRAMEWORK_DIR/skills/flow-planner/SKILL.md" >> "$OUTPUT_FILE"
+
+cat >> "$OUTPUT_FILE" <<'MIDDLE9_EOF'
+SKILL_FLOW_PLANNER_EOF
+}
+
+get_skill_flow_planner_templates() {
+  cat <<'SKILL_FLOW_PLANNER_TEMPLATES_EOF'
+MIDDLE9_EOF
+
+# Embed flow-planner TEMPLATES.md
+cat "$FRAMEWORK_DIR/skills/flow-planner/TEMPLATES.md" >> "$OUTPUT_FILE"
+
+cat >> "$OUTPUT_FILE" <<'MIDDLE10_EOF'
+SKILL_FLOW_PLANNER_TEMPLATES_EOF
+}
+
+get_skill_flow_implementer() {
+  cat <<'SKILL_FLOW_IMPLEMENTER_EOF'
+MIDDLE10_EOF
+
+# Embed flow-implementer SKILL.md
+cat "$FRAMEWORK_DIR/skills/flow-implementer/SKILL.md" >> "$OUTPUT_FILE"
+
+cat >> "$OUTPUT_FILE" <<'MIDDLE11_EOF'
+SKILL_FLOW_IMPLEMENTER_EOF
+}
+
+get_skill_flow_implementer_patterns() {
+  cat <<'SKILL_FLOW_IMPLEMENTER_PATTERNS_EOF'
+MIDDLE11_EOF
+
+# Embed flow-implementer PATTERNS.md
+cat "$FRAMEWORK_DIR/skills/flow-implementer/PATTERNS.md" >> "$OUTPUT_FILE"
+
+cat >> "$OUTPUT_FILE" <<'MIDDLE12_EOF'
+SKILL_FLOW_IMPLEMENTER_PATTERNS_EOF
+}
+
+get_skill_flow_implementer_verification() {
+  cat <<'SKILL_FLOW_IMPLEMENTER_VERIFICATION_EOF'
+MIDDLE12_EOF
+
+# Embed flow-implementer VERIFICATION.md
+cat "$FRAMEWORK_DIR/skills/flow-implementer/VERIFICATION.md" >> "$OUTPUT_FILE"
+
+cat >> "$OUTPUT_FILE" <<'MIDDLE13_EOF'
+SKILL_FLOW_IMPLEMENTER_VERIFICATION_EOF
+}
+
+get_skill_flow_architect() {
+  cat <<'SKILL_FLOW_ARCHITECT_EOF'
+MIDDLE13_EOF
+
+# Embed flow-architect SKILL.md
+cat "$FRAMEWORK_DIR/skills/flow-architect/SKILL.md" >> "$OUTPUT_FILE"
+
+cat >> "$OUTPUT_FILE" <<'MIDDLE14_EOF'
+SKILL_FLOW_ARCHITECT_EOF
+}
+
+get_skill_flow_architect_plan_updates() {
+  cat <<'SKILL_FLOW_ARCHITECT_PLAN_UPDATES_EOF'
+MIDDLE14_EOF
+
+# Embed flow-architect PLAN_UPDATES.md
+cat "$FRAMEWORK_DIR/skills/flow-architect/PLAN_UPDATES.md" >> "$OUTPUT_FILE"
+
+cat >> "$OUTPUT_FILE" <<'MIDDLE15_EOF'
+SKILL_FLOW_ARCHITECT_PLAN_UPDATES_EOF
+}
+
+get_skill_flow_reviewer() {
+  cat <<'SKILL_FLOW_REVIEWER_EOF'
+MIDDLE15_EOF
+
+# Embed flow-reviewer SKILL.md
+cat "$FRAMEWORK_DIR/skills/flow-reviewer/SKILL.md" >> "$OUTPUT_FILE"
+
+cat >> "$OUTPUT_FILE" <<'MIDDLE16_EOF'
+SKILL_FLOW_REVIEWER_EOF
+}
+
+get_skill_flow_reviewer_verify() {
+  cat <<'SKILL_FLOW_REVIEWER_VERIFY_EOF'
+MIDDLE16_EOF
+
+# Embed flow-reviewer VERIFY.md
+cat "$FRAMEWORK_DIR/skills/flow-reviewer/VERIFY.md" >> "$OUTPUT_FILE"
+
+cat >> "$OUTPUT_FILE" <<'MIDDLE17_EOF'
+SKILL_FLOW_REVIEWER_VERIFY_EOF
+}
+
+get_skill_flow_documenter() {
+  cat <<'SKILL_FLOW_DOCUMENTER_EOF'
+MIDDLE17_EOF
+
+# Embed flow-documenter SKILL.md
+cat "$FRAMEWORK_DIR/skills/flow-documenter/SKILL.md" >> "$OUTPUT_FILE"
+
+cat >> "$OUTPUT_FILE" <<'MIDDLE18_EOF'
+SKILL_FLOW_DOCUMENTER_EOF
+}
+
+MIDDLE18_EOF
 
 # Write the main deployment logic
 cat >> "$OUTPUT_FILE" <<'FOOTER_EOF'
@@ -401,21 +525,138 @@ deploy_framework() {
 deploy_skills() {
   local target_dir="$1"
   local force="$2"
-  local skills_dir="$target_dir/skills"
   local success_count=0
 
-  # For now, Skills are templates only (no actual Skills to deploy yet)
-  # This function will be expanded in Phase 2 when actual Skills are created
+  # target_dir already points to .claude/skills, no need to add /skills again
+  mkdir -p "$target_dir" || { echo -e "${RED}❌ mkdir skills/${NC}"; return 1; }
 
-  # Note: Skills will deploy to .claude/skills/flow-*/SKILL.md once created
-  # Template Skills (_TEMPLATE, _TEMPLATE-MULTI) are NOT deployed to user projects
+  # Deploy flow-navigator Skill
+  local navigator_dir="$target_dir/flow-navigator"
+  mkdir -p "$navigator_dir" || { echo -e "${RED}❌ mkdir flow-navigator${NC}"; return 1; }
 
+  if [ "$force" = true ] && [ -f "$navigator_dir/SKILL.md" ]; then
+    rm -f "$navigator_dir/SKILL.md"
+  fi
+
+  if [ -f "$navigator_dir/SKILL.md" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow-navigator/SKILL.md${NC}"
+  else
+    get_skill_flow_navigator > "$navigator_dir/SKILL.md" && { echo -e "${GREEN}✅ flow-navigator/SKILL.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow-navigator/SKILL.md${NC}"
+  fi
+
+  # Deploy flow-planner Skill
+  local planner_dir="$target_dir/flow-planner"
+  mkdir -p "$planner_dir" || { echo -e "${RED}❌ mkdir flow-planner${NC}"; return 1; }
+
+  if [ "$force" = true ]; then
+    [ -f "$planner_dir/SKILL.md" ] && rm -f "$planner_dir/SKILL.md"
+    [ -f "$planner_dir/TEMPLATES.md" ] && rm -f "$planner_dir/TEMPLATES.md"
+  fi
+
+  if [ -f "$planner_dir/SKILL.md" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow-planner/SKILL.md${NC}"
+  else
+    get_skill_flow_planner > "$planner_dir/SKILL.md" && { echo -e "${GREEN}✅ flow-planner/SKILL.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow-planner/SKILL.md${NC}"
+  fi
+
+  if [ -f "$planner_dir/TEMPLATES.md" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow-planner/TEMPLATES.md${NC}"
+  else
+    get_skill_flow_planner_templates > "$planner_dir/TEMPLATES.md" && { echo -e "${GREEN}✅ flow-planner/TEMPLATES.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow-planner/TEMPLATES.md${NC}"
+  fi
+
+  # Deploy flow-implementer Skill
+  local implementer_dir="$target_dir/flow-implementer"
+  mkdir -p "$implementer_dir" || { echo -e "${RED}❌ mkdir flow-implementer${NC}"; return 1; }
+
+  if [ "$force" = true ]; then
+    [ -f "$implementer_dir/SKILL.md" ] && rm -f "$implementer_dir/SKILL.md"
+    [ -f "$implementer_dir/PATTERNS.md" ] && rm -f "$implementer_dir/PATTERNS.md"
+    [ -f "$implementer_dir/VERIFICATION.md" ] && rm -f "$implementer_dir/VERIFICATION.md"
+  fi
+
+  if [ -f "$implementer_dir/SKILL.md" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow-implementer/SKILL.md${NC}"
+  else
+    get_skill_flow_implementer > "$implementer_dir/SKILL.md" && { echo -e "${GREEN}✅ flow-implementer/SKILL.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow-implementer/SKILL.md${NC}"
+  fi
+
+  if [ -f "$implementer_dir/PATTERNS.md" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow-implementer/PATTERNS.md${NC}"
+  else
+    get_skill_flow_implementer_patterns > "$implementer_dir/PATTERNS.md" && { echo -e "${GREEN}✅ flow-implementer/PATTERNS.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow-implementer/PATTERNS.md${NC}"
+  fi
+
+  if [ -f "$implementer_dir/VERIFICATION.md" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow-implementer/VERIFICATION.md${NC}"
+  else
+    get_skill_flow_implementer_verification > "$implementer_dir/VERIFICATION.md" && { echo -e "${GREEN}✅ flow-implementer/VERIFICATION.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow-implementer/VERIFICATION.md${NC}"
+  fi
+
+  # Deploy flow-architect Skill
+  local architect_dir="$target_dir/flow-architect"
+  mkdir -p "$architect_dir" || { echo -e "${RED}❌ mkdir flow-architect${NC}"; return 1; }
+
+  if [ "$force" = true ]; then
+    [ -f "$architect_dir/SKILL.md" ] && rm -f "$architect_dir/SKILL.md"
+    [ -f "$architect_dir/PLAN_UPDATES.md" ] && rm -f "$architect_dir/PLAN_UPDATES.md"
+  fi
+
+  if [ -f "$architect_dir/SKILL.md" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow-architect/SKILL.md${NC}"
+  else
+    get_skill_flow_architect > "$architect_dir/SKILL.md" && { echo -e "${GREEN}✅ flow-architect/SKILL.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow-architect/SKILL.md${NC}"
+  fi
+
+  if [ -f "$architect_dir/PLAN_UPDATES.md" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow-architect/PLAN_UPDATES.md${NC}"
+  else
+    get_skill_flow_architect_plan_updates > "$architect_dir/PLAN_UPDATES.md" && { echo -e "${GREEN}✅ flow-architect/PLAN_UPDATES.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow-architect/PLAN_UPDATES.md${NC}"
+  fi
+
+  # Deploy flow-reviewer Skill
+  local reviewer_dir="$target_dir/flow-reviewer"
+  mkdir -p "$reviewer_dir" || { echo -e "${RED}❌ mkdir flow-reviewer${NC}"; return 1; }
+
+  if [ "$force" = true ]; then
+    [ -f "$reviewer_dir/SKILL.md" ] && rm -f "$reviewer_dir/SKILL.md"
+    [ -f "$reviewer_dir/VERIFY.md" ] && rm -f "$reviewer_dir/VERIFY.md"
+  fi
+
+  if [ -f "$reviewer_dir/SKILL.md" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow-reviewer/SKILL.md${NC}"
+  else
+    get_skill_flow_reviewer > "$reviewer_dir/SKILL.md" && { echo -e "${GREEN}✅ flow-reviewer/SKILL.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow-reviewer/SKILL.md${NC}"
+  fi
+
+  if [ -f "$reviewer_dir/VERIFY.md" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow-reviewer/VERIFY.md${NC}"
+  else
+    get_skill_flow_reviewer_verify > "$reviewer_dir/VERIFY.md" && { echo -e "${GREEN}✅ flow-reviewer/VERIFY.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow-reviewer/VERIFY.md${NC}"
+  fi
+
+  # Deploy flow-documenter Skill
+  local documenter_dir="$target_dir/flow-documenter"
+  mkdir -p "$documenter_dir" || { echo -e "${RED}❌ mkdir flow-documenter${NC}"; return 1; }
+
+  if [ "$force" = true ] && [ -f "$documenter_dir/SKILL.md" ]; then
+    rm -f "$documenter_dir/SKILL.md"
+  fi
+
+  if [ -f "$documenter_dir/SKILL.md" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow-documenter/SKILL.md${NC}"
+  else
+    get_skill_flow_documenter > "$documenter_dir/SKILL.md" && { echo -e "${GREEN}✅ flow-documenter/SKILL.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow-documenter/SKILL.md${NC}"
+  fi
+
+  echo "$success_count"
   return 0
 }
 
 validate() {
   local commands_dir="$1"
   local flow_dir="$2"
+  local skills_dir="$3"
   local valid=true
 
   echo -e "\n${CYAN}🔍 Validating...${NC}\n"
@@ -434,6 +675,24 @@ validate() {
 
   echo -e "${GREEN}✅ Commands: $count/${#COMMANDS[@]}${NC}"
   [ "$count" -eq 0 ] && { echo -e "${RED}❌ No commands${NC}"; valid=false; }
+
+  # Check Skills
+  local skills_count=0
+  [ -f "$skills_dir/flow-navigator/SKILL.md" ] && ((skills_count++))
+  [ -f "$skills_dir/flow-planner/SKILL.md" ] && ((skills_count++))
+  [ -f "$skills_dir/flow-implementer/SKILL.md" ] && ((skills_count++))
+  [ -f "$skills_dir/flow-architect/SKILL.md" ] && ((skills_count++))
+  [ -f "$skills_dir/flow-reviewer/SKILL.md" ] && ((skills_count++))
+  [ -f "$skills_dir/flow-documenter/SKILL.md" ] && ((skills_count++))
+
+  if [ "$skills_count" -eq 6 ]; then
+    echo -e "${GREEN}✅ Skills: $skills_count/6 (with supporting files)${NC}"
+  elif [ "$skills_count" -gt 0 ]; then
+    echo -e "${YELLOW}⚠️  Skills: $skills_count/6 (partial)${NC}"
+  else
+    echo -e "${RED}❌ No Skills${NC}"
+    valid=false
+  fi
 
   [ "$valid" = true ]
 }
@@ -454,10 +713,12 @@ main() {
   echo -e "Mode: ${CYAN}Self-contained${NC}\n"
 
   local commands_dir="$(pwd)/.claude/commands"
+  local skills_dir="$(pwd)/.claude/skills"
   local flow_dir="$(pwd)/.flow"
 
   # Create directories
   mkdir -p "$commands_dir" || { echo -e "${RED}❌ mkdir .claude/commands failed${NC}"; exit 1; }
+  mkdir -p "$skills_dir" || { echo -e "${RED}❌ mkdir .claude/skills failed${NC}"; exit 1; }
   mkdir -p "$flow_dir" || { echo -e "${RED}❌ mkdir .flow failed${NC}"; exit 1; }
   echo -e "${BLUE}📁 Created directories${NC}\n"
 
@@ -469,27 +730,42 @@ main() {
   echo -e "\n${BLUE}📚 Installing framework documentation...${NC}\n"
   deploy_framework "$flow_dir" "$FORCE"
 
+  # Deploy Skills
+  echo -e "\n${BLUE}🎯 Installing Agent Skills...${NC}\n"
+  local skills_count=$(deploy_skills "$skills_dir" "$FORCE")
+
   # Validate
-  if validate "$commands_dir" "$flow_dir"; then
+  if validate "$commands_dir" "$flow_dir" "$skills_dir"; then
     echo ""
     echo "=================================================="
     echo -e "${GREEN}✅ Flow Framework Installed!${NC}\n"
     echo -e "${CYAN}📂 Structure:${NC}"
     echo "   .claude/commands/       (${#COMMANDS[@]} slash commands)"
+    echo "   .claude/skills/         (6 Agent Skills)"
     echo "   .flow/                  (your workspace)"
     echo "     └── framework/        (AI reference files)"
     echo "         ├── DEVELOPMENT_FRAMEWORK.md"
+    echo "         ├── skills/SKILLS_GUIDE.md"
     echo "         └── examples/"
     echo "             ├── DASHBOARD.md"
     echo "             ├── PLAN.md"
     echo "             ├── phase-1/task-1.md"
     echo "             └── phase-2/task-3.md"
     echo ""
+    echo -e "${CYAN}🎯 Agent Skills Installed:${NC}"
+    echo "   flow-navigator       - Dashboard-first navigation"
+    echo "   flow-planner         - Planning new features/iterations"
+    echo "   flow-implementer     - Implementation workflow guidance"
+    echo "   flow-architect       - Architecture decisions & DO/DON'Ts"
+    echo "   flow-reviewer        - Plan/code verification (read-only)"
+    echo "   flow-documenter      - Task notes & discoveries"
+    echo ""
     echo -e "${CYAN}🚀 Next Steps:${NC}"
     echo "   1. Restart Claude Code (if running)"
     echo "   2. Run: /flow-blueprint <your-feature-name>"
     echo "   3. Read: .flow/framework/DEVELOPMENT_FRAMEWORK.md"
     echo "   4. Examples: .flow/framework/examples/"
+    echo "   5. Skills Guide: .flow/framework/skills/SKILLS_GUIDE.md"
     echo ""
     echo "💡 Share this script - it's self-contained!"
     echo "=================================================="
