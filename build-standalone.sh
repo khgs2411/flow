@@ -434,6 +434,163 @@ MIDDLE18_EOF
 
 # Write the main deployment logic
 cat >> "$OUTPUT_FILE" <<'FOOTER_EOF'
+update_claude_md() {
+  local force="$1"
+  local claude_md="$(pwd)/CLAUDE.md"
+
+  # Flow framework notice content (without header for insertion)
+  local flow_content='- **This project leverages '\''flow framework'\''**: This project uses the flow framework for project management. Follow flow conventions for tasks, iterations, and brainstorming. Try to use the skills agents where possible for the best results. Alternatively, use the slash commands to interact with the flow system.'
+
+  echo -e "${CYAN}📝 Checking CLAUDE.md...${NC}"
+
+  # Check if CLAUDE.md exists
+  if [ ! -f "$claude_md" ]; then
+    # Create minimal CLAUDE.md with Flow section
+    echo -e "${BLUE}Creating CLAUDE.md with Flow framework notice...${NC}"
+    cat > "$claude_md" <<CLAUDE_EOF
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Important rules and guidelines
+${flow_content}
+CLAUDE_EOF
+    echo -e "${GREEN}✅ Created CLAUDE.md with Flow notice${NC}"
+    return 0
+  fi
+
+  # CLAUDE.md exists - check if Flow notice is present
+  if grep -qi "flow framework" "$claude_md"; then
+    # Flow framework mention found
+    if [ "$force" = true ]; then
+      # Force mode: update/replace the section
+      echo -e "${YELLOW}🔄 Updating Flow framework section (--force mode)...${NC}"
+
+      # Strategy: Remove old flow section, then add new one
+      local temp_file="${claude_md}.tmp"
+      local in_flow_section=0
+
+      # First pass: remove old flow section
+      while IFS= read -r line; do
+        if [[ "$line" =~ ^##\ Important\ rules\ and\ guidelines ]]; then
+          in_flow_section=1
+          continue
+        fi
+
+        if [ $in_flow_section -eq 1 ] && [[ "$line" =~ ^## ]]; then
+          in_flow_section=0
+        fi
+
+        if [[ "$line" =~ flow\ framework ]] && [ $in_flow_section -eq 1 ]; then
+          continue
+        fi
+
+        if [ $in_flow_section -eq 0 ]; then
+          echo "$line"
+        fi
+      done < "$claude_md" > "$temp_file"
+
+      # Second pass: add new flow section after title + boilerplate
+      local final_file="${claude_md}.final"
+      local inserted=0
+      local after_title=0
+
+      while IFS= read -r line; do
+        echo "$line"
+
+        # Track when we pass the title
+        if [[ "$line" =~ ^#\ CLAUDE\.md ]]; then
+          after_title=1
+        fi
+
+        # Insert after the boilerplate line (the "This file provides..." line)
+        if [ $after_title -eq 1 ] && [ $inserted -eq 0 ]; then
+          if [[ "$line" =~ This\ file\ provides\ guidance ]]; then
+            echo ""
+            echo "## Important rules and guidelines"
+            echo "${flow_content}"
+            echo ""
+            inserted=1
+          fi
+        fi
+
+        # Fallback: if we hit another ## section and still haven't inserted, insert before it
+        if [[ "$line" =~ ^## ]] && [ $inserted -eq 0 ] && [ $after_title -eq 0 ]; then
+          echo "## Important rules and guidelines"
+          echo "${flow_content}"
+          echo ""
+          inserted=1
+          echo "$line"
+          continue
+        fi
+      done < "$temp_file" > "$final_file"
+
+      # If never inserted (no title, no ## sections), add at top
+      if [ $inserted -eq 0 ]; then
+        {
+          echo "## Important rules and guidelines"
+          echo "${flow_content}"
+          echo ""
+          cat "$temp_file"
+        } > "$final_file"
+      fi
+
+      mv "$final_file" "$claude_md"
+      rm -f "$temp_file"
+      echo -e "${GREEN}✅ Updated Flow framework section in CLAUDE.md${NC}"
+    else
+      # Not force mode - skip
+      echo -e "${GREEN}✅ CLAUDE.md already has Flow framework notice (use --force to update)${NC}"
+    fi
+    return 0
+  fi
+
+  # Flow notice not found - add it
+  echo -e "${BLUE}Adding Flow framework notice to CLAUDE.md...${NC}"
+
+  local temp_file="${claude_md}.tmp"
+  local inserted=0
+  local after_title=0
+  local prev_line=""
+
+  # Check if file has "# CLAUDE.md" title
+  if grep -q "^# CLAUDE.md" "$claude_md"; then
+    # Has title - insert after title + boilerplate
+    while IFS= read -r line; do
+      echo "$line"
+
+      # Track when we pass the title
+      if [[ "$line" =~ ^#\ CLAUDE\.md ]]; then
+        after_title=1
+      fi
+
+      # Insert after the boilerplate line (the "This file provides..." line)
+      if [ $after_title -eq 1 ] && [ $inserted -eq 0 ]; then
+        if [[ "$line" =~ This\ file\ provides\ guidance ]]; then
+          echo ""
+          echo "## Important rules and guidelines"
+          echo "${flow_content}"
+          echo ""
+          inserted=1
+        fi
+      fi
+
+      prev_line="$line"
+    done < "$claude_md" > "$temp_file"
+  else
+    # No title - insert at very top
+    {
+      echo "## Important rules and guidelines"
+      echo "${flow_content}"
+      echo ""
+      cat "$claude_md"
+    } > "$temp_file"
+  fi
+
+  mv "$temp_file" "$claude_md"
+  echo -e "${GREEN}✅ Added Flow framework notice to CLAUDE.md${NC}"
+}
+
 deploy_commands() {
   local target_dir="$1"
   local force="$2"
@@ -733,6 +890,10 @@ main() {
   # Deploy Skills
   echo -e "\n${BLUE}🎯 Installing Agent Skills...${NC}\n"
   local skills_count=$(deploy_skills "$skills_dir" "$FORCE")
+
+  # Update CLAUDE.md
+  echo -e "\n${BLUE}📝 Updating project CLAUDE.md...${NC}\n"
+  update_claude_md "$FORCE"
 
   # Validate
   if validate "$commands_dir" "$flow_dir" "$skills_dir"; then
