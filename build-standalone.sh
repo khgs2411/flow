@@ -445,17 +445,8 @@ update_claude_md() {
 
   # Check if CLAUDE.md exists
   if [ ! -f "$claude_md" ]; then
-    # Create minimal CLAUDE.md with Flow section
-    echo -e "${BLUE}Creating CLAUDE.md with Flow framework notice...${NC}"
-    cat > "$claude_md" <<CLAUDE_EOF
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
-## Important rules and guidelines
-${flow_content}
-CLAUDE_EOF
-    echo -e "${GREEN}✅ Created CLAUDE.md with Flow notice${NC}"
+    # CLAUDE.md doesn't exist - skip
+    echo -e "${YELLOW}⏭️  No CLAUDE.md found - skipping${NC}"
     return 0
   fi
 
