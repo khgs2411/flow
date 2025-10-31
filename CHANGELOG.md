@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.3.4** - Added Claude Skills Support (2025-10-31)
+**v1.3.6** - Claude.md adjustments (2025-10-31)
 
 **Changes**:
 
-- - Flow now works with the skills API for claude code :)\n
-See the [v1.3.4 release](https://github.com/khgs2411/flow/releases/tag/v1.3.4) for full details.
+- - Flow now isnerts a small reminder to use flow into an existing Claude.md file\n
+See the [v1.3.6 release](https://github.com/khgs2411/flow/releases/tag/v1.3.6) for full details.
 
 ---
 
