@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.3.3** - Updated the DEVELOPMENT_FRAMEWORK.md file (2025-10-30)
+**v1.3.4** - Added Claude Skills Support (2025-10-31)
 
 **Changes**:
 
-- - Aligned the dashboard file structure to suit the desired ouput\n
-See the [v1.3.3 release](https://github.com/khgs2411/flow/releases/tag/v1.3.3) for full details.
+- - Flow now works with the skills API for claude code :)\n
+See the [v1.3.4 release](https://github.com/khgs2411/flow/releases/tag/v1.3.4) for full details.
 
 ---
 
