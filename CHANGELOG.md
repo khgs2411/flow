@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.3.6** - Claude.md adjustments (2025-10-31)
+**v1.3.7** - Next subject now gives an AI recommmendation (2025-11-01)
 
 **Changes**:
 
-- - Flow now isnerts a small reminder to use flow into an existing Claude.md file\n
-See the [v1.3.6 release](https://github.com/khgs2411/flow/releases/tag/v1.3.6) for full details.
+- - Ai will now include its recommendation and rational\n
+See the [v1.3.7 release](https://github.com/khgs2411/flow/releases/tag/v1.3.7) for full details.
 
 ---
 
