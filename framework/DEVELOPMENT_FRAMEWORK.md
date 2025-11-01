@@ -536,11 +536,12 @@ These tasks MUST be completed BEFORE starting main implementation of this iterat
   - Directory structure rules
   - File naming conventions
 
-- Lines 1101-1400: **Task Structure Rules (Complete Guide)**
+- Lines 1101-1550: **Task Structure Rules (Complete Guide)**
   - Iterations-only architecture
   - When to split tasks
   - Task size guidelines
   - Nested iteration patterns
+  - **Markdown heading structure rules** (5-level hierarchy for perfect folding)
 
 - Lines 1401-1700: **Brainstorming Pattern (Complete Guide)**
   - Full brainstorming workflow
@@ -1403,6 +1404,140 @@ Task: Add Logging
 **If You Feel You Need More Nesting**:
 1. You probably need multiple tasks instead
 2. Or your brainstorming subjects should become separate iterations
+
+---
+
+## Markdown Heading Structure Rules
+
+**Purpose**: Flow task files use a consistent 5-level heading hierarchy that enables perfect folding in Markdown previewers (VSCode, GitHub, etc.). This structure is **mandatory** for all task files.
+
+### The 5-Level Hierarchy
+
+```
+Level 1: # Task N: [Name]                              ← Task title (fold entire file)
+Level 2: ## Task Overview, ## Iterations, ## Task Notes  ← Major sections (fold section)
+Level 3: ### Iteration N: [Name]                        ← Individual iteration (fold iteration)
+Level 4: #### Pre-Implementation Tasks                  ← Iteration subsections (fold subsection)
+         #### Brainstorming Session
+         #### Action Items
+         #### Implementation
+Level 5: ##### Subject N: [Name]                        ← Individual subjects/pre-tasks (fold item)
+         ##### Pre-Task N: [Name]
+```
+
+### Visual Folding Hierarchy
+
+```
+# Task 3: API Integration                                    [Level 1 - Fold entire task]
+├── ## Task Overview                                         [Level 2 - Fold section]
+├── ## Iterations                                            [Level 2 - Fold section]
+│   ├── ### ✅ Iteration 1: REST Client Setup               [Level 3 - Fold iteration]
+│   │   ├── #### Pre-Implementation Tasks                    [Level 4 - Fold subsection]
+│   │   │   ├── ##### ✅ Pre-Task 1: Update ErrorHandler    [Level 5 - Fold item]
+│   │   │   └── ##### ⏳ Pre-Task 2: Fix Type Definitions   [Level 5 - Fold item]
+│   │   ├── #### Brainstorming Session - REST Client         [Level 4 - Fold subsection]
+│   │   │   ├── ##### ✅ Subject 1: Client Pattern          [Level 5 - Fold item]
+│   │   │   ├── ##### ✅ Subject 2: Authentication          [Level 5 - Fold item]
+│   │   │   └── ##### ✅ Subject 3: Timeouts                [Level 5 - Fold item]
+│   │   ├── #### Action Items                                [Level 4 - Fold subsection]
+│   │   └── #### Implementation - Iteration 1                [Level 4 - Fold subsection]
+│   ├── ### 🚧 Iteration 2: Error Handling                  [Level 3 - Fold iteration]
+│   │   ├── #### Pre-Implementation Tasks                    [Level 4 - Fold subsection]
+│   │   ├── #### Brainstorming Session - Error Handling      [Level 4 - Fold subsection]
+│   │   ├── #### Action Items                                [Level 4 - Fold subsection]
+│   │   └── #### Implementation - Iteration 2                [Level 4 - Fold subsection]
+│   └── ### ⏳ Iteration 3: Retry Logic                     [Level 3 - Fold iteration]
+└── ## Task Notes                                            [Level 2 - Fold section]
+```
+
+### Golden Rules
+
+**Rule 1: Never Skip Levels**
+- ✅ CORRECT: Go 1 → 2 → 3 → 4 → 5 sequentially
+- ❌ WRONG: Skip from 1 → 3 or 2 → 5
+
+**Rule 2: Consistent Subsections**
+All four subsections within an iteration MUST be level 4:
+- `#### Pre-Implementation Tasks` (if needed)
+- `#### Brainstorming Session - [Topic]` (if needed)
+- `#### Action Items` (required)
+- `#### Implementation - Iteration N: [Name]` (after `/flow-implement-start`)
+
+**Rule 3: Subjects and Pre-Tasks are Level 5**
+Individual items within subsections MUST be level 5:
+- `##### ✅ Subject 1: [Name]`
+- `##### ⏳ Pre-Task 1: [Name]`
+
+**Rule 4: Status Markers in Heading Text**
+Include status emoji in heading for visual scanning:
+- `### ✅ Iteration 1: REST Client Setup`
+- `##### 🚧 Subject 2: Error Taxonomy`
+
+### DO / DON'T Examples
+
+**✅ DO - Correct Hierarchy**:
+```markdown
+## Iterations                           ← Level 2
+### ✅ Iteration 1: Setup                ← Level 3 (one level deeper)
+#### Brainstorming Session               ← Level 4 (one level deeper)
+##### ✅ Subject 1: Architecture          ← Level 5 (one level deeper)
+```
+
+**❌ DON'T - Skipped Levels**:
+```markdown
+## Iterations                           ← Level 2
+### ✅ Iteration 1: Setup                ← Level 3
+#### Brainstorming Session               ← Level 4
+###### Subject 1: Architecture           ← Level 6 (WRONG - skipped level 5!)
+```
+
+**❌ DON'T - Inconsistent Subsection Levels**:
+```markdown
+### Iteration 1: Setup
+### Brainstorming Session                ← WRONG - should be level 4 (####)
+#### Subject 1                           ← WRONG - should be level 5 (#####)
+```
+
+**❌ DON'T - Content Sections with Headings Inside Subjects**:
+```markdown
+##### Subject 1: Error Handling
+**Decision**: Use exponential backoff
+**Resolution Type**: D
+###### Resolution Items                  ← WRONG - no level 6 allowed
+```
+
+**✅ DO - Use Bold Text, Not Headings**:
+```markdown
+##### Subject 1: Error Handling
+**Decision**: Use exponential backoff
+**Resolution Type**: D (Iteration Action Items)
+**Resolution Items**:                    ← Bold text, not heading
+- Create RetryPolicy class
+- Implement backoff algorithm
+```
+
+### Why This Matters
+
+**For Users**:
+- Clean folding in VSCode/GitHub - fold any section with one click
+- Easy navigation - jump between iterations/subjects
+- Visual hierarchy - clear parent-child relationships
+- Better readability - consistent structure across all tasks
+
+**For AI**:
+- Parsing consistency - AI can reliably extract sections
+- Template adherence - AI generates correctly structured files
+- Section identification - AI knows exactly where to add content
+- Command execution - Slash commands can navigate predictably
+
+### Validation
+
+When creating or updating task files, verify:
+1. Each heading is exactly one level deeper than its parent
+2. All iteration subsections use level 4 (`####`)
+3. All subjects/pre-tasks use level 5 (`#####`)
+4. No heading uses level 6 (`######`) or deeper
+5. Status markers included in heading text where applicable
 
 ---
 
@@ -2392,96 +2527,268 @@ Before marking iteration complete, verify:
 
 ---
 
-## Iteration Section Template (Full)
+## Complete Task File Template (All Heading Levels)
+
+**Purpose**: This template shows the complete task file structure with all 5 heading levels explicitly labeled. Use this as a reference when creating or updating task files.
 
 ```markdown
-### [Status Emoji] Iteration [N]: [Name]
+# Task 3: API Integration                                           ← LEVEL 1: Task title
 
-**Goal**: [One sentence]
-
-**Status**: [Status]
+**Status**: 🚧 IN PROGRESS
+**Phase**: [Phase 2 - Core Implementation](../DASHBOARD.md#phase-2-core-implementation)
+**Purpose**: Integrate with Stripe REST API for payment processing
 
 ---
 
-#### Pre-Implementation Tasks
+## Task Overview                                                     ← LEVEL 2: Major section
+
+Build a robust Stripe API client with error handling, retry logic, and integration tests.
+
+**Why This Task**: Core payment functionality depends on reliable API integration.
+
+**Dependencies**:
+- **Requires**: Task 1 (Database Layer) - need PaymentRepository
+- **Blocks**: Task 4 (Webhook Handler) - webhook processing depends on API client
+
+**Estimated Complexity**: High (4 iterations expected)
+
+---
+
+## Iterations                                                        ← LEVEL 2: Major section
+
+### ✅ Iteration 1: REST Client Setup                                ← LEVEL 3: Iteration
+
+**Goal**: Create Stripe API client wrapper with authentication
+
+**Status**: ✅ COMPLETE (2025-01-12)
+
+---
+
+#### Pre-Implementation Tasks                                        ← LEVEL 4: Iteration subsection
 
 (Optional - only if Type A subjects identified during brainstorming)
 
-##### ⏳ Pre-Task 1: [Name]
-
-**Why Blocking**: [Explanation]
-
-**Scope** (< 30 min):
-- [What to do]
-
-**Files**:
-- [file1]
-
-**Test**: [How to verify]
+These tasks MUST be completed BEFORE starting main implementation of this iteration.
 
 ---
 
-#### Brainstorming Session - [Topic]
+##### ✅ Pre-Task 1: Refactor Legacy ErrorHandler                   ← LEVEL 5: Individual pre-task
+
+**Completed**: 2025-01-14
+
+**Why Blocking**: Current ErrorHandler doesn't support async retry logic
+
+**Scope** (< 30 min):
+- Update ErrorHandler.ts to support async
+- Add retryAsync() method
+- Update 3 existing call sites
+
+**Files**:
+- src/utils/ErrorHandler.ts
+- src/services/BillingService.ts
+- tests/utils/ErrorHandler.test.ts
+
+**Test**: Run existing test suite to ensure no regressions
+
+**Changes Made**:
+- Added `retryAsync<T>()` method
+- All tests passing
+- No breaking changes
+
+---
+
+##### ⏳ Pre-Task 2: Update Type Definitions                         ← LEVEL 5: Individual pre-task
+
+**Why Blocking**: Need new error types for error handling
+
+**Scope** (< 30 min):
+- Add ErrorType enum
+- Update function signatures
+
+**Files**:
+- src/types/errors.ts
+
+**Test**: TypeScript compilation succeeds
+
+---
+
+#### Brainstorming Session - REST Client Architecture                ← LEVEL 4: Iteration subsection
 
 (Optional - only for complex iterations requiring design decisions)
 
-**Focus**: [What we're designing]
+**Focus**: Design API client abstraction and authentication flow
 
 **Subjects to Discuss**:
-1. ⏳ [Subject name]
-2. ⏳ [Subject name]
+(All subjects resolved)
 
 **Resolved Subjects**:
 
 ---
 
-##### ✅ Subject 1: [Name]
+##### ✅ Subject 1: Client Architecture Pattern                       ← LEVEL 5: Individual subject
 
-**Decision**: [The decision made]
+**Decision**: Use singleton pattern with lazy initialization
 
-**Resolution Type**: [A/B/C/D]
+**Resolution Type**: D (Iteration Action Items)
 
-**Rationale**: [Why this decision]
+**Rationale**:
+- Stripe SDK maintains connection pool internally
+- Multiple instances would create redundant connections
+- Lazy initialization delays credential validation until first use
 
-**Resolution Items** (if Type D):
-- [Item to do]
-- [Item to do]
-
-**Note**: Type A creates Pre-Tasks. Type B updates PLAN.md immediately. Type C references other subjects. Type D creates Resolution Items.
+**Resolution Items**:
+- Create `StripeClient` singleton class
+- Implement lazy initialization in constructor
+- Add credential validation on first API call
+- Export singleton instance for import across codebase
 
 ---
 
-#### Action Items
+##### ✅ Subject 2: Authentication Flow                               ← LEVEL 5: Individual subject
+
+**Decision**: Use API key from environment variable with startup validation
+
+**Resolution Type**: D (Iteration Action Items)
+
+**Rationale**:
+- Stripe best practices recommend environment-based configuration
+- Supports different keys per environment (dev/staging/prod)
+- Validation at startup prevents runtime errors
+
+**Resolution Items**:
+- Load `STRIPE_API_KEY` from environment variables
+- Validate key format at startup (must start with `sk_test_` or `sk_live_`)
+- Throw descriptive error if key is missing or invalid
+- Log masked key on startup for debugging
+
+---
+
+##### ✅ Subject 3: API Timeout Configuration                         ← LEVEL 5: Individual subject
+
+**Decision**: Set 30-second timeout for API calls, configurable via environment
+
+**Resolution Type**: D (Iteration Action Items)
+
+**Rationale**:
+- Stripe recommends 30s timeout for payment operations
+- Prevents indefinite hanging on network issues
+- Configurable for different deployment scenarios
+
+**Resolution Items**:
+- Configure default timeout of 30 seconds
+- Make timeout configurable via `STRIPE_API_TIMEOUT_MS` env var
+- Add timeout handling in API call wrapper
+- Log timeout events for monitoring
+
+---
+
+#### Action Items                                                    ← LEVEL 4: Iteration subsection
 
 (Required - ONE list per iteration)
 
-**If brainstorming**: `/flow-brainstorm-review` consolidates all Resolution Items into this list
-**If no brainstorming**: List action items directly
+Consolidated from Resolution Items above by `/flow-brainstorm-review`
 
-- [ ] [Action item 1]
-- [ ] [Action item 2]
-- [ ] [Action item 3]
+- [x] Create `StripeClient` singleton class
+- [x] Implement lazy initialization in constructor
+- [x] Add credential validation on first API call
+- [x] Export singleton instance for import across codebase
+- [x] Load `STRIPE_API_KEY` from environment variables
+- [x] Validate key format at startup (must start with `sk_test_` or `sk_live_`)
+- [x] Throw descriptive error if key is missing or invalid
+- [x] Log masked key on startup for debugging
+- [x] Configure default timeout of 30 seconds
+- [x] Make timeout configurable via `STRIPE_API_TIMEOUT_MS` env var
+- [x] Add timeout handling in API call wrapper
+- [x] Log timeout events for monitoring
 
 ---
 
-#### Implementation - Iteration [N]: [Name]
+#### Implementation - Iteration 1: REST Client Setup                 ← LEVEL 4: Iteration subsection
 
-(Added by `/flow-implement-start`, updated during work, completed by `/flow-implement-complete`)
+(Added by `/flow-implement-start`, updated during work)
 
-**Status**: 🚧 IN PROGRESS
+**Status**: ✅ COMPLETE (2025-01-12)
 
 **Implementation Notes**:
-- [Discovery during implementation]
-- [Change from plan]
+- Created `src/integrations/stripe/StripeClient.ts` with singleton pattern
+- Implemented lazy initialization - Stripe SDK initialized on first `getInstance()` call
+- Added comprehensive key validation (format check + test API call)
+- Discovered: Stripe SDK v12 changed API - using `paymentIntents` instead of deprecated `charges`
+- Performance: Singleton initialization takes ~50ms (acceptable for lazy init)
 
 **Files Modified**:
-- [file1.ts] - [what changed]
-- [file2.ts] - [what changed]
+- `src/integrations/stripe/StripeClient.ts` - Created new file (187 lines)
+- `src/config/env.ts` - Added STRIPE_API_KEY and STRIPE_API_TIMEOUT_MS validation
+- `src/integrations/stripe/index.ts` - Barrel export for clean imports
+- `scripts/stripe-client.scripts.ts` - Created test file
 
 **Verification**:
-- ✅ [Test passed]
-- ✅ [Manual verification done]
+- ✅ All tests passing in stripe-client.scripts.ts
+- ✅ API key validation working correctly (rejects invalid keys)
+- ✅ Singleton pattern verified (same instance returned)
+- ✅ Timeout configuration working
+- ✅ Connection to Stripe test API successful
+
+---
+
+### 🚧 Iteration 2: Error Handling                                   ← LEVEL 3: Iteration
+
+**Goal**: Implement comprehensive error handling and error taxonomy
+
+**Status**: 🚧 IN PROGRESS (Implementing)
+
+---
+
+(Pre-Implementation Tasks, Brainstorming Session, Action Items, Implementation sections follow same structure as Iteration 1)
+
+---
+
+### ⏳ Iteration 3: Advanced Retry Logic                             ← LEVEL 3: Iteration
+
+**Goal**: Add jitter to exponential backoff and retry budget pattern
+
+**Status**: ⏳ PENDING
+
+---
+
+## Task Notes                                                        ← LEVEL 2: Major section
+
+**Discoveries**:
+- Stripe SDK already implements connection pooling (no need for custom)
+- Stripe SDK v12 uses `paymentIntents` API instead of deprecated `charges`
+- Error codes changed in Stripe API v2023-10-16
+
+**Decisions**:
+- Using Stripe Node SDK v12.18.0 (latest stable)
+- NOT implementing custom connection pool (SDK handles it)
+- NOT implementing circuit breaker for V1 (defer to V2)
+
+**Performance**:
+- Stripe API calls average 200-300ms response time
+- Singleton initialization overhead: ~50ms (one-time cost)
+
+**References**:
+- Stripe API Docs: https://stripe.com/docs/api
+- Existing PayPal integration: `src/legacy/billing.ts`
 ```
+
+---
+
+## Heading Level Reference (Quick Lookup)
+
+When creating or editing task files, use this quick reference:
+
+| Level | Markdown | Usage | Example |
+|-------|----------|-------|---------|
+| **1** | `#` | Task title (once per file) | `# Task 3: API Integration` |
+| **2** | `##` | Major sections (3-4 per file) | `## Task Overview`, `## Iterations`, `## Task Notes` |
+| **3** | `###` | Individual iterations (multiple per task) | `### ✅ Iteration 1: REST Client Setup` |
+| **4** | `####` | Iteration subsections (4 types) | `#### Pre-Implementation Tasks`, `#### Brainstorming Session`, `#### Action Items`, `#### Implementation` |
+| **5** | `#####` | Individual items (subjects/pre-tasks) | `##### ✅ Subject 1: Architecture`, `##### ⏳ Pre-Task 1: Fix Types` |
+
+**Critical Rule**: Never use level 6 (`######`) or deeper. If you need more nesting, restructure with additional iterations instead.
+
+---
 
 
 <!-- AI_SCAN:COMMAND_PATTERNS:2726-2900 -->
