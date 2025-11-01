@@ -2960,7 +2960,7 @@ description: Discuss next subject, capture decision, and mark resolved
 
 You are executing the `/flow-next-subject` command from the Flow framework.
 
-**Purpose**: Show next unresolved subject, present options collaboratively, wait for user decision, then mark as ✅ resolved.
+**Purpose**: Show next unresolved subject, present options collaboratively, include your recommendation with rationale, wait for user decision, then mark as ✅ resolved.
 
 **🔴 REQUIRED: Read Framework Quick Reference First**
 
@@ -3033,6 +3033,7 @@ User responds → capture decision → document → mark ✅ → auto-advance to
    - Present each option with brief pros/cons (1-2 sentences each)
    - Format as numbered list for clarity
    - Include option for "Your own approach"
+   - Include your recommendation with rationale
    - Ask user explicitly: "Which option do you prefer? Or provide your own approach."
    - **🛑 STOP HERE - Wait for user response (do NOT proceed to capture decision)**
    - **DO NOT** decide on behalf of user
