@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.3.7** - Next subject now gives an AI recommmendation (2025-11-01)
+**v1.3.8** - MD adjustments (2025-11-01)
 
 **Changes**:
 
-- - Ai will now include its recommendation and rational\n
-See the [v1.3.7 release](https://github.com/khgs2411/flow/releases/tag/v1.3.7) for full details.
+- - Fixed an MD hierarchy issue in the reference files\n
+See the [v1.3.8 release](https://github.com/khgs2411/flow/releases/tag/v1.3.8) for full details.
 
 ---
 
