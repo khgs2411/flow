@@ -26,6 +26,39 @@ See the [v1.3.9 release](https://github.com/khgs2411/flow/releases/tag/v1.3.9) f
 
 ---
 
+## Upcoming in Next Release (In Development)
+
+**Major Architecture Refactor**: 6 Activity-Based Skills → 8 Workflow Stage-Based Skills
+
+**Migration**:
+- Old 6 skills (29% command coverage) being replaced with new 8 skills (100% coverage)
+- Workflow stages match user journey: initialize → plan → design → build → complete → navigate → verify → curate
+
+**Renamed Skills**:
+- `flow-implementer` → `flow-builder` (renamed to match "build" stage)
+- `flow-reviewer` → `flow-verifier` (renamed + expanded with summarize, compact, rollback commands)
+
+**Removed Skills** (logic merged into new skills):
+- `flow-architect` → merged into `flow-designer`
+- `flow-documenter` → merged into `flow-verifier`
+
+**New Skills**:
+- `flow-initializer` - Project setup & migration (3 commands)
+- `flow-designer` - Brainstorming & architecture decisions (5 commands)
+- `flow-completer` - Task & phase completion verification (2 commands)
+- `flow-curator` - Backlog & archive management (4 commands)
+
+**Build System Updates**:
+- Updated `build-standalone.sh` with new 8-skill extraction functions
+- Updated `deploy_skills()` to deploy all 8 skills with supporting files
+- Added deprecated skill cleanup in `--force` mode
+- Updated validation to check for 8 skills instead of 6
+- Updated deployment messages to reflect new skill names
+
+**Total**: 8 skills, 28 commands (100% coverage), 5,664+ lines of skill documentation
+
+---
+
 
 ## Previous Versions
 
