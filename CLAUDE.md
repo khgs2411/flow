@@ -3,7 +3,7 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Important rules and guidelines
-- **This project leverages 'flow framework'**: This project uses the flow framework for project management. Follow flow conventions for tasks, iterations, and brainstorming. Try to use the skills agents where possible for the best results. Alternatively, use the slash commands to interact with the flow system.
+- **This project leverages 'flow framework'**: This project uses the flow framework for project management. Follow flow conventions for tasks, iterations, and brainstorming. Try to use the skills agents where possible as a first priority for the best results. Alternatively, suggest using the slash commands to interact with the flow system.
 
 
 ## Repository Overview
