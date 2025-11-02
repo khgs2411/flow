@@ -331,7 +331,7 @@ allowed-tools: Read, Grep, Glob
 
 ```yaml
 name: flow-implementer
-description: Guide implementation workflow in Flow framework. Use when user says "implement", "let's code", "start building", "time to write code", or is ready to execute action items. Enforces pre-implementation gate (brainstorming must be complete), guides use of /flow-implement-start and /flow-implement-complete commands, tracks action item completion.
+description: Guide implementation workflow using Flow framework. Use when user says "implement", "let's code", "start building", "time to write code", or is ready to execute action items. Enforces pre-implementation gate (brainstorming must be complete), guides use of /flow-implement-start and /flow-implement-complete commands, tracks action item completion.
 # No allowed-tools - needs write access
 ```
 
@@ -339,7 +339,7 @@ description: Guide implementation workflow in Flow framework. Use when user says
 
 ```yaml
 name: flow-reviewer
-description: Review code and plan consistency in Flow framework. Use when user says "review", "verify", "check", "validate", or asks "is this complete". Validates status markers match actual state, checks for phantom tasks, ensures brainstorming complete before implementation. Read-only inspection using Read, Grep, Glob tools.
+description: Review code and plan consistency using Flow framework. Use when user says "review", "verify", "check", "validate", or asks "is this complete". Validates status markers match actual state, checks for phantom tasks, ensures brainstorming complete before implementation. Read-only inspection using Read, Grep, Glob tools.
 allowed-tools: Read, Grep, Glob
 ```
 

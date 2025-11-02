@@ -1,6 +1,6 @@
 # PLAN.md Update Patterns
 
-This document provides best practices and patterns for updating PLAN.md during brainstorming sessions in Flow framework projects. Use this as a reference when documenting architectural decisions, DO/DON'T guidelines, technology choices, and scope boundaries.
+This document provides best practices and patterns for updating PLAN.md during brainstorming sessions using Flow framework projects. Use this as a reference when documenting architectural decisions, DO/DON'T guidelines, technology choices, and scope boundaries.
 
 > **Note**: This is a Level 3 resource for the flow-architect Skill. See [SKILL.md](SKILL.md) for core architectural guidance.
 

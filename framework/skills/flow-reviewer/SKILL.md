@@ -5,7 +5,7 @@ description: Review and verify Flow framework plan consistency. Use when user sa
 
 # Flow Reviewer
 
-Help users verify plan consistency, validate status markers, and review implementation completeness in Flow framework projects. This Skill performs read-only inspections to ensure the plan matches reality.
+Help users verify plan consistency, validate status markers, and review implementation completeness using Flow framework projects. This Skill performs read-only inspections to ensure the plan matches reality.
 
 ## When to Use This Skill
 

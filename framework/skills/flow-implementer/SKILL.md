@@ -1,11 +1,11 @@
 ---
 name: flow-implementer
-description: Guide implementation workflow in Flow framework. Use when user says "implement", "implement this", "let's code", "let's implement", "start building", "time to write code", "time to code", "execute action items", "ready to implement", or is ready to implement. Enforces pre-implementation gate (brainstorming must be complete), guides use of /flow-implement-start and /flow-implement-complete commands, tracks action item completion, ensures verification before marking work complete.
+description: Guide implementation workflow using Flow framework. Use when user says "implement", "implement this", "let's code", "let's implement", "start building", "time to write code", "time to code", "execute action items", "ready to implement", or is ready to implement. Enforces pre-implementation gate (brainstorming must be complete), guides use of /flow-implement-start and /flow-implement-complete commands, tracks action item completion, ensures verification before marking work complete.
 ---
 
 # Flow Implementer
 
-Help users execute implementation work in Flow framework projects. This Skill ensures AI follows Flow's implementation pattern: verify readiness → start implementation → execute action items → verify completion → mark complete.
+Help users execute implementation work using Flow framework projects. This Skill ensures AI follows Flow's implementation pattern: verify readiness → start implementation → execute action items → verify completion → mark complete.
 
 ## When to Use This Skill
 

@@ -1,6 +1,6 @@
 # Flow Planning Templates
 
-Ready-to-use templates for creating phases, tasks, and iterations in Flow framework. Copy and customize these structures for your planning needs.
+Ready-to-use templates for creating phases, tasks, and iterations using Flow framework. Copy and customize these structures for your planning needs.
 
 ## Template 1: Standalone Task
 

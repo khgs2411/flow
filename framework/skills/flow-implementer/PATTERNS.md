@@ -1,6 +1,6 @@
 # Implementation Patterns
 
-This document provides detailed patterns for handling pre-implementation tasks and executing action items in Flow framework.
+This document provides detailed patterns for handling pre-implementation tasks and executing action items using Flow framework.
 
 ## Table of Contents
 

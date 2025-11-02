@@ -1,6 +1,6 @@
 # Implementation Verification Guide
 
-This document provides detailed verification patterns, completion criteria, and decision-making guidance for implementation work in Flow framework. Reference this guide when you need detailed examples and templates for verifying your work.
+This document provides detailed verification patterns, completion criteria, and decision-making guidance for implementation work using Flow framework. Reference this guide when you need detailed examples and templates for verifying your work.
 
 > **Note**: This is a Level 3 resource for the flow-implementer Skill. See [SKILL.md](SKILL.md) for core implementation workflow.
 
