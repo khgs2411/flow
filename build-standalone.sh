@@ -518,7 +518,7 @@ update_claude_md() {
   local claude_md="$(pwd)/CLAUDE.md"
 
   # Flow framework notice content (without header for insertion)
-  local flow_content='- **This project leverages '\''flow framework'\''**: This project uses the flow framework for project management. Follow flow conventions for tasks, iterations, and brainstorming. Try to use the agent skills where possible as a first priority for the best results. Alternatively, suggest using the slash commands to interact with the flow system.'
+  local flow_content='- **This project leverages '\''flow framework'\''**: This project uses the flow framework for project management. Follow flow conventions for tasks, iterations, and brainstorming. ALWAYS try to use the agent skills where possible as a first priority for the best results. Alternatively, suggest using the slash commands to interact with the flow system.'
 
   echo -e "${CYAN}📝 Checking CLAUDE.md...${NC}"
 
