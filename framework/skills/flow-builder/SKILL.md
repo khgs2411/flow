@@ -1,11 +1,11 @@
 ---
-name: flow-implementer
-description: Guide implementation workflow using Flow framework. Use when user says "implement", "implement this", "let's code", "let's implement", "start building", "time to write code", "time to code", "execute action items", "ready to implement", or is ready to implement. Enforces pre-implementation gate (brainstorming must be complete), guides use of /flow-implement-start and /flow-implement-complete commands, tracks action item completion, ensures verification before marking work complete.
+name: flow-builder
+description: Execute implementation work with gate checks and verification. Use when user wants to code, build features, implement iterations, or execute action items. Enforces gates, guides workflow, tracks progress.
 ---
 
-# Flow Implementer
+# Flow Builder
 
-Help users execute implementation work using Flow framework projects. This Skill ensures AI follows Flow's implementation pattern: verify readiness → start implementation → execute action items → verify completion → mark complete.
+Execute implementation work following Flow framework patterns. This skill guides the build phase: verify readiness → start implementation → execute action items → verify completion → mark complete.
 
 ## When to Use This Skill
 
@@ -478,14 +478,156 @@ Estimated completion: 1 hour
 Working on integrating RetryPolicy with StripeClient.ts. Will move to tests next.
 ```
 
+## Examples
+
+### Example 1: Starting Implementation After Brainstorming
+
+```
+User: "Let's start building the retry logic"
+
+AI Process:
+1. Read current iteration from task file
+2. Check brainstorming status: ✅ COMPLETE (4 subjects resolved)
+3. Check pre-tasks: ✅ COMPLETE (updated ErrorHandler.ts)
+4. Verify iteration status: 🎨 READY
+
+AI Response:
+"Ready to start implementation! All gates passed:
+✅ Brainstorming complete (4 subjects resolved)
+✅ Pre-tasks complete (ErrorHandler updated)
+✅ Iteration status: READY
+
+Action items from brainstorming (Type D):
+- [ ] Create RetryPolicy class
+- [ ] Implement exponential backoff algorithm
+- [ ] Add configuration for max retries
+- [ ] Integrate with StripeClient
+- [ ] Add tests for retry scenarios
+
+Use `/flow-implement-start` to begin, then I'll execute these action items."
+```
+
+### Example 2: Handling Incomplete Pre-Tasks
+
+```
+User: "Start implementing the payment flow"
+
+AI Process:
+1. Read current iteration from task file
+2. Check brainstorming: ✅ COMPLETE
+3. Check pre-tasks: Found 2 incomplete pre-tasks
+
+AI Response:
+"Cannot start implementation yet. Pre-tasks must be completed first:
+
+❌ Pre-Implementation Tasks - INCOMPLETE
+
+Blocking tasks:
+1. ⏳ Pre-Task 1: Update PaymentStatus enum - Add PENDING_RETRY and FAILED_PERMANENT states
+2. ⏳ Pre-Task 2: Refactor PaymentService.process() - Extract validation logic to separate method
+
+These must be done BEFORE main implementation. Should I complete these pre-tasks now?"
+
+User: "Yes, complete them"
+
+AI Process:
+1. Complete Pre-Task 1 (update enum, update switch statements)
+2. Mark Pre-Task 1 ✅ COMPLETE with date and changes
+3. Complete Pre-Task 2 (extract validation method)
+4. Mark Pre-Task 2 ✅ COMPLETE with date and changes
+5. Verify all pre-tasks done
+
+AI Response:
+"All pre-tasks completed:
+✅ Pre-Task 1: PaymentStatus enum updated (4 files modified)
+✅ Pre-Task 2: Validation logic extracted (2 files modified)
+
+Now ready for main implementation. Use `/flow-implement-start` to begin."
+```
+
+### Example 3: Verification Before Marking Complete
+
+```
+User: "I think we're done with this iteration"
+
+AI Process:
+1. Read current iteration action items
+2. Check completion status
+3. Verify each completion criterion
+
+AI Response:
+"Let me verify completion criteria:
+
+✅ Action Items (5/5):
+  - [x] Create RetryPolicy class
+  - [x] Implement exponential backoff algorithm
+  - [x] Add configuration for max retries
+  - [x] Integrate with StripeClient
+  - [x] Add tests for retry scenarios
+
+✅ Code Quality:
+  - No syntax errors
+  - Linting passed
+  - Follows project conventions
+
+✅ Tests:
+  - Unit tests: 8/8 passing
+  - Integration tests: 2/2 passing
+
+✅ Documentation:
+  - Files modified documented (4 files)
+  - Implementation notes updated
+
+All verification criteria met! Use `/flow-implement-complete` to mark this iteration complete."
+```
+
+### Example 4: Scope Boundary During Implementation
+
+```
+User: [AI is implementing action items]
+
+AI Process:
+1. Working on "Integrate RetryPolicy with StripeClient"
+2. Discovers PaymentService.ts uses deprecated error format
+3. Realizes this is out of scope
+
+AI Response:
+"⚠️ SCOPE BOUNDARY ALERT
+
+While integrating RetryPolicy with StripeClient, I discovered:
+
+**Issue**: PaymentService.ts uses deprecated error format that conflicts with new retry logic
+
+**Impact**: Current action item can continue, but this will cause issues when we add retry to PaymentService later
+
+**Options**:
+A) Create pre-implementation task for NEXT iteration:
+   - Estimated: 20-30 minutes
+   - Update PaymentService error format
+   - Update 3 call sites
+
+B) Add as new brainstorming subject:
+   - Design error format standard across all services
+   - Affects PaymentService, BillingService, OrderService
+
+C) Handle immediately (expand current scope):
+   - Fix PaymentService.ts now
+   - Document as scope expansion
+
+D) Defer to separate iteration:
+   - Work around for now (document workaround)
+   - Create new task for error format standardization
+
+I recommend Option A (pre-task for next iteration) as it's small and blocking for future work. Which approach would you prefer?"
+```
+
 ## Interaction with Other Flow Skills
 
-**Planning Stage** (flow-planner Skill):
-- `/flow-task-add` - Create task
-- `/flow-iteration-add` - Add iterations
+**Design Stage** (flow-designer Skill):
 - `/flow-brainstorm-start` - Design decisions
+- `/flow-brainstorm-complete` - Generate action items
 
-**Implementation Stage** (This Skill):
+**Build Stage** (This Skill):
 - `/flow-implement-start` - Begin work ← YOU ARE HERE
 - `/flow-implement-complete` - Finish iteration ← YOU ARE HERE
 

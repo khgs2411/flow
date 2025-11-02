@@ -1,11 +1,11 @@
 ---
 name: flow-planner
-description: Plan new features, tasks, and iterations using Flow framework. Use when user says "add task", "add a task", "create task", "plan feature", "plan this feature", "create iteration", "add iteration", "break this down", "how should we structure this", "how do I structure", or wants to add new work to the plan. Guides task structure decisions (standalone vs iterations), suggests brainstorming for complex features, references planning slash commands.
+description: Plan phases, tasks, and iterations. Use when structuring new work, adding features, or organizing development plans.
 ---
 
 # Flow Planner
 
-Help users plan and structure new work using Flow framework projects. This Skill guides AI in understanding Flow's planning patterns and using appropriate slash commands for adding phases, tasks, and iterations.
+Help users plan and structure new work using Flow framework. Guide task structure decisions (standalone vs iterations) and suggest brainstorming for complex features.
 
 ## When to Use This Skill
 
@@ -16,11 +16,10 @@ Activate when the user wants to add new work:
 - "Break this down into steps"
 - "How should we structure this?"
 - "Add this to the plan"
-- "What's the best way to organize this work?"
 
 ## Planning Philosophy
 
-**Flow's Core Principle**: Plan before code. Structure work hierarchically (phases → tasks → iterations) with clear boundaries and iterative refinement.
+**Flow's Core Principle**: Plan before code. Structure work hierarchically (phases → tasks → iterations) with clear boundaries.
 
 **Key Decision**: Every task is EITHER:
 - **Standalone** - Direct action items, no iterations
@@ -36,76 +35,23 @@ User wants to add work
 Is it complex/multi-step?
     ↓
 YES → Task with Iterations
-    ↓
     Break into 3-5 iterations
     Each iteration = milestone
     ↓
 NO → Standalone Task
-    ↓
     Direct action items
     Complete in one go
 ```
 
-## Planning Slash Commands
-
-### Core Commands
-
-**`/flow-task-add [name]`**
-- Creates new task file in current phase
-- Use when: Adding new task to phase
-- Prompts for: Standalone vs Iterations decision
-
-**`/flow-iteration-add [name]`**
-- Adds iteration to current task
-- Use when: Breaking down complex task
-- Creates: New iteration with goal, action items
-
-**`/flow-phase-add [name]`**
-- Creates new phase directory
-- Use when: Major milestone or category of work
-- Updates: DASHBOARD.md with new phase
-
-**`/flow-brainstorm-start [topics]`**
-- Begins design discussion
-- Use when: Complex features need planning
-- Helps: Make decisions before implementing
-
-### When to Suggest Brainstorming
-
-Use this decision tree to determine if brainstorming is needed:
-
-```
-User wants to add work
-    ↓
-Does it involve design decisions?
-    ↓
-YES → Brainstorm first
-    ↓
-    Multiple valid approaches?
-    Trade-offs to discuss?
-    Architectural impact?
-    Integration complexity?
-    ↓
-    Use /flow-brainstorm-start
-    ↓
-NO → Direct implementation
-    ↓
-    Clear requirements?
-    Single obvious approach?
-    Isolated change?
-    ↓
-    Skip brainstorming
-```
+## When to Suggest Brainstorming
 
 **Always suggest brainstorming for**:
 - Complex features with multiple approaches
 - Architectural decisions needed
 - Integration with external systems
 - Performance-critical features
-- Features affecting multiple areas
 - Database schema changes
 - API contract design
-- Error handling strategies
 - Security-sensitive features
 
 **Skip brainstorming for**:
@@ -113,238 +59,74 @@ NO → Direct implementation
 - Well-defined tasks (clear requirements)
 - Repetitive work (similar to previous tasks)
 - Bug fixes with obvious solutions
-- Trivial refactoring
 
 ## Brainstorming Subject Resolution Types
 
-When users DO need brainstorming, help them understand how subjects get resolved. There are 4 types:
+When users DO need brainstorming, help them understand how subjects get resolved:
 
 ### Type A: Pre-Implementation Task
 
 **When**: Small blocking code change needed BEFORE iteration starts
 
-**Criteria**:
-- Required for iteration (blocking)
-- Small scope (< 30 min)
-- Can be done independently
-- Examples: Fix interface, rename file, update enum, fix bug
+**Criteria**: Required for iteration (blocking), small scope (< 30 min), can be done independently
 
-**Example Subject**:
-```markdown
-Subject: Type Definition Updates
+**Examples**: Fix interface, rename file, update enum, fix bug
 
-Decision: Need to update PaymentStatus enum to include new states
-
-Resolution Type: A (Pre-Implementation Task)
-
-Action Items:
-- [ ] Update PaymentStatus enum in types.ts
-- [ ] Update 4 switch statements to handle new states
-- [ ] Add tests for new states
-```
-
-**What happens**: These action items go into "Pre-Implementation Tasks" section and must be completed BEFORE main implementation starts.
+**What happens**: Action items go into "Pre-Implementation Tasks" section, must complete BEFORE main implementation
 
 ### Type B: Immediate Documentation
 
 **When**: Architectural decision that affects system design
 
-**Criteria**:
-- No code changes yet
-- Updates PLAN.md Architecture section NOW
-- Examples: Design pattern choice, API contract, data model
+**Criteria**: No code changes yet, updates PLAN.md Architecture section NOW
 
-**Example Subject**:
-```markdown
-Subject: Error Recovery Strategy
+**Examples**: Design pattern choice, API contract, data model
 
-Decision: Implement retry with exponential backoff, no circuit breaker for V1
-
-Resolution Type: B (Documentation)
-
-Documentation Update:
-Updated PLAN.md Architecture section with retry strategy diagram and V2 scope for circuit breaker
-```
-
-**What happens**: AI updates PLAN.md immediately during brainstorming, before implementation.
+**What happens**: AI updates PLAN.md immediately during brainstorming
 
 ### Type C: Auto-Resolved
 
 **When**: Subject answered by another subject's decision
 
-**Criteria**:
-- No independent decision needed
-- Cascade from another subject
-- Examples: Implementation detail determined by architecture choice
+**Criteria**: No independent decision needed, cascade from another subject
 
-**Example Subject**:
-```markdown
-Subject: Retry Delay Calculation
-
-Decision: Use exponential backoff as decided in Subject 1
-
-Resolution Type: C (Auto-Resolved by Subject 1)
-```
-
-**What happens**: No action items, just note which subject resolved this.
+**What happens**: No action items, just note which subject resolved this
 
 ### Type D: Iteration Action Items
 
 **When**: Substantial feature work that IS the iteration
 
-**Criteria**:
-- Main implementation work
-- Takes significant time (> 30 min)
-- Examples: Build API endpoint, implement validator, create service
+**Criteria**: Main implementation work, takes significant time (> 30 min)
 
-**Example Subject**:
-```markdown
-Subject: Retry Implementation
+**Examples**: Build API endpoint, implement validator, create service
 
-Decision: Implement RetryPolicy class with configurable backoff strategy
-
-Resolution Type: D (Iteration Action Items)
-
-Action Items:
-- [ ] Create RetryPolicy class
-- [ ] Implement exponential backoff algorithm
-- [ ] Add configuration for max retries, base delay
-- [ ] Integrate with StripeClient
-- [ ] Add tests for retry scenarios
-```
-
-**What happens**: These action items become the iteration's implementation action items.
+**What happens**: These action items become the iteration's implementation action items
 
 ## Complexity Indicators
 
-Help users recognize task complexity:
-
 ### Simple Task (No Brainstorming)
 
-**Indicators**:
-- Single file change
-- Clear requirements from user
-- No integration points
-- < 1 hour to complete
-- Similar to previous work
+**Indicators**: Single file change, clear requirements, no integration points, < 1 hour, similar to previous work
 
-**Examples**:
-- "Add a validation function"
-- "Fix typo in error message"
-- "Export existing function"
-- "Add logging statement"
+**Examples**: "Add validation function", "Fix typo", "Export function", "Add logging"
 
-**Guidance**: "This looks straightforward - I suggest a standalone task with direct action items. No brainstorming needed."
+**Guidance**: "This looks straightforward - standalone task with direct action items. No brainstorming needed."
 
 ### Complex Task (Needs Brainstorming)
 
-**Indicators**:
-- Multiple approaches possible
-- Affects system architecture
-- Integration with external services
-- > 4 hours to complete
-- User says "I'm not sure how to..."
+**Indicators**: Multiple approaches possible, affects architecture, integration needed, > 4 hours, user unsure
 
-**Examples**:
-- "Add authentication system"
-- "Integrate Stripe payments"
-- "Implement caching layer"
-- "Design database schema"
+**Examples**: "Add authentication", "Integrate Stripe", "Implement caching", "Design database"
 
-**Guidance**: "This is complex - I recommend brainstorming first. Let's use `/flow-brainstorm-start` to discuss: [list 3-5 subjects]."
+**Guidance**: "This is complex - I recommend brainstorming first. Let's discuss: [list 3-5 subjects]."
 
 ### Borderline Task (Ask User)
 
-**Indicators**:
-- Moderate complexity (2-4 hours)
-- Some design decisions needed
-- User hasn't expressed preference
+**Indicators**: Moderate complexity (2-4 hours), some design decisions, user hasn't expressed preference
 
-**Examples**:
-- "Add error handling to API"
-- "Refactor data layer"
-- "Implement search feature"
+**Examples**: "Add error handling to API", "Refactor data layer", "Implement search"
 
-**Guidance**: "This could go either way. We could brainstorm the approach first, or jump into iterations if you already have a clear vision. Which would you prefer?"
-
-## Task Structure Patterns
-
-### Pattern 1: Standalone Task
-
-**Use when**: Simple, focused work
-
-```markdown
-# Task 3: Add Logging
-
-**Status**: ⏳ PENDING
-
-## Action Items
-- [ ] Create logger utility
-- [ ] Add log statements to main functions
-- [ ] Test logging output
-- [ ] Update documentation
-```
-
-**Characteristics**:
-- Single focus area
-- Clear action items
-- Can complete in one session
-- No need to break down further
-
-### Pattern 2: Task with Iterations (Skeleton → Veins → Flesh)
-
-**Use when**: Complex, multi-phase work
-
-```markdown
-# Task 3: API Integration
-
-**Status**: ⏳ PENDING
-
-## Iterations
-
-### ⏳ Iteration 1: Skeleton - Basic API client
-**Goal**: Minimal working connection
-
-### ⏳ Iteration 2: Veins - Core endpoints
-**Goal**: Essential CRUD operations
-
-### ⏳ Iteration 3: Flesh - Error handling & retry
-**Goal**: Production-ready reliability
-```
-
-**Characteristics**:
-- Multiple milestones
-- Each iteration is testable
-- Progressive complexity
-- Incremental value delivery
-
-**NO direct action items in task** - Only in iterations
-
-### Pattern 3: Task with Brainstorming
-
-**Use when**: Design decisions needed
-
-```markdown
-# Task 2: Database Schema
-
-**Status**: 🚧 IN PROGRESS
-
-## Iterations
-
-### 🚧 Iteration 1: Design schema structure
-**Status**: 🚧 BRAINSTORMING
-
-#### Brainstorming Session
-**Subjects to Discuss**:
-1. ⏳ Table relationships - One-to-many or many-to-many?
-2. ⏳ Indexing strategy - Which fields to index?
-3. ⏳ Migration approach - How to handle schema changes?
-```
-
-**When to use**:
-- Multiple valid approaches exist
-- Trade-offs need discussion
-- User needs to make decisions
+**Guidance**: "This could go either way. We could brainstorm first, or jump into iterations if you have a clear vision. Which do you prefer?"
 
 ## Step-by-Step Planning Workflow
 
@@ -383,10 +165,15 @@ Which approach fits better?
 
 ### Step 4: Create the Structure
 
-Use appropriate slash command:
-- `/flow-task-add "Task Name"` - Create task
-- Follow prompts for standalone vs iterations
-- If iterations: `/flow-iteration-add "Iteration Name"` for each
+Read DASHBOARD.md to find current phase and task count, then create appropriate files:
+
+**For new phase**: Create `.flow/phase-N/` directory, update DASHBOARD.md with new phase entry
+
+**For new task**: Create `.flow/phase-N/task-M.md`, add to DASHBOARD.md progress overview
+
+**For new iteration**: Add iteration section to existing task file
+
+Use templates from [TEMPLATES.md](TEMPLATES.md) for proper structure.
 
 ### Step 5: Add Context
 
@@ -396,63 +183,56 @@ Help user fill in:
 - **Design Notes**: Key considerations
 - **Action Items**: Concrete steps (standalone) or iteration goals (with iterations)
 
-## Common Patterns
+## Starting Work (Phase/Task)
 
-### Pattern: Feature Addition
+### Starting a Phase
 
-```
-User: "Add user authentication"
+When user wants to begin work on a phase:
 
-Response:
-This is a complex feature - I suggest a task with 3 iterations:
+1. Read DASHBOARD.md to find the phase
+2. Verify phase status is ⏳ PENDING (not already 🚧 IN PROGRESS)
+3. Update DASHBOARD.md:
+   - Change phase status from ⏳ PENDING to 🚧 IN PROGRESS
+   - Update "Current Work" section to point to this phase
+4. Report to user: "Phase N: [Name] is now in progress. Starting with Task 1."
 
-1. Iteration 1: Basic login/logout (Skeleton)
-2. Iteration 2: JWT tokens & session management (Veins)
-3. Iteration 3: Password reset & email verification (Flesh)
+### Starting a Task
 
-Should we also brainstorm the auth approach first?
-(OAuth, JWT, session-based, etc.)
-```
+When user wants to begin work on a task:
 
-### Pattern: Bug Fix
+1. Read DASHBOARD.md to find the task
+2. Verify task status is ⏳ PENDING (not already 🚧 IN PROGRESS)
+3. Update task file:
+   - Change `**Status**: ⏳ PENDING` to `**Status**: 🚧 IN PROGRESS`
+4. Update DASHBOARD.md:
+   - Change task status marker from ⏳ to 🚧
+   - Update "Current Work" section to point to this task
+5. Report to user: "Task N: [Name] is now in progress. [Guidance on first step]"
 
-```
-User: "Fix the pagination bug"
+## Next Action Suggestions
 
-Response:
-This sounds like a standalone task:
+When user asks "what's next" or "what should I work on":
 
-Task: Fix Pagination Bug
-- [ ] Reproduce the issue
-- [ ] Identify root cause
-- [ ] Implement fix
-- [ ] Add regression test
-- [ ] Verify fix works
+### If Nothing In Progress
 
-Does this structure work?
-```
+Read DASHBOARD.md to find next ⏳ PENDING item:
+- If current phase has pending tasks → "Start Task N: [Name]"
+- If current phase complete → "Start Phase N+1: [Name]"
+- If project complete → "All work complete! 🎉"
 
-### Pattern: Refactoring
+### If Work In Progress
 
-```
-User: "Refactor the data layer"
+Read current work context:
+- If task has pending iterations → "Continue with Iteration N"
+- If iteration needs planning → "Add iterations to break down the work"
+- If unclear → "What aspect would you like to work on next?"
 
-Response:
-This is complex - let's break it down:
+## Task Structure Patterns
 
-Task: Refactor Data Layer (4 iterations)
-1. Iteration 1: Extract interfaces
-2. Iteration 2: Migrate to new pattern
-3. Iteration 3: Update tests
-4. Iteration 4: Remove old code
-
-We should brainstorm:
-- New architecture pattern
-- Migration strategy
-- Backwards compatibility
-
-Should I start `/flow-brainstorm-start` for this?
-```
+See [TEMPLATES.md](TEMPLATES.md) for complete templates:
+- **Standalone Task**: Direct action items, no iterations
+- **Task with Iterations**: Skeleton → Veins → Flesh pattern
+- **Task with Brainstorming**: Design decisions first, then implementation
 
 ## Best Practices
 
@@ -460,8 +240,7 @@ Should I start `/flow-brainstorm-start` for this?
 2. **Suggest iterations for complex work** - Better to break down than have massive tasks
 3. **Propose brainstorming when uncertain** - Design first, implement second
 4. **Use Flow's metaphor** - Skeleton → Veins → Flesh
-5. **Reference slash commands** - Guide user to use Flow's tools
-6. **Keep iterations focused** - Each should have clear goal and completion criteria
+5. **Keep iterations focused** - Each should have clear goal and completion criteria
 
 ## Task Structure Golden Rules
 
@@ -502,38 +281,29 @@ Should I start `/flow-brainstorm-start` for this?
 ```
 User: "I want to add real-time notifications"
 
-AI Response:
-Let me help you plan this feature. Real-time notifications is complex - I suggest:
+AI Process:
+1. Assess complexity: Complex feature (WebSocket, multiple components)
+2. Suggest structure: Task with 3 iterations
+3. Propose brainstorming: Technology choice, message format, persistence
+4. Create task file with iteration structure
 
+Structure Created:
 **Task: Real-Time Notifications** (3 iterations)
 
 **Iteration 1: Skeleton - WebSocket Connection**
 - Goal: Establish basic WebSocket connection
-- Action items:
-  - Set up WebSocket server
-  - Implement client connection
-  - Basic ping/pong keepalive
+- Set up WebSocket server, implement client connection, basic keepalive
 
 **Iteration 2: Veins - Notification System**
 - Goal: Core notification sending/receiving
-- Action items:
-  - Design notification message format
-  - Implement server-side broadcast
-  - Add client-side handlers
+- Design message format, server-side broadcast, client-side handlers
 
 **Iteration 3: Flesh - UI & Polish**
 - Goal: User-facing notification display
-- Action items:
-  - Create notification UI component
-  - Add notification history
-  - Implement dismiss/mark-read
+- Create UI component, add history, implement dismiss/mark-read
 
-Before we start, should we brainstorm:
-- WebSocket library choice (ws, socket.io, native)?
-- Notification types and priority system?
-- Persistence strategy?
-
-Use `/flow-task-add "Real-Time Notifications"` to create this structure.
+Before Starting:
+Suggest brainstorming: WebSocket library choice (ws, socket.io, native)? Notification types? Persistence strategy?
 ```
 
 ### Example 2: User Asks to Fix Bug
@@ -541,70 +311,42 @@ Use `/flow-task-add "Real-Time Notifications"` to create this structure.
 ```
 User: "The search filter isn't working correctly"
 
-AI Response:
-This looks like a standalone task - focused bug fix:
+AI Process:
+1. Assess complexity: Simple bug fix (focused scope)
+2. Suggest structure: Standalone task
+3. Skip brainstorming: Clear requirements
+4. Create task file with action items
 
+Task Created:
 **Task: Fix Search Filter Bug**
 
 **Action Items**:
-- [ ] Reproduce the bug with test case
-- [ ] Debug the filter logic
+- [ ] Reproduce bug with test case
+- [ ] Debug filter logic
 - [ ] Identify root cause (likely query building)
 - [ ] Implement fix
 - [ ] Add unit test for this scenario
 - [ ] Verify fix resolves issue
 
 Estimated: 1-2 hours
-
-Use `/flow-task-add "Fix Search Filter Bug"` to create this task.
 ```
 
-### Example 3: User Unsure How to Structure
-
-```
-User: "I need to integrate with Stripe for payments"
-
-AI Response:
-Stripe integration is substantial - let's think through the structure:
-
-**Two approaches**:
-
-**Option A: Task with 4 Iterations** (Recommended)
-- Iteration 1: Setup Stripe client & test connection
-- Iteration 2: Implement payment processing
-- Iteration 3: Add webhook handling
-- Iteration 4: Error handling & edge cases
-
-**Option B: Brainstorm First** (For complex decisions)
-Run `/flow-brainstorm-start` to discuss:
-- Payment flow (one-time vs subscription)
-- Error handling strategy
-- Webhook security
-- Testing approach (Stripe test mode)
-
-Which approach do you prefer? Or should we brainstorm first?
-```
-
-### Example 4: Guiding Brainstorming Subject Resolution
+### Example 3: Guiding Brainstorming Subject Resolution
 
 ```
 User: "Let's brainstorm the retry logic for API calls"
 
 AI Response:
-Great! Let's start brainstorming. I'll suggest some subjects:
+Great! Let me suggest subjects to discuss:
 
-Subjects to Discuss:
-1. Retry Strategy - Exponential backoff vs fixed delay vs linear?
-2. Error Classification - Which errors should trigger retry vs immediate fail?
-3. Max Retry Attempts - How many retries before giving up?
-4. Existing Error Handler - Need to update ErrorHandler.ts to support async?
-5. Timeout Configuration - Per-request timeout vs total operation timeout?
+Subjects:
+1. Retry Strategy - Exponential backoff vs fixed delay?
+2. Error Classification - Which errors trigger retry?
+3. Max Retry Attempts - How many before giving up?
+4. Existing Error Handler - Need to update ErrorHandler.ts for async?
+5. Timeout Configuration - Per-request vs total operation?
 
-Use `/flow-brainstorm-start` to begin. I'll help you categorize each decision:
-- Type A: Pre-implementation tasks (must do before main work)
-- Type B: Architecture docs (update PLAN.md now)
-- Type C: Auto-resolved (answered by other decisions)
-- Type D: Main implementation work (the actual iteration)
+I'll help categorize each decision by resolution type (A/B/C/D).
 
 ---
 
@@ -613,22 +355,21 @@ Use `/flow-brainstorm-start` to begin. I'll help you categorize each decision:
 User: "We need to update ErrorHandler.ts to support async operations"
 
 AI Response:
-This sounds like Type A (Pre-Implementation Task). Let me confirm:
+This is Type A (Pre-Implementation Task):
 
-✅ Is it blocking? YES - Can't implement retry logic without async support
-✅ Is it small? YES - Estimated 20-30 minutes
-✅ Can it be done independently? YES - Self-contained change
+✅ Blocking? YES - Can't implement retry without async support
+✅ Small? YES - Estimated 20-30 minutes
+✅ Independent? YES - Self-contained change
 
-Resolution Type: A (Pre-Implementation Task)
+Resolution Type: A
 
-Action Items:
+Action Items (Pre-Implementation):
 - [ ] Update ErrorHandler.ts to support async operations
 - [ ] Add retryAsync() method
-- [ ] Update 3 existing call sites to use async version
+- [ ] Update 3 existing call sites
 - [ ] Add tests for async error handling
 
-This will go into "Pre-Implementation Tasks" section and must be completed
-BEFORE we run `/flow-implement-start`.
+Must complete BEFORE running implementation.
 
 ---
 
@@ -637,15 +378,15 @@ BEFORE we run `/flow-implement-start`.
 User: "Let's use exponential backoff with base delay of 1 second"
 
 AI Response:
-This sounds like Type D (Iteration Action Items). Let me confirm:
+This is Type D (Iteration Action Items):
 
-✅ Is it substantial work? YES - Core feature implementation
-✅ Does it take > 30 min? YES - Estimated 2-3 hours
-✅ Is it the main iteration work? YES - This IS what we're building
+✅ Substantial work? YES - Core feature implementation
+✅ Takes > 30 min? YES - Estimated 2-3 hours
+✅ Main iteration work? YES - This IS what we're building
 
-Resolution Type: D (Iteration Action Items)
+Resolution Type: D
 
-Action Items:
+Action Items (Implementation):
 - [ ] Create RetryPolicy class
 - [ ] Implement exponential backoff algorithm (base: 1s, max: 32s)
 - [ ] Add configuration for max retries (default: 3)
@@ -655,24 +396,26 @@ Action Items:
 These become the iteration's implementation action items.
 ```
 
-## Interaction with Other Flow Commands
+## Files Read/Write
 
-**Planning Stage** (This Skill):
-- `/flow-task-add` - Create task
-- `/flow-iteration-add` - Add iterations
-- `/flow-brainstorm-start` - Design decisions
+**READ**:
+- `.flow/DASHBOARD.md` - Find current phase, count tasks, check structure
+- `.flow/phase-N/task-M.md` - Existing tasks (when adding iterations)
 
-**Implementation Stage** (flow-implementer Skill):
-- `/flow-implement-start` - Begin work
-- `/flow-implement-complete` - Finish iteration
+**WRITE**:
+- `.flow/phase-N/` - Create new phase directories
+- `.flow/phase-N/task-M.md` - Create new task files, add iterations
+- `.flow/DASHBOARD.md` - Add tasks/phases to progress overview, update status
 
-**Navigation Stage** (flow-navigator Skill):
-- `/flow-status` - Check progress
-- `/flow-next` - What to do next
+## Validation Gates
+
+- Before adding phase: Verify previous phase has at least one task
+- Before adding task: Verify phase directory exists
+- Before starting task/phase: Verify not already IN PROGRESS
+- Before adding iteration: Verify task file exists
 
 ## References
 
-- **Task Structure Rules**: DEVELOPMENT_FRAMEWORK.md lines 238-566
-- **Brainstorming Pattern**: DEVELOPMENT_FRAMEWORK.md lines 1167-1797
-- **Complete Workflow**: DEVELOPMENT_FRAMEWORK.md lines 614-940
-- **Quick Reference**: DEVELOPMENT_FRAMEWORK.md lines 1-353
+- **Task Structure Rules**: [TEMPLATES.md](TEMPLATES.md) - Complete templates for all task types
+- **Framework Reference**: .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 238-566 (Task structure)
+- **Brainstorming Pattern**: .flow/framework/DEVELOPMENT_FRAMEWORK.md lines 1167-1797

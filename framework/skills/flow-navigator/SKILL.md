@@ -1,6 +1,6 @@
 ---
 name: flow-navigator
-description: Navigate Flow framework's multi-file architecture (DASHBOARD.md, PLAN.md, phase-N/task-M.md). Use when user asks "where am I", "what's next", "what should I work on next", "what do I work on", "show status", "show me status", "current work", "what should I do", or wants to understand project structure and progress. Provides dashboard-first navigation guidance with status awareness.
+description: Navigate Flow projects with dashboard-first pattern. Use when user asks about status, current work, what's next, or project progress. Read-only skill.
 allowed-tools: Read, Grep, Glob
 ---
 
@@ -148,11 +148,11 @@ Flow projects use this structure:
 - Add/remove tasks
 - Make architectural changes
 
-**When user wants changes**: Guide them to appropriate slash commands:
-- `/flow-task-start` - Start working on a task
-- `/flow-implement-start` - Begin iteration implementation
-- `/flow-implement-complete` - Mark iteration done
-- `/flow-status` - Show current status (command version)
+**When user wants changes**: Guide them to appropriate actions:
+- To start working on a task: Help them understand what task to begin
+- To begin iteration implementation: Verify they're ready (brainstorming complete)
+- To mark iteration done: Verify all work is complete first
+- Read-only skill: Cannot modify files, only show status and suggest next steps
 
 ## Examples
 
@@ -217,11 +217,11 @@ Response:
 3. **Stay high-level by default** - Only dive into details when asked
 4. **Use exact marker symbols** - Don't paraphrase (✅ not "done", 🚧 not "working")
 5. **Reference file paths** - Help user understand multi-file structure
-6. **Suggest slash commands** - When user wants to make changes
+6. **Suggest next actions** - Guide user on what to do next based on context
 
 ## References
 
-- **Dashboard-first approach**: See `/flow-status` slash command (reference model)
+- **Dashboard-first approach**: Read DASHBOARD.md to understand current position
 - **Status markers**: DEVELOPMENT_FRAMEWORK.md lines 1872-1968
 - **Multi-file architecture**: DEVELOPMENT_FRAMEWORK.md lines 105-179
 - **Quick Reference Guide**: DEVELOPMENT_FRAMEWORK.md lines 1-353

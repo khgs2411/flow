@@ -1,11 +1,12 @@
 ---
-name: flow-reviewer
-description: Review and verify Flow framework plan consistency. Use when user says "review", "review the plan", "review this", "verify", "verify this", "check", "check the plan", "validate", "is this complete", "are we done", or wants to inspect plan status. Validates status markers match reality, checks for phantom tasks, ensures brainstorming complete before implementation, verifies task structure follows rules. Read-only inspection using Grep, Read, Glob tools only - never modifies files.
+name: flow-verifier
+description: Verify plan consistency, generate summaries, maintain plan health. Use for review, verification, summaries, or plan maintenance. Mostly read-only with maintenance operations.
+allowed-tools: Read, Grep, Glob, Edit, Write
 ---
 
-# Flow Reviewer
+# Flow Verifier
 
-Help users verify plan consistency, validate status markers, and review implementation completeness using Flow framework projects. This Skill performs read-only inspections to ensure the plan matches reality.
+Verify plan consistency, generate summaries, and maintain plan health. This skill combines read-only inspection (verify, review) with maintenance operations (summarize, compact, rollback).
 
 ## When to Use This Skill
 
@@ -391,23 +392,158 @@ grep -A 5 "## Action Items" .flow/phase-*/task-*.md
 grep "### " .flow/phase-*/task-*.md | grep -i iteration
 ```
 
+## Summary Generation
+
+**Command**: `/flow-summarize`
+
+**Purpose**: Generate comprehensive summary of project status
+
+### When to Summarize
+
+- Project milestone reached
+- Preparing status report
+- End of sprint/phase
+- Before stakeholder meeting
+- User asks "summarize the project"
+
+### Summary Template
+
+```markdown
+# Project Summary
+
+**Generated**: [DATE]
+**Project**: [PROJECT_NAME from PLAN.md]
+**Version**: [VERSION from PLAN.md]
+
+## Overview
+
+**Goal**: [Project goal from PLAN.md]
+**Status**: [Overall status - % complete]
+**Current Work**: Phase [N], Task [M], Iteration [K]
+
+## Phase Progress
+
+### Phase 1: [Name] ✅ COMPLETE
+**Duration**: [Start date] - [End date]
+**Goal**: [Phase goal]
+**Completed Tasks**: [X/X]
+
+Key deliverables:
+- [Task 1: Name] - [Brief outcome]
+- [Task 2: Name] - [Brief outcome]
+
+### Phase 2: [Name] 🚧 IN PROGRESS
+**Duration**: [Start date] - present
+**Goal**: [Phase goal]
+**Completed Tasks**: [X/Y]
+
+Completed:
+- [Task 1: Name] - [Brief outcome]
+
+In Progress:
+- [Task 2: Name] - [Current iteration]
+
+Pending:
+- [Task 3: Name] - [Purpose]
+
+## Key Decisions
+
+[Extract from PLAN.md Key Decisions section]
+
+## Next Steps
+
+1. [Immediate next action]
+2. [Upcoming milestone]
+3. [Blockers if any]
+```
+
+### Summary Generation Process
+
+1. Read DASHBOARD.md for current status
+2. Read all task files for completion details
+3. Read PLAN.md for project context
+4. Generate summary using template
+5. Return formatted markdown
+
+## Plan Maintenance
+
+### Compact Operation
+
+**Command**: `/flow-compact`
+
+**Purpose**: Remove clutter from old completed work
+
+**When to Compact**:
+- DASHBOARD.md getting too large (>500 lines)
+- Many completed iterations with excessive notes
+- Old completed phases cluttering active plan
+
+**What Gets Compacted**:
+- Completed iterations older than 30 days:
+  - Remove implementation notes (keep summary)
+  - Remove detailed action items (keep count)
+  - Keep completion date and key outcomes
+- Completed phases:
+  - Collapse task details (keep titles and status)
+  - Keep phase summary and goals achieved
+
+**What's Preserved**:
+- All status markers
+- Completion dates
+- Task/iteration names
+- Key outcomes
+- Current work (last 30 days)
+
+**Process**:
+1. Create backup in `.flow/.backups/`
+2. Identify items to compact
+3. Remove excessive detail
+4. Verify plan still valid
+5. Report what was compacted
+
+### Rollback Operation
+
+**Command**: `/flow-rollback`
+
+**Purpose**: Undo last change if something went wrong
+
+**When to Rollback**:
+- Accidental deletion of important content
+- Bad compact operation
+- Incorrect status updates
+- User regrets last change
+
+**Rollback Process**:
+1. List available backups in `.flow/.backups/`
+2. Show timestamp and change description
+3. User selects backup to restore
+4. Restore selected files
+5. Report what was rolled back
+
+**Backup Strategy**:
+- Auto-backup before compact
+- Auto-backup before plan-split
+- Keep last 10 backups
+- Backups include timestamp and change type
+
 ## Interaction with Other Flow Skills
 
 **Planning Stage** (flow-planner Skill):
 - Planner creates structure
-- Reviewer validates structure
+- Verifier validates structure
 
-**Implementation Stage** (flow-implementer Skill):
-- Implementer executes work
-- Reviewer verifies completion
+**Implementation Stage** (flow-builder Skill):
+- Builder executes work
+- Verifier checks completion
 
-**Architecture Stage** (flow-architect Skill):
-- Architect documents decisions
-- Reviewer checks references are valid
+**Design Stage** (flow-designer Skill):
+- Designer documents decisions
+- Verifier checks references are valid
 
-**Review Stage** (This Skill):
+**Verify Stage** (This Skill):
 - Inspect plan consistency ← YOU ARE HERE
-- Report findings, don't fix ← YOU ARE HERE
+- Generate summaries ← YOU ARE HERE
+- Maintain plan health ← YOU ARE HERE
 
 ## Reporting Guidelines
 
@@ -456,12 +592,189 @@ grep "### " .flow/phase-*/task-*.md | grep -i iteration
 - Formatting inconsistencies
 - Missing optional documentation
 
+## Examples
+
+### Example 1: Full Plan Review
+
+```
+User: "Review the entire plan"
+
+AI Process:
+1. Read DASHBOARD.md to understand structure (3 phases, 8 tasks total)
+2. Check each phase for status consistency
+3. Verify all task files exist
+4. Check task structure (standalone XOR iterations)
+5. Verify status markers match implementation
+6. Check action item completion
+
+AI Response:
+"## Plan Review Results
+
+**Summary**: 15 checks performed, 2 issues found
+
+### ✅ Passing Checks (13)
+- All phase statuses consistent with task statuses
+- No phantom tasks detected (all DASHBOARD tasks have files)
+- Task structure valid (no mixing of action items and iterations)
+- All completed iterations have checked action items
+- File references valid
+
+### ❌ Issues Found (2)
+
+#### Issue 1: Status Marker Mismatch
+- **Location**: Phase 2, Task 3, Iteration 2
+- **Problem**: Header shows 🚧 IN PROGRESS but status line shows ✅ COMPLETE (2025-10-30)
+- **Severity**: ⚠️ Warning (cosmetic issue)
+- **Action**: Update header to `### ✅ Iteration 2: Error Handling`
+
+#### Issue 2: Implementation Gate Violation
+- **Location**: Phase 2, Task 4, Iteration 1
+- **Problem**: Brainstorming status is 🚧 IN PROGRESS but Implementation section exists
+- **Severity**: ❌ Critical (violates gate rule)
+- **Action**: Complete brainstorming before continuing implementation"
+```
+
+### Example 2: Generating Summary
+
+```
+User: "Summarize the project status"
+
+AI Process:
+1. Read DASHBOARD.md for current work and progress
+2. Read PLAN.md for project context
+3. Read all task files for completion details
+4. Generate formatted summary
+
+AI Response:
+"# Project Summary
+
+**Generated**: 2025-11-02
+**Project**: Flow Framework Agent Skills
+**Version**: 1.0.0
+
+## Overview
+
+**Goal**: Refactor 8 workflow stage-based agent skills from 28 slash commands
+**Status**: 57% complete (4/7 iterations in current task)
+**Current Work**: Phase 3, Task 4, Iteration 5
+
+## Phase Progress
+
+### Phase 1: Foundation ✅ COMPLETE
+**Duration**: Oct 15 - Oct 22
+**Goal**: Set up project structure
+**Completed Tasks**: 2/2
+
+Key deliverables:
+- Task 1: Project Setup - Framework structure established
+- Task 2: Documentation - Architecture spec complete
+
+### Phase 2: Initial Skills 🚧 IN PROGRESS
+**Duration**: Oct 23 - present
+**Goal**: Build core workflow skills
+**Completed Tasks**: 2/4
+
+Completed:
+- Task 1: flow-initializer - Project initialization complete
+- Task 2: flow-planner - Planning workflows done
+
+In Progress:
+- Task 4: Stage-Based Skills - Building flow-designer + flow-builder (Iteration 5 of 7)
+
+Pending:
+- Task 5: Verification Skills - Not started
+
+## Key Decisions
+
+- Progressive disclosure strategy: SKILL.md (400-500 lines) + supporting files
+- 8 workflow stage-based skills absorb all 28 commands
+- Dashboard-first navigation pattern throughout
+
+## Next Steps
+
+1. Complete Iteration 5 (flow-completer + flow-navigator)
+2. Begin Iteration 6 (flow-verifier + flow-curator)
+3. Final verification and integration testing"
+```
+
+### Example 3: Compact Operation
+
+```
+User: "The DASHBOARD is getting too long, can you clean it up?"
+
+AI Process:
+1. Read DASHBOARD.md (780 lines)
+2. Identify completed items older than 30 days (Phase 1 completed Oct 22)
+3. Create backup before compacting
+
+AI Response:
+"I'll compact old completed work to reduce clutter.
+
+**Before Compacting**:
+- Created backup: .flow/.backups/2025-11-02-143022-pre-compact.zip
+- Current DASHBOARD.md: 780 lines
+- Identified items to compact: Phase 1 (completed 11 days ago)
+
+**What Will Be Compacted**:
+- Phase 1, Task 1: Remove 45 lines of implementation notes (keep summary)
+- Phase 1, Task 2: Remove 38 lines of detailed action items (keep count)
+- Preserve all status markers and completion dates
+
+**After Compacting**:
+- New DASHBOARD.md: ~520 lines (33% reduction)
+- All important info preserved
+- Backup available for rollback if needed
+
+Proceed with compact operation?"
+```
+
+### Example 4: Rollback Operation
+
+```
+User: "Oh no, I accidentally deleted important content. Can you undo that?"
+
+AI Process:
+1. List backups in .flow/.backups/
+2. Show recent backups with timestamps
+
+AI Response:
+"Available backups:
+
+1. 2025-11-02 14:30:22 - Pre-compact (DASHBOARD.md, 780 lines)
+2. 2025-11-01 16:45:10 - Pre-plan-split (3 phase files archived)
+3. 2025-10-31 09:20:15 - Manual backup (full project)
+
+Which backup would you like to restore?
+
+User: "Restore backup 1"
+
+AI Process:
+1. Restore DASHBOARD.md from backup 1
+2. Verify restored file
+3. Report what was rolled back
+
+AI Response:
+"✅ Rollback complete!
+
+**Restored**:
+- .flow/DASHBOARD.md (from 2025-11-02 14:30:22 backup)
+- File size: 780 lines
+- All content restored to pre-compact state
+
+**What Changed**:
+- Phase 1 details restored (83 lines of implementation notes)
+- Detailed action items restored
+- Current file backed up to .flow/.backups/2025-11-02-145530-pre-rollback.zip (just in case)
+
+Your content is back!"
+```
+
 ## References
 
 - **Status Markers**: DEVELOPMENT_FRAMEWORK.md lines 1872-1968
 - **Task Structure Rules**: DEVELOPMENT_FRAMEWORK.md lines 238-566
 - **Implementation Gates**: DEVELOPMENT_FRAMEWORK.md lines 1798-1836
-- **Slash Command**: `/flow-verify-plan` (automated verification)
+- **Slash Commands**: `/flow-verify-plan`, `/flow-summarize`, `/flow-compact`, `/flow-rollback`
 
 ## Key Reminders
 
