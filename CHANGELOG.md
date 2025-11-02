@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.4.1** - Minor adjustment (2025-11-02)
+**v1.4.2** - Typo (2025-11-02)
 
 **Changes**:
 
-- - Minor adjustment to the claude code addition\n
-See the [v1.4.1 release](https://github.com/khgs2411/flow/releases/tag/v1.4.1) for full details.
+- - Typo\n
+See the [v1.4.2 release](https://github.com/khgs2411/flow/releases/tag/v1.4.2) for full details.
 
 ---
 
