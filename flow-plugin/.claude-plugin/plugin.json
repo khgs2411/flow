@@ -1,0 +1,9 @@
+{
+  "name": "flow",
+  "description": "Flow framework - Human-in-loop development methodology with AI-driven commands and agent skills",
+  "version": "1.4.4",
+  "author": {
+    "name": "Topsyde Utils",
+    "url": "https://github.com/topsyde-utils/flow"
+  }
+}

@@ -1,0 +1,272 @@
+#!/usr/bin/env bash
+
+################################################################################
+# Build Plugin for Claude Code
+#
+# This script generates the flow-plugin directory structure by extracting
+# commands from framework/SLASH_COMMANDS.md and copying skills from
+# framework/skills/. This ensures the plugin stays in sync with framework.
+################################################################################
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+FRAMEWORK_DIR="$SCRIPT_DIR/framework"
+PLUGIN_DIR="$SCRIPT_DIR/flow-plugin"
+VERSION_FILE="$SCRIPT_DIR/VERSION"
+
+# Read version from VERSION file (single source of truth)
+if [ ! -f "$VERSION_FILE" ]; then
+  echo "❌ VERSION file not found!"
+  exit 1
+fi
+FLOW_VERSION=$(cat "$VERSION_FILE" | tr -d '[:space:]')
+
+echo "🔨 Building Flow plugin v${FLOW_VERSION}..."
+echo ""
+
+# List of all 28 commands to extract
+COMMANDS=(
+  "flow-blueprint"
+  "flow-migrate"
+  "flow-plan-update"
+  "flow-plan-split"
+  "flow-phase-add"
+  "flow-phase-start"
+  "flow-phase-complete"
+  "flow-task-add"
+  "flow-task-start"
+  "flow-task-complete"
+  "flow-iteration-add"
+  "flow-brainstorm-start"
+  "flow-brainstorm-subject"
+  "flow-brainstorm-review"
+  "flow-brainstorm-complete"
+  "flow-implement-start"
+  "flow-implement-complete"
+  "flow-next"
+  "flow-next-subject"
+  "flow-next-iteration"
+  "flow-status"
+  "flow-summarize"
+  "flow-verify-plan"
+  "flow-compact"
+  "flow-rollback"
+  "flow-backlog-add"
+  "flow-backlog-view"
+  "flow-backlog-pull"
+)
+
+# Extract a single command from SLASH_COMMANDS.md
+extract_command() {
+  local cmd="$1"
+  local marker="## /${cmd}\$"
+
+  awk -v marker="$marker" '
+    $0 ~ marker {found=1; next}
+    found && /<!-- COMMAND_START -->/ {inside=1; next}
+    found && inside && /<!-- COMMAND_END -->/ {exit}
+    found && inside {print}
+  ' "$FRAMEWORK_DIR/SLASH_COMMANDS.md"
+}
+
+# Create plugin directory structure
+create_plugin_structure() {
+  echo "📁 Creating plugin directory structure..."
+
+  # Create main directories
+  mkdir -p "$PLUGIN_DIR/commands"
+  mkdir -p "$PLUGIN_DIR/skills"
+  mkdir -p "$PLUGIN_DIR/.claude-plugin"
+
+  echo "   ✅ Created flow-plugin/commands/"
+  echo "   ✅ Created flow-plugin/skills/"
+  echo "   ✅ Created flow-plugin/.claude-plugin/"
+  echo ""
+}
+
+# Deploy all commands to plugin/commands/
+deploy_commands() {
+  echo "📝 Extracting commands from framework/SLASH_COMMANDS.md..."
+  echo ""
+
+  local extracted=0
+  local failed=0
+
+  for cmd in "${COMMANDS[@]}"; do
+    local output_file="$PLUGIN_DIR/commands/${cmd}.md"
+    local content=$(extract_command "$cmd")
+
+    if [ -n "$content" ]; then
+      # Write content directly (frontmatter already included in source)
+      echo "$content" > "$output_file"
+      echo "   ✅ Extracted /${cmd}"
+      ((extracted++))
+    else
+      echo "   ❌ Failed to extract /${cmd}"
+      ((failed++))
+    fi
+  done
+
+  echo ""
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+  if [ "$failed" -gt 0 ]; then
+    echo "⚠️  Extracted $extracted commands, $failed failed"
+    echo ""
+    return 1
+  else
+    echo "✅ Successfully extracted all $extracted commands!"
+    echo ""
+    return 0
+  fi
+}
+
+# Generate plugin.json manifest
+generate_plugin_manifest() {
+  echo "📄 Generating plugin.json manifest..."
+  echo ""
+
+  local manifest_file="$PLUGIN_DIR/.claude-plugin/plugin.json"
+
+  cat > "$manifest_file" <<EOF
+{
+  "name": "flow",
+  "description": "Flow framework - Human-in-loop development methodology with AI-driven commands and agent skills",
+  "version": "$FLOW_VERSION",
+  "author": {
+    "name": "Topsyde Utils",
+    "url": "https://github.com/topsyde-utils/flow"
+  }
+}
+EOF
+
+  if [ $? -eq 0 ]; then
+    echo "   ✅ Generated plugin.json (version $FLOW_VERSION)"
+    echo ""
+    return 0
+  else
+    echo "   ❌ Failed to generate plugin.json"
+    echo ""
+    return 1
+  fi
+}
+
+# Generate marketplace.json manifest
+generate_marketplace_manifest() {
+  echo "📄 Generating marketplace.json manifest..."
+  echo ""
+
+  local marketplace_dir="$SCRIPT_DIR/topsyde-utils-marketplace"
+  local manifest_file="$marketplace_dir/.claude-plugin/marketplace.json"
+
+  # Create marketplace directory structure if needed
+  mkdir -p "$marketplace_dir/.claude-plugin"
+
+  cat > "$manifest_file" <<EOF
+{
+  "name": "topsyde-utils",
+  "owner": {
+    "name": "Topsyde Utils"
+  },
+  "plugins": [
+    {
+      "name": "flow",
+      "source": "../flow-plugin",
+      "description": "Flow framework - Human-in-loop development methodology with 28 commands and 10 agent skills"
+    }
+  ]
+}
+EOF
+
+  if [ $? -eq 0 ]; then
+    echo "   ✅ Generated marketplace.json"
+    echo ""
+    return 0
+  else
+    echo "   ❌ Failed to generate marketplace.json"
+    echo ""
+    return 1
+  fi
+}
+
+# Deploy all skills to plugin/skills/
+deploy_skills() {
+  echo "📦 Copying skills from framework/skills/..."
+  echo ""
+
+  local copied=0
+  local failed=0
+
+  # Copy each flow-* skill directory
+  for skill_dir in "$FRAMEWORK_DIR/skills"/flow-*; do
+    if [ -d "$skill_dir" ]; then
+      local skill_name=$(basename "$skill_dir")
+      local target_dir="$PLUGIN_DIR/skills/$skill_name"
+
+      # Copy entire skill directory with all files
+      if cp -r "$skill_dir" "$target_dir" 2>/dev/null; then
+        echo "   ✅ Copied $skill_name/"
+        ((copied++))
+      else
+        echo "   ❌ Failed to copy $skill_name/"
+        ((failed++))
+      fi
+    fi
+  done
+
+  echo ""
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+  if [ "$failed" -gt 0 ]; then
+    echo "⚠️  Copied $copied skills, $failed failed"
+    echo ""
+    return 1
+  else
+    echo "✅ Successfully copied all $copied skills!"
+    echo ""
+    return 0
+  fi
+}
+
+# Main execution
+main() {
+  # Clean old build if --clean flag provided
+  if [ "$1" = "--clean" ]; then
+    echo "🧹 Cleaning old build..."
+    rm -rf "$PLUGIN_DIR"
+    rm -rf "$SCRIPT_DIR/topsyde-utils-marketplace"
+    echo "   ✅ Removed flow-plugin/"
+    echo "   ✅ Removed topsyde-utils-marketplace/"
+    echo ""
+  fi
+
+  # Create directory structure
+  create_plugin_structure
+
+  # Deploy commands
+  deploy_commands || exit 1
+
+  # Deploy skills
+  deploy_skills || exit 1
+
+  # Generate manifests
+  generate_plugin_manifest || exit 1
+  generate_marketplace_manifest || exit 1
+
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "✅ Plugin build complete!"
+  echo ""
+  echo "📦 Plugin output: $PLUGIN_DIR"
+  echo "📦 Marketplace output: $SCRIPT_DIR/topsyde-utils-marketplace"
+  echo "📊 Version: $FLOW_VERSION"
+  echo ""
+  echo "Plugin structure:"
+  echo "  - 28 commands in flow-plugin/commands/"
+  echo "  - 10 skills in flow-plugin/skills/"
+  echo "  - plugin.json manifest with version $FLOW_VERSION"
+  echo ""
+}
+
+# Run main function
+main "$@"
