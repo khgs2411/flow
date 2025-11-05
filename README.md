@@ -88,22 +88,34 @@ your-project/
 
 ## Quick Start
 
-### 1. Install Flow (30 seconds)
+### 1. Install Flow
+
+**Option A: Claude Code Plugin** (Recommended for Claude Code users)
+
+```bash
+# Add Flow to your Claude Code marketplace
+/plugin marketplace add khgs2411/flow
+
+# Install the plugin
+/plugin install flow@topsyde-utils
+
+# Initialize Flow in your project
+/flow-init
+```
+
+After installation, restart Claude Code to load all 29 slash commands.
+
+**Option B: Standalone Installer** (For other AI tools or manual installation)
 
 ```bash
 cd /path/to/your/project
-```
 
-```bash
 # Download and run
 curl -O https://raw.githubusercontent.com/khgs2411/flow/master/flow.sh
 chmod +x flow.sh && ./flow.sh
-```
 
-```bash
 # Rerun to update
-curl -O https://raw.githubusercontent.com/khgs2411/flow/master/flow.sh
-chmod +x flow.sh && ./flow.sh --force
+./flow.sh --force
 ```
 
 ### 2. Create Your First Plan
@@ -293,9 +305,15 @@ See [SLASH_COMMANDS.md](framework/SLASH_COMMANDS.md) for full reference.
 
 **The methodology is framework-agnostic.** You can use Flow principles with any AI (ChatGPT, Gemini, etc.).
 
-### Setup
+Flow provides three installation paths:
 
-First, get the framework reference files:
+1. **Claude Code Plugin** - Ultra-lightweight plugin with `/flow-init` command (Claude Code only)
+2. **Standalone Installer** - Self-contained `flow.sh` script (works with any AI)
+3. **Manual Setup** - Clone framework files directly (for customization)
+
+### Manual Setup
+
+If you want to use Flow methodology without the automated installers:
 
 **Option 1: Clone the repository** (recommended)
 
@@ -406,23 +424,38 @@ Confirm implementation matches your design.
 
 ## Architecture (For Framework Developers)
 
-### Three-Part System
+Flow uses a two-distribution architecture optimized for different use cases:
 
-1. **`flow.sh`** (~150KB)
+### Distribution Paths
 
-   - Self-contained deployment script
-   - All framework content embedded (no external dependencies)
-   - This is what users download
+**1. Claude Code Plugin** (~6.5KB)
 
-2. **`framework/`** (source files)
+- Ultra-lightweight plugin with single `/flow-init` command
+- Downloads framework files on-demand from GitHub
+- Installed via Claude Code's plugin marketplace
+- Best for Claude Code users
 
-   - `DEVELOPMENT_FRAMEWORK.md` - Complete methodology (3,900 lines)
-   - `SLASH_COMMANDS.md` - All command definitions
-   - `examples/` - Reference examples
+**2. Standalone Installer** (`flow.sh`, ~437KB)
 
-3. **Build system**
-   - `build-standalone.sh` - Generates `flow.sh` from sources
-   - Embeds framework docs via heredocs
+- Self-contained script with all framework content embedded
+- No external dependencies after download
+- Works with any AI tool or manual installation
+- Best for offline use or non-Claude-Code environments
+
+### Source Structure
+
+**`framework/`** (Single source of truth)
+
+- `DEVELOPMENT_FRAMEWORK.md` - Complete methodology (3,900 lines)
+- `SLASH_COMMANDS.md` - All 29 command definitions (extracted to `framework/commands/`)
+- `skills/` - 8 agent skill definitions
+- `examples/` - Reference examples (DASHBOARD, PLAN, task files)
+
+### Build System
+
+- `build-standalone.sh` - Generates `flow.sh` from framework sources, embeds via heredocs
+- `build-plugin.sh` - Generates plugin package with `/flow-init` command
+- `release.sh` - Automates versioning, changelog, git tagging, GitHub releases
 
 ### Contributing
 
