@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.5.2** - Fixed a small deployment issue (2025-11-05)
+**v1.5.3** - Fixed flow-init command (2025-11-05)
 
 **Changes**:
 
-- - Fixed a small deployment issue with flow-init\n
-See the [v1.5.2 release](https://github.com/khgs2411/flow/releases/tag/v1.5.2) for full details.
+- - Fixed the instructions in the command\n
+See the [v1.5.3 release](https://github.com/khgs2411/flow/releases/tag/v1.5.3) for full details.
 
 ---
 
