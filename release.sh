@@ -139,10 +139,58 @@ echo ""
 echo -e "Version: ${CYAN}v${VERSION}${NC}"
 echo ""
 
-# Step 1: Build flow.sh
-echo -e "${BLUE}📦 Step 1/6: Building flow.sh...${NC}"
+# Step 1: Build flow.sh and plugin
+echo -e "${BLUE}📦 Step 1/7: Building flow.sh and plugin...${NC}"
 echo ""
 bash "$BUILD_SCRIPT"
+echo ""
+
+echo -e "${BLUE}📦 Building plugin...${NC}"
+echo ""
+bash "$SCRIPT_DIR/build-plugin.sh" --clean
+echo ""
+
+# Step 1.5: Verify version synchronization
+echo -e "${BLUE}🔍 Verifying version synchronization...${NC}"
+echo ""
+
+# Extract version from flow.sh header (line 3: "# Version: X.X.X")
+FLOW_SH_VERSION=$(grep "^# Version:" "$FLOW_SH" | head -1 | sed 's/^# Version: //' | tr -d '[:space:]')
+
+# Extract version from plugin.json
+PLUGIN_JSON="$SCRIPT_DIR/flow-plugin/.claude-plugin/plugin.json"
+if [ -f "$PLUGIN_JSON" ]; then
+  PLUGIN_VERSION=$(grep '"version"' "$PLUGIN_JSON" | sed 's/.*"version": "\([^"]*\)".*/\1/' | tr -d '[:space:]')
+else
+  echo -e "${RED}❌ Plugin manifest not found: $PLUGIN_JSON${NC}"
+  echo "Run build-plugin.sh first"
+  exit 1
+fi
+
+# Compare versions
+echo "VERSION file:    v${VERSION}"
+echo "flow.sh header:  v${FLOW_SH_VERSION}"
+echo "plugin.json:     v${PLUGIN_VERSION}"
+echo ""
+
+if [ "$VERSION" != "$FLOW_SH_VERSION" ] || [ "$VERSION" != "$PLUGIN_VERSION" ]; then
+  echo -e "${RED}❌ Version mismatch detected!${NC}"
+  echo ""
+  echo "All three versions must match:"
+  echo "  • VERSION file: ${VERSION}"
+  echo "  • flow.sh header: ${FLOW_SH_VERSION}"
+  echo "  • plugin.json: ${PLUGIN_VERSION}"
+  echo ""
+  echo "This usually means:"
+  echo "  1. build-standalone.sh didn't update flow.sh correctly"
+  echo "  2. build-plugin.sh didn't update plugin.json correctly"
+  echo "  3. VERSION file was changed after building"
+  echo ""
+  echo "Fix: Re-run build scripts or check VERSION file"
+  exit 1
+fi
+
+echo -e "${GREEN}✅ Version synchronization verified${NC}"
 echo ""
 
 # Step 2: Prompt for changelog entry
@@ -214,9 +262,9 @@ echo -e "${BLUE}📊 Step 3/7: Checking git status...${NC}"
 echo ""
 
 # Check for uncommitted changes EXCLUDING the files we're about to modify
-git diff-index --quiet HEAD -- ':!VERSION' ':!CHANGELOG.md' ':!flow.sh' ':!build-standalone.sh' || {
+git diff-index --quiet HEAD -- ':!VERSION' ':!CHANGELOG.md' ':!flow.sh' ':!build-standalone.sh' ':!build-plugin.sh' ':!flow-plugin' ':!topsyde-utils-marketplace' || {
   echo -e "${YELLOW}⚠️  You have uncommitted changes (excluding release files):${NC}"
-  git status --short | grep -v -E '(VERSION|CHANGELOG.md|flow.sh|build-standalone.sh)'
+  git status --short | grep -v -E '(VERSION|CHANGELOG.md|flow.sh|build-standalone.sh|build-plugin.sh|flow-plugin|topsyde-utils-marketplace)'
   echo ""
   read -p "Continue with release? (y/n): " -n 1 -r
   echo ""
@@ -231,7 +279,7 @@ echo -e "${BLUE}📝 Step 4/7: Creating git commit...${NC}"
 echo ""
 
 # Stage the release files
-git add VERSION CHANGELOG.md flow.sh build-standalone.sh framework/DEVELOPMENT_FRAMEWORK.md framework/SLASH_COMMANDS.md framework/examples/ README.md 2>/dev/null || true
+git add VERSION CHANGELOG.md flow.sh build-standalone.sh build-plugin.sh flow-plugin/ topsyde-utils-marketplace/ framework/DEVELOPMENT_FRAMEWORK.md framework/SLASH_COMMANDS.md framework/examples/ README.md 2>/dev/null || true
 
 # Check if there are changes to commit
 if git diff --cached --quiet; then
@@ -242,7 +290,7 @@ else
 
 ${CHANGELOG_NOTES}
 - Updated VERSION file to ${VERSION}
-- Rebuilt flow.sh with new version
+- Rebuilt flow.sh and plugin with new version
 - Updated CHANGELOG.md with release notes
 "
 

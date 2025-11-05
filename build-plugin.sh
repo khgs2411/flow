@@ -78,10 +78,12 @@ create_plugin_structure() {
   mkdir -p "$PLUGIN_DIR/commands"
   mkdir -p "$PLUGIN_DIR/skills"
   mkdir -p "$PLUGIN_DIR/.claude-plugin"
+  mkdir -p "$PLUGIN_DIR/framework/examples"
 
   echo "   ✅ Created flow-plugin/commands/"
   echo "   ✅ Created flow-plugin/skills/"
   echo "   ✅ Created flow-plugin/.claude-plugin/"
+  echo "   ✅ Created flow-plugin/framework/"
   echo ""
 }
 
@@ -229,6 +231,43 @@ deploy_skills() {
   fi
 }
 
+# Deploy framework files to plugin/framework/
+deploy_framework() {
+  echo "📚 Copying framework files..."
+  echo ""
+
+  local errors=0
+
+  # Copy DEVELOPMENT_FRAMEWORK.md
+  if cp "$FRAMEWORK_DIR/DEVELOPMENT_FRAMEWORK.md" "$PLUGIN_DIR/framework/DEVELOPMENT_FRAMEWORK.md" 2>/dev/null; then
+    echo "   ✅ Copied DEVELOPMENT_FRAMEWORK.md"
+  else
+    echo "   ❌ Failed to copy DEVELOPMENT_FRAMEWORK.md"
+    ((errors++))
+  fi
+
+  # Copy examples directory
+  if cp -r "$FRAMEWORK_DIR/examples/." "$PLUGIN_DIR/framework/examples/" 2>/dev/null; then
+    echo "   ✅ Copied examples/ directory"
+  else
+    echo "   ❌ Failed to copy examples/ directory"
+    ((errors++))
+  fi
+
+  echo ""
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+  if [ "$errors" -gt 0 ]; then
+    echo "⚠️  Framework deployment had $errors errors"
+    echo ""
+    return 1
+  else
+    echo "✅ Successfully deployed framework files!"
+    echo ""
+    return 0
+  fi
+}
+
 # Main execution
 main() {
   # Clean old build if --clean flag provided
@@ -250,6 +289,9 @@ main() {
   # Deploy skills
   deploy_skills || exit 1
 
+  # Deploy framework
+  deploy_framework || exit 1
+
   # Generate manifests
   generate_plugin_manifest || exit 1
   generate_marketplace_manifest || exit 1
@@ -264,6 +306,7 @@ main() {
   echo "Plugin structure:"
   echo "  - 28 commands in flow-plugin/commands/"
   echo "  - 10 skills in flow-plugin/skills/"
+  echo "  - Framework reference in flow-plugin/framework/"
   echo "  - plugin.json manifest with version $FLOW_VERSION"
   echo ""
 }
