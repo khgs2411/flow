@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.5.0** - Claude Code Plugin System (2025-11-05)
+**v1.5.1** - Claude Code Plugin (2025-11-05)
 
 **Changes**:
 
-- - Flow can now be installed by claude code's plugin system\n
-See the [v1.5.0 release](https://github.com/khgs2411/flow/releases/tag/v1.5.0) for full details.
+- - Install Flow using Claude Code's plugin system\n
+See the [v1.5.1 release](https://github.com/khgs2411/flow/releases/tag/v1.5.1) for full details.
 
 ---
 
