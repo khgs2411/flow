@@ -25,37 +25,23 @@ FLOW_VERSION=$(cat "$VERSION_FILE" | tr -d '[:space:]')
 echo "🔨 Building Flow plugin v${FLOW_VERSION}..."
 echo ""
 
-# List of all 28 commands to extract
-COMMANDS=(
-  "flow-blueprint"
-  "flow-migrate"
-  "flow-plan-update"
-  "flow-plan-split"
-  "flow-phase-add"
-  "flow-phase-start"
-  "flow-phase-complete"
-  "flow-task-add"
-  "flow-task-start"
-  "flow-task-complete"
-  "flow-iteration-add"
-  "flow-brainstorm-start"
-  "flow-brainstorm-subject"
-  "flow-brainstorm-review"
-  "flow-brainstorm-complete"
-  "flow-implement-start"
-  "flow-implement-complete"
-  "flow-next"
-  "flow-next-subject"
-  "flow-next-iteration"
-  "flow-status"
-  "flow-summarize"
-  "flow-verify-plan"
-  "flow-compact"
-  "flow-rollback"
-  "flow-backlog-add"
-  "flow-backlog-view"
-  "flow-backlog-pull"
-)
+# Auto-detect all commands from SLASH_COMMANDS.md
+# Extract command names from "## /command-name" patterns
+echo "🔍 Auto-detecting commands from framework/SLASH_COMMANDS.md..."
+
+COMMANDS=()
+while IFS= read -r line; do
+  cmd=$(echo "$line" | sed 's/^## \/\(.*\)/\1/')
+  COMMANDS+=("$cmd")
+done < <(grep "^## /" "$FRAMEWORK_DIR/SLASH_COMMANDS.md")
+
+if [ ${#COMMANDS[@]} -eq 0 ]; then
+  echo "❌ No commands found in framework/SLASH_COMMANDS.md!"
+  exit 1
+fi
+
+echo "   ✅ Found ${#COMMANDS[@]} commands"
+echo ""
 
 # Extract a single command from SLASH_COMMANDS.md
 extract_command() {
@@ -165,6 +151,12 @@ generate_marketplace_manifest() {
   # Create marketplace directory structure if needed
   mkdir -p "$marketplace_dir/.claude-plugin"
 
+  # Count commands dynamically
+  local cmd_count=${#COMMANDS[@]}
+
+  # Count skills dynamically
+  local skill_count=$(ls -1d "$FRAMEWORK_DIR/skills"/flow-* 2>/dev/null | wc -l | tr -d ' ')
+
   cat > "$manifest_file" <<EOF
 {
   "name": "topsyde-utils",
@@ -175,7 +167,7 @@ generate_marketplace_manifest() {
     {
       "name": "flow",
       "source": "../flow-plugin",
-      "description": "Flow framework - Human-in-loop development methodology with 28 commands and 10 agent skills"
+      "description": "Flow framework - Human-in-loop development methodology with $cmd_count commands and $skill_count agent skills"
     }
   ]
 }
@@ -296,6 +288,10 @@ main() {
   generate_plugin_manifest || exit 1
   generate_marketplace_manifest || exit 1
 
+  # Count actual files deployed
+  local cmd_count=$(ls -1 "$PLUGIN_DIR/commands/" 2>/dev/null | wc -l | tr -d ' ')
+  local skill_count=$(ls -1 "$PLUGIN_DIR/skills/" 2>/dev/null | wc -l | tr -d ' ')
+
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo "✅ Plugin build complete!"
   echo ""
@@ -304,8 +300,8 @@ main() {
   echo "📊 Version: $FLOW_VERSION"
   echo ""
   echo "Plugin structure:"
-  echo "  - 28 commands in flow-plugin/commands/"
-  echo "  - 10 skills in flow-plugin/skills/"
+  echo "  - $cmd_count commands in flow-plugin/commands/"
+  echo "  - $skill_count skills in flow-plugin/skills/"
   echo "  - Framework reference in flow-plugin/framework/"
   echo "  - plugin.json manifest with version $FLOW_VERSION"
   echo ""

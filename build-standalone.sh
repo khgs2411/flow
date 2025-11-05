@@ -154,24 +154,23 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
-COMMANDS=(
-  # Plan Initialization (4 commands)
-  "flow-blueprint" "flow-migrate" "flow-plan-update" "flow-plan-split"
-  # Phase Lifecycle (3 commands)
-  "flow-phase-add" "flow-phase-start" "flow-phase-complete"
-  # Task Lifecycle (3 commands)
-  "flow-task-add" "flow-task-start" "flow-task-complete"
-  # Iteration Lifecycle (6 commands: add, start, subject, review, complete, implement-start, implement-complete = 7 total)
-  "flow-iteration-add"
-  "flow-brainstorm-start" "flow-brainstorm-subject" "flow-brainstorm-review" "flow-brainstorm-complete"
-  "flow-implement-start" "flow-implement-complete"
-  # Navigation (3 commands)
-  "flow-next" "flow-next-subject" "flow-next-iteration"
-  # Status & Validation (5 commands)
-  "flow-status" "flow-summarize" "flow-verify-plan" "flow-compact" "flow-rollback"
-  # Backlog Management (3 commands)
-  "flow-backlog-add" "flow-backlog-view" "flow-backlog-pull"
-)
+# Auto-detect all commands from SLASH_COMMANDS.md
+# Extract command names from "## /command-name" patterns
+echo "🔍 Auto-detecting commands from framework/SLASH_COMMANDS.md..."
+
+COMMANDS=()
+while IFS= read -r line; do
+  cmd=$(echo "$line" | sed 's/^## \/\(.*\)/\1/')
+  COMMANDS+=("$cmd")
+done < <(grep "^## /" "$FRAMEWORK_DIR/SLASH_COMMANDS.md")
+
+if [ ${#COMMANDS[@]} -eq 0 ]; then
+  echo "❌ No commands found in framework/SLASH_COMMANDS.md!"
+  exit 1
+fi
+
+echo "   ✅ Found ${#COMMANDS[@]} commands"
+echo ""
 
 # Deprecated commands (renamed/removed in v1.0.11+) - cleaned up during --force
 DEPRECATED_COMMANDS=(
