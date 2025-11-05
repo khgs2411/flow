@@ -1,6 +1,6 @@
 {
   "name": "flow",
-  "description": "Flow framework - Human-in-loop development methodology with AI-driven commands and agent skills",
+  "description": "Flow framework - Ultra-lightweight installer. Run /flow-init to download all 28 commands + 10 agent skills",
   "version": "1.4.4",
   "author": {
     "name": "Topsyde Utils",

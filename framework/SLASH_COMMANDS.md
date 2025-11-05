@@ -404,125 +404,185 @@ Testing: Simulation-based per service"
 ```markdown
 <!-- COMMAND_START -->
 ---
-description: Initialize Flow framework files in your project
+description: Install/update complete Flow framework (commands, skills, framework files)
 ---
 
 You are executing the `/flow-init` command from the Flow framework.
 
-**Purpose**: Download and install Flow framework reference files into your project.
+**Purpose**: Complete Flow framework installer/updater - downloads all commands, skills, and framework files from GitHub.
 
-**🟢 NO FRAMEWORK READING REQUIRED - This is the initialization command**
-
-This command sets up the `.flow/framework/` directory with reference documentation that other Flow commands depend on.
+**🟢 NO FRAMEWORK READING REQUIRED - This is the installation command**
 
 **Instructions**:
 
-1. **Check if framework already exists**:
+1. **Detect installation mode**:
    ```bash
-   if [ -d ".flow/framework" ]; then
-     echo "✅ Framework files already exist in .flow/framework/"
-     echo ""
-     echo "Contents:"
-     ls -la .flow/framework/
-     echo ""
-     echo "If you want to update these files, delete .flow/framework/ and run /flow-init again."
-     exit 0
+   if [ -d ".claude/commands" ] && ls .claude/commands/flow-*.md >/dev/null 2>&1; then
+     MODE="UPDATE"
+   else
+     MODE="INSTALL"
    fi
    ```
 
-2. **Ask user for permission**:
+2. **Show installation prompt** and get user confirmation:
+
+   Display this message using echo, then use read to get yes/no:
+
    ```
-   📥 Flow Framework Installation
+   📥 Flow Framework ${MODE}
 
-   This command will download framework reference files to .flow/framework/:
-   - DEVELOPMENT_FRAMEWORK.md (methodology guide)
-   - examples/ (template files for AI learning)
+   This will download from GitHub (khgs2411/flow):
+   ✓ 28 slash commands → .claude/commands/
+   ✓ 10 agent skills → .claude/skills/
+   ✓ Framework docs → .flow/framework/
+   ✓ Example files → .flow/framework/examples/
 
-   These files are used by Flow commands for context and patterns.
+   Total size: ~200KB
 
-   Download from: https://github.com/khgs2411/flow/tree/master/framework
-   Size: ~100KB
+   ${MODE == "UPDATE" && "⚠️  Existing files will be overwritten"}
 
-   Proceed with download? (y/n)
+   Proceed? (y/n)
    ```
 
-3. **If user approves, download framework files**:
+3. **If user declines**, show message and exit:
+   ```
+   ⚠️  Installation cancelled. Run /flow-init again when ready.
+   ```
 
-   Use the Bash tool to execute these commands:
+4. **If user approves**, download all files using the Bash tool:
+
+   Execute this bash script:
 
    ```bash
-   # Create directory structure
-   mkdir -p .flow/framework/examples
+   # Base URL for GitHub raw files
+   BASE_URL="https://raw.githubusercontent.com/khgs2411/flow/master"
 
-   # Download DEVELOPMENT_FRAMEWORK.md
-   curl -o .flow/framework/DEVELOPMENT_FRAMEWORK.md \
-     https://raw.githubusercontent.com/khgs2411/flow/master/framework/DEVELOPMENT_FRAMEWORK.md
+   echo "📦 Installing Flow framework..."
+   echo ""
 
-   # Download example files
-   curl -o .flow/framework/examples/DASHBOARD.md \
-     https://raw.githubusercontent.com/khgs2411/flow/master/framework/examples/DASHBOARD.md
-
-   curl -o .flow/framework/examples/PLAN.md \
-     https://raw.githubusercontent.com/khgs2411/flow/master/framework/examples/PLAN.md
-
-   # Download phase examples
+   # Create directories
+   mkdir -p .claude/commands
+   mkdir -p .claude/skills
    mkdir -p .flow/framework/examples/phase-1
    mkdir -p .flow/framework/examples/phase-2
 
-   curl -o .flow/framework/examples/phase-1/task-1.md \
-     https://raw.githubusercontent.com/khgs2411/flow/master/framework/examples/phase-1/task-1.md
+   # Download commands (28 commands)
+   echo "📝 Downloading slash commands..."
+   COMMANDS=(
+     "flow-backlog-add" "flow-backlog-pull" "flow-backlog-view"
+     "flow-blueprint" "flow-brainstorm-complete" "flow-brainstorm-review"
+     "flow-brainstorm-start" "flow-brainstorm-subject" "flow-compact"
+     "flow-implement-complete" "flow-implement-start" "flow-iteration-add"
+     "flow-migrate" "flow-next" "flow-next-iteration"
+     "flow-next-subject" "flow-phase-add" "flow-phase-complete"
+     "flow-phase-start" "flow-plan-split" "flow-plan-update"
+     "flow-rollback" "flow-status" "flow-summarize"
+     "flow-task-add" "flow-task-complete" "flow-task-start"
+     "flow-verify-plan"
+   )
 
-   curl -o .flow/framework/examples/phase-2/task-3.md \
-     https://raw.githubusercontent.com/khgs2411/flow/master/framework/examples/phase-2/task-3.md
+   for cmd in "${COMMANDS[@]}"; do
+     if curl -sS -f -o ".claude/commands/${cmd}.md" \
+        "$BASE_URL/flow-plugin/commands/${cmd}.md" 2>/dev/null; then
+       echo "  ✓ ${cmd}"
+     else
+       echo "  ✗ ${cmd} (download failed)"
+     fi
+   done
+
+   echo ""
+   echo "🤖 Downloading agent skills..."
+
+   # Download skills (10 skills)
+   SKILLS=(
+     "flow-architect" "flow-builder" "flow-completer" "flow-curator"
+     "flow-designer" "flow-documenter" "flow-initializer" "flow-navigator"
+     "flow-planner" "flow-verifier"
+   )
+
+   for skill in "${SKILLS[@]}"; do
+     mkdir -p ".claude/skills/${skill}"
+
+     # Download SKILL.md (required)
+     if curl -sS -f -o ".claude/skills/${skill}/SKILL.md" \
+        "$BASE_URL/flow-plugin/skills/${skill}/SKILL.md" 2>/dev/null; then
+
+       # Try to download additional skill files if they exist (optional)
+       for file in TEMPLATES.md PATTERNS.md VERIFICATION.md EXAMPLES.md; do
+         curl -sS -f -o ".claude/skills/${skill}/${file}" \
+           "$BASE_URL/flow-plugin/skills/${skill}/${file}" 2>/dev/null || true
+       done
+
+       echo "  ✓ ${skill}"
+     else
+       echo "  ✗ ${skill} (download failed)"
+     fi
+   done
+
+   echo ""
+   echo "📚 Downloading framework files..."
+
+   # Download framework reference
+   if curl -sS -f -o .flow/framework/DEVELOPMENT_FRAMEWORK.md \
+      "$BASE_URL/framework/DEVELOPMENT_FRAMEWORK.md" 2>/dev/null; then
+     echo "  ✓ DEVELOPMENT_FRAMEWORK.md"
+   else
+     echo "  ✗ DEVELOPMENT_FRAMEWORK.md (download failed)"
+   fi
+
+   # Download examples (failures are ok)
+   curl -sS -f -o .flow/framework/examples/DASHBOARD.md \
+     "$BASE_URL/framework/examples/DASHBOARD.md" 2>/dev/null && \
+     echo "  ✓ examples/DASHBOARD.md"
+
+   curl -sS -f -o .flow/framework/examples/PLAN.md \
+     "$BASE_URL/framework/examples/PLAN.md" 2>/dev/null && \
+     echo "  ✓ examples/PLAN.md"
+
+   curl -sS -f -o .flow/framework/examples/phase-1/task-1.md \
+     "$BASE_URL/framework/examples/phase-1/task-1.md" 2>/dev/null && \
+     echo "  ✓ examples/phase-1/task-1.md"
+
+   curl -sS -f -o .flow/framework/examples/phase-2/task-3.md \
+     "$BASE_URL/framework/examples/phase-2/task-3.md" 2>/dev/null && \
+     echo "  ✓ examples/phase-2/task-3.md"
    ```
 
-4. **Verify downloads**:
+5. **Show completion message**:
+
    ```bash
-   # Check if files were downloaded successfully
-   if [ -f ".flow/framework/DEVELOPMENT_FRAMEWORK.md" ]; then
-     echo "✅ Downloaded DEVELOPMENT_FRAMEWORK.md"
+   echo ""
+   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+   echo "✅ Flow framework installed successfully!"
+   echo ""
+   echo "📦 Installation summary:"
+   echo "  • 28 commands in .claude/commands/"
+   echo "  • 10 skills in .claude/skills/"
+   echo "  • Framework docs in .flow/framework/"
+   echo ""
+   echo "🎯 Next steps:"
+   echo ""
+
+   if [ ! -f ".flow/DASHBOARD.md" ]; then
+     echo "**New Flow project**:"
+     echo "  Run: /flow-blueprint \"Your Project Description\""
+     echo ""
+     echo "**Migrate existing docs**:"
+     echo "  Run: /flow-migrate"
    else
-     echo "❌ Failed to download DEVELOPMENT_FRAMEWORK.md"
-     exit 1
-   fi
-
-   if [ -d ".flow/framework/examples" ]; then
-     echo "✅ Downloaded examples directory"
-   else
-     echo "❌ Failed to download examples"
-     exit 1
+     echo "**Existing Flow project detected**"
+     echo "  Framework files updated"
+     echo "  Continue with: /flow-status"
    fi
    ```
 
-5. **Confirm to user**:
-   ```
-   ✅ Flow framework initialized successfully!
-
-   📂 Created:
-   - .flow/framework/DEVELOPMENT_FRAMEWORK.md (methodology guide)
-   - .flow/framework/examples/ (reference templates)
-
-   🎯 Next Steps:
-
-   **For new projects**:
-   - Run `/flow-blueprint "Your Project Description"` to create a new Flow project
-
-   **For existing projects**:
-   - Run `/flow-migrate` to convert existing documentation to Flow format
-
-   **Check status anytime**:
-   - Run `/flow-status` to see your current progress
-
-   All Flow commands are now ready to use! 🚀
-   ```
-
-6. **Handle errors**:
-   - If curl fails: "❌ Download failed. Check your internet connection or download manually from: https://github.com/khgs2411/flow/tree/master/framework"
-   - If user declines: "⚠️ Framework installation cancelled. Run `/flow-init` again when ready."
-   - If directory creation fails: "❌ Could not create .flow/framework/ directory. Check permissions."
+6. **Error handling**:
+   - Network errors: Show "❌ Download failed. Check internet connection or visit: https://github.com/khgs2411/flow"
+   - Permission errors: Show "❌ Permission denied. Check .claude/ and .flow/ directory permissions"
+   - Partial failures are OK - show which files succeeded/failed
 
 <!-- COMMAND_END -->
-**Output**: Download framework files to `.flow/framework/` and guide user to next steps.
+**Output**: Download all Flow files and guide user to next steps.
 ```
 
 ---

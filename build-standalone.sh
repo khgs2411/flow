@@ -125,6 +125,30 @@ validate_framework_references() {
 # Run validation before building
 validate_framework_references || exit 1
 
+# Auto-detect all commands from SLASH_COMMANDS.md BEFORE embedding
+echo "🔍 Auto-detecting commands from framework/SLASH_COMMANDS.md..."
+
+COMMANDS=()
+while IFS= read -r line; do
+  cmd=$(echo "$line" | sed 's/^## \/\(.*\)/\1/')
+  COMMANDS+=("$cmd")
+done < <(grep "^## /" "$FRAMEWORK_DIR/SLASH_COMMANDS.md")
+
+if [ ${#COMMANDS[@]} -eq 0 ]; then
+  echo "❌ No commands found in framework/SLASH_COMMANDS.md!"
+  exit 1
+fi
+
+echo "   ✅ Found ${#COMMANDS[@]} commands"
+echo ""
+
+# Build the commands array string for embedding
+COMMANDS_ARRAY="COMMANDS=("
+for cmd in "${COMMANDS[@]}"; do
+  COMMANDS_ARRAY="$COMMANDS_ARRAY \"$cmd\""
+done
+COMMANDS_ARRAY="$COMMANDS_ARRAY )"
+
 echo "🔨 Building standalone Flow framework script v${FLOW_VERSION}..."
 echo ""
 
@@ -154,23 +178,8 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
-# Auto-detect all commands from SLASH_COMMANDS.md
-# Extract command names from "## /command-name" patterns
-echo "🔍 Auto-detecting commands from framework/SLASH_COMMANDS.md..."
-
-COMMANDS=()
-while IFS= read -r line; do
-  cmd=$(echo "$line" | sed 's/^## \/\(.*\)/\1/')
-  COMMANDS+=("$cmd")
-done < <(grep "^## /" "$FRAMEWORK_DIR/SLASH_COMMANDS.md")
-
-if [ ${#COMMANDS[@]} -eq 0 ]; then
-  echo "❌ No commands found in framework/SLASH_COMMANDS.md!"
-  exit 1
-fi
-
-echo "   ✅ Found ${#COMMANDS[@]} commands"
-echo ""
+# Commands list - auto-generated at build time from framework/SLASH_COMMANDS.md
+__COMMANDS_ARRAY__
 
 # Deprecated commands (renamed/removed in v1.0.11+) - cleaned up during --force
 DEPRECATED_COMMANDS=(
@@ -233,6 +242,10 @@ extract_command() {
     found && inside {print}
   ' <<'COMMANDS_DATA_EOF'
 HEADER_EOF
+
+# Replace __COMMANDS_ARRAY__ placeholder with actual commands
+sed -i.bak "s|__COMMANDS_ARRAY__|$COMMANDS_ARRAY|" "$OUTPUT_FILE"
+rm "${OUTPUT_FILE}.bak"
 
 # Embed SLASH_COMMANDS.md content
 cat "$FRAMEWORK_DIR/SLASH_COMMANDS.md" >> "$OUTPUT_FILE"

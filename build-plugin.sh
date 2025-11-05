@@ -25,22 +25,13 @@ FLOW_VERSION=$(cat "$VERSION_FILE" | tr -d '[:space:]')
 echo "🔨 Building Flow plugin v${FLOW_VERSION}..."
 echo ""
 
-# Auto-detect all commands from SLASH_COMMANDS.md
-# Extract command names from "## /command-name" patterns
-echo "🔍 Auto-detecting commands from framework/SLASH_COMMANDS.md..."
+# Ultra-lightweight plugin - only include flow-init command
+# flow-init downloads everything else from GitHub
+echo "🔍 Extracting flow-init command from framework/SLASH_COMMANDS.md..."
 
-COMMANDS=()
-while IFS= read -r line; do
-  cmd=$(echo "$line" | sed 's/^## \/\(.*\)/\1/')
-  COMMANDS+=("$cmd")
-done < <(grep "^## /" "$FRAMEWORK_DIR/SLASH_COMMANDS.md")
+COMMANDS=("flow-init")
 
-if [ ${#COMMANDS[@]} -eq 0 ]; then
-  echo "❌ No commands found in framework/SLASH_COMMANDS.md!"
-  exit 1
-fi
-
-echo "   ✅ Found ${#COMMANDS[@]} commands"
+echo "   ✅ Building ultra-lightweight plugin (1 command: flow-init)"
 echo ""
 
 # Extract a single command from SLASH_COMMANDS.md
@@ -60,53 +51,39 @@ extract_command() {
 create_plugin_structure() {
   echo "📁 Creating plugin directory structure..."
 
-  # Create main directories
+  # Create minimal directories - only need commands/ for flow-init
   mkdir -p "$PLUGIN_DIR/commands"
-  mkdir -p "$PLUGIN_DIR/skills"
   mkdir -p "$PLUGIN_DIR/.claude-plugin"
-  mkdir -p "$PLUGIN_DIR/framework/examples"
 
   echo "   ✅ Created flow-plugin/commands/"
-  echo "   ✅ Created flow-plugin/skills/"
   echo "   ✅ Created flow-plugin/.claude-plugin/"
-  echo "   ✅ Created flow-plugin/framework/"
   echo ""
 }
 
-# Deploy all commands to plugin/commands/
+# Deploy flow-init command to plugin/commands/
 deploy_commands() {
-  echo "📝 Extracting commands from framework/SLASH_COMMANDS.md..."
+  echo "📝 Extracting flow-init from framework/SLASH_COMMANDS.md..."
   echo ""
 
-  local extracted=0
-  local failed=0
+  local output_file="$PLUGIN_DIR/commands/flow-init.md"
+  local content=$(extract_command "flow-init")
 
-  for cmd in "${COMMANDS[@]}"; do
-    local output_file="$PLUGIN_DIR/commands/${cmd}.md"
-    local content=$(extract_command "$cmd")
-
-    if [ -n "$content" ]; then
-      # Write content directly (frontmatter already included in source)
-      echo "$content" > "$output_file"
-      echo "   ✅ Extracted /${cmd}"
-      ((extracted++))
-    else
-      echo "   ❌ Failed to extract /${cmd}"
-      ((failed++))
-    fi
-  done
-
-  echo ""
-  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-
-  if [ "$failed" -gt 0 ]; then
-    echo "⚠️  Extracted $extracted commands, $failed failed"
+  if [ -n "$content" ]; then
+    # Write content directly (frontmatter already included in source)
+    echo "$content" > "$output_file"
+    echo "   ✅ Extracted /flow-init"
     echo ""
-    return 1
-  else
-    echo "✅ Successfully extracted all $extracted commands!"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "✅ Successfully extracted flow-init command!"
     echo ""
     return 0
+  else
+    echo "   ❌ Failed to extract /flow-init"
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "❌ Extraction failed!"
+    echo ""
+    return 1
   fi
 }
 
@@ -120,7 +97,7 @@ generate_plugin_manifest() {
   cat > "$manifest_file" <<EOF
 {
   "name": "flow",
-  "description": "Flow framework - Human-in-loop development methodology with AI-driven commands and agent skills",
+  "description": "Flow framework - Ultra-lightweight installer. Run /flow-init to download all 28 commands + 10 agent skills",
   "version": "$FLOW_VERSION",
   "author": {
     "name": "Topsyde Utils",
@@ -151,12 +128,6 @@ generate_marketplace_manifest() {
   # Create marketplace directory structure if needed
   mkdir -p "$marketplace_dir/.claude-plugin"
 
-  # Count commands dynamically
-  local cmd_count=${#COMMANDS[@]}
-
-  # Count skills dynamically
-  local skill_count=$(ls -1d "$FRAMEWORK_DIR/skills"/flow-* 2>/dev/null | wc -l | tr -d ' ')
-
   cat > "$manifest_file" <<EOF
 {
   "name": "topsyde-utils",
@@ -167,7 +138,7 @@ generate_marketplace_manifest() {
     {
       "name": "flow",
       "source": "./flow-plugin",
-      "description": "Flow framework - Human-in-loop development methodology with $cmd_count commands and $skill_count agent skills"
+      "description": "Flow framework - Ultra-lightweight installer. Run /flow-init to download all 28 commands + 10 agent skills"
     }
   ]
 }
@@ -275,36 +246,32 @@ main() {
   # Create directory structure
   create_plugin_structure
 
-  # Deploy commands
+  # Deploy flow-init command only
   deploy_commands || exit 1
-
-  # Deploy skills
-  deploy_skills || exit 1
-
-  # Deploy framework
-  deploy_framework || exit 1
 
   # Generate manifests
   generate_plugin_manifest || exit 1
   generate_marketplace_manifest || exit 1
 
-  # Count actual files deployed
-  local cmd_count=$(ls -1 "$PLUGIN_DIR/commands/" 2>/dev/null | wc -l | tr -d ' ')
-  local skill_count=$(ls -1 "$PLUGIN_DIR/skills/" 2>/dev/null | wc -l | tr -d ' ')
+  # Get file size
+  local flow_init_size=$(wc -c < "$PLUGIN_DIR/commands/flow-init.md" | tr -d ' ')
 
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-  echo "✅ Plugin build complete!"
+  echo "✅ Ultra-lightweight plugin build complete!"
   echo ""
   echo "📦 Plugin output: $PLUGIN_DIR"
   echo "📦 Marketplace manifest: $SCRIPT_DIR/.claude-plugin/marketplace.json"
   echo "📊 Version: $FLOW_VERSION"
   echo ""
   echo "Plugin structure:"
-  echo "  - $cmd_count commands in flow-plugin/commands/"
-  echo "  - $skill_count skills in flow-plugin/skills/"
-  echo "  - Framework reference in flow-plugin/framework/"
+  echo "  - 1 command (flow-init.md) - ${flow_init_size} bytes"
   echo "  - plugin.json manifest with version $FLOW_VERSION"
   echo "  - marketplace.json at repository root"
+  echo ""
+  echo "🚀 Installation instructions:"
+  echo "  1. Install plugin: /plugin marketplace add khgs2411/flow"
+  echo "  2. Install Flow: /plugin install flow@topsyde-utils"
+  echo "  3. Download framework: /flow-init"
   echo ""
 }
 
