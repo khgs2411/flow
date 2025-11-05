@@ -166,7 +166,7 @@ generate_marketplace_manifest() {
   "plugins": [
     {
       "name": "flow",
-      "source": "flow-plugin",
+      "source": "./flow-plugin",
       "description": "Flow framework - Human-in-loop development methodology with $cmd_count commands and $skill_count agent skills"
     }
   ]

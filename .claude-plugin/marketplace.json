@@ -6,7 +6,7 @@
   "plugins": [
     {
       "name": "flow",
-      "source": "flow-plugin",
+      "source": "./flow-plugin",
       "description": "Flow framework - Human-in-loop development methodology with 29 commands and 10 agent skills"
     }
   ]
