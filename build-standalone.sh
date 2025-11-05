@@ -142,6 +142,55 @@ fi
 echo "   ✅ Found ${#COMMANDS[@]} commands"
 echo ""
 
+# Extract commands to framework/commands/ directory (for /flow-init to download)
+echo "📝 Extracting commands to framework/commands/..."
+echo ""
+
+COMMANDS_OUTPUT_DIR="$FRAMEWORK_DIR/commands"
+mkdir -p "$COMMANDS_OUTPUT_DIR"
+
+# Extract command function (same as the one that will be embedded in flow.sh)
+extract_command_to_file() {
+  local cmd="$1"
+  local marker="## /${cmd}\$"
+
+  awk -v marker="$marker" '
+    $0 ~ marker {found=1; next}
+    found && /<!-- COMMAND_START -->/ {inside=1; next}
+    found && inside && /<!-- COMMAND_END -->/ {exit}
+    found && inside {print}
+  ' "$FRAMEWORK_DIR/SLASH_COMMANDS.md"
+}
+
+extracted_count=0
+failed_count=0
+
+for cmd in "${COMMANDS[@]}"; do
+  output_file="$COMMANDS_OUTPUT_DIR/${cmd}.md"
+  content=$(extract_command_to_file "$cmd")
+
+  if [ -n "$content" ]; then
+    echo "$content" > "$output_file"
+    echo "   ✅ Extracted ${cmd}.md"
+    ((extracted_count++))
+  else
+    echo "   ❌ Failed to extract ${cmd}.md"
+    ((failed_count++))
+  fi
+done
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+if [ "$failed_count" -gt 0 ]; then
+  echo "⚠️  Extracted $extracted_count commands, $failed_count failed"
+  echo ""
+  exit 1
+else
+  echo "✅ Successfully extracted all $extracted_count commands to framework/commands/"
+  echo ""
+fi
+
 # Build the commands array string for embedding
 COMMANDS_ARRAY="COMMANDS=("
 for cmd in "${COMMANDS[@]}"; do

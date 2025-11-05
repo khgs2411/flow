@@ -483,7 +483,7 @@ You are executing the `/flow-init` command from the Flow framework.
 
    for cmd in "${COMMANDS[@]}"; do
      if curl -sS -f -o ".claude/commands/${cmd}.md" \
-        "$BASE_URL/flow-plugin/commands/${cmd}.md" 2>/dev/null; then
+        "$BASE_URL/framework/commands/${cmd}.md" 2>/dev/null; then
        echo "  ✓ ${cmd}"
      else
        echo "  ✗ ${cmd} (download failed)"
@@ -505,12 +505,12 @@ You are executing the `/flow-init` command from the Flow framework.
 
      # Download SKILL.md (required)
      if curl -sS -f -o ".claude/skills/${skill}/SKILL.md" \
-        "$BASE_URL/flow-plugin/skills/${skill}/SKILL.md" 2>/dev/null; then
+        "$BASE_URL/framework/skills/${skill}/SKILL.md" 2>/dev/null; then
 
        # Try to download additional skill files if they exist (optional)
        for file in TEMPLATES.md PATTERNS.md VERIFICATION.md EXAMPLES.md; do
          curl -sS -f -o ".claude/skills/${skill}/${file}" \
-           "$BASE_URL/flow-plugin/skills/${skill}/${file}" 2>/dev/null || true
+           "$BASE_URL/framework/skills/${skill}/${file}" 2>/dev/null || true
        done
 
        echo "  ✓ ${skill}"
