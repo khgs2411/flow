@@ -145,7 +145,7 @@ generate_marketplace_manifest() {
   echo "📄 Generating marketplace.json manifest..."
   echo ""
 
-  local marketplace_dir="$SCRIPT_DIR/topsyde-utils-marketplace"
+  local marketplace_dir="$SCRIPT_DIR"
   local manifest_file="$marketplace_dir/.claude-plugin/marketplace.json"
 
   # Create marketplace directory structure if needed
@@ -166,7 +166,7 @@ generate_marketplace_manifest() {
   "plugins": [
     {
       "name": "flow",
-      "source": "../flow-plugin",
+      "source": "flow-plugin",
       "description": "Flow framework - Human-in-loop development methodology with $cmd_count commands and $skill_count agent skills"
     }
   ]
@@ -174,7 +174,7 @@ generate_marketplace_manifest() {
 EOF
 
   if [ $? -eq 0 ]; then
-    echo "   ✅ Generated marketplace.json"
+    echo "   ✅ Generated marketplace.json at .claude-plugin/"
     echo ""
     return 0
   else
@@ -266,9 +266,9 @@ main() {
   if [ "$1" = "--clean" ]; then
     echo "🧹 Cleaning old build..."
     rm -rf "$PLUGIN_DIR"
-    rm -rf "$SCRIPT_DIR/topsyde-utils-marketplace"
+    rm -rf "$SCRIPT_DIR/.claude-plugin"
     echo "   ✅ Removed flow-plugin/"
-    echo "   ✅ Removed topsyde-utils-marketplace/"
+    echo "   ✅ Removed .claude-plugin/"
     echo ""
   fi
 
@@ -296,7 +296,7 @@ main() {
   echo "✅ Plugin build complete!"
   echo ""
   echo "📦 Plugin output: $PLUGIN_DIR"
-  echo "📦 Marketplace output: $SCRIPT_DIR/topsyde-utils-marketplace"
+  echo "📦 Marketplace manifest: $SCRIPT_DIR/.claude-plugin/marketplace.json"
   echo "📊 Version: $FLOW_VERSION"
   echo ""
   echo "Plugin structure:"
@@ -304,6 +304,7 @@ main() {
   echo "  - $skill_count skills in flow-plugin/skills/"
   echo "  - Framework reference in flow-plugin/framework/"
   echo "  - plugin.json manifest with version $FLOW_VERSION"
+  echo "  - marketplace.json at repository root"
   echo ""
 }
 
