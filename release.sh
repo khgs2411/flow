@@ -262,9 +262,9 @@ echo -e "${BLUE}📊 Step 3/7: Checking git status...${NC}"
 echo ""
 
 # Check for uncommitted changes EXCLUDING the files we're about to modify
-git diff-index --quiet HEAD -- ':!VERSION' ':!CHANGELOG.md' ':!flow.sh' ':!build-standalone.sh' ':!build-plugin.sh' ':!flow-plugin' ':!.claude-plugin' || {
+git diff-index --quiet HEAD -- ':!VERSION' ':!CHANGELOG.md' ':!flow.sh' ':!build-standalone.sh' ':!build-plugin.sh' ':!flow-plugin' ':!.claude-plugin' ':!framework/commands' || {
   echo -e "${YELLOW}⚠️  You have uncommitted changes (excluding release files):${NC}"
-  git status --short | grep -v -E '(VERSION|CHANGELOG.md|flow.sh|build-standalone.sh|build-plugin.sh|flow-plugin|.claude-plugin)'
+  git status --short | grep -v -E '(VERSION|CHANGELOG.md|flow.sh|build-standalone.sh|build-plugin.sh|flow-plugin|.claude-plugin|framework/commands)'
   echo ""
   read -p "Continue with release? (y/n): " -n 1 -r
   echo ""
@@ -279,7 +279,7 @@ echo -e "${BLUE}📝 Step 4/7: Creating git commit...${NC}"
 echo ""
 
 # Stage the release files
-git add VERSION CHANGELOG.md flow.sh build-standalone.sh build-plugin.sh flow-plugin/ .claude-plugin/ framework/DEVELOPMENT_FRAMEWORK.md framework/SLASH_COMMANDS.md framework/examples/ README.md 2>/dev/null || true
+git add VERSION CHANGELOG.md flow.sh build-standalone.sh build-plugin.sh flow-plugin/ .claude-plugin/ framework/DEVELOPMENT_FRAMEWORK.md framework/SLASH_COMMANDS.md framework/commands/ framework/examples/ README.md 2>/dev/null || true
 
 # Check if there are changes to commit
 if git diff --cached --quiet; then
