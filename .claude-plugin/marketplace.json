@@ -8,7 +8,7 @@
       "name": "flow",
       "source": "./flow-plugin",
       "description": "Flow framework - Ultra-lightweight installer. Run /flow-init to download all 29 commands + 8 skills + 1 Claude agent",
-      "version": "1.6.7"
+      "version": "1.6.8"
     }
   ]
 }

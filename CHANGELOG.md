@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.6.7** - update plugin marketplace (2025-11-09)
+**v1.6.8** - Small update to flow-init (2025-11-09)
 
 **Changes**:
 
-- - plugin marketplace update\n
-See the [v1.6.7 release](https://github.com/khgs2411/flow/releases/tag/v1.6.7) for full details.
+- - Made sure flow-init instructs the ai to update the user's CLAUDE.md file\n
+See the [v1.6.8 release](https://github.com/khgs2411/flow/releases/tag/v1.6.8) for full details.
 
 ---
 
