@@ -29,10 +29,11 @@ You are executing the `/flow-init` command from the Flow framework.
    I will download and install from GitHub (khgs2411/flow):
    ✓ 29 slash commands → .claude/commands/
    ✓ 8 agent skills → .claude/skills/
+   ✓ 1 Claude agent → .claude/agents/
    ✓ Framework docs → .flow/framework/
    ✓ Example files → .flow/framework/examples/
 
-   Total download size: ~200KB
+   Total download size: ~210KB
 
    [If UPDATE mode: ⚠️  Existing Flow files will be overwritten]
 
@@ -58,6 +59,7 @@ You are executing the `/flow-init` command from the Flow framework.
    # Create directories
    mkdir -p .claude/commands
    mkdir -p .claude/skills
+   mkdir -p .claude/agents
    mkdir -p .flow/framework/examples/phase-1
    mkdir -p .flow/framework/examples/phase-2
 
@@ -116,6 +118,17 @@ You are executing the `/flow-init` command from the Flow framework.
    done
 
    echo ""
+   echo "🤖 Downloading Claude agent from framework/agents/..."
+
+   # Download Flow agent
+   if curl -sS -f -o ".claude/agents/flow.md" \
+      "$BASE_URL/framework/agents/flow.md" 2>/dev/null; then
+     echo "  ✓ flow"
+   else
+     echo "  ✗ flow (download failed)"
+   fi
+
+   echo ""
    echo "📚 Downloading framework documentation..."
 
    # Download framework reference
@@ -157,6 +170,7 @@ You are executing the `/flow-init` command from the Flow framework.
    echo "📦 Installation summary:"
    echo "  • 29 commands in .claude/commands/"
    echo "  • 8 skills in .claude/skills/"
+   echo "  • 1 agent in .claude/agents/"
    echo "  • Framework docs in .flow/framework/"
    echo "  • Example files in .flow/framework/examples/"
    echo ""

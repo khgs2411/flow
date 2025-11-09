@@ -97,7 +97,7 @@ generate_plugin_manifest() {
   cat > "$manifest_file" <<EOF
 {
   "name": "flow",
-  "description": "Flow framework - Ultra-lightweight installer. Run /flow-init to download all 28 commands + 10 agent skills",
+  "description": "Flow framework - Ultra-lightweight installer. Run /flow-init to download all 29 commands + 8 skills + 1 Claude agent",
   "version": "$FLOW_VERSION",
   "author": {
     "name": "Topsyde Utils",
@@ -138,7 +138,7 @@ generate_marketplace_manifest() {
     {
       "name": "flow",
       "source": "./flow-plugin",
-      "description": "Flow framework - Ultra-lightweight installer. Run /flow-init to download all 28 commands + 10 agent skills"
+      "description": "Flow framework - Ultra-lightweight installer. Run /flow-init to download all 29 commands + 8 skills + 1 Claude agent"
     }
   ]
 }

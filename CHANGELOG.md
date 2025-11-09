@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.5.3** - Fixed flow-init command (2025-11-05)
+**v1.6.0** - Claude Code Flow Subagent (2025-11-09)
 
 **Changes**:
 
-- - Fixed the instructions in the command\n
-See the [v1.5.3 release](https://github.com/khgs2411/flow/releases/tag/v1.5.3) for full details.
+- - Added a new subagent to take care of the work regarding 'flow' - saves context and tokens on the main thread\n
+See the [v1.6.0 release](https://github.com/khgs2411/flow/releases/tag/v1.6.0) for full details.
 
 ---
 
