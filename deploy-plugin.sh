@@ -16,7 +16,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VERSION_FILE="$SCRIPT_DIR/VERSION"
 PLUGIN_DIR="$SCRIPT_DIR/flow-plugin"
-MARKETPLACE_DIR="$SCRIPT_DIR/topsyde-utils-marketplace"
+MARKETPLACE_FILE="$SCRIPT_DIR/.claude-plugin/marketplace.json"
 
 # Colors
 RED='\033[0;31m'
@@ -84,20 +84,14 @@ if [ ! -d "$PLUGIN_DIR" ]; then
   exit 1
 fi
 
-if [ ! -d "$MARKETPLACE_DIR" ]; then
-  echo -e "${RED}❌ Marketplace directory not found: $MARKETPLACE_DIR${NC}"
-  echo "Run with --build flag or run ./build-plugin.sh first"
-  exit 1
-fi
-
 # Verify manifests exist
 if [ ! -f "$PLUGIN_DIR/.claude-plugin/plugin.json" ]; then
   echo -e "${RED}❌ Plugin manifest not found${NC}"
   exit 1
 fi
 
-if [ ! -f "$MARKETPLACE_DIR/.claude-plugin/marketplace.json" ]; then
-  echo -e "${RED}❌ Marketplace manifest not found${NC}"
+if [ ! -f "$MARKETPLACE_FILE" ]; then
+  echo -e "${RED}❌ Marketplace manifest not found: $MARKETPLACE_FILE${NC}"
   exit 1
 fi
 
@@ -112,11 +106,11 @@ echo ""
 if ! git ls-files --error-unmatch "$PLUGIN_DIR" >/dev/null 2>&1; then
   echo -e "${YELLOW}⚠️  Plugin files not tracked in git${NC}"
   echo "Adding plugin files..."
-  git add "$PLUGIN_DIR/" "$MARKETPLACE_DIR/"
+  git add "$PLUGIN_DIR/" "$MARKETPLACE_FILE"
 fi
 
 # Check for uncommitted changes
-if ! git diff --quiet "$PLUGIN_DIR" "$MARKETPLACE_DIR" 2>/dev/null; then
+if ! git diff --quiet "$PLUGIN_DIR" "$MARKETPLACE_FILE" 2>/dev/null; then
   echo -e "${YELLOW}Plugin files have uncommitted changes${NC}"
   echo ""
 
@@ -124,12 +118,12 @@ if ! git diff --quiet "$PLUGIN_DIR" "$MARKETPLACE_DIR" 2>/dev/null; then
   echo ""
 
   if [[ $REPLY =~ ^[Yy]$ ]]; then
-    git add "$PLUGIN_DIR/" "$MARKETPLACE_DIR/"
+    git add "$PLUGIN_DIR/" "$MARKETPLACE_FILE"
     git commit -m "Update Flow plugin to v${VERSION}
 
 - Rebuilt plugin with version ${VERSION}
 - Updated marketplace manifest
-- 29 commands, 8 skills, and 1 Claude agent included
+- Ultra-lightweight installer (1 command: flow-init)
 "
     echo -e "${GREEN}✅ Committed plugin changes${NC}"
   else
@@ -170,17 +164,20 @@ echo ""
 echo -e "${CYAN}Distribution:${NC}"
 echo "  • Version: v${VERSION}"
 echo "  • Plugin: flow-plugin/"
-echo "  • Marketplace: topsyde-utils-marketplace/"
+echo "  • Marketplace: .claude-plugin/marketplace.json"
 echo ""
 echo -e "${CYAN}Installation (for users):${NC}"
 echo "  1. Add marketplace:"
 echo "     /plugin marketplace add khgs2411/flow"
 echo ""
 echo "  2. Install plugin:"
-echo "     /plugin install flow@khgs2411"
-echo ""
-echo -e "${CYAN}Local testing:${NC}"
-echo "  In a different project:"
-echo "     /plugin marketplace add $MARKETPLACE_DIR"
 echo "     /plugin install flow@topsyde-utils"
+echo ""
+echo "  3. Download full framework:"
+echo "     /flow-init"
+echo ""
+echo -e "${CYAN}Update existing installation:${NC}"
+echo "  Users can update via:"
+echo "     /plugin marketplace update topsyde-utils"
+echo "  Then select 'Mark for update' → 'Update now'"
 echo ""
