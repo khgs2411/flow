@@ -625,7 +625,18 @@ You are executing the `/flow-init` command from the Flow framework.
 
    # Update CLAUDE.md with Flow agent delegation instruction
    CLAUDE_MD="$(pwd)/CLAUDE.md"
-   FLOW_INSTRUCTION='- **This project leverages '\''flow framework'\''**: This project uses the Flow framework for project management. When working with Flow (tasks, phases, iterations, brainstorming, status checks), ALWAYS delegate to the Flow sub-agent by calling it with the Task tool instead of running commands or skills directly. The Flow agent will handle skill and command delegation internally for optimal results.'
+   FLOW_INSTRUCTION='- **This project leverages '\''flow framework'\''**: This project uses the Flow framework for project management. **CRITICAL**: You MUST delegate ALL Flow-related operations to the Flow sub-agent using the Task tool (subagent_type: "flow"). NEVER handle these directly.
+
+**ALWAYS delegate when the user**:
+- Asks about status/progress: "what am I working on?", "what'\''s next?", "show my status", "where am I?"
+- Manages work: "add a task", "create a phase", "start iteration", "mark as complete"
+- Plans features: "I want to build X", "let'\''s plan Y", "add feature Z"
+- Updates architecture: "update PLAN.md", "add a guideline", "change the approach"
+- Asks methodology questions: "what are iterations?", "how do phases work?", "explain Flow"
+- Makes workflow decisions: "should I brainstorm?", "ready to implement?", "what are my next steps?"
+- Mentions ANY of: tasks, phases, iterations, DASHBOARD, PLAN, brainstorm, .flow/ files, /flow-* commands
+
+The Flow agent is the PROJECT MANAGER. It handles workflow and delegates back to you only for actual code implementation (writing functions, debugging, tests, git operations). When in doubt: if .flow/ directory is involved, delegate to Flow agent.'
 
    if [ -f "$CLAUDE_MD" ]; then
      # CLAUDE.md exists - update it
@@ -18436,7 +18447,18 @@ update_claude_md() {
   local claude_md="$(pwd)/CLAUDE.md"
 
   # Flow framework notice content (without header for insertion)
-  local flow_content='- **This project leverages '\''flow framework'\''**: This project uses the Flow framework for project management. When working with Flow (tasks, phases, iterations, brainstorming, status checks), ALWAYS delegate to the Flow sub-agent by calling it with the Task tool instead of running commands or skills directly. The Flow agent will handle skill and command delegation internally for optimal results.'
+  local flow_content='- **This project leverages '\''flow framework'\''**: This project uses the Flow framework for project management. **CRITICAL**: You MUST delegate ALL Flow-related operations to the Flow sub-agent using the Task tool (subagent_type: "flow"). NEVER handle these directly.
+
+**ALWAYS delegate when the user**:
+- Asks about status/progress: "what am I working on?", "what'\''s next?", "show my status", "where am I?"
+- Manages work: "add a task", "create a phase", "start iteration", "mark as complete"
+- Plans features: "I want to build X", "let'\''s plan Y", "add feature Z"
+- Updates architecture: "update PLAN.md", "add a guideline", "change the approach"
+- Asks methodology questions: "what are iterations?", "how do phases work?", "explain Flow"
+- Makes workflow decisions: "should I brainstorm?", "ready to implement?", "what are my next steps?"
+- Mentions ANY of: tasks, phases, iterations, DASHBOARD, PLAN, brainstorm, .flow/ files, /flow-* commands
+
+The Flow agent is the PROJECT MANAGER. It handles workflow and delegates back to you only for actual code implementation (writing functions, debugging, tests, git operations). When in doubt: if .flow/ directory is involved, delegate to Flow agent.'
 
   echo -e "${CYAN}📝 Checking CLAUDE.md...${NC}"
 
