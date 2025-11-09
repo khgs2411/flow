@@ -129,7 +129,7 @@ if ! git diff --quiet "$PLUGIN_DIR" "$MARKETPLACE_DIR" 2>/dev/null; then
 
 - Rebuilt plugin with version ${VERSION}
 - Updated marketplace manifest
-- 28 commands and 10 skills included
+- 29 commands, 8 skills, and 1 Claude agent included
 "
     echo -e "${GREEN}✅ Committed plugin changes${NC}"
   else
