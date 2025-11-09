@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.6.1** - Adjust the new agent (2025-11-09)
+**v1.6.2** - Adjustments (2025-11-09)
 
 **Changes**:
 
-- - adjustments\n
-See the [v1.6.1 release](https://github.com/khgs2411/flow/releases/tag/v1.6.1) for full details.
+- - Adjustments\n
+See the [v1.6.2 release](https://github.com/khgs2411/flow/releases/tag/v1.6.2) for full details.
 
 ---
 
