@@ -570,7 +570,18 @@ cat >> "$OUTPUT_FILE" <<'MIDDLE26_EOF'
 SKILL_FLOW_CURATOR_EOF
 }
 
+# Agent extraction function (Flow agent)
+get_agent_flow() {
+  cat <<'AGENT_FLOW_EOF'
 MIDDLE26_EOF
+
+cat "$FRAMEWORK_DIR/agents/flow.md" >> "$OUTPUT_FILE"
+
+cat >> "$OUTPUT_FILE" <<'MIDDLE27_EOF'
+AGENT_FLOW_EOF
+}
+
+MIDDLE27_EOF
 
 # Write the main deployment logic
 cat >> "$OUTPUT_FILE" <<'FOOTER_EOF'
@@ -957,10 +968,34 @@ deploy_skills() {
   return 0
 }
 
+deploy_agents() {
+  local target_dir="$1"
+  local force="$2"
+  local success_count=0
+
+  mkdir -p "$target_dir" || { echo -e "${RED}❌ mkdir agents/${NC}"; return 1; }
+
+  # Deploy flow agent
+  local flow_agent="$target_dir/flow.md"
+
+  # If force mode, delete existing file first
+  [ "$force" = true ] && [ -f "$flow_agent" ] && rm -f "$flow_agent"
+
+  if [ -f "$flow_agent" ] && [ "$force" = false ]; then
+    echo -e "${YELLOW}⏭️  Skip flow.md${NC}"
+  else
+    get_agent_flow > "$flow_agent" && { echo -e "${GREEN}✅ flow.md${NC}"; ((success_count++)); } || echo -e "${RED}❌ flow.md${NC}"
+  fi
+
+  echo "$success_count"
+  return 0
+}
+
 validate() {
   local commands_dir="$1"
   local flow_dir="$2"
   local skills_dir="$3"
+  local agents_dir="$4"
   local valid=true
 
   echo -e "\n${CYAN}🔍 Validating...${NC}\n"
@@ -1000,6 +1035,16 @@ validate() {
     valid=false
   fi
 
+  # Check Agents
+  local agents_count=0
+  [ -f "$agents_dir/flow.md" ] && ((agents_count++))
+
+  if [ "$agents_count" -eq 1 ]; then
+    echo -e "${GREEN}✅ Agents: $agents_count/1 (Flow agent)${NC}"
+  else
+    echo -e "${YELLOW}⚠️  Agents: $agents_count/1${NC}"
+  fi
+
   [ "$valid" = true ]
 }
 
@@ -1020,11 +1065,13 @@ main() {
 
   local commands_dir="$(pwd)/.claude/commands"
   local skills_dir="$(pwd)/.claude/skills"
+  local agents_dir="$(pwd)/.claude/agents"
   local flow_dir="$(pwd)/.flow"
 
   # Create directories
   mkdir -p "$commands_dir" || { echo -e "${RED}❌ mkdir .claude/commands failed${NC}"; exit 1; }
   mkdir -p "$skills_dir" || { echo -e "${RED}❌ mkdir .claude/skills failed${NC}"; exit 1; }
+  mkdir -p "$agents_dir" || { echo -e "${RED}❌ mkdir .claude/agents failed${NC}"; exit 1; }
   mkdir -p "$flow_dir" || { echo -e "${RED}❌ mkdir .flow failed${NC}"; exit 1; }
   echo -e "${BLUE}📁 Created directories${NC}\n"
 
@@ -1040,18 +1087,23 @@ main() {
   echo -e "\n${BLUE}🎯 Installing Agent Skills...${NC}\n"
   local skills_count=$(deploy_skills "$skills_dir" "$FORCE")
 
+  # Deploy Agents
+  echo -e "\n${BLUE}🤖 Installing Claude Agents...${NC}\n"
+  local agents_count=$(deploy_agents "$agents_dir" "$FORCE")
+
   # Update CLAUDE.md
   echo -e "\n${BLUE}📝 Updating project CLAUDE.md...${NC}\n"
   update_claude_md "$FORCE"
 
   # Validate
-  if validate "$commands_dir" "$flow_dir" "$skills_dir"; then
+  if validate "$commands_dir" "$flow_dir" "$skills_dir" "$agents_dir"; then
     echo ""
     echo "=================================================="
     echo -e "${GREEN}✅ Flow Framework Installed!${NC}\n"
     echo -e "${CYAN}📂 Structure:${NC}"
     echo "   .claude/commands/       (${#COMMANDS[@]} slash commands)"
     echo "   .claude/skills/         (8 Agent Skills)"
+    echo "   .claude/agents/         (1 Claude Agent)"
     echo "   .flow/                  (your workspace)"
     echo "     └── framework/        (AI reference files)"
     echo "         ├── DEVELOPMENT_FRAMEWORK.md"
@@ -1061,6 +1113,9 @@ main() {
     echo "             ├── PLAN.md"
     echo "             ├── phase-1/task-1.md"
     echo "             └── phase-2/task-3.md"
+    echo ""
+    echo -e "${CYAN}🤖 Claude Agent Installed:${NC}"
+    echo "   flow                 - Flow framework project management specialist"
     echo ""
     echo -e "${CYAN}🎯 Agent Skills Installed (8 workflow stage-based):${NC}"
     echo "   flow-initializer     - Project setup & migration"
