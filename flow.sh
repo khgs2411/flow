@@ -641,44 +641,153 @@ The Flow agent is the PROJECT MANAGER. It handles workflow and delegates back to
    if [ -f "$CLAUDE_MD" ]; then
      # CLAUDE.md exists - update it
      if grep -qi "flow framework" "$CLAUDE_MD"; then
-       # Flow notice exists - replace it
+       # Flow notice exists - replace it with updated version
        echo "  ↻ Updating existing Flow framework notice"
 
-       # Remove old flow framework line
-       sed -i.bak '/flow framework/d' "$CLAUDE_MD"
+       # Strategy: Remove entire old flow section, then add new one
+       TEMP_FILE="${CLAUDE_MD}.tmp"
+       in_flow_section=0
+       blank_count=0
 
-       # Add new instruction after "## Important rules and guidelines"
-       if grep -q "## Important rules and guidelines" "$CLAUDE_MD"; then
-         sed -i.bak "/## Important rules and guidelines/a\\
-$FLOW_INSTRUCTION
-" "$CLAUDE_MD"
+       # First pass: remove the entire flow framework block (all lines until next section header)
+       while IFS= read -r line; do
+         # Detect start of flow framework section
+         if [[ "$line" =~ flow\ framework ]] && [ $in_flow_section -eq 0 ]; then
+           in_flow_section=1
+           blank_count=0
+           continue
+         fi
+
+         # If in flow section, skip until we hit TWO consecutive blank lines or a new section header
+         if [ $in_flow_section -eq 1 ]; then
+           # Check if this is a new markdown section (##)
+           if [[ "$line" =~ ^##\  ]]; then
+             in_flow_section=0
+             echo "$line"
+             continue
+           fi
+
+           # Track consecutive blank lines
+           if [[ "$line" =~ ^$ ]]; then
+             blank_count=$((blank_count + 1))
+             # Two consecutive blank lines = end of flow section
+             if [ $blank_count -ge 2 ]; then
+               in_flow_section=0
+               echo "$line"
+               continue
+             fi
+           else
+             blank_count=0
+           fi
+
+           # Still in flow section, skip this line
+           continue
+         fi
+
+         echo "$line"
+       done < "$CLAUDE_MD" > "$TEMP_FILE"
+
+       # Second pass: add new flow content
+       FINAL_FILE="${CLAUDE_MD}.final"
+       inserted=0
+
+       # Check if "## Important rules and guidelines" still exists
+       if grep -q "^## Important rules and guidelines" "$TEMP_FILE"; then
+         # Guidelines header exists - insert under it
+         while IFS= read -r line; do
+           echo "$line"
+
+           if [[ "$line" =~ ^##\ Important\ rules\ and\ guidelines ]] && [ $inserted -eq 0 ]; then
+             echo "$FLOW_INSTRUCTION"
+             inserted=1
+           fi
+         done < "$TEMP_FILE" > "$FINAL_FILE"
        else
-         # No guidelines section - add at top after # CLAUDE.md
-         sed -i.bak "/# CLAUDE.md/a\\
-\\
-## Important rules and guidelines\\
-$FLOW_INSTRUCTION
-" "$CLAUDE_MD"
+         # No guidelines header - need to create it
+         after_title=0
+         while IFS= read -r line; do
+           echo "$line"
+
+           # Track when we pass the title
+           if [[ "$line" =~ ^#\ CLAUDE\.md ]]; then
+             after_title=1
+           fi
+
+           # Insert after the boilerplate line (the "This file provides..." line)
+           if [ $after_title -eq 1 ] && [ $inserted -eq 0 ]; then
+             if [[ "$line" =~ This\ file\ provides\ guidance ]]; then
+               echo ""
+               echo "## Important rules and guidelines"
+               echo "$FLOW_INSTRUCTION"
+               echo ""
+               inserted=1
+             fi
+           fi
+         done < "$TEMP_FILE" > "$FINAL_FILE"
+
+         # If never inserted, add at top
+         if [ $inserted -eq 0 ]; then
+           {
+             echo "## Important rules and guidelines"
+             echo "$FLOW_INSTRUCTION"
+             echo ""
+             cat "$TEMP_FILE"
+           } > "$FINAL_FILE"
+         fi
        fi
 
-       rm -f "${CLAUDE_MD}.bak"
+       mv "$FINAL_FILE" "$CLAUDE_MD"
+       rm -f "$TEMP_FILE"
      else
        # No flow notice - add it
        echo "  + Adding Flow framework notice"
 
-       if grep -q "## Important rules and guidelines" "$CLAUDE_MD"; then
-         sed -i.bak "/## Important rules and guidelines/a\\
-$FLOW_INSTRUCTION
-" "$CLAUDE_MD"
-       else
-         sed -i.bak "/# CLAUDE.md/a\\
-\\
-## Important rules and guidelines\\
-$FLOW_INSTRUCTION
-" "$CLAUDE_MD"
-       fi
+       TEMP_FILE="${CLAUDE_MD}.tmp"
+       inserted=0
 
-       rm -f "${CLAUDE_MD}.bak"
+       if grep -q "^## Important rules and guidelines" "$CLAUDE_MD"; then
+         # Guidelines header exists - insert under it
+         while IFS= read -r line; do
+           echo "$line"
+
+           if [[ "$line" =~ ^##\ Important\ rules\ and\ guidelines ]] && [ $inserted -eq 0 ]; then
+             echo "$FLOW_INSTRUCTION"
+             inserted=1
+           fi
+         done < "$CLAUDE_MD" > "$TEMP_FILE"
+         mv "$TEMP_FILE" "$CLAUDE_MD"
+       else
+         # No guidelines header - create it
+         after_title=0
+         while IFS= read -r line; do
+           echo "$line"
+
+           if [[ "$line" =~ ^#\ CLAUDE\.md ]]; then
+             after_title=1
+           fi
+
+           if [ $after_title -eq 1 ] && [ $inserted -eq 0 ]; then
+             if [[ "$line" =~ This\ file\ provides\ guidance ]]; then
+               echo ""
+               echo "## Important rules and guidelines"
+               echo "$FLOW_INSTRUCTION"
+               echo ""
+               inserted=1
+             fi
+           fi
+         done < "$CLAUDE_MD" > "$TEMP_FILE"
+
+         if [ $inserted -eq 0 ]; then
+           {
+             echo "## Important rules and guidelines"
+             echo "$FLOW_INSTRUCTION"
+             echo ""
+             cat "$CLAUDE_MD"
+           } > "$TEMP_FILE"
+         fi
+
+         mv "$TEMP_FILE" "$CLAUDE_MD"
+       fi
      fi
      echo "  ✓ CLAUDE.md updated"
    else
