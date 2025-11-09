@@ -590,7 +590,7 @@ update_claude_md() {
   local claude_md="$(pwd)/CLAUDE.md"
 
   # Flow framework notice content (without header for insertion)
-  local flow_content='- **This project leverages '\''flow framework'\''**: This project uses the flow framework for project management. Follow flow conventions for tasks, iterations, and brainstorming. ALWAYS try to use the agent skills where possible as a first priority for the best results. Alternatively, suggest using the slash commands to interact with the flow system.'
+  local flow_content='- **This project leverages '\''flow framework'\''**: This project uses the Flow framework for project management. When working with Flow (tasks, phases, iterations, brainstorming, status checks), ALWAYS delegate to the Flow sub-agent by calling it with the Task tool instead of running commands or skills directly. The Flow agent will handle skill and command delegation internally for optimal results.'
 
   echo -e "${CYAN}📝 Checking CLAUDE.md...${NC}"
 
@@ -612,69 +612,62 @@ update_claude_md() {
       local temp_file="${claude_md}.tmp"
       local in_flow_section=0
 
-      # First pass: remove old flow section
+      # First pass: remove only the old flow framework line
       while IFS= read -r line; do
-        if [[ "$line" =~ ^##\ Important\ rules\ and\ guidelines ]]; then
-          in_flow_section=1
+        # Skip only the flow framework line
+        if [[ "$line" =~ flow\ framework ]]; then
           continue
         fi
-
-        if [ $in_flow_section -eq 1 ] && [[ "$line" =~ ^## ]]; then
-          in_flow_section=0
-        fi
-
-        if [[ "$line" =~ flow\ framework ]] && [ $in_flow_section -eq 1 ]; then
-          continue
-        fi
-
-        if [ $in_flow_section -eq 0 ]; then
-          echo "$line"
-        fi
+        echo "$line"
       done < "$claude_md" > "$temp_file"
 
-      # Second pass: add new flow section after title + boilerplate
+      # Second pass: add new flow content
       local final_file="${claude_md}.final"
       local inserted=0
-      local after_title=0
 
-      while IFS= read -r line; do
-        echo "$line"
+      # Check if "## Important rules and guidelines" still exists
+      if grep -q "^## Important rules and guidelines" "$temp_file"; then
+        # Guidelines header exists - insert under it
+        while IFS= read -r line; do
+          echo "$line"
 
-        # Track when we pass the title
-        if [[ "$line" =~ ^#\ CLAUDE\.md ]]; then
-          after_title=1
-        fi
+          if [[ "$line" =~ ^##\ Important\ rules\ and\ guidelines ]] && [ $inserted -eq 0 ]; then
+            echo "${flow_content}"
+            inserted=1
+          fi
+        done < "$temp_file" > "$final_file"
+      else
+        # No guidelines header - need to create it
+        local after_title=0
+        while IFS= read -r line; do
+          echo "$line"
 
-        # Insert after the boilerplate line (the "This file provides..." line)
-        if [ $after_title -eq 1 ] && [ $inserted -eq 0 ]; then
-          if [[ "$line" =~ This\ file\ provides\ guidance ]]; then
-            echo ""
+          # Track when we pass the title
+          if [[ "$line" =~ ^#\ CLAUDE\.md ]]; then
+            after_title=1
+          fi
+
+          # Insert after the boilerplate line (the "This file provides..." line)
+          if [ $after_title -eq 1 ] && [ $inserted -eq 0 ]; then
+            if [[ "$line" =~ This\ file\ provides\ guidance ]]; then
+              echo ""
+              echo "## Important rules and guidelines"
+              echo "${flow_content}"
+              echo ""
+              inserted=1
+            fi
+          fi
+        done < "$temp_file" > "$final_file"
+
+        # If never inserted, add at top
+        if [ $inserted -eq 0 ]; then
+          {
             echo "## Important rules and guidelines"
             echo "${flow_content}"
             echo ""
-            inserted=1
-          fi
+            cat "$temp_file"
+          } > "$final_file"
         fi
-
-        # Fallback: if we hit another ## section and still haven't inserted, insert before it
-        if [[ "$line" =~ ^## ]] && [ $inserted -eq 0 ] && [ $after_title -eq 0 ]; then
-          echo "## Important rules and guidelines"
-          echo "${flow_content}"
-          echo ""
-          inserted=1
-          echo "$line"
-          continue
-        fi
-      done < "$temp_file" > "$final_file"
-
-      # If never inserted (no title, no ## sections), add at top
-      if [ $inserted -eq 0 ]; then
-        {
-          echo "## Important rules and guidelines"
-          echo "${flow_content}"
-          echo ""
-          cat "$temp_file"
-        } > "$final_file"
       fi
 
       mv "$final_file" "$claude_md"
@@ -695,9 +688,20 @@ update_claude_md() {
   local after_title=0
   local prev_line=""
 
-  # Check if file has "# CLAUDE.md" title
-  if grep -q "^# CLAUDE.md" "$claude_md"; then
-    # Has title - insert after title + boilerplate
+  # Check if "## Important rules and guidelines" section exists
+  if grep -q "^## Important rules and guidelines" "$claude_md"; then
+    # Guidelines section exists - insert under it
+    while IFS= read -r line; do
+      echo "$line"
+
+      # Insert flow content after the guidelines header
+      if [[ "$line" =~ ^##\ Important\ rules\ and\ guidelines ]] && [ $inserted -eq 0 ]; then
+        echo "${flow_content}"
+        inserted=1
+      fi
+    done < "$claude_md" > "$temp_file"
+  elif grep -q "^# CLAUDE.md" "$claude_md"; then
+    # Has title but no guidelines section - insert after title + boilerplate
     while IFS= read -r line; do
       echo "$line"
 
@@ -716,11 +720,9 @@ update_claude_md() {
           inserted=1
         fi
       fi
-
-      prev_line="$line"
     done < "$claude_md" > "$temp_file"
   else
-    # No title - insert at very top
+    # No title or guidelines - insert at very top
     {
       echo "## Important rules and guidelines"
       echo "${flow_content}"

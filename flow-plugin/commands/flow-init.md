@@ -129,6 +129,60 @@ You are executing the `/flow-init` command from the Flow framework.
    fi
 
    echo ""
+   echo "📝 Updating CLAUDE.md..."
+
+   # Update CLAUDE.md with Flow agent delegation instruction
+   CLAUDE_MD="$(pwd)/CLAUDE.md"
+   FLOW_INSTRUCTION='- **This project leverages '\''flow framework'\''**: This project uses the Flow framework for project management. When working with Flow (tasks, phases, iterations, brainstorming, status checks), ALWAYS delegate to the Flow sub-agent by calling it with the Task tool instead of running commands or skills directly. The Flow agent will handle skill and command delegation internally for optimal results.'
+
+   if [ -f "$CLAUDE_MD" ]; then
+     # CLAUDE.md exists - update it
+     if grep -qi "flow framework" "$CLAUDE_MD"; then
+       # Flow notice exists - replace it
+       echo "  ↻ Updating existing Flow framework notice"
+
+       # Remove old flow framework line
+       sed -i.bak '/flow framework/d' "$CLAUDE_MD"
+
+       # Add new instruction after "## Important rules and guidelines"
+       if grep -q "## Important rules and guidelines" "$CLAUDE_MD"; then
+         sed -i.bak "/## Important rules and guidelines/a\\
+$FLOW_INSTRUCTION
+" "$CLAUDE_MD"
+       else
+         # No guidelines section - add at top after # CLAUDE.md
+         sed -i.bak "/# CLAUDE.md/a\\
+\\
+## Important rules and guidelines\\
+$FLOW_INSTRUCTION
+" "$CLAUDE_MD"
+       fi
+
+       rm -f "${CLAUDE_MD}.bak"
+     else
+       # No flow notice - add it
+       echo "  + Adding Flow framework notice"
+
+       if grep -q "## Important rules and guidelines" "$CLAUDE_MD"; then
+         sed -i.bak "/## Important rules and guidelines/a\\
+$FLOW_INSTRUCTION
+" "$CLAUDE_MD"
+       else
+         sed -i.bak "/# CLAUDE.md/a\\
+\\
+## Important rules and guidelines\\
+$FLOW_INSTRUCTION
+" "$CLAUDE_MD"
+       fi
+
+       rm -f "${CLAUDE_MD}.bak"
+     fi
+     echo "  ✓ CLAUDE.md updated"
+   else
+     echo "  ⏭️  No CLAUDE.md found - skipping"
+   fi
+
+   echo ""
    echo "📚 Downloading framework documentation..."
 
    # Download framework reference
