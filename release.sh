@@ -383,6 +383,29 @@ else
 fi
 
 echo ""
+
+# Step 7.5: Deploy plugin to marketplace
+echo -e "${BLUE}📦 Step 7.5/7: Deploying plugin to marketplace...${NC}"
+echo ""
+echo "The plugin has been built with version ${VERSION}."
+echo "Plugin files need to be committed and pushed for marketplace updates."
+echo ""
+
+read -p "Deploy plugin to marketplace now? (y/n): " -n 1 -r
+echo ""
+
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+  bash "$SCRIPT_DIR/deploy-plugin.sh"
+  echo ""
+else
+  echo -e "${YELLOW}⚠️  Skipped plugin deployment${NC}"
+  echo ""
+  echo "To deploy plugin manually:"
+  echo "  ./deploy-plugin.sh"
+  echo ""
+fi
+
+echo ""
 echo "=================================================="
 echo -e "${GREEN}✅ Release v${VERSION} Complete!${NC}"
 echo "=================================================="
@@ -395,8 +418,11 @@ echo "  • Commit: $(git rev-parse --short HEAD)"
 echo ""
 echo -e "${CYAN}Distribution:${NC}"
 echo "  • GitHub: flow.sh attached to release"
+echo "  • Plugin: flow-plugin/ ready for marketplace"
+echo "  • Marketplace: .claude-plugin/marketplace.json with v${VERSION}"
 echo ""
 echo -e "${CYAN}Next Steps:${NC}"
+echo "  • Users can update via: /plugin marketplace update topsyde-utils"
 echo "  • Update README.md if needed (screenshots, features, etc.)"
 echo "  • Announce release in project channels"
 echo "  • Monitor GitHub issues for feedback"
