@@ -1,7 +1,7 @@
 {
   "name": "flow",
   "description": "Flow framework - Ultra-lightweight installer. Run /flow-init to download all 29 commands + 8 skills + 1 Claude agent",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "author": {
     "name": "Topsyde Utils",
     "url": "https://github.com/topsyde-utils/flow"

@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.6.3** - Automated plugin update (2025-11-09)
+**v1.6.4** - Fixed plugin updater (2025-11-09)
 
 **Changes**:
 
-- Bug fixes and improvements\n
-See the [v1.6.3 release](https://github.com/khgs2411/flow/releases/tag/v1.6.3) for full details.
+- - Plugin version now updated automatically\n
+See the [v1.6.4 release](https://github.com/khgs2411/flow/releases/tag/v1.6.4) for full details.
 
 ---
 
