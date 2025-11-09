@@ -138,7 +138,8 @@ generate_marketplace_manifest() {
     {
       "name": "flow",
       "source": "./flow-plugin",
-      "description": "Flow framework - Ultra-lightweight installer. Run /flow-init to download all 29 commands + 8 skills + 1 Claude agent"
+      "description": "Flow framework - Ultra-lightweight installer. Run /flow-init to download all 29 commands + 8 skills + 1 Claude agent",
+      "version": "$FLOW_VERSION"
     }
   ]
 }
