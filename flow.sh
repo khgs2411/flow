@@ -18065,26 +18065,25 @@ get_agent_flow() {
 ---
 name: flow
 description: |
-  Flow framework project management and workflow specialist. ALWAYS use this agent for ANY interaction involving Flow framework operations. NEVER handle Flow-related requests in the main thread - ALWAYS delegate to this agent.
+  **CRITICAL - PROACTIVE TRIGGER REQUIRED**: Flow framework project manager. This agent MUST be invoked immediately when the user asks questions like: "what am I working on?", "what's next?", "show my status", "where am I?", "add a task", "create a phase", "start iteration", "mark as complete", "I want to build X", "let's plan Y", "update PLAN.md", "what are iterations?", "how do phases work?", "should I brainstorm?", "ready to implement?", or mentions: tasks, phases, iterations, DASHBOARD, PLAN, brainstorm, .flow/ files, /flow-* commands. NEVER handle Flow-related requests in the main thread - ALWAYS delegate to this agent FIRST.
 
   **ALWAYS Use This Agent For**:
-  - Reading, analyzing, or explaining DASHBOARD.md (project status, current work, progress) - Example: "What am I working on?", "Show me project status", "What's next?"
-  - Creating, modifying, or managing tasks, phases, or iterations - Example: "Add a task for authentication", "Create a new phase", "I want to add email notifications"
-  - Updating PLAN.md with architecture decisions or project scope - Example: "Update the architecture section", "Add a DO/DON'T guideline"
-  - Answering ANY questions about project status, progress, or navigation - Example: "Where am I in the project?", "How much is complete?", "What should I focus on?"
-  - Planning new features or work items within Flow structure - Example: "I need to build a payment system", "Let's plan the API layer"
-  - Explaining Flow methodology concepts - Example: "What's the difference between tasks and iterations?", "How do I complete a phase?", "Explain the Flow workflow"
-  - Guiding workflow decisions - Example: "Should I brainstorm or implement?", "Am I ready to code?", "What are my next steps?"
+  - Status/progress questions: "What am I working on?", "What's next?", "Show me project status", "Where am I in the project?", "How much is complete?", "What should I focus on?"
+  - Managing work: "Add a task for authentication", "Create a new phase", "Start iteration", "Mark as complete", "I want to add email notifications"
+  - Planning features: "I need to build a payment system", "Let's plan the API layer", "Add feature X"
+  - Architecture updates: "Update PLAN.md", "Add a DO/DON'T guideline", "Change the approach"
+  - Methodology questions: "What's the difference between tasks and iterations?", "How do I complete a phase?", "Explain the Flow workflow", "What are iterations?", "How do phases work?"
+  - Workflow decisions: "Should I brainstorm or implement?", "Am I ready to code?", "What are my next steps?"
   - ANY operation involving .flow/ directory files (DASHBOARD.md, PLAN.md, phase-N/task-M.md files)
   - Delegating to Flow skills (flow-navigator, flow-planner, flow-builder, flow-designer, flow-verifier, flow-completer)
   - Using Flow slash commands (/flow-status, /flow-task-add, /flow-implement-start, etc.)
 
   **NEVER Use This Agent For** (main Claude handles these directly):
-  - Writing or debugging code/functions (implementation work) - Example: "Write the login function", "Fix this bug in auth.js"
-  - Running tests or builds - Example: "Run the test suite", "Build the project"
-  - Git operations - Example: "Commit these changes", "Create a PR"
-  - Installing packages or dependencies - Example: "npm install express", "Add this library"
-  - Reading or modifying source code files outside .flow/ - Example: "Update api/routes.ts", "Show me the config file"
+  - Writing or debugging code/functions (implementation work): "Write the login function", "Fix this bug in auth.js"
+  - Running tests or builds: "Run the test suite", "Build the project"
+  - Git operations: "Commit these changes", "Create a PR"
+  - Installing packages or dependencies: "npm install express", "Add this library"
+  - Reading or modifying source code files outside .flow/: "Update api/routes.ts", "Show me the config file"
 
   **Critical Rule**: This agent is the PROJECT MANAGER for Flow projects. If the user mentions: dashboard, status, task, phase, iteration, planning, "what's next", "where am I", PLAN.md, brainstorm, workflow, Flow methodology, or .flow/ files - ALWAYS use this agent. If they want to write/debug actual code - main Claude handles it directly.
 
@@ -18479,13 +18478,43 @@ The Flow agent is the PROJECT MANAGER. It handles workflow and delegates back to
       # Strategy: Remove old flow section, then add new one
       local temp_file="${claude_md}.tmp"
       local in_flow_section=0
+      local blank_count=0
 
-      # First pass: remove only the old flow framework line
+      # First pass: remove the entire flow framework block (all lines until next section header)
       while IFS= read -r line; do
-        # Skip only the flow framework line
-        if [[ "$line" =~ flow\ framework ]]; then
+        # Detect start of flow framework section
+        if [[ "$line" =~ flow\ framework ]] && [ $in_flow_section -eq 0 ]; then
+          in_flow_section=1
+          blank_count=0
           continue
         fi
+
+        # If in flow section, skip until we hit TWO consecutive blank lines or a new section header
+        if [ $in_flow_section -eq 1 ]; then
+          # Check if this is a new markdown section (##)
+          if [[ "$line" =~ ^##\  ]]; then
+            in_flow_section=0
+            echo "$line"
+            continue
+          fi
+
+          # Track consecutive blank lines
+          if [[ "$line" =~ ^$ ]]; then
+            blank_count=$((blank_count + 1))
+            # Two consecutive blank lines = end of flow section
+            if [ $blank_count -ge 2 ]; then
+              in_flow_section=0
+              echo "$line"
+              continue
+            fi
+          else
+            blank_count=0
+          fi
+
+          # Still in flow section, skip this line
+          continue
+        fi
+
         echo "$line"
       done < "$claude_md" > "$temp_file"
 

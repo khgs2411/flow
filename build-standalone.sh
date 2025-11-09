@@ -622,13 +622,43 @@ The Flow agent is the PROJECT MANAGER. It handles workflow and delegates back to
       # Strategy: Remove old flow section, then add new one
       local temp_file="${claude_md}.tmp"
       local in_flow_section=0
+      local blank_count=0
 
-      # First pass: remove only the old flow framework line
+      # First pass: remove the entire flow framework block (all lines until next section header)
       while IFS= read -r line; do
-        # Skip only the flow framework line
-        if [[ "$line" =~ flow\ framework ]]; then
+        # Detect start of flow framework section
+        if [[ "$line" =~ flow\ framework ]] && [ $in_flow_section -eq 0 ]; then
+          in_flow_section=1
+          blank_count=0
           continue
         fi
+
+        # If in flow section, skip until we hit TWO consecutive blank lines or a new section header
+        if [ $in_flow_section -eq 1 ]; then
+          # Check if this is a new markdown section (##)
+          if [[ "$line" =~ ^##\  ]]; then
+            in_flow_section=0
+            echo "$line"
+            continue
+          fi
+
+          # Track consecutive blank lines
+          if [[ "$line" =~ ^$ ]]; then
+            blank_count=$((blank_count + 1))
+            # Two consecutive blank lines = end of flow section
+            if [ $blank_count -ge 2 ]; then
+              in_flow_section=0
+              echo "$line"
+              continue
+            fi
+          else
+            blank_count=0
+          fi
+
+          # Still in flow section, skip this line
+          continue
+        fi
+
         echo "$line"
       done < "$claude_md" > "$temp_file"
 
