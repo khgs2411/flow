@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.6.4** - Fixed plugin updater (2025-11-09)
+**v1.6.5** - Some more adjustments to make sure our agent is ready to roll (2025-11-09)
 
 **Changes**:
 
-- - Plugin version now updated automatically\n
-See the [v1.6.4 release](https://github.com/khgs2411/flow/releases/tag/v1.6.4) for full details.
+- - Made sure that the mainthread will now try to delegate the work properly\n
+See the [v1.6.5 release](https://github.com/khgs2411/flow/releases/tag/v1.6.5) for full details.
 
 ---
 
