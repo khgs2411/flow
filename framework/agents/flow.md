@@ -27,7 +27,7 @@ description: |
 
   This agent MUST be used proactively - do not wait for explicit requests. If you detect Flow framework context, invoke this agent immediately.
 tools: Read, Write, Edit, Glob, Grep, Skill, SlashCommand
-model: sonnet
+model: haiku
 color: blue
 ---
 
