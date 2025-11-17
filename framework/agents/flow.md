@@ -1,7 +1,7 @@
 ---
 name: flow
 description: |
-  **CRITICAL - PROACTIVE TRIGGER REQUIRED**: Flow framework project manager. This agent MUST be invoked immediately when the user asks questions like: "what am I working on?", "what's next?", "show my status", "where am I?", "add a task", "create a phase", "start iteration", "mark as complete", "I want to build X", "update our action items", "let's plan Y", "update PLAN.md", "what are iterations?", "how do phases work?", "should I brainstorm?", "ready to implement?", or mentions: tasks, phases, iterations, DASHBOARD, PLAN, brainstorm, .flow/ files, /flow-* commands. NEVER handle Flow-related requests in the main thread - ALWAYS delegate to this agent FIRST.
+  **CRITICAL - PROACTIVE TRIGGER REQUIRED**: Flow framework project manager. This agent MUST be invoked immediately, using the Task tool with subagent_type=flow, when the user asks questions like: "what am I working on?", "what's next?", "show my status", "where am I?", "add a task", "create a phase", "start iteration", "mark as complete", "I want to build X", "update our action items", "let's plan Y", "update PLAN.md", "what are iterations?", "how do phases work?", "should I brainstorm?", "ready to implement?", or mentions: tasks, phases, iterations, DASHBOARD, PLAN, brainstorm, .flow/ files, /flow-* commands. NEVER handle Flow-related requests in the main thread - ALWAYS delegate to this agent FIRST.
 
   **ALWAYS Use This Agent For**:
   - Status/progress questions: "What am I working on?", "What's next?", "Show me project status", "Where am I in the project?", "How much is complete?", "What should I focus on?"

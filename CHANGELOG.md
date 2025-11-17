@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.6.9** - Changed our agent to use haiku (2025-11-17)
+**v1.6.11** - Flow Agent Adjustments (2025-11-17)
 
 **Changes**:
 
-- - The flow sub agent now uses Haiku for token optimization and speed\n
-See the [v1.6.9 release](https://github.com/khgs2411/flow/releases/tag/v1.6.9) for full details.
+- - This agent MUST be invoked immediately, using the Task tool with subagent_type=flow, when...\n
+See the [v1.6.11 release](https://github.com/khgs2411/flow/releases/tag/v1.6.11) for full details.
 
 ---
 
