@@ -17,12 +17,12 @@ All notable changes to the Flow Framework are documented in **[GitHub Releases](
 
 ## Current Version
 
-**v1.6.11** - Flow Agent Adjustments (2025-11-17)
+**v1.6.12** - Adjust the claude code instructions (2025-11-17)
 
 **Changes**:
 
-- - This agent MUST be invoked immediately, using the Task tool with subagent_type=flow, when...\n
-See the [v1.6.11 release](https://github.com/khgs2411/flow/releases/tag/v1.6.11) for full details.
+- - Claude will now hopefuly more accurately know to use the sub agent for flow related operations\n
+See the [v1.6.12 release](https://github.com/khgs2411/flow/releases/tag/v1.6.12) for full details.
 
 ---
 
